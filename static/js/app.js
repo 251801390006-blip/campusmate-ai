@@ -23,6 +23,13 @@ document.addEventListener("DOMContentLoaded", () => {
 async function initApp() {
     setupResumeUploadDragAndDrop();
     
+    // Pre-fill Gemini Key if saved
+    const savedKey = localStorage.getItem("campusmate_gemini_key");
+    const keyInput = document.getElementById("sidebar-gemini-key");
+    if (savedKey && keyInput) {
+        keyInput.value = savedKey;
+    }
+    
     // Check if there is a saved sandbox session
     if (localStorage.getItem("campusmate_sandbox_active") === "true") {
         launchSandboxMode();
@@ -586,6 +593,13 @@ function navigateToTab(tabName) {
             item.classList.remove("active");
         }
     });
+
+    const sidebar = document.querySelector(".sidebar");
+    if (sidebar && sidebar.classList.contains("open")) {
+        sidebar.classList.remove("open");
+        const backdrop = document.getElementById("sidebar-backdrop");
+        if (backdrop) backdrop.style.display = "none";
+    }
 
     document.querySelectorAll(".mobile-nav-item").forEach(item => {
         if (item.getAttribute("data-mobile-tab") === tabName) {
@@ -2181,86 +2195,19 @@ async function handleUploadedResume(file) {
     try {
         let response = null;
         if (appMode === "sandbox") {
-            // Simulate sandbox file upload parse delay
-            await new Promise(resolve => setTimeout(resolve, 1200));
+            response = await API.parseResumeFileGuest(file);
             
-            // Build sandbox mock resume from file name
-            const fnLower = file.name.toLowerCase();
-            let parsedName = "Alex Smith";
-            let parsedEmail = "alex.smith@university.edu";
-            let parsedRole = "Software Engineering Intern";
-            let parsedExpDesc = "Responsible for coding the backend of the student project application. Helped team build website.";
-            let parsedProjTitle = "Distributed Document Scraper";
-            let parsedProjDesc = "Wrote backend scripts to parse directories. Integrated database mapping.";
-            let keywords = ["Git", "REST APIs", "Uvicorn", "Postgres"];
-            
-            if (fnLower.includes("cyber") || fnLower.includes("security")) {
-                parsedRole = "Security Analyst Intern";
-                parsedExpDesc = "Conducted vulnerability assessments using Wireshark and network security audits.";
-                parsedProjTitle = "Bastion Firewall Setup";
-                parsedProjDesc = "Configured SSH tunnels, iptables protocols, and log auditing policies.";
-                keywords = ["Wireshark", "Nmap", "Metasploit", "Penetration Testing"];
-            } else if (fnLower.includes("ai") || fnLower.includes("machine") || fnLower.includes("ml")) {
-                parsedRole = "ML/AI Engineering Intern";
-                parsedExpDesc = "Constructed data preprocessing pipelines and trained neural networks models.";
-                parsedProjTitle = "RAG Document Assistant";
-                parsedProjDesc = "Configured vector stores matching and structured Gemini API request prompts.";
-                keywords = ["FastAPI", "Docker", "SQLModel", "Gemini API"];
-            }
-
-            const analysisData = {
-                score: 78,
-                missingKeywords: keywords,
-                improvements: [
-                    {
-                        originalText: parsedExpDesc,
-                        suggestedText: `Optimized backend workflows using standard tools, reducing resource utilization metrics by 25%.`,
-                        reason: "Uses exact technical stacks and metric goals."
-                    }
-                ]
-            };
-
             const parsedResume = {
                 title: file.name,
                 theme: "classic",
-                content: {
-                    name: parsedName,
-                    email: parsedEmail,
-                    phone: "+1 (555) 019-2834",
-                    github: "https://github.com/alexsmith",
-                    experienceRole: parsedRole,
-                    experienceComp: "Global Tech Solutions",
-                    experienceDates: "June 2025 – August 2025",
-                    experienceB1: parsedExpDesc,
-                    experienceB2: "Implemented secure coding practices using Python and Flask for backend APIs.",
-                    experienceB3: "Supported data migration and JWT authentication modules to improve system security.",
-                    experienceB4: "Collaborated with engineers to test and refine code architectures for improved reliability.",
-                    projectTitle: parsedProjTitle,
-                    projectLink: "github.com/alexsmith/" + parsedProjTitle.toLowerCase().replace(/\s+/g, '-'),
-                    projectB1: parsedProjDesc,
-                    projectB2: "Implemented user authentication, routing, and activity logging to ensure secure data handling.",
-                    projectB3: "Focused on applying secure web development principles and structured threat analysis workflows.",
-                    certC1: "Deloitte Australia Cyber Job Simulation (Forage)",
-                    certC2: "Cyber Security & Ethical Hacking Workshop (DV Analytics)",
-                    certC3: "Python Tutorial Module Certificate of Excellence (Scaler)",
-                    certC4: "Python Course for Beginners: Mastering the Essentials (Scaler)"
-                },
-                analysis_feedback: analysisData
+                content: response.content,
+                analysis_feedback: response.feedback
             };
             
             // Save in localStorage
             localStorage.setItem("campusmate_sandbox_resume", JSON.stringify(parsedResume));
-            localStorage.setItem("campusmate_sandbox_resumescore", 78);
-            localStorage.setItem("campusmate_sandbox_resume_feedback", JSON.stringify(analysisData));
-            
-            response = {
-                success: true,
-                filename: file.name,
-                atsScore: 78,
-                readabilityScore: 85,
-                industryMatchScore: 72,
-                feedback: analysisData
-            };
+            localStorage.setItem("campusmate_sandbox_resumescore", response.atsScore);
+            localStorage.setItem("campusmate_sandbox_resume_feedback", JSON.stringify(response.feedback));
 
             currentUser.xp += 50;
             localStorage.setItem("campusmate_sandbox_user", JSON.stringify(currentUser));
@@ -2316,3 +2263,40 @@ function downloadResumePDF() {
         alert("Failed to download PDF: " + err.message);
     });
 }
+
+// --- GEMINI KEY & SIDEBAR CONTROLS ---
+function saveGeminiKey(key) {
+    if (key && key.trim()) {
+        localStorage.setItem("campusmate_gemini_key", key.trim());
+        alert("Gemini API Key saved successfully! Outgoing calls will now use this key.");
+    } else {
+        localStorage.removeItem("campusmate_gemini_key");
+        alert("Gemini API Key cleared. System will use backend default key or heuristic fallbacks.");
+    }
+}
+
+function toggleMobileSidebar() {
+    const sidebar = document.querySelector(".sidebar");
+    if (!sidebar) return;
+    
+    sidebar.classList.toggle("open");
+    
+    let backdrop = document.getElementById("sidebar-backdrop");
+    if (sidebar.classList.contains("open")) {
+        if (!backdrop) {
+            backdrop = document.createElement("div");
+            backdrop.id = "sidebar-backdrop";
+            backdrop.className = "sidebar-backdrop";
+            backdrop.onclick = toggleMobileSidebar;
+            document.body.appendChild(backdrop);
+        }
+        backdrop.style.display = "block";
+    } else {
+        if (backdrop) {
+            backdrop.style.display = "none";
+        }
+    }
+}
+
+window.saveGeminiKey = saveGeminiKey;
+window.toggleMobileSidebar = toggleMobileSidebar;

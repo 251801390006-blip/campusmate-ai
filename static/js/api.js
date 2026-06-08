@@ -31,6 +31,11 @@ const API = {
             headers["Authorization"] = `Bearer ${token}`;
         }
 
+        const geminiKey = localStorage.getItem("campusmate_gemini_key");
+        if (geminiKey) {
+            headers["X-Gemini-API-Key"] = geminiKey;
+        }
+
         const config = {
             ...options,
             headers
@@ -127,6 +132,10 @@ const API = {
         if (token) {
             headers["Authorization"] = `Bearer ${token}`;
         }
+        const geminiKey = localStorage.getItem("campusmate_gemini_key");
+        if (geminiKey) {
+            headers["X-Gemini-API-Key"] = geminiKey;
+        }
 
         const response = await fetch(`${this.baseUrl}/api/resumes/upload`, {
             method: "POST",
@@ -136,6 +145,28 @@ const API = {
         const data = await response.json();
         if (!response.ok) {
             throw new Error(data.detail || "Upload failed.");
+        }
+        return data;
+    },
+
+    async parseResumeFileGuest(file) {
+        const formData = new FormData();
+        formData.append("file", file);
+        
+        const headers = {};
+        const geminiKey = localStorage.getItem("campusmate_gemini_key");
+        if (geminiKey) {
+            headers["X-Gemini-API-Key"] = geminiKey;
+        }
+
+        const response = await fetch(`${this.baseUrl}/api/resumes/parse-guest`, {
+            method: "POST",
+            headers,
+            body: formData
+        });
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.detail || "Guest parsing failed.");
         }
         return data;
     },
