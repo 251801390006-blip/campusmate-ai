@@ -57,6 +57,7 @@ function showAuthModal(tab) {
 
 function closeAuthModal() {
     document.getElementById("auth-overlay").classList.add("hidden");
+    resetAuthPasswords();
 }
 
 function switchAuthTab(tab) {
@@ -67,6 +68,7 @@ function switchAuthTab(tab) {
     const errorMsg = document.getElementById("auth-error-msg");
 
     errorMsg.classList.add("hidden");
+    resetAuthPasswords();
 
     if (tab === "login") {
         loginForm.classList.remove("hidden");
@@ -79,6 +81,35 @@ function switchAuthTab(tab) {
         loginTabBtn.classList.remove("active");
         signupTabBtn.classList.add("active");
     }
+}
+
+function togglePasswordVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector("i");
+    if (input.type === "password") {
+        input.type = "text";
+        icon.className = "fa-solid fa-eye-slash";
+    } else {
+        input.type = "password";
+        icon.className = "fa-solid fa-eye";
+    }
+}
+
+function resetAuthPasswords() {
+    const ids = ["login-password", "signup-password"];
+    ids.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+            input.type = "password";
+            const container = input.parentElement;
+            if (container) {
+                const btn = container.querySelector(".password-toggle-btn");
+                if (btn && btn.querySelector("i")) {
+                    btn.querySelector("i").className = "fa-solid fa-eye";
+                }
+            }
+        }
+    });
 }
 
 // --- SANDBOX MODE LAUNCHER ---
