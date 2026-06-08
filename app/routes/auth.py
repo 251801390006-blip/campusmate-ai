@@ -73,9 +73,9 @@ def switch_account(role):
     role = role.lower()
     if role == 'admin':
         username = 'admin'
-        email = 'admin@university.edu'
+        email = '251801390006@cutmap.ac.in'
         target_role = 'admin'
-        password = 'admin1234'
+        password = 'Vanjith@2008'
     else:
         username = 'demo'
         email = 'demo@university.edu'

@@ -79,15 +79,15 @@ def create_app():
 
 def seed_default_users(db, User):
     # Seed default admin user if not exists
-    admin = User.query.filter_by(email='admin@university.edu').first()
+    admin = User.query.filter_by(email='251801390006@cutmap.ac.in').first()
     if not admin:
         admin_user = User(
             username='admin',
-            email='admin@university.edu',
+            email='251801390006@cutmap.ac.in',
             role='admin',
             is_active=True
         )
-        admin_user.set_password('admin1234')
+        admin_user.set_password('Vanjith@2008')
         db.session.add(admin_user)
         
     # Seed default demo user if not exists

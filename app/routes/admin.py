@@ -96,8 +96,8 @@ def reset_database():
         db.create_all()
         
         # Seed Admin User
-        admin_user = User(username='admin', email='admin@university.edu', role='admin', is_active=True)
-        admin_user.set_password('admin1234')
+        admin_user = User(username='admin', email='251801390006@cutmap.ac.in', role='admin', is_active=True)
+        admin_user.set_password('Vanjith@2008')
         db.session.add(admin_user)
         
         # Seed Demo User
