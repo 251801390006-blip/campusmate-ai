@@ -1,6 +1,15 @@
 // CampusMate AI Client API Service Library
 const API = {
-    baseUrl: "", // relative URL
+    baseUrl: (() => {
+        const isLocalDev = window.location.hostname === "localhost" || 
+                            window.location.hostname === "127.0.0.1" || 
+                            window.location.protocol === "file:";
+        const isBackendPort = window.location.port === "8000";
+        if (isLocalDev && !isBackendPort) {
+            return "http://127.0.0.1:8000";
+        }
+        return "";
+    })(),
 
     getToken() {
         return localStorage.getItem("campusmate_token");
