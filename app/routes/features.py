@@ -723,3 +723,188 @@ def chat():
         "success": True,
         "response": ai_response_content
     })
+
+@features_bp.route('/ai-mentor/history', methods=['GET'])
+@login_required
+def ai_mentor_history():
+    messages = ChatMessage.query.filter_by(user_id=current_user.id).order_by(ChatMessage.created_at.asc()).all()
+    history = [{"sender": m.sender, "content": m.content} for m in messages]
+    
+    progress = RoadmapProgress.query.filter_by(user_id=current_user.id).first()
+    track = progress.role if progress else "None selected"
+    
+    completed_count = 0
+    if progress and progress.completed_nodes:
+        completed_count = len([x for x in progress.completed_nodes.split(",") if x.strip()])
+    xp = 100 + completed_count * 20
+    
+    resume = ResumeAnalysis.query.filter_by(user_id=current_user.id).order_by(ResumeAnalysis.created_at.desc()).first()
+    resume_score = resume.ats_score if resume else 0
+    
+    return jsonify({
+        "history": history,
+        "track": track,
+        "xp": xp,
+        "resume_score": resume_score
+    })
+
+@features_bp.route('/ai-mentor/reset', methods=['POST'])
+@login_required
+def ai_mentor_reset():
+    ChatMessage.query.filter_by(user_id=current_user.id).delete()
+    db.session.commit()
+    return jsonify({"success": True})
+
+# 4. AJAX Resume Analysis (Side-by-side Builder Verification)
+@features_bp.route('/resume-analyzer/analyze', methods=['POST'])
+@login_required
+def analyze_resume_ajax():
+    data = request.get_json() or {}
+    
+    name = data.get('name', '')
+    email = data.get('email', '')
+    phone = data.get('phone', '')
+    github = data.get('github', '')
+    linkedin = data.get('linkedin', '')
+    skills = f"{data.get('skillsProg', '')} {data.get('skillsCyber', '')} {data.get('skillsOs', '')} {data.get('skillsTools', '')} {data.get('skillsWeb', '')}"
+    experience = f"{data.get('experienceRole', '')} {data.get('experienceComp', '')} {data.get('experienceB1', '')} {data.get('experienceB2', '')} {data.get('experienceB3', '')} {data.get('experienceB4', '')}"
+    projects = f"{data.get('projectTitle', '')} {data.get('projectB1', '')} {data.get('projectB2', '')} {data.get('projectB3', '')}"
+    certs = f"{data.get('certC1', '')} {data.get('certC2', '')} {data.get('certC3', '')} {data.get('certC4', '')}"
+    
+    full_text = f"{name}\n{email}\n{phone}\n{github}\n{linkedin}\n{skills}\n{experience}\n{projects}\n{certs}"
+    
+    analysis = heuristic_parse_resume(full_text)
+    
+    progress = RoadmapProgress.query.filter_by(user_id=current_user.id).first()
+    target_role = progress.role if progress else "Software Engineer"
+    analysis['target_role'] = target_role
+    
+    new_analysis = ResumeAnalysis(
+        user_id=current_user.id,
+        filename=data.get('title', 'Scratch_Resume_Version'),
+        ats_score=analysis['atsScore'],
+        readability_score=analysis['readabilityScore'],
+        industry_match_score=analysis['industryMatchScore'],
+        target_role=target_role,
+        analysis_json=json.dumps(analysis)
+    )
+    db.session.add(new_analysis)
+    db.session.commit()
+    
+    return jsonify({
+        "success": True,
+        "score": analysis['atsScore'],
+        "readability": analysis['readabilityScore'],
+        "alignment": analysis['industryMatchScore'],
+        "feedback": {
+            "score": analysis['atsScore'],
+            "missingKeywords": analysis['missingKeywords'],
+            "improvements": analysis['improvements'],
+            "mistakes": analysis['mistakes'],
+            "suggestions": analysis['suggestions']
+        }
+    })
+
+# 5. Interview Prep
+@features_bp.route('/interview-prep', methods=['GET'])
+@login_required
+def interview_prep():
+    return render_template('interview_prep.html')
+
+@features_bp.route('/interview-prep/evaluate', methods=['POST'])
+@login_required
+def interview_prep_evaluate():
+    data = request.get_json() or {}
+    question = data.get('question', '')
+    answer = data.get('answer', '')
+    custom_key = data.get('custom_key', '').strip()
+    
+    if not answer:
+        return jsonify({"success": False, "error": "Answer is required"}), 400
+        
+    system_prompt = (
+        "You are a Senior Technical Recruiter grading a mock coding/engineering interview. "
+        "Analyze the candidate's answer for the technical question. "
+        "Grade their answer out of 100, and provide clear constructive feedback. "
+        "Provide your evaluation in JSON format with two keys: "
+        "\"score\" (an integer from 0 to 100) and \"feedback\" (a detailed string summary)."
+    )
+    user_prompt = f"Question: {question}\nCandidate Answer: {answer}"
+    
+    ai_res = call_gemini(system_prompt, user_prompt, user_key=custom_key)
+    score = 80
+    feedback = "Good description of the concepts. Expand on practical edge cases."
+    
+    if ai_res:
+        try:
+            json_match = re.search(r'\{.*\}', ai_res, re.DOTALL)
+            if json_match:
+                parsed = json.loads(json_match.group(0))
+                score = int(parsed.get('score', 80))
+                feedback = parsed.get('feedback', ai_res)
+            else:
+                feedback = ai_res
+        except Exception:
+            feedback = ai_res
+            
+    return jsonify({
+        "success": True,
+        "score": score,
+        "feedback": feedback
+    })
+
+# 6. Hackathon Assistant
+@features_bp.route('/hackathon-assistant', methods=['GET'])
+@login_required
+def hackathon_assistant():
+    return render_template('hackathon.html')
+
+@features_bp.route('/hackathon-assistant/generate', methods=['POST'])
+@login_required
+def hackathon_generate():
+    data = request.get_json() or {}
+    theme = data.get('theme', '')
+    custom_key = data.get('custom_key', '').strip()
+    
+    if not theme:
+        return jsonify({"success": False, "error": "Theme is required"}), 400
+        
+    system_prompt = (
+        "You are a Hackathon Mentor. Draft a comprehensive project MVP blueprint concept for the theme provided. "
+        "Format your response in structured HTML matching the expected outline: "
+        "1. MVP Architecture Overview (wrap architecture diagrams in <pre><code>...</code></pre>), "
+        "2. Tech Stack & Configurations (as a list), "
+        "3. Presentation Pitch Outline (Slide outline list), "
+        "4. Step-by-Step implementation milestones."
+    )
+    user_prompt = f"Hackathon Theme: {theme}"
+    
+    ai_res = call_gemini(system_prompt, user_prompt, user_key=custom_key)
+    if not ai_res:
+        ai_res = (
+            f"<h2>Hackathon Project Blueprint: {theme}</h2>"
+            f"<h3>1. MVP Architecture Overview</h3>"
+            f"<pre><code>[Frontend: HTML5/JS] ---> [Flask App Server] ---> [SQLite Database]</code></pre>"
+            f"<h3>2. Tech Stack & Library Configurations</h3>"
+            f"<ul>"
+            f"<li><strong>Language:</strong> Python 3.12, Javascript ES6</li>"
+            f"<li><strong>Backend:</strong> Flask, SQLAlchemy (ORM)</li>"
+            f"<li><strong>Styling:</strong> Vanilla CSS with layout variables</li>"
+            f"</ul>"
+            f"<h3>3. Presentation Pitch Outline</h3>"
+            f"<ul>"
+            f"<li><strong>Slide 1:</strong> Problem statement & current inefficiencies.</li>"
+            f"<li><strong>Slide 2:</strong> Solution architecture & demo overview.</li>"
+            f"<li><strong>Slide 3:</strong> Future roadmap & API expandability layers.</li>"
+            f"</ul>"
+            f"<h3>4. Implementation milestones</h3>"
+            f"<p>Define schemas, configure Flask factory app, package inside Docker, and push deployments to Railway.</p>"
+        )
+    else:
+        ai_res = ai_res.replace("### ", "<h3>").replace("## ", "<h2>").replace("\n", "<br>")
+        
+    return jsonify({
+        "success": True,
+        "response": ai_res
+    })
+

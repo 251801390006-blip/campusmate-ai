@@ -38,10 +38,13 @@
                 <i class="fa-solid fa-route"></i> Learning Roadmaps
             </a>
             <a href="{{ url_for('features.resume_analyzer') }}" class="sidebar-link {% if request.endpoint == 'features.resume_analyzer' %}active{% endif %}">
-                <i class="fa-solid fa-file-invoice"></i> Resume Analyzer
+                <i class="fa-solid fa-file-invoice"></i> Resume Builder
             </a>
-            <a href="{{ url_for('features.ai_mentor') }}" class="sidebar-link {% if request.endpoint == 'features.ai_mentor' %}active{% endif %}">
-                <i class="fa-solid fa-robot"></i> AI Mentor Chat
+            <a href="{{ url_for('features.interview_prep') }}" class="sidebar-link {% if request.endpoint == 'features.interview_prep' %}active{% endif %}">
+                <i class="fa-solid fa-microphone"></i> Interview Prep
+            </a>
+            <a href="{{ url_for('features.hackathon_assistant') }}" class="sidebar-link {% if request.endpoint == 'features.hackathon_assistant' %}active{% endif %}">
+                <i class="fa-solid fa-laptop-code"></i> Hackathon Assistant
             </a>
             
             <hr class="sidebar-divider">
@@ -88,7 +91,7 @@
         <!-- Top Profile Header Bar -->
         <header class="dashboard-header">
             <div class="header-left">
-                <button class="hamburger-toggle d-lg-none" onclick="toggleSidebar()" aria-label="Open Sidebar Menu" style="font-size: 1.3rem; margin-right: 12px; color: var(--text-primary); background: none; border: none; cursor: pointer; padding: 4px;">
+                <button class="hamburger-toggle" onclick="toggleSidebar()" aria-label="Toggle Sidebar Menu" style="font-size: 1.3rem; margin-right: 12px; color: var(--text-primary); background: none; border: none; cursor: pointer; padding: 4px;">
                     <i class="fa-solid fa-bars"></i>
                 </button>
                 <h1 class="header-title">{% block header_title %}Dashboard{% endblock %}</h1>
@@ -119,8 +122,42 @@
         </div>
     </div>
 
+    <!-- Global Floating AI Mentor Side Drawer -->
+    <div id="mentor-drawer" class="mentor-drawer glass-effect">
+        <div class="mentor-header" onclick="toggleMentorDrawer()">
+            <div class="mentor-avatar"><i class="fa-solid fa-robot"></i></div>
+            <div class="mentor-title">
+                <h4>AI Mentor Coach 2.0</h4>
+                <span class="text-secondary" style="font-size:11px;">Active Profile Helper</span>
+            </div>
+            <button class="mentor-toggle-btn"><i class="fa-solid fa-chevron-up" id="mentor-arrow-icon"></i></button>
+        </div>
+        <div class="mentor-body">
+            <div class="mentor-memory-bar" id="mentor-memory-bar" style="background: rgba(124, 58, 237, 0.03); border-bottom: 1px solid var(--border-color); padding: 8px 15px; font-size: 11px; color: var(--text-secondary); display: flex; gap: 8px; align-items: center; justify-content: space-between;">
+                <span style="display:flex; align-items:center; gap:6px;"><i class="fa-solid fa-brain" style="color: var(--neon-blue);"></i> <span id="mentor-memory-text">Memory: Target Track: None | XP: 100</span></span>
+                <button class="btn btn-sm btn-outline" onclick="resetMentorChat()" style="padding:2px 6px; font-size:9px; border-radius:4px;"><i class="fa-solid fa-trash"></i> Reset Chat</button>
+            </div>
+            <div class="mentor-messages" id="mentor-chat-messages">
+                <div class="message mentor">
+                    <p>Hello! I am your career mentor. Ask me questions about roadmaps, certifications, project architectures, or resumes!</p>
+                </div>
+            </div>
+            <!-- Dialogue chips -->
+            <div class="chat-chips-container" id="mentor-chat-chips">
+                <button class="chip" onclick="handleChipClick('What certifications fit my target track?')">What certs fit this?</button>
+                <button class="chip" onclick="handleChipClick('Recommend a project template.')">Recommend a project</button>
+                <button class="chip" onclick="handleChipClick('Check my experience bullet points.')">Check my resume</button>
+            </div>
+            <form class="mentor-input-area" onsubmit="sendMentorMessage(event)">
+                <input type="text" id="mentor-user-input" placeholder="Ask about system design, code, etc..." required>
+                <button type="submit" class="mentor-send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+            </form>
+        </div>
+    </div>
+
     <!-- Core Scripts -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/mentor.js') }}"></script>
     <script>
         // Load Gemini API Key from localStorage
         document.addEventListener("DOMContentLoaded", () => {
@@ -133,6 +170,34 @@
 
         function saveGeminiKey(val) {
             localStorage.setItem("campusmate_gemini_key", val.trim());
+        }
+
+        async function resetMentorChat() {
+            if (!confirm("Are you sure you want to clear your chat history with the AI Mentor?")) return;
+            const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
+            try {
+                const response = await fetch("/ai-mentor/reset", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrfToken
+                    }
+                });
+                if (response.ok) {
+                    const messagesBox = document.getElementById("mentor-chat-messages");
+                    if (messagesBox) {
+                        messagesBox.innerHTML = `
+                            <div class="message mentor">
+                                <p>Hello! I am your career mentor. Ask me questions about roadmaps, certifications, project architectures, or resumes!</p>
+                            </div>
+                        `;
+                    }
+                } else {
+                    alert("Failed to reset chat on server.");
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Connection failed.");
+            }
         }
     </script>
     {% block extra_scripts %}{% endblock %}

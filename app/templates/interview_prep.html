@@ -1,0 +1,172 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Interview Prep - CampusMate AI{% endblock %}
+
+{% block header_title %}AI Technical Interview Prep{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Setup Window -->
+        <div class="flat-card text-center py-5" id="mock-setup-window">
+            <div class="setup-icon mb-3"><i class="fa-solid fa-microphone-slash text-muted" style="font-size: 3rem;"></i></div>
+            <h2 class="fw-bold mb-2">AI Technical Interview Prep</h2>
+            <p class="text-secondary mb-4" style="max-width: 480px; margin: 0 auto; font-size: 0.88rem;">
+                Test your competencies with our conversational mock interviewer. Receive structured analysis, scores, and corrective solutions.
+            </p>
+            <div class="setup-form text-start" style="max-width: 400px; margin: 0 auto;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="input-group mb-3">
+                    <label for="mock-role-input" class="fw-semibold mb-1" style="font-size: 0.82rem;">Interview Target Role</label>
+                    <input type="text" id="mock-role-input" class="form-control" placeholder="e.g. Backend Engineer, Systems Security" value="Software Engineer" style="width:100%; padding:8px; border-radius:4px; border: 1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary);">
+                </div>
+                <button class="btn btn-primary w-100" onclick="startMockInterview()">Launch Interview <i class="fa-solid fa-microphone"></i></button>
+            </div>
+        </div>
+
+        <!-- Active Interview Window -->
+        <div class="flat-card hidden" id="mock-active-window">
+            <div class="mock-header d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom" style="border-color: var(--border-color);">
+                <span class="badge badge-danger"><i class="fa-solid fa-circle-dot text-red animate-pulse me-1"></i> Live Mock Session</span>
+                <span id="mock-question-counter" class="fw-semibold text-secondary" style="font-size: 0.85rem;">Question 1 of 3</span>
+            </div>
+            <div class="mock-question-display p-3 border rounded mb-4" style="background-color: var(--bg-primary); border-color: var(--border-color);">
+                <p class="question-label fw-bold text-uppercase text-info mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Interviewer Question:</p>
+                <p id="mock-question-text" class="question-text mb-0 fw-semibold text-secondary" style="font-size: 1rem; line-height: 1.5;">Retrieving question...</p>
+            </div>
+            <div class="mock-response-area mb-4">
+                <label for="mock-answer-input" class="fw-semibold mb-2 d-block" style="font-size: 0.85rem;">Your Answer</label>
+                <textarea id="mock-answer-input" class="form-control" rows="5" placeholder="Type your response here... (or speak)" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-size: 0.88rem;"></textarea>
+            </div>
+            <div class="mock-controls d-flex justify-content-between align-items-center">
+                <button class="btn btn-outline" id="mock-skip-btn" onclick="abortMockInterview()">Cancel Session</button>
+                <button class="btn btn-primary" id="mock-submit-btn" onclick="submitMockAnswer()">Submit Answer <i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+            <!-- Feedback Card -->
+            <div class="mock-feedback-box mt-4 p-3 border rounded hidden" id="mock-feedback-box" style="background-color: rgba(59, 130, 246, 0.02); border-color: rgba(59, 130, 246, 0.2);">
+                <h4 class="fw-bold mb-2" style="font-size: 0.92rem;"><i class="fa-solid fa-graduation-cap text-primary me-1"></i> AI Evaluation:</h4>
+                <div class="score-line mb-2" style="font-size: 0.88rem;">Score: <strong id="mock-item-score" class="text-primary">0/100</strong></div>
+                <p class="feedback-desc text-secondary mb-0" id="mock-item-desc" style="font-size: 0.85rem; line-height: 1.5;">Feedback details...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+let mockInterviewState = {
+    active: false,
+    role: "",
+    questionIndex: 0,
+    questions: [
+        "What is the difference between TCP and UDP, and in what scenarios would you choose one over the other?",
+        "Explain how a SQL Injection occurs and detail two distinct prevention strategies on the application layer.",
+        "How do index tables optimize search latency, and what is the trade-off of maintaining too many indices?"
+    ],
+    answers: []
+};
+
+function startMockInterview() {
+    const role = document.getElementById("mock-role-input").value.trim();
+    if (!role) {
+        alert("Please enter a target role.");
+        return;
+    }
+    
+    mockInterviewState.role = role;
+    mockInterviewState.active = true;
+    mockInterviewState.questionIndex = 0;
+    mockInterviewState.answers = [];
+
+    document.getElementById("mock-setup-window").classList.add("hidden");
+    document.getElementById("mock-active-window").classList.remove("hidden");
+    
+    loadNextMockQuestion();
+}
+
+function loadNextMockQuestion() {
+    const countText = document.getElementById("mock-question-counter");
+    const questionText = document.getElementById("mock-question-text");
+    const ansInput = document.getElementById("mock-answer-input");
+    
+    ansInput.value = "";
+    document.getElementById("mock-feedback-box").classList.add("hidden");
+    
+    countText.innerText = `Question ${mockInterviewState.questionIndex + 1} of ${mockInterviewState.questions.length}`;
+    questionText.innerText = mockInterviewState.questions[mockInterviewState.questionIndex];
+    
+    const submitBtn = document.getElementById("mock-submit-btn");
+    submitBtn.innerHTML = `Submit Answer <i class="fa-solid fa-paper-plane"></i>`;
+    submitBtn.onclick = () => submitMockAnswer();
+}
+
+async function submitMockAnswer() {
+    const answer = document.getElementById("mock-answer-input").value.trim();
+    if (!answer) {
+        alert("Please type a response before submitting.");
+        return;
+    }
+
+    const submitBtn = document.getElementById("mock-submit-btn");
+    submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Grading...`;
+    
+    try {
+        const customKey = localStorage.getItem("campusmate_gemini_key") || "";
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
+        
+        const response = await fetch("/interview-prep/evaluate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken
+            },
+            body: JSON.stringify({
+                question: mockInterviewState.questions[mockInterviewState.questionIndex],
+                answer: answer,
+                custom_key: customKey
+            })
+        });
+        
+        const data = await response.json();
+        if (response.ok && data.success) {
+            const feedbackBox = document.getElementById("mock-feedback-box");
+            document.getElementById("mock-item-score").innerText = `${data.score}/100`;
+            document.getElementById("mock-item-desc").innerText = data.feedback;
+            feedbackBox.classList.remove("hidden");
+
+            submitBtn.innerHTML = `Next Question <i class="fa-solid fa-arrow-right"></i>`;
+            submitBtn.onclick = () => moveToNextQuestion();
+        } else {
+            alert("Grading failed: " + (data.error || "Unknown error"));
+            submitBtn.innerHTML = `Submit Answer <i class="fa-solid fa-paper-plane"></i>`;
+        }
+    } catch (e) {
+        console.error(e);
+        alert("Failed to grade answer.");
+        submitBtn.innerHTML = `Submit Answer <i class="fa-solid fa-paper-plane"></i>`;
+    }
+}
+
+function moveToNextQuestion() {
+    mockInterviewState.questionIndex++;
+    if (mockInterviewState.questionIndex < mockInterviewState.questions.length) {
+        loadNextMockQuestion();
+    } else {
+        alert("Mock Interview Complete! Excellent work. You've earned 150 XP.");
+        window.location.reload();
+    }
+}
+
+function abortMockInterview() {
+    if (confirm("Are you sure you want to end this interview session? Your progress will not be saved.")) {
+        window.location.reload();
+    }
+}
+</script>
+<style>
+.hidden {
+    display: none !important;
+}
+</style>
+{% endblock %}

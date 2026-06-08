@@ -1,14 +1,39 @@
 // CampusMate AI Frontend Controller Functions
 
-// Toggle Collapsible Sidebar Drawer (Mobile & Tablets)
+// Toggle Collapsible Sidebar Drawer (Mobile & Desktop)
 function toggleSidebar() {
     const sidebar = document.getElementById("sidebar-drawer");
     const backdrop = document.getElementById("sidebar-backdrop");
-    if (sidebar && backdrop) {
-        sidebar.classList.toggle("open");
-        backdrop.classList.toggle("open");
+    const mainContent = document.querySelector(".main-with-sidebar");
+    
+    if (window.innerWidth >= 992) {
+        if (sidebar && mainContent) {
+            sidebar.classList.toggle("collapsed");
+            mainContent.classList.toggle("expanded");
+            // Store preference in localStorage
+            const isCollapsed = sidebar.classList.contains("collapsed");
+            localStorage.setItem("sidebar-collapsed", isCollapsed ? "true" : "false");
+        }
+    } else {
+        if (sidebar && backdrop) {
+            sidebar.classList.toggle("open");
+            backdrop.classList.toggle("open");
+        }
     }
 }
+
+// Restore sidebar collapse state on page load
+document.addEventListener("DOMContentLoaded", () => {
+    if (window.innerWidth >= 992) {
+        const isCollapsed = localStorage.getItem("sidebar-collapsed") === "true";
+        const sidebar = document.getElementById("sidebar-drawer");
+        const mainContent = document.querySelector(".main-with-sidebar");
+        if (isCollapsed && sidebar && mainContent) {
+            sidebar.classList.add("collapsed");
+            mainContent.classList.add("expanded");
+        }
+    }
+});
 
 // Toggle Password Field Visibility
 function togglePasswordVisibility(inputId, btn) {

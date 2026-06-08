@@ -49,186 +49,309 @@
         {% endif %}
     </div>
 
-    <!-- Right Panel: Predefined Roadmap Steps Timeline -->
+    <!-- Right Panel: Visual Roadmap Node Canvas -->
     <div class="col-lg-8">
         {% if selected_role %}
             <div class="flat-card">
-                <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom" style="border-color: var(--border-color);">
-                    <h3 style="font-size: 1.1rem; font-weight: 700;" class="mb-0"><i class="fa-solid fa-list-check text-muted me-2"></i> Timeline Milestones ({{ nodes | length }} steps)</h3>
+                <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom flex-wrap gap-2" style="border-color: var(--border-color);">
+                    <div>
+                        <h3 style="font-size: 1.1rem; font-weight: 700;" class="mb-0"><i class="fa-solid fa-circle-nodes text-muted me-2"></i> Target Path Learning Tree</h3>
+                        <span class="badge badge-warning mt-1" style="font-size: 0.65rem;">Sequential Unlocks Enabled</span>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <input type="text" id="roadmap-node-search" placeholder="Search topics..." oninput="searchRoadmapNodes()" style="padding:6px 12px; border-radius:4px; border:1px solid var(--border-color); outline:none; font-size:12px; background: var(--bg-primary); color: var(--text-primary);">
+                    </div>
                 </div>
                 
-                <div class="roadmap-timeline">
-                    {% for node in nodes %}
-                        {% set step_idx = loop.index %}
-                        <div class="roadmap-step-item {% if step_idx in completed_set %}step-completed{% endif %}" id="step-container-{{ step_idx }}">
-                            <div class="roadmap-step-checkbox-wrapper">
-                                <input type="checkbox" class="step-checkbox" id="chk-step-{{ step_idx }}" data-step="{{ step_idx }}" {% if step_idx in completed_set %}checked{% endif %} onchange="toggleStepProgress({{ step_idx }})">
-                            </div>
-                            
-                            <div class="roadmap-step-content border rounded p-3 mb-3" style="background: var(--bg-primary); border-color: var(--border-color);">
-                                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
-                                    <h4 class="fw-bold mb-0 text-secondary" style="font-size:0.95rem;">{{ node.title }}</h4>
-                                    <div class="d-flex gap-2">
-                                        <span class="badge badge-info" style="font-size:0.68rem; padding: 2px 6px;">{{ node.difficulty }}</span>
-                                        <span class="badge badge-success" style="font-size:0.68rem; padding: 2px 6px;"><i class="fa-regular fa-clock me-1"></i> {{ node.estimated_duration }}</span>
-                                    </div>
-                                </div>
-                                <p class="text-muted mb-3" style="font-size:0.82rem; line-height:1.4;">{{ node.description }}</p>
-                                
-                                <details class="roadmap-details">
-                                    <summary class="fw-semibold text-secondary" style="font-size:0.78rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-circle-chevron-down me-1"></i> View Learning Resources & Projects</summary>
-                                    <div class="mt-3 pt-2 border-top" style="font-size:0.8rem; border-color: var(--border-color);">
-                                        <!-- Resources -->
-                                        <div class="mb-3">
-                                            <span class="fw-bold text-secondary d-block mb-1" style="font-size:0.75rem;"><i class="fa-solid fa-book-open me-1 text-muted"></i> Recommended Resources:</span>
-                                            {% for res in node.resources %}
-                                                <a href="{{ res.url }}" target="_blank" class="d-inline-block text-primary me-3"><i class="fa-solid fa-arrow-up-right-from-square me-1" style="font-size:0.7rem;"></i> {{ res.title }}</a>
-                                            {% endfor %}
-                                        </div>
-                                        
-                                        <!-- Projects -->
-                                        {% if node.projects %}
-                                            <div class="mb-3 p-2 rounded" style="background-color: rgba(124,58,237,0.02); border: 1px solid var(--border-color);">
-                                                {% for proj in node.projects %}
-                                                    <span class="fw-bold text-secondary d-block mb-1" style="font-size:0.75rem;"><i class="fa-solid fa-flask me-1 text-muted"></i> Hands-on Project: {{ proj.title }}</span>
-                                                    <p class="text-muted mb-2" style="font-size:0.75rem;">{{ proj.description }}</p>
-                                                    <ul class="ps-3 mb-0" style="font-size:0.75rem;">
-                                                        {% for task in proj.tasks %}
-                                                            <li>{{ task }}</li>
-                                                        {% endfor %}
-                                                    </ul>
-                                                {% endfor %}
-                                            </div>
-                                        {% endif %}
-                                        
-                                        <!-- Certifications -->
-                                        {% if node.certifications %}
-                                            <div>
-                                                {% for cert in node.certifications %}
-                                                    <span class="badge badge-warning" style="font-size:0.7rem;"><i class="fa-solid fa-award me-1"></i> Matches: {{ cert.name }} (by {{ cert.provider }})</span>
-                                                {% endfor %}
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </details>
-                            </div>
-                        </div>
-                    {% endfor %}
+                <div class="roadmap-tree-canvas" id="roadmap-tree-canvas">
+                    <!-- Dynamic visual node badges generated via JS -->
                 </div>
-            {% else %}
-                <div class="flat-card text-center py-5">
-                    <i class="fa-solid fa-route text-muted mb-3" style="font-size: 3rem;"></i>
-                    <h3 style="font-size:1.15rem;" class="fw-bold">No Pathway Selected</h3>
-                    <p class="text-secondary mb-0" style="font-size:0.85rem; max-width:440px; margin:0 auto;">
-                        Select a track on the left panel and click "Generate Pathway" to seed a curriculum containing 25+ detailed steps matching industry guidelines.
-                    </p>
-                </div>
-            {% endif %}
+            </div>
+        {% else %}
+            <div class="flat-card text-center py-5">
+                <i class="fa-solid fa-route text-muted mb-3" style="font-size: 3rem;"></i>
+                <h3 style="font-size:1.15rem;" class="fw-bold">No Pathway Selected</h3>
+                <p class="text-secondary mb-0" style="font-size:0.85rem; max-width:440px; margin:0 auto;">
+                    Select a track on the left panel and click "Generate Pathway" to seed a curriculum containing 25+ detailed steps matching industry guidelines.
+                </p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Dynamic Roadmap Node Modal Popup -->
+<div id="node-modal" class="modal-overlay hidden">
+    <div class="glass-card node-modal-card animate-pop" style="background: var(--bg-secondary); border: 2.5px solid #111827; box-shadow: 6px 6px 0px #111827; border-radius: 8px; max-width:550px; width:100%; padding:25px;">
+        <div class="node-modal-header d-flex justify-content-between align-items-center mb-3">
+            <h2 id="node-modal-title" class="fw-bold mb-0" style="font-size: 1.15rem;">Node Title</h2>
+            <button class="btn-close" onclick="closeNodeModal()" style="background:none; border:none; color:var(--text-secondary); font-size:1.2rem; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="node-modal-body">
+            <p id="node-modal-desc" class="node-desc text-secondary mb-3" style="font-size: 0.85rem; line-height: 1.5;">Node description goes here.</p>
+            <div class="node-meta mb-3 p-2 rounded" style="font-size: 0.8rem; background-color: var(--bg-primary); border: 1px solid var(--border-color); display:flex; justify-content:space-around;">
+                <span>Difficulty: <strong id="node-modal-difficulty" style="color: var(--neon-blue);">BEGINNER</strong></span>
+                <span>Duration: <strong id="node-modal-duration" style="color: var(--neon-blue);">10 hours</strong></span>
+            </div>
+            
+            <hr class="divider" style="border:0; border-top:1px solid var(--border-color); margin:15px 0;">
+            
+            <!-- Resources Accordion -->
+            <div class="accordion-section mb-3">
+                <h4 class="fw-bold mb-2 text-secondary" style="font-size:0.8rem; text-transform:uppercase;"><i class="fa-solid fa-book-open text-muted me-1"></i> Learning Resources</h4>
+                <ul id="node-modal-resources" class="resource-list ps-3 mb-0" style="font-size: 0.8rem; line-height: 1.6; color: var(--text-secondary);"></ul>
+            </div>
+            
+            <!-- Project Accordion -->
+            <div class="accordion-section mb-3">
+                <h4 class="fw-bold mb-2 text-secondary" style="font-size:0.8rem; text-transform:uppercase;"><i class="fa-solid fa-flask text-muted me-1"></i> Mini Project Target</h4>
+                <div class="project-info-box p-3 border rounded text-secondary" id="node-modal-project" style="font-size: 0.8rem; line-height: 1.5; background-color: var(--bg-primary); border-color: var(--border-color);"></div>
+            </div>
+
+            <!-- Certifications Accordion -->
+            <div class="accordion-section mb-4">
+                <h4 class="fw-bold mb-2 text-secondary" style="font-size:0.8rem; text-transform:uppercase;"><i class="fa-solid fa-award text-muted me-1"></i> Certificate Matching</h4>
+                <ul id="node-modal-certs" class="cert-list ps-3 mb-0" style="font-size: 0.8rem; line-height: 1.6; color: var(--text-secondary);"></ul>
+            </div>
+
+            <div class="node-action-footer d-flex justify-content-end">
+                <button id="node-modal-action-btn" class="btn btn-primary" onclick="triggerNodeCompletion()">Mark Complete <i class="fa-solid fa-check"></i></button>
+            </div>
         </div>
     </div>
 </div>
 {% endblock %}
 
 {% block extra_scripts %}
+{% if selected_role %}
 <script>
-async function toggleStepProgress(stepNum) {
-    const chk = document.getElementById(`chk-step-${stepNum}`);
-    const container = document.getElementById(`step-container-${stepNum}`);
-    const isChecked = chk.checked;
-    
-    // Optimistic toggle styling
-    if (isChecked) {
-        container.classList.add("step-completed");
-    } else {
-        container.classList.remove("step-completed");
+// Load nodes data and completed states from Jinja context
+const activeNodes = {{ nodes|tojson }};
+let completedNodes = [
+    {% for step in completed_set %}
+        {{ step }},
+    {% endfor %}
+];
+
+let selectedNode = null;
+let selectedStepIdx = -1;
+
+function computeNodeStatuses() {
+    activeNodes.forEach((node, index) => {
+        const stepNum = index + 1;
+        if (completedNodes.includes(stepNum)) {
+            node.status = "COMPLETED";
+        } else {
+            // Check if all previous steps are completed
+            let allPrevCompleted = true;
+            for (let j = 1; j < stepNum; j++) {
+                if (!completedNodes.includes(j)) {
+                    allPrevCompleted = false;
+                    break;
+                }
+            }
+            if (allPrevCompleted) {
+                node.status = "IN_PROGRESS";
+            } else {
+                node.status = "LOCKED";
+            }
+        }
+    });
+}
+
+function renderRoadmapTree() {
+    const canvas = document.getElementById("roadmap-tree-canvas");
+    if (!canvas) return;
+    canvas.innerHTML = "";
+
+    if (activeNodes.length === 0) {
+        canvas.innerHTML = `<p class="empty-state">No milestones generated.</p>`;
+        return;
     }
+
+    computeNodeStatuses();
+
+    activeNodes.forEach((node, index) => {
+        const div = document.createElement("div");
+        div.className = `glass-card roadmap-node-badge ${node.status}`;
+        
+        let statusIcon = "lock";
+        if (node.status === "COMPLETED") statusIcon = "check";
+        else if (node.status === "IN_PROGRESS") statusIcon = "circle-play";
+
+        div.innerHTML = `
+            <div class="node-status-indicator"><i class="fa-solid fa-${statusIcon}"></i></div>
+            <div class="node-content-details">
+                <h4>${node.title}</h4>
+                <p>${node.description}</p>
+            </div>
+        `;
+        
+        if (node.status !== "LOCKED") {
+            div.onclick = () => openNodeModal(node, index + 1);
+        }
+        
+        canvas.appendChild(div);
+    });
+}
+
+function openNodeModal(node, stepIdx) {
+    selectedNode = node;
+    selectedStepIdx = stepIdx;
+    
+    document.getElementById("node-modal-title").innerText = node.title;
+    document.getElementById("node-modal-desc").innerText = node.description;
+    document.getElementById("node-modal-difficulty").innerText = node.difficulty;
+    document.getElementById("node-modal-duration").innerText = node.estimated_duration;
+
+    const resList = document.getElementById("node-modal-resources");
+    resList.innerHTML = "";
+    if (node.resources && node.resources.length > 0) {
+        node.resources.forEach(r => {
+            resList.innerHTML += `<li><a href="${r.url}" target="_blank" class="fw-semibold"><i class="fa-solid fa-arrow-up-right-from-square me-1" style="font-size:0.7rem;"></i> ${r.title}</a></li>`;
+        });
+    } else {
+        resList.innerHTML = "<li>No specific resources listed.</li>";
+    }
+
+    const projBox = document.getElementById("node-modal-project");
+    projBox.innerHTML = "";
+    if (node.projects && node.projects.length > 0) {
+        const p = node.projects[0];
+        projBox.innerHTML = `
+            <strong class="text-secondary">${p.title}</strong>
+            <p style="margin: 6px 0; font-size:0.78rem;">${p.description}</p>
+            <ul class="ps-3 mb-0" style="font-size:0.78rem;">
+                ${p.tasks.map(t => `<li>${t}</li>`).join("")}
+            </ul>
+        `;
+    } else {
+        projBox.innerHTML = "No mini-project mapped to this node.";
+    }
+
+    const certList = document.getElementById("node-modal-certs");
+    certList.innerHTML = "";
+    if (node.certifications && node.certifications.length > 0) {
+        node.certifications.forEach(c => {
+            certList.innerHTML += `<li><i class="fa-solid fa-certificate me-1 text-muted"></i> ${c.name} (by ${c.provider})</li>`;
+        });
+    } else {
+        certList.innerHTML = "<li>No matched cert mapping.</li>";
+    }
+
+    const actionBtn = document.getElementById("node-modal-action-btn");
+    if (node.status === "COMPLETED") {
+        actionBtn.innerText = "Completed!";
+        actionBtn.disabled = true;
+        actionBtn.className = "btn btn-outline";
+    } else {
+        actionBtn.innerHTML = `Mark Complete <i class="fa-solid fa-check"></i>`;
+        actionBtn.disabled = false;
+        actionBtn.className = "btn btn-primary";
+    }
+
+    document.getElementById("node-modal").classList.remove("hidden");
+}
+
+function closeNodeModal() {
+    document.getElementById("node-modal").classList.add("hidden");
+    selectedNode = null;
+    selectedStepIdx = -1;
+}
+
+async function triggerNodeCompletion() {
+    if (selectedStepIdx === -1) return;
+    
+    const actionBtn = document.getElementById("node-modal-action-btn");
+    actionBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Updating...`;
     
     try {
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
         const response = await fetch("{{ url_for('features.toggle_step') }}", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRFToken": "{{ csrf_token() }}"
+                "X-CSRFToken": csrfToken
             },
-            body: JSON.stringify({ step: stepNum })
+            body: JSON.stringify({ step: selectedStepIdx })
         });
         
         const data = await response.json();
         if (response.ok && data.success) {
-            // Update progress bar
-            const bar = document.getElementById("progress-bar-fill");
-            const label = document.getElementById("progress-percent-label");
-            const milestoneLabel = document.getElementById("milestones-count-label");
-            
-            if (bar) bar.style.width = `${data.percent}%`;
-            if (label) label.innerText = `${data.percent}%`;
-            if (milestoneLabel) milestoneLabel.innerText = `${data.completed_count} / ${data.total_count} completed`;
-        } else {
-            // Revert styling on error
-            chk.checked = !isChecked;
-            if (!isChecked) {
-                container.classList.add("step-completed");
+            if (data.status === "added") {
+                if (!completedNodes.includes(selectedStepIdx)) completedNodes.push(selectedStepIdx);
             } else {
-                container.classList.remove("step-completed");
+                completedNodes = completedNodes.filter(x => x !== selectedStepIdx);
             }
+            
+            // Re-render
+            renderRoadmapTree();
+            
+            // Update stats labels
+            const fill = document.getElementById("progress-bar-fill");
+            const label = document.getElementById("progress-percent-label");
+            const msLabel = document.getElementById("milestones-count-label");
+            
+            if (fill) fill.style.width = `${data.percent}%`;
+            if (label) label.innerText = `${data.percent}%`;
+            if (msLabel) msLabel.innerText = `${data.completed_count} / ${data.total_count} completed`;
+            
+            // Sync AI Mentor ribbon memory
+            if (window.loadMentorChatHistory) {
+                window.loadMentorChatHistory();
+            }
+            
+            closeNodeModal();
+        } else {
             alert("Error updating milestone state: " + (data.error || "Unknown error"));
+            renderRoadmapTree();
+            closeNodeModal();
         }
     } catch (e) {
-        chk.checked = !isChecked;
-        if (!isChecked) {
-            container.classList.add("step-completed");
-        } else {
-            container.classList.remove("step-completed");
-        }
         console.error(e);
-        alert("Network error: failed to communicate with the server.");
+        alert("Connection error.");
+        renderRoadmapTree();
+        closeNodeModal();
     }
 }
+
+function searchRoadmapNodes() {
+    const query = document.getElementById("roadmap-node-search").value.toLowerCase();
+    const badges = document.querySelectorAll(".roadmap-node-badge");
+    badges.forEach(badge => {
+        const title = badge.querySelector("h4").innerText.toLowerCase();
+        const desc = badge.querySelector("p").innerText.toLowerCase();
+        if (title.includes(query) || desc.includes(query)) {
+            badge.classList.remove("hidden-badge");
+        } else {
+            badge.classList.add("hidden-badge");
+        }
+    });
+}
+
+// Initial render
+document.addEventListener("DOMContentLoaded", () => {
+    renderRoadmapTree();
+});
 </script>
 <style>
-.roadmap-timeline {
-    position: relative;
-    padding-left: 20px;
+.hidden {
+    display: none !important;
 }
-.roadmap-timeline::before {
-    content: '';
-    position: absolute;
-    left: 8px;
-    top: 5px;
-    bottom: 5px;
-    width: 2px;
-    background-color: var(--border-color);
+.hidden-badge {
+    display: none !important;
 }
-.roadmap-step-item {
-    position: relative;
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
     display: flex;
-    gap: 15px;
-}
-.roadmap-step-checkbox-wrapper {
-    position: relative;
-    z-index: 2;
-    padding-top: 10px;
-}
-.step-checkbox {
-    width: 18px;
-    height: 18px;
-    accent-color: var(--neon-blue);
-    cursor: pointer;
-    background-color: var(--bg-primary);
-    border: 2px solid var(--border-color);
-    border-radius: 4px;
-}
-.roadmap-step-content {
-    flex-grow: 1;
-    transition: all 0.2s ease;
-}
-.step-completed .roadmap-step-content {
-    opacity: 0.75;
-    background-color: rgba(16, 185, 129, 0.01) !important;
-    border-color: rgba(16, 185, 129, 0.2) !important;
-}
-.roadmap-details summary::-webkit-details-marker {
-    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
 }
 </style>
+{% endif %}
 {% endblock %}

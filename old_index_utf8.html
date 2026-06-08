@@ -1,0 +1,969 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusMate AI ΓÇö The Premium AI Operating System for Students</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- HTML2PDF.js for clean resume downloads -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- CSS Style Sheets -->
+    <link rel="stylesheet" href="css/style.css?v=2.2">
+</head>
+<body class="light-mode">
+
+    <!-- 9-SECTION PREMIUM STARTUP LANDING PAGE -->
+    <div id="landing-container" class="landing-layout animate-pop">
+        <!-- Landing Header -->
+        <header class="landing-header glass-effect">
+            <div class="logo"><i class="fa-solid fa-graduation-cap"></i> CampusMate AI</div>
+            <div class="landing-nav">
+                <a href="#features">Features</a>
+                <button class="btn btn-sm btn-outline" onclick="showAuthModal('login')">Sign In</button>
+                <button class="btn btn-sm btn-primary" onclick="showAuthModal('signup')">Sign Up</button>
+            </div>
+        </header>
+
+        <!-- Section 1: Hero Section -->
+        <section class="hero-section">
+            <div class="hero-badge animate-pulse"><i class="fa-solid fa-wand-magic-sparkles"></i> The Premium Operating System for Students</div>
+            <h1 class="hero-title">The Complete <span class="gradient-text">AI Operating System</span> for Students</h1>
+            <p class="hero-subtitle">Accelerate your learning, build professional ATS-optimized resumes, follow visual non-linear roadmaps, and prep for interviews with a deep reasoning career coach.</p>
+            
+            <div class="hero-ctas">
+                <button class="btn btn-primary btn-lg" onclick="launchSandboxMode()">Start Building Free (No Login) <i class="fa-solid fa-circle-play"></i></button>
+                <button class="btn btn-outline btn-lg" onclick="showAuthModal('login')">Sign In with Student Account <i class="fa-solid fa-server"></i></button>
+            </div>
+            
+            <div class="sandbox-tip"><i class="fa-solid fa-circle-info text-blue"></i> Free Guest Demo runs 100% locally in your browser. Zero setup required!</div>
+        </section>
+
+        <!-- Section 2: Features Section -->
+        <section id="features" class="features-section">
+            <h2 class="section-title">An Interconnected Student Growth Engine</h2>
+            <p class="section-subtitle">Everything you need to accelerate your academic and internship goals in one unified space.</p>
+            
+            <div class="features-grid">
+                <div class="glass-card feature-card">
+                    <div class="feature-icon"><i class="fa-solid fa-route"></i></div>
+                    <h3>Interactive Roadmaps</h3>
+                    <p>Unlock 8 professional tracks with skill trees, estimated durations, mini projects, and dependencies.</p>
+                </div>
+                <div class="glass-card feature-card">
+                    <div class="feature-icon"><i class="fa-solid fa-file-invoice"></i></div>
+                    <h3>ATS Resume Analyzer</h3>
+                    <p>Build from scratch or upload PDF/DOCX files. Get instant readability scores, keywords audits, and suggested rewrites.</p>
+                </div>
+                <div class="glass-card feature-card">
+                    <div class="feature-icon"><i class="fa-solid fa-comments"></i></div>
+                    <h3>Interview Prep Simulator</h3>
+                    <p>Simulate technical questions and receive grading, accuracy analysis, and structured corrective solutions.</p>
+                </div>
+                <div class="glass-card feature-card">
+                    <div class="feature-icon"><i class="fa-solid fa-laptop-code"></i></div>
+                    <h3>Hackathon Concept Planner</h3>
+                    <p>Transform hackathon themes into database schemas, folder structures, pitch decks, and deployment steps.</p>
+                </div>
+            </div>
+        </section>
+
+
+
+        <!-- Section 9: Footer -->
+        <footer class="landing-footer">
+            <div class="logo"><i class="fa-solid fa-graduation-cap"></i> CampusMate AI</div>
+            <p>┬⌐ 2026 CampusMate AI. The Complete AI Operating System for Students.</p>
+        </footer>
+    </div>
+
+    <!-- AUTHENTICATION OVERLAY & DIALOG -->
+    <div id="auth-overlay" class="modal-overlay hidden">
+        <div class="glass-card auth-card animate-pop">
+            <div class="auth-header">
+                <div class="logo"><i class="fa-solid fa-graduation-cap"></i> CampusMate AI</div>
+                <p class="tagline">Sign in to sync your profile database</p>
+                <button class="auth-close-btn" onclick="closeAuthModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <!-- Tab Headers -->
+            <div class="auth-tabs">
+                <button id="tab-login-btn" class="auth-tab active" onclick="switchAuthTab('login')">Login</button>
+                <button id="tab-signup-btn" class="auth-tab" onclick="switchAuthTab('signup')">Sign Up</button>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="login-form" class="auth-form" onsubmit="handleLogin(event)">
+                <div class="input-group">
+                    <label for="login-email">Email Address</label>
+                    <input type="email" id="login-email" required placeholder="name@university.edu">
+                </div>
+                <div class="input-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" required placeholder="ΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇó">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Sign In <i class="fa-solid fa-arrow-right"></i></button>
+            </form>
+            
+            <!-- Signup Form -->
+            <form id="signup-form" class="auth-form hidden" onsubmit="handleSignup(event)">
+                <div class="input-group">
+                    <label for="signup-name">Full Name</label>
+                    <input type="text" id="signup-name" required placeholder="Alex Smith">
+                </div>
+                <div class="input-group">
+                    <label for="signup-email">Email Address</label>
+                    <input type="email" id="signup-email" required placeholder="name@university.edu">
+                </div>
+                <div class="input-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" required placeholder="Create secure password">
+                </div>
+                <div class="input-group">
+                    <label for="signup-level">Academic Level</label>
+                    <select id="signup-level">
+                        <option value="HIGH_SCHOOL">High School Student</option>
+                        <option value="UNDERGRADUATE" selected>Undergraduate Student</option>
+                        <option value="POSTGRADUATE">Postgraduate / Master Student</option>
+                        <option value="SELF_LEARNER">Self Learner</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Create Account <i class="fa-solid fa-user-plus"></i></button>
+            </form>
+            <div id="auth-error-msg" class="error-msg hidden">Invalid login credentials. Please check connection.</div>
+        </div>
+    </div>
+
+    <!-- MAIN APP WORKSPACE WRAPPER -->
+    <div id="app-container" class="app-layout hidden">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar glass-effect">
+            <div class="sidebar-brand" style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <i class="fa-solid fa-graduation-cap brand-icon"></i>
+                    <span class="brand-name">CampusMate AI</span>
+                </div>
+                <button class="sidebar-close-btn" onclick="toggleMobileSidebar()" aria-label="Close menu" style="display:none; background:none; border:none; color:var(--text-secondary); font-size:18px; cursor:pointer; padding:4px;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <a href="#" class="menu-item active" data-tab="dashboard" onclick="navigateToTab('dashboard')">
+                    <i class="fa-solid fa-chart-pie menu-icon"></i> <span>Dashboard</span>
+                </a>
+                <a href="#" class="menu-item" data-tab="roadmap" onclick="navigateToTab('roadmap')">
+                    <i class="fa-solid fa-route menu-icon"></i> <span>Roadmap Engine</span>
+                </a>
+                <a href="#" class="menu-item" data-tab="resume" onclick="navigateToTab('resume')">
+                    <i class="fa-solid fa-file-invoice menu-icon"></i> <span>ATS Resume Builder</span>
+                </a>
+                <a href="#" class="menu-item" data-tab="mock" onclick="navigateToTab('mock')">
+                    <i class="fa-solid fa-comments menu-icon"></i> <span>Interview Prep</span>
+                </a>
+                <a href="#" class="menu-item" data-tab="hackathon" onclick="navigateToTab('hackathon')">
+                    <i class="fa-solid fa-laptop-code menu-icon"></i> <span>Hackathon Assistant</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-key-section" style="padding: 15px 0 10px 0; border-top: 1px dashed var(--border-glass); margin: 10px 0 5px 0;">
+                <div style="font-size: 10px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="fa-solid fa-key text-cyan"></i> Gemini API Settings</div>
+                <div style="display:flex; gap:6px;">
+                    <input type="password" id="sidebar-gemini-key" placeholder="Paste Gemini Key..." style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--border-glass); background:var(--slate-card); color:var(--text-primary); font-size:11px; outline:none;" title="Key remains in browser storage and is only sent to your backend.">
+                    <button class="btn btn-sm btn-cyan" onclick="saveGeminiKey(document.getElementById('sidebar-gemini-key').value)" style="padding:8px 10px; font-size:11px; font-weight:700;"><i class="fa-solid fa-save"></i></button>
+                </div>
+                <div style="font-size: 9px; color: var(--text-secondary); margin-top: 5px; line-height:1.2;">Key is stored locally in your browser.</div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-badge" id="profile-card">
+                    <div class="user-avatar" id="avatar-initials">AS</div>
+                    <div class="user-details">
+                        <div class="user-name" id="user-display-name">Alex Smith</div>
+                        <div class="user-role" id="user-display-level">Undergraduate</div>
+                    </div>
+                </div>
+                <button class="btn btn-logout" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Exit App</button>
+            </div>
+        </aside>
+
+        <!-- Mobile Bottom Navigation Bar -->
+        <div class="mobile-nav-bar">
+            <button class="mobile-nav-item active" data-mobile-tab="dashboard" onclick="navigateToTab('dashboard')">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Dashboard</span>
+            </button>
+            <button class="mobile-nav-item" data-mobile-tab="roadmap" onclick="navigateToTab('roadmap')">
+                <i class="fa-solid fa-route"></i>
+                <span>Roadmap</span>
+            </button>
+            <button class="mobile-nav-item" data-mobile-tab="resume" onclick="navigateToTab('resume')">
+                <i class="fa-solid fa-file-invoice"></i>
+                <span>Resume</span>
+            </button>
+            <button class="mobile-nav-item" data-mobile-tab="mock" onclick="navigateToTab('mock')">
+                <i class="fa-solid fa-comments"></i>
+                <span>Prep</span>
+            </button>
+            <button class="mobile-nav-item" data-mobile-tab="hackathon" onclick="navigateToTab('hackathon')">
+                <i class="fa-solid fa-laptop-code"></i>
+                <span>Hackathon</span>
+            </button>
+        </div>
+
+        <!-- Main Workspace Area -->
+        <main class="workspace">
+            <!-- Header bar -->
+            <header class="top-header glass-effect">
+                <div class="page-title-section">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <button id="sidebar-toggle-btn" class="sidebar-toggle-btn" onclick="toggleMobileSidebar()" aria-label="Toggle navigation menu" style="display:none; background:none; border:none; color:var(--text-primary); font-size:20px; cursor:pointer; padding:6px; margin-right:4px;">
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
+                        <h1 id="tab-title">Student Growth Dashboard</h1>
+                        <span id="sandbox-badge" class="badge badge-warning hidden">Guest Demo Mode</span>
+                    </div>
+                    <p class="tab-subtitle" id="tab-subtitle">Track your goals, streaks, and target roadmaps.</p>
+                </div>
+                
+                <div class="header-stats">
+                    <div class="header-stat-badge streak-badge" title="Daily streak tracker">
+                        <i class="fa-solid fa-fire fire-icon"></i>
+                        <span id="streak-counter">1</span> Days
+                    </div>
+                    <div class="header-stat-badge xp-badge" title="Campus XP Points">
+                        <i class="fa-solid fa-star star-icon"></i>
+                        <span id="xp-counter">100</span> XP
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dynamic Views Container -->
+            <section class="content-view" id="content-container">
+                
+                <!-- DASHBOARD 2.0 VIEW -->
+                <div id="view-dashboard" class="tab-view active-view">
+                    <!-- Unified Growth Tracker Grid -->
+                    <div class="growth-tracker-grid">
+                        
+                        <!-- Panel 1: Target Pathway & Streak -->
+                        <div class="glass-card growth-panel-card">
+                            <div class="panel-header-row">
+                                <span class="panel-tag"><i class="fa-solid fa-compass"></i> Career Focus</span>
+                                <i class="fa-solid fa-bullseye panel-icon text-cyan"></i>
+                            </div>
+                            <h2 class="panel-title">Target Pathway</h2>
+                            <p id="dashboard-target-role" class="panel-highlight">Not Configured</p>
+                            <div class="panel-mini-stats">
+                                <div class="mini-stat-item">
+                                    <span class="label">Weekly Commitment</span>
+                                    <span class="value"><i class="fa-solid fa-clock text-blue"></i> 14 hrs</span>
+                                </div>
+                            </div>
+                            <div class="panel-actions">
+                                <button class="btn btn-sm btn-outline btn-block" onclick="navigateToTab('roadmap')">Setup Career Track <i class="fa-solid fa-arrow-right"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Panel 2: Learning Progress -->
+                        <div class="glass-card growth-panel-card">
+                            <div class="panel-header-row">
+                                <span class="panel-tag"><i class="fa-solid fa-route"></i> Roadmap Progress</span>
+                                <i class="fa-solid fa-chart-line panel-icon text-yellow"></i>
+                            </div>
+                            <h2 class="panel-title">Milestone Completion</h2>
+                            <div class="progress-section">
+                                <div class="progress-bar-container large">
+                                    <div class="progress-bar" id="dashboard-roadmap-progress" style="width: 0%"></div>
+                                </div>
+                                <span id="dashboard-roadmap-progress-text" class="panel-highlight-sub">0% Completed</span>
+                            </div>
+                            <div class="panel-mini-stats">
+                                <div class="mini-stat-item">
+                                    <span class="label">Pending Certs</span>
+                                    <span class="value"><i class="fa-solid fa-award text-yellow"></i> <span id="dashboard-certs-count">0</span> Certifications</span>
+                                </div>
+                            </div>
+                            <div class="panel-actions">
+                                <button class="btn btn-sm btn-primary btn-block" onclick="navigateToTab('roadmap')">Resume Learning <i class="fa-solid fa-circle-play"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Panel 3: Application Readiness -->
+                        <div class="glass-card growth-panel-card">
+                            <div class="panel-header-row">
+                                <span class="panel-tag"><i class="fa-solid fa-file-invoice"></i> ATS Verification</span>
+                                <i class="fa-solid fa-shield-halved panel-icon text-green"></i>
+                            </div>
+                            <h2 class="panel-title">Resume Match Score</h2>
+                            <p id="dashboard-resume-score" class="panel-highlight">0 / 100</p>
+                            <div class="nested-progress-section">
+                                <div class="nested-progress-item">
+                                    <div class="nested-labels">
+                                        <span>Readability</span>
+                                        <span id="dashboard-readability-score">0%</span>
+                                    </div>
+                                    <div class="progress-bar-container mini">
+                                        <div class="progress-bar" id="dashboard-readability-bar" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div class="nested-progress-item" style="margin-top: 10px;">
+                                    <div class="nested-labels">
+                                        <span>Industry Alignment</span>
+                                        <span id="dashboard-industry-score">0%</span>
+                                    </div>
+                                    <div class="progress-bar-container mini">
+                                        <div class="progress-bar" id="dashboard-industry-bar" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-actions">
+                                <button class="btn btn-sm btn-outline btn-block" onclick="navigateToTab('resume')">Optimize ATS Profile <i class="fa-solid fa-screwdriver-wrench"></i></button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Main Dashboard Sections -->
+                    <div class="dashboard-details">
+                        <!-- Next Task Card -->
+                        <div class="glass-card large-card">
+                            <div class="card-header">
+                                <h2><i class="fa-solid fa-chevron-right text-blue"></i> Next Learning Milestone</h2>
+                            </div>
+                            <div class="next-task-body" id="dashboard-next-task-body">
+                                <p class="empty-state">No roadmap initialized yet. Select your goal in the Roadmap Engine to begin!</p>
+                            </div>
+                        </div>
+
+                        <!-- Quick Tips / Mentor Card -->
+                        <div class="glass-card medium-card">
+                            <div class="card-header">
+                                <h2><i class="fa-solid fa-lightbulb text-yellow"></i> Mentor Guidance</h2>
+                            </div>
+                            <div class="insight-content">
+                                <p>Welcome to **CampusMate AI**! As your career coach, I recommend initializing your **Target Career Pathway** in the Roadmap panel. We will trace your skill gaps, match certifications, and score your resume against internship applications.</p>
+                                <ul class="insight-list">
+                                    <li><i class="fa-solid fa-circle-check text-blue"></i> Build your resume template.</li>
+                                    <li><i class="fa-solid fa-circle-check text-blue"></i> Execute practice mock interviews.</li>
+                                    <li><i class="fa-solid fa-circle-check text-blue"></i> Run code architectures for hackathons.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ROADMAP ENGINE 2.0 VIEW -->
+                <div id="view-roadmap" class="tab-view hidden-view">
+                    <!-- Roadmap Generator Overlay if no roadmap is generated -->
+                    <div id="roadmap-setup" class="roadmap-setup-overlay glass-card">
+                        <div class="setup-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+                        <h2>Launch Your Career Roadmap</h2>
+                        <p>Select your dream career path and we will use AI deep reasoning to establish a personalized, non-linear milestone tree complete with learning courses, certifications, and projects.</p>
+                        
+                        <div class="setup-form">
+                            <div class="input-group">
+                                <label for="target-career-input">Select Career Track / Dream Goal</label>
+                                <select id="target-career-input">
+                                    <option value="Cyber Security">Cyber Security Specialist</option>
+                                    <option value="AI Engineering">AI System Architect</option>
+                                    <option value="Machine Learning">Machine Learning Engineer</option>
+                                    <option value="Data Science">Data Analyst / Data Scientist</option>
+                                    <option value="Cloud Computing">Cloud Infrastructure Architect</option>
+                                    <option value="DevOps" selected>DevOps Systems Administrator</option>
+                                    <option value="Full Stack Development">Full Stack Web Developer</option>
+                                    <option value="Mobile Development">Mobile Application Developer</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>Your current skills (comma separated)</label>
+                                <input type="text" id="current-skills-input" placeholder="e.g. Python, Git, HTML">
+                            </div>
+                            <button class="btn btn-primary" onclick="triggerRoadmapGeneration()">Generate Career Tree <i class="fa-solid fa-wand-magic-sparkles"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Roadmap Active Graph Screen -->
+                    <div id="roadmap-active-container" class="roadmap-active-layout hidden">
+                        <div class="roadmap-controls">
+                            <div>
+                                <h2 id="active-roadmap-title">Target Path Learning Tree</h2>
+                                <span class="badge badge-warning" style="margin-top:6px;">Zoom & Search Active</span>
+                            </div>
+                            <div style="display:flex; gap:10px;">
+                                <input type="text" id="roadmap-node-search" placeholder="Search topics..." oninput="searchRoadmapNodes()" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border-primary); outline:none; font-size:13px;">
+                                <button class="btn btn-sm btn-outline" onclick="resetRoadmapSetup()"><i class="fa-solid fa-arrows-rotate"></i> Change Track</button>
+                            </div>
+                        </div>
+                        <div class="roadmap-tree-canvas" id="roadmap-tree-canvas">
+                            <!-- Roadmap Nodes will be generated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ATS RESUME BUILDER 2.0 VIEW -->
+                <div id="view-resume" class="tab-view hidden-view">
+                    <div class="resume-workspace-split">
+                        <!-- Left Panel: Input Fields & Uploads -->
+                        <div class="glass-card resume-fields-panel">
+                            <h2>Edit Resume Sections</h2>
+                            <div class="resume-form-scroller">
+                                
+                                <!-- File Upload Mode (Mode 2) -->
+                                <div class="upload-zone-wrapper">
+                                    <label>Mode 2: Upload Existing Resume</label>
+                                    <div class="drag-drop-zone" id="resume-drag-drop-zone">
+                                        <i class="fa-solid fa-cloud-arrow-up cloud-upload-icon"></i>
+                                        <p>Drag and drop PDF or DOCX file here</p>
+                                        <span>or click to browse local files</span>
+                                        <input type="file" id="resume-file-input" class="hidden" accept=".pdf,.docx">
+                                    </div>
+                                    <div id="upload-status-text" class="stat-meta mt-10">No file uploaded.</div>
+                                </div>
+                                <hr class="divider">
+                                
+                                <h3>Mode 1: Create Resume From Scratch</h3>
+                                <div class="input-row" style="margin-bottom:12px;">
+                                    <div class="input-group" style="flex:2;">
+                                        <label for="resume-title-field">Version Name / Title</label>
+                                        <input type="text" id="resume-title-field" value="Alex Smith Academic Resume">
+                                    </div>
+                                    <div class="input-group" style="flex:1;">
+                                        <label for="resume-draft-select">Active Draft</label>
+                                        <select id="resume-draft-select" onchange="handleDraftSelection()" style="padding:10px; border-radius:8px; border:1px solid var(--border-glass); background:var(--slate-card); color:var(--text-primary); font-size:13px; font-weight:500; width:100%;">
+                                            <option value="draft-1" selected>Draft Version A</option>
+                                            <option value="draft-2">Draft Version B</option>
+                                            <option value="draft-3">Draft Version C</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-section">
+                                    <h4 style="font-size:12px; border-bottom:1px solid var(--border-glass); padding-bottom:4px; margin-bottom:8px; color:var(--text-secondary);">1. Personal Details</h4>
+                                    <div class="input-group">
+                                        <label for="res-name">Full Name</label>
+                                        <input type="text" id="res-name" value="Alex Smith">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="res-address">Address Location</label>
+                                        <input type="text" id="res-address" value="San Francisco, California, USA">
+                                    </div>
+                                    <div class="input-row">
+                                        <div class="input-group">
+                                            <label for="res-email">Primary Email</label>
+                                            <input type="email" id="res-email" value="alex.smith@example.edu">
+                                        </div>
+                                        <div class="input-group">
+                                            <label for="res-phone">Phone / Contact ID</label>
+                                            <input type="text" id="res-phone" value="+1 (555) 019-2834">
+                                        </div>
+                                    </div>
+                                    <div class="input-row">
+                                        <div class="input-group">
+                                            <label for="res-linkedin">LinkedIn Profile</label>
+                                            <input type="text" id="res-linkedin" value="linkedin.com/in/alexsmith">
+                                        </div>
+                                        <div class="input-group">
+                                            <label for="res-github">GitHub Repository Link</label>
+                                            <input type="text" id="res-github" value="https://github.com/alexsmith">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="accordion-section">
+                                    <h4 style="font-size:12px; border-bottom:1px solid var(--border-glass); padding-bottom:4px; margin-bottom:8px; color:var(--text-secondary);">2. Education</h4>
+                                    <h5 style="font-size:11px; margin-bottom:6px;">College / University</h5>
+                                    <div class="input-group">
+                                        <label for="res-edu1-inst">Institution Name</label>
+                                        <input type="text" id="res-edu1-inst" value="State Tech University">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="res-edu1-degree">Degree & Major</label>
+                                        <input type="text" id="res-edu1-degree" value="B.S. in Computer Science">
+                                    </div>
+                                    <div class="input-row">
+                                        <div class="input-group">
+                                            <label for="res-edu1-dates">Graduation Term / Year</label>
+                                            <input type="text" id="res-edu1-dates" value="2024 ΓÇô 2028">
+                                        </div>
+                                        <div class="input-group">
+                                            <label for="res-edu1-gpa">CGPA / Score</label>
+                                            <input type="text" id="res-edu1-gpa" value="3.8/4.0">
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="res-edu1-coursework">Coursework Topics</label>
+                                        <input type="text" id="res-edu1-coursework" value="Data Structures, Cryptography, Database Systems, Computer Networks">
+                                    </div>
+
+                                    <h5 style="font-size:11px; margin:10px 0 6px;">Junior College / High School</h5>
+                                    <div class="input-group">
+                                        <label for="res-edu2-inst">Institution Name</label>
+                                        <input type="text" id="res-edu2-inst" value="Central High School">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="res-edu2-degree">Degree & Major</label>
+                                        <input type="text" id="res-edu2-degree" value="High School Diploma">
+                                    </div>
+                                    <div class="input-row">
+                                        <div class="input-group">
+                                            <label for="res-edu2-dates">Graduation Year</label>
+                                            <input type="text" id="res-edu2-dates" value="2020 ΓÇô 2024">
+                                        </div>
+                                        <div class="input-group">
+                                            <label for="res-edu2-gpa">GPA / Score</label>
+                                            <input type="text" id="res-edu2-gpa" value="3.9/4.0">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="accordion-section">
+                                    <h4 style="font-size:12px; border-bottom:1px solid var(--border-glass); padding-bottom:4px; margin-bottom:8px; color:var(--text-secondary);">3. Technical Skills</h4>
+                                    <div class="input-group">
+                                        <label for="res-skills-prog">Programming</label>
+                                        <input type="text" id="res-skills-prog" value="Python, Java, Go">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="res-skills-cyber">Cybersecurity</label>
+                                        <input type="text" id="res-skills-cyber" value="Vulnerability Scanning, Web Security Basics, OWASP Top 10">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="res-skills-os">Operating Systems</label>
+                                        <input type="text" id="res-skills-os" value="Linux, macOS, Windows">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="res-skills-tools">Tools</label>
+                                        <input type="text" id="res-skills-tools" value="Git, Docker, VS Code, Command Line">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="res-skills-web">Web</label>
+                                        <input type="text" id="res-skills-web" value="HTML, CSS, Flask, React">
+                                    </div>
+                                </div>
+
+                                <div class="accordion-section">
+                                    <h4 style="font-size:12px; border-bottom:1px solid var(--border-glass); padding-bottom:4px; margin-bottom:8px; color:var(--text-secondary);">4. Experience</h4>
+                                    <div class="input-group">
+                                        <label for="res-exp-role">Role & Company</label>
+                                        <input type="text" id="res-exp-role" value="Software Engineering Intern">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="res-exp-comp">Institution/Company Name</label>
+                                        <input type="text" id="res-exp-comp" value="Global Tech Solutions">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="res-exp-dates">Duration Dates</label>
+                                        <input type="text" id="res-exp-dates" value="June 2025 ΓÇô August 2025">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Experience Bullet Points</label>
+                                        <input type="text" id="res-exp-b1" style="margin-bottom:6px;" value="Contributed to the design and development of automated data analysis pipelines." class="res-bullet-input">
+                                        <input type="text" id="res-exp-b2" style="margin-bottom:6px;" value="Implemented secure coding practices using Python and Flask for backend APIs." class="res-bullet-input">
+                                        <input type="text" id="res-exp-b3" style="margin-bottom:6px;" value="Supported data migration and JWT authentication modules to improve system security." class="res-bullet-input">
+                                        <input type="text" id="res-exp-b4" value="Collaborated with engineers to test and refine code architectures for improved reliability." class="res-bullet-input">
+                                        
+                                        <!-- Action-Verb Assistant panel -->
+                                        <div class="action-verb-assistant" style="margin-top:10px; padding:10px; background:rgba(15,23,42,0.15); border:1px solid var(--border-glass); border-radius:8px;">
+                                            <div style="font-size:11px; font-weight:600; color:var(--text-secondary); margin-bottom:5px;"><i class="fa-solid fa-list-check text-cyan"></i> Action-Verb Assistant (Click to insert)</div>
+                                            <div class="verb-category-title">Leadership & Development</div>
+                                            <div class="verb-chips-container">
+                                                <span class="verb-chip" onclick="insertActionVerb('Architected')">Architected</span>
+                                                <span class="verb-chip" onclick="insertActionVerb('Engineered')">Engineered</span>
+                                                <span class="verb-chip" onclick="insertActionVerb('Optimized')">Optimized</span>
+                                                <span class="verb-chip" onclick="insertActionVerb('Automated')">Automated</span>
+                                                <span class="verb-chip" onclick="insertActionVerb('Implemented')">Implemented</span>
+                                            </div>
+                                            <div class="verb-category-title">Security & Cyber Operations</div>
+                                            <div class="verb-chips-container">
+                                                <span class="verb-chip" onclick="insertActionVerb('Vulnerability-scanned')">Vulnerability-scanned</span>
+                                                <span class="verb-chip" onclick="insertActionVerb('Hardened')">Hardened</span>
+                                                <span class="verb-chip" onclick="insertActionVerb('Audited')">Audited</span>
+                                                <span class="verb-chip" onclick="insertActionVerb('Investigated')">Investigated</span>
+                                                <span class="verb-chip" onclick="insertActionVerb('Secured')">Secured</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="accordion-section">
+                                    <h4 style="font-size:12px; border-bottom:1px solid var(--border-glass); padding-bottom:4px; margin-bottom:8px; color:var(--text-secondary);">5. Projects</h4>
+                                    <div class="input-group">
+                                        <label for="res-proj-title">Project Name</label>
+                                        <input type="text" id="res-proj-title" value="AegisShield AI ΓÇô Cyber Crime Detection Platform">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="res-proj-link">Repository Link / Details</label>
+                                        <input type="text" id="res-proj-link" value="github.com/alexsmith/aegisshield-ai">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Project Bullet Points</label>
+                                        <input type="text" id="res-proj-b1" style="margin-bottom:6px;" value="Developed a web-based platform using Python, Flask, HTML, and CSS to support cybercrime reporting and analysis." class="res-bullet-input">
+                                        <input type="text" id="res-proj-b2" style="margin-bottom:6px;" value="Implemented user authentication, routing, and activity logging to ensure secure data handling." class="res-bullet-input">
+                                        <input type="text" id="res-proj-b3" value="Focused on applying secure web development principles and structured threat analysis workflows." class="res-bullet-input">
+                                        
+                                        <!-- Action-Verb Assistant panel -->
+                                        <div class="action-verb-assistant" style="margin-top:10px; padding:10px; background:rgba(15,23,42,0.15); border:1px solid var(--border-glass); border-radius:8px;">
+                                            <div style="font-size:11px; font-weight:600; color:var(--text-secondary); margin-bottom:5px;"><i class="fa-solid fa-list-check text-cyan"></i> Action-Verb Assistant (Click to insert)</div>
+                                            <div class="verb-category-title">Execution & Deployment</div>
+                                            <div class="verb-chips-container">
+                                                <span class="verb-chip" onclick="insertActionVerb('Deployed')">Deployed</span>
+                                                <span class="verb-chip" onclick="insertActionVerb('Designed')">Designed</span>
+                                                <span class="verb-chip" onclick="insertActionVerb('Integrated')">Integrated</span>
+                                                <span class="verb-chip" onclick="insertActionVerb('Restructured')">Restructured</span>
+                                                <span class="verb-chip" onclick="insertActionVerb('Configured')">Configured</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="accordion-section">
+                                    <h4 style="font-size:12px; border-bottom:1px solid var(--border-glass); padding-bottom:4px; margin-bottom:8px; color:var(--text-secondary);">6. Certifications</h4>
+                                    <div class="input-group">
+                                        <label>List Certifications</label>
+                                        <input type="text" id="res-cert-c1" style="margin-bottom:6px;" value="Deloitte Australia Cyber Job Simulation (Forage)">
+                                        <input type="text" id="res-cert-c2" style="margin-bottom:6px;" value="Cyber Security & Ethical Hacking Workshop (DV Analytics)">
+                                        <input type="text" id="res-cert-c3" style="margin-bottom:6px;" value="Python Tutorial Module Certificate of Excellence (Scaler)">
+                                        <input type="text" id="res-cert-c4" value="Python Course for Beginners: Mastering the Essentials (Scaler)">
+                                    </div>
+                                </div>
+                                
+                                <button class="btn btn-primary btn-block" onclick="saveResumeContent()">Save Draft & Verify <i class="fa-solid fa-floppy-disk"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Resume Rendering & ATS Analyzer -->
+                        <div class="resume-preview-panel">
+                            <div class="resume-toolbar">
+                                <div class="theme-selector">
+                                    Theme: 
+                                    <select id="resume-theme-select" onchange="changeResumeTheme()" style="padding:6px; border-radius:6px; border:1px solid var(--border-glass); font-size:13px; font-weight:500;">
+                                        <option value="classic" selected>Classic Ivory</option>
+                                        <option value="modern-cyan">Modern Cyan Accent</option>
+                                        <option value="slate-glass">Slate Glassmorphic</option>
+                                        <option value="minimalist-executive">Minimalist Executive</option>
+                                        <option value="tech-mono">Tech Minimalist</option>
+                                        <option value="creative-violet">Creative Violet</option>
+                                        <option value="emerald-forest">Emerald Forest</option>
+                                        <option value="royal-indigo">Royal Indigo</option>
+                                        <option value="corporate-navy">Corporate Navy</option>
+                                        <option value="modern-warm">Modern Warm</option>
+                                        <option value="clean-slate">Clean Slate</option>
+                                        <option value="elegant-georgia">Elegant Georgia</option>
+                                        <option value="stanford-academic">Stanford Academic</option>
+                                        <option value="sleek-tech">Sleek Tech</option>
+                                        <option value="compact-cv">Compact CV</option>
+                                        <option value="hybrid-columns">Double Column Hybrid</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-sm btn-outline" onclick="downloadResumePDF()"><i class="fa-solid fa-download"></i> Download PDF</button>
+                            </div>
+
+                            <!-- PDF Sheet Paper Wrapper -->
+                            <div class="resume-sheet classic" id="resume-sheet-paper">
+                                <div class="resume-render-header" style="text-align: left;">
+                                    <h1 id="res-render-name" style="font-size:20px; font-weight:700; margin-bottom:5px; text-transform:uppercase;">Alex Smith</h1>
+                                    <div class="resume-render-meta" style="font-size:11px; color:#475569; line-height:1.4;">
+                                        <span id="res-render-address">San Francisco, California, USA</span><br>
+                                        <span id="res-render-email">alex.smith@example.edu</span> | <span id="res-render-phone">+1 (555) 019-2834</span> | 
+                                        <span id="res-render-linkedin">linkedin.com/in/alexsmith</span> | <span id="res-render-links">https://github.com/alexsmith</span>
+                                    </div>
+                                </div>
+
+                                <div class="resume-render-section" style="margin-top:15px;">
+                                    <h2 style="font-size: 13px; font-weight: 700; border-bottom: 1px solid #1e293b; padding-bottom: 3px; margin-bottom: 8px; text-transform:uppercase;">Education</h2>
+                                    
+                                    <div style="margin-bottom: 8px;">
+                                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:12px;">
+                                            <span id="res-render-edu1-inst">State Tech University</span>
+                                            <span id="res-render-edu1-degree" style="font-weight:normal;">B.S. in Computer Science</span>
+                                        </div>
+                                        <div style="display:flex; justify-content:space-between; font-size:11px; color:#64748b; margin-top:2px;">
+                                            <span id="res-render-edu1-dates">2024 ΓÇô 2028</span>
+                                            <span>CGPA: <strong id="res-render-edu1-gpa">3.8/4.0</strong></span>
+                                        </div>
+                                        <div style="font-size:11px; margin-top:4px;" id="res-render-edu1-coursework">
+                                            Relevant Coursework: Data Structures, Cryptography, Database Systems, Computer Networks
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:12px;">
+                                            <span id="res-render-edu2-inst">Central High School</span>
+                                            <span id="res-render-edu2-degree" style="font-weight:normal;">High School Diploma</span>
+                                        </div>
+                                        <div style="display:flex; justify-content:space-between; font-size:11px; color:#64748b; margin-top:2px;">
+                                            <span id="res-render-edu2-dates">2020 ΓÇô 2024</span>
+                                            <span>GPA: <strong id="res-render-edu2-gpa">3.9/4.0</strong></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="resume-render-section" style="margin-top:15px;">
+                                    <h2 style="font-size: 13px; font-weight: 700; border-bottom: 1px solid #1e293b; padding-bottom: 3px; margin-bottom: 8px; text-transform:uppercase;">Technical Skills</h2>
+                                    <div style="font-size:11px; line-height:1.5;">
+                                        <div><strong>Programming:</strong> <span id="res-render-skills-prog">Python, Java, Go</span></div>
+                                        <div><strong>Cybersecurity:</strong> <span id="res-render-skills-cyber">Vulnerability Scanning, Web Security Basics, OWASP Top 10</span></div>
+                                        <div><strong>Operating Systems:</strong> <span id="res-render-skills-os">Linux, macOS, Windows</span></div>
+                                        <div><strong>Tools:</strong> <span id="res-render-skills-tools">Git, Docker, VS Code, Command Line</span></div>
+                                        <div><strong>Web:</strong> <span id="res-render-skills-web">HTML, CSS, Flask, React</span></div>
+                                    </div>
+                                </div>
+
+                                <div class="resume-render-section" style="margin-top:15px;">
+                                    <h2 style="font-size: 13px; font-weight: 700; border-bottom: 1px solid #1e293b; padding-bottom: 3px; margin-bottom: 8px; text-transform:uppercase;">Experience</h2>
+                                    <div>
+                                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:12px;">
+                                            <span id="res-render-exp-role">Software Engineering Intern</span>
+                                            <span id="res-render-exp-dates">June 2025 ΓÇô August 2025</span>
+                                        </div>
+                                        <div style="font-size: 11px; font-style: italic; color:#64748b;" id="res-render-exp-comp">Global Tech Solutions</div>
+                                        <ul class="bullet-list" style="font-size:11px; margin-left:18px; margin-top:4px; line-height:1.4;">
+                                            <li id="res-render-exp-b1">Contributed to the design and development of automated data analysis pipelines.</li>
+                                            <li id="res-render-exp-b2">Implemented secure coding practices using Python and Flask for backend APIs.</li>
+                                            <li id="res-render-exp-b3">Supported data migration and JWT authentication modules to improve system security.</li>
+                                            <li id="res-render-exp-b4">Collaborated with engineers to test and refine code architectures for improved reliability.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="resume-render-section" style="margin-top:15px;">
+                                    <h2 style="font-size: 13px; font-weight: 700; border-bottom: 1px solid #1e293b; padding-bottom: 3px; margin-bottom: 8px; text-transform:uppercase;">Projects</h2>
+                                    <div>
+                                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:12px;">
+                                            <span id="res-render-proj-title">AegisShield AI ΓÇô Cyber Crime Detection Platform</span>
+                                            <span id="res-render-proj-link" style="font-weight:normal; font-size:11px; color:#475569;">github.com/alexsmith/aegisshield-ai</span>
+                                        </div>
+                                        <ul class="bullet-list" style="font-size:11px; margin-left:18px; margin-top:4px; line-height:1.4;">
+                                            <li id="res-render-proj-b1">Developed a web-based platform using Python, Flask, HTML, and CSS to support cybercrime reporting and analysis.</li>
+                                            <li id="res-render-proj-b2">Implemented user authentication, routing, and activity logging to ensure secure data handling.</li>
+                                            <li id="res-render-proj-b3">Focused on applying secure web development principles and structured threat analysis workflows.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="resume-render-section" style="margin-top:15px;">
+                                    <h2 style="font-size: 13px; font-weight: 700; border-bottom: 1px solid #1e293b; padding-bottom: 3px; margin-bottom: 8px; text-transform:uppercase;">Certifications</h2>
+                                    <ul class="bullet-list" style="font-size:11px; margin-left:18px; margin-top:4px; line-height:1.4;">
+                                        <li id="res-render-cert-c1">Deloitte Australia Cyber Job Simulation (Forage)</li>
+                                        <li id="res-render-cert-c2">Cyber Security & Ethical Hacking Workshop (DV Analytics)</li>
+                                        <li id="res-render-cert-c3">Python Tutorial Module Certificate of Excellence (Scaler)</li>
+                                        <li id="res-render-cert-c4">Python Course for Beginners: Mastering the Essentials (Scaler)</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- ATS Score / Review Drawer -->
+                            <div class="glass-card ats-feedback-card">
+                                <div class="ats-header">
+                                    <div class="ats-score-comparison-wrapper" style="display:flex; flex-direction:column; gap:10px; width:100%;">
+                                        <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                                            <div>
+                                                <div style="font-size:11px; text-transform:uppercase; color:var(--text-secondary); font-weight:600; letter-spacing:0.5px;">ATS Scoring Engine</div>
+                                                <h3 style="font-size:20px; margin-top:2px;">ATS Match: <span id="ats-score-display" class="text-blue">--%</span></h3>
+                                            </div>
+                                            <div style="text-align:right;">
+                                                <span class="badge badge-warning" id="ats-score-badge">Audit Pending</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Score comparison tracker -->
+                                        <div class="score-tracker-bar" style="display:flex; gap:10px; background:rgba(15,23,42,0.03); border:1px solid var(--border-glass); border-radius:8px; padding:10px 15px; font-size:12px; justify-content:space-between; align-items:center; width:100%;">
+                                            <div>Original Score: <strong id="ats-original-score" style="color:var(--text-secondary);">--</strong></div>
+                                            <div style="color:var(--border-glass);">|</div>
+                                            <div>Current Upgraded: <strong id="ats-upgraded-score" style="color:var(--blue);">--</strong></div>
+                                            <button class="btn btn-sm btn-cyan" id="btn-auto-upgrade" onclick="autoUpgradeResume()" style="padding:4px 8px; font-size:10px; border-radius:4px;"><i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Optimize</button>
+                                        </div>
+                                        
+                                        <div class="ats-sub-scores" style="display:flex; gap:15px; font-size:12px; color:var(--text-secondary); margin-top:4px;">
+                                            <span>Readability: <strong id="ats-readability-display">--%</strong></span>
+                                            <span>Alignment: <strong id="ats-alignment-display">--%</strong></span>
+                                        </div>
+                                        
+                                        <!-- Live Keyword Scanner checklist -->
+                                        <div class="live-keyword-scanner-box" style="margin-top:12px; padding:12px; background:rgba(15,23,42,0.15); border:1px solid var(--border-glass); border-radius:8px; width:100%;">
+                                            <div style="font-size:11px; font-weight:600; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;"><i class="fa-solid fa-satellite-dish text-cyan"></i> Live ATS Keyword Check</div>
+                                            <div id="live-keywords-list" style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+                                                <!-- Populated dynamically via JS matching current roadmap track skills -->
+                                                <div class="live-keyword-item" id="kw-python"><i class="fa-solid fa-circle-notch"></i> Python</div>
+                                                <div class="live-keyword-item" id="kw-flask"><i class="fa-solid fa-circle-notch"></i> Flask</div>
+                                                <div class="live-keyword-item" id="kw-wireshark"><i class="fa-solid fa-circle-notch"></i> Wireshark</div>
+                                                <div class="live-keyword-item" id="kw-docker"><i class="fa-solid fa-circle-notch"></i> Docker</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="margin-top:10px;">
+                                        <button class="btn btn-sm btn-cyan" onclick="triggerResumeATSAnalysis()">Analyze Score <i class="fa-solid fa-wand-magic-sparkles"></i></button>
+                                    </div>
+                                </div>
+                                <div class="ats-body" id="ats-analysis-body">
+                                    <p class="empty-state">Click 'Analyze Score' to run deep reasoning AI checks against your target job.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INTERVIEW MOCK VIEW -->
+                <div id="view-mock" class="tab-view hidden-view">
+                    <div class="mock-layout">
+                        <!-- Setup Window -->
+                        <div class="glass-card mock-setup" id="mock-setup-window">
+                            <div class="setup-icon"><i class="fa-solid fa-comments"></i></div>
+                            <h2>AI Technical Interview Prep</h2>
+                            <p>Test your competencies with our conversational mock interviewer. Receive structured analysis, scores, and corrective solutions.</p>
+                            <div class="setup-form">
+                                <div class="input-group">
+                                    <label for="mock-role-input">Interview Target Role</label>
+                                    <input type="text" id="mock-role-input" placeholder="e.g. Backend Engineer, Systems Security, Cloud Architect">
+                                </div>
+                                <button class="btn btn-primary" onclick="startMockInterview()">Launch Interview <i class="fa-solid fa-microphone"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Active Interview Window -->
+                        <div class="glass-card mock-active hidden" id="mock-active-window">
+                            <div class="mock-header">
+                                <span class="interview-badge"><i class="fa-solid fa-circle-dot text-red animate-pulse"></i> Live Mock session</span>
+                                <span id="mock-question-counter">Question 1 of 3</span>
+                            </div>
+                            <div class="mock-question-display">
+                                <p class="question-label">INTERVIEWER QUESTION:</p>
+                                <p id="mock-question-text" class="question-text">Retrieving question...</p>
+                            </div>
+                            <div class="mock-response-area">
+                                <label for="mock-answer-input">Your Answer</label>
+                                <textarea id="mock-answer-input" rows="5" placeholder="Type your response here... (or speak)"></textarea>
+                            </div>
+                            <div class="mock-controls">
+                                <button class="btn btn-outline" id="mock-skip-btn" onclick="abortMockInterview()">Cancel Session</button>
+                                <button class="btn btn-cyan" id="mock-submit-btn" onclick="submitMockAnswer()">Submit Answer <i class="fa-solid fa-paper-plane"></i></button>
+                            </div>
+                            <!-- Feedback Card -->
+                            <div class="mock-feedback-card hidden" id="mock-feedback-box">
+                                <h4>AI Interlinear Evaluation:</h4>
+                                <div class="score-line">Score: <strong id="mock-item-score" class="text-blue">0/100</strong></div>
+                                <p class="feedback-desc" id="mock-item-desc">Feedback details...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HACKATHON VIEW -->
+                <div id="view-hackathon" class="tab-view hidden-view">
+                    <div class="hackathon-layout">
+                        <div class="glass-card hackathon-card">
+                            <div class="setup-icon"><i class="fa-solid fa-laptop-code"></i></div>
+                            <h2>Hackathon Project Generator</h2>
+                            <p>Entering a hackathon? Type the theme, track, or problem statement, and we will formulate system architectures, database designs, PPT outlines, and folder templates.</p>
+                            
+                            <div class="setup-form">
+                                <div class="input-group">
+                                    <label for="hackathon-theme">Hackathon Theme / Topic</label>
+                                    <input type="text" id="hackathon-theme" placeholder="e.g. Climate Tech Tracker, Healthcare AI, Web3 Gaming">
+                                </div>
+                                <button class="btn btn-primary" onclick="generateHackathonConcept()">Generate Blueprint <i class="fa-solid fa-wand-magic-sparkles"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Hackathon Output Screen -->
+                        <div class="glass-card hackathon-output-card hidden" id="hackathon-output-container">
+                            <div class="output-header">
+                                <h3>Hackathon MVP Blueprint</h3>
+                                <button class="btn btn-sm btn-outline" onclick="closeHackathonOutput()"><i class="fa-solid fa-arrow-left"></i> Change Theme</button>
+                            </div>
+                            <div class="output-body markdown-body" id="hackathon-markdown-output">
+                                <!-- Markdown content generated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </main>
+        
+        <!-- FLOATING AI MENTOR SIDE DRAWER (AI MENTOR 2.0) -->
+        <div id="mentor-drawer" class="mentor-drawer glass-effect">
+            <div class="mentor-header" onclick="toggleMentorDrawer()">
+                <div class="mentor-avatar"><i class="fa-solid fa-robot"></i></div>
+                <div class="mentor-title">
+                    <h4>AI Mentor Coach 2.0</h4>
+                    <span>Active Profile Helper</span>
+                </div>
+                <button class="mentor-toggle-btn"><i class="fa-solid fa-chevron-up" id="mentor-arrow-icon"></i></button>
+            </div>
+            <div class="mentor-body">
+                <div class="mentor-memory-bar" id="mentor-memory-bar" style="background: rgba(37, 99, 235, 0.04); border-bottom: 1px solid var(--border-glass); padding: 8px 15px; font-size: 11px; color: var(--text-secondary); display: flex; gap: 8px; align-items: center; justify-content: space-between;">
+                    <span style="display:flex; align-items:center; gap:6px;"><i class="fa-solid fa-brain" style="color: var(--blue);"></i> <span id="mentor-memory-text">Memory: Target Track: None | XP: 100</span></span>
+                    <button class="btn btn-sm btn-outline" onclick="localStorage.removeItem('campusmate_sandbox_chat_history'); loadChatHistory();" style="padding:2px 6px; font-size:9px; border-radius:4px;"><i class="fa-solid fa-trash"></i> Reset Chat</button>
+                </div>
+                <div class="mentor-messages" id="mentor-chat-messages">
+                    <div class="message mentor">
+                        <p>Hello! I am your career mentor. Ask me questions about roadmaps, certifications, project architectures, or resumes!</p>
+                        <span class="time">Just now</span>
+                    </div>
+                </div>
+                <!-- Dialogue chips -->
+                <div class="chat-chips-container" id="mentor-chat-chips">
+                    <button class="chip" onclick="handleChipClick('What certifications fit my target track?')">What certs fit this?</button>
+                    <button class="chip" onclick="handleChipClick('Recommend a project template.')">Recommend a project</button>
+                    <button class="chip" onclick="handleChipClick('Check my experience bullet points.')">Check my resume</button>
+                </div>
+                <form class="mentor-input-area" onsubmit="sendMentorMessage(event)">
+                    <input type="text" id="mentor-user-input" placeholder="Ask about system design, code, etc..." required>
+                    <button type="submit" class="mentor-send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Dynamic Roadmap Node Modal Popup -->
+    <div id="node-modal" class="modal-overlay hidden">
+        <div class="glass-card node-modal-card animate-pop">
+            <div class="node-modal-header">
+                <h2 id="node-modal-title">Node Title</h2>
+                <button class="btn-close" onclick="closeNodeModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="node-modal-body">
+                <p id="node-modal-desc" class="node-desc">Node description goes here.</p>
+                <div class="node-meta">
+                    <span>Difficulty: <strong id="node-modal-difficulty" class="text-blue">BEGINNER</strong></span>
+                    <span>Duration: <strong id="node-modal-duration" class="text-blue">10 hours</strong></span>
+                </div>
+                
+                <hr class="divider">
+                
+                <!-- Resources Accordion -->
+                <div class="accordion-section">
+                    <h4><i class="fa-solid fa-book-open text-blue"></i> Learning Resources</h4>
+                    <ul id="node-modal-resources" class="resource-list"></ul>
+                </div>
+                
+                <!-- Project Accordion -->
+                <div class="accordion-section">
+                    <h4><i class="fa-solid fa-code text-blue"></i> Mini Project Target</h4>
+                    <div class="project-info-box" id="node-modal-project"></div>
+                </div>
+
+                <!-- Certifications Accordion -->
+                <div class="accordion-section">
+                    <h4><i class="fa-solid fa-award text-blue"></i> Certificate Matching</h4>
+                    <ul id="node-modal-certs" class="cert-list"></ul>
+                </div>
+
+                <div class="node-action-footer">
+                    <button id="node-modal-action-btn" class="btn btn-primary" onclick="markNodeAsCompleted()">Mark Complete <i class="fa-solid fa-check"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Logic Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/app.js?v=2.2"></script>
+</body>
+</html>
