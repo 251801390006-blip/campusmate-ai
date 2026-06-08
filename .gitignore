@@ -1,0 +1,12 @@
+# Python virtual environment
+.venv/
+__pycache__/
+*.pyc
+
+# Local Database files
+database.db
+database.db-journal
+
+# Logs and system generation folders
+.system_generated/
+*.log

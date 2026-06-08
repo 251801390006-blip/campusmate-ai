@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusMate AI — The Complete AI Operating System for Students</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Style Sheets -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="dark-mode">
+
+    <!-- STUNNING LANDING PAGE VIEW -->
+    <div id="landing-container" class="landing-layout">
+        <!-- Landing Header -->
+        <header class="landing-header glass-effect">
+            <div class="logo"><i class="fa-solid fa-graduation-cap"></i> CampusMate AI</div>
+            <div class="landing-nav">
+                <a href="#features">Features</a>
+                <button class="btn btn-sm btn-outline" onclick="showAuthModal('login')">Sign In</button>
+                <button class="btn btn-sm btn-primary" onclick="showAuthModal('signup')">Sign Up</button>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-badge animate-pulse"><i class="fa-solid fa-wand-magic-sparkles"></i> Next-Gen Student Operating System</div>
+            <h1 class="hero-title">The Complete <span class="gradient-text">AI Operating System</span> for Students</h1>
+            <p class="hero-subtitle">Learn faster, plan roadmaps, build ATS-optimized resumes, simulate mock interviews, and organize hackathons with a deep reasoning career mentor.</p>
+            
+            <div class="hero-ctas">
+                <button class="btn btn-primary btn-lg" onclick="launchSandboxMode()">Launch App Sandbox <i class="fa-solid fa-circle-play"></i></button>
+                <button class="btn btn-outline btn-lg" onclick="showAuthModal('login')">Connect Server Account <i class="fa-solid fa-server"></i></button>
+            </div>
+            
+            <div class="sandbox-tip"><i class="fa-solid fa-circle-info text-cyan"></i> Sandbox mode runs 100% locally in your browser using local storage. No server required!</div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="features-section">
+            <h2 class="section-title">An Interconnected Student Growth Ecosystem</h2>
+            <p class="section-subtitle">Everything you need to accelerate your career, from goal mapping to portfolio building.</p>
+            
+            <div class="features-grid">
+                <div class="glass-card feature-card">
+                    <div class="feature-icon cyan"><i class="fa-solid fa-route"></i></div>
+                    <h3>Roadmap Engine</h3>
+                    <p>Generate non-linear interactive learning pathways with milestones, specific resources, and progress tracking.</p>
+                </div>
+                <div class="glass-card feature-card">
+                    <div class="feature-icon blue"><i class="fa-solid fa-file-invoice"></i></div>
+                    <h3>ATS Resume Builder</h3>
+                    <p>Build professional resumes and run deep reasoning audits to check keyword alignment against your target career path.</p>
+                </div>
+                <div class="glass-card feature-card">
+                    <div class="feature-icon green"><i class="fa-solid fa-comments"></i></div>
+                    <h3>Interview Simulator</h3>
+                    <p>Conduct technical and behavioral mock sessions with constructive grading and model answer feedback.</p>
+                </div>
+                <div class="glass-card feature-card">
+                    <div class="feature-icon yellow"><i class="fa-solid fa-laptop-code"></i></div>
+                    <h3>Hackathon Assistant</h3>
+                    <p>Instantly generate MVP specs, database schemas, presentation slides templates, and repository folder layouts.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Footer -->
+        <footer class="landing-footer">
+            <p>© 2026 CampusMate AI. Built by an Elite Product Team.</p>
+        </footer>
+    </div>
+    
+    <!-- AUTH MODALS CONTAINER -->
+    <div id="auth-overlay" class="modal-overlay hidden">
+        <div class="glass-card auth-card animate-pop">
+            <div class="auth-header">
+                <div class="logo"><i class="fa-solid fa-graduation-cap"></i> CampusMate AI</div>
+                <p class="tagline">Sign in to sync your profile database</p>
+                <button class="auth-close-btn" onclick="closeAuthModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <!-- Tab Headers -->
+            <div class="auth-tabs">
+                <button id="tab-login-btn" class="auth-tab active" onclick="switchAuthTab('login')">Login</button>
+                <button id="tab-signup-btn" class="auth-tab" onclick="switchAuthTab('signup')">Sign Up</button>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="login-form" class="auth-form" onsubmit="handleLogin(event)">
+                <div class="input-group">
+                    <label for="login-email">Email Address</label>
+                    <input type="email" id="login-email" required placeholder="name@university.edu">
+                </div>
+                <div class="input-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Sign In <i class="fa-solid fa-arrow-right"></i></button>
+            </form>
+            
+            <!-- Signup Form -->
+            <form id="signup-form" class="auth-form hidden" onsubmit="handleSignup(event)">
+                <div class="input-group">
+                    <label for="signup-name">Full Name</label>
+                    <input type="text" id="signup-name" required placeholder="Alex Smith">
+                </div>
+                <div class="input-group">
+                    <label for="signup-email">Email Address</label>
+                    <input type="email" id="signup-email" required placeholder="name@university.edu">
+                </div>
+                <div class="input-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" required placeholder="Create secure password">
+                </div>
+                <div class="input-group">
+                    <label for="signup-level">Academic Level</label>
+                    <select id="signup-level">
+                        <option value="HIGH_SCHOOL">High School Student</option>
+                        <option value="UNDERGRADUATE" selected>Undergraduate Student</option>
+                        <option value="POSTGRADUATE">Postgraduate / Master Student</option>
+                        <option value="SELF_LEARNER">Self Learner</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Create Account <i class="fa-solid fa-user-plus"></i></button>
+            </form>
+            <div id="auth-error-msg" class="error-msg hidden">Invalid login credentials. Please check input.</div>
+        </div>
+    </div>
+
+    <!-- MAIN APP WRAPPER -->
+    <div id="app-container" class="app-layout hidden">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar glass-effect">
+            <div class="sidebar-brand">
+                <i class="fa-solid fa-graduation-cap brand-icon"></i>
+                <span class="brand-name">CampusMate AI</span>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <a href="#" class="menu-item active" data-tab="dashboard" onclick="navigateToTab('dashboard')">
+                    <i class="fa-solid fa-chart-pie menu-icon"></i> <span>Dashboard</span>
+                </a>
+                <a href="#" class="menu-item" data-tab="roadmap" onclick="navigateToTab('roadmap')">
+                    <i class="fa-solid fa-route menu-icon"></i> <span>Roadmap Engine</span>
+                </a>
+                <a href="#" class="menu-item" data-tab="resume" onclick="navigateToTab('resume')">
+                    <i class="fa-solid fa-file-invoice menu-icon"></i> <span>ATS Resume Builder</span>
+                </a>
+                <a href="#" class="menu-item" data-tab="mock" onclick="navigateToTab('mock')">
+                    <i class="fa-solid fa-comments menu-icon"></i> <span>Interview Prep</span>
+                </a>
+                <a href="#" class="menu-item" data-tab="hackathon" onclick="navigateToTab('hackathon')">
+                    <i class="fa-solid fa-laptop-code menu-icon"></i> <span>Hackathon Assistant</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-badge" id="profile-card">
+                    <div class="user-avatar" id="avatar-initials">AS</div>
+                    <div class="user-details">
+                        <div class="user-name" id="user-display-name">Alex Smith</div>
+                        <div class="user-role" id="user-display-level">Undergraduate</div>
+                    </div>
+                </div>
+                <button class="btn btn-logout" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Exit App</button>
+            </div>
+        </aside>
+
+        <!-- Main Workspace Area -->
+        <main class="workspace">
+            <!-- Header bar -->
+            <header class="top-header glass-effect">
+                <div class="page-title-section">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <h1 id="tab-title">Student Growth Dashboard</h1>
+                        <span id="sandbox-badge" class="badge badge-warning hidden">Sandbox Mode</span>
+                    </div>
+                    <p class="tab-subtitle" id="tab-subtitle">Track your goals, streaks, and target roadmaps.</p>
+                </div>
+                
+                <div class="header-stats">
+                    <div class="header-stat-badge streak-badge" title="Daily streak tracker">
+                        <i class="fa-solid fa-fire fire-icon"></i>
+                        <span id="streak-counter">1</span> Days
+                    </div>
+                    <div class="header-stat-badge xp-badge" title="Campus XP Points">
+                        <i class="fa-solid fa-star star-icon"></i>
+                        <span id="xp-counter">100</span> XP
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dynamic Views Container -->
+            <section class="content-view" id="content-container">
+                
+                <!-- DASHBOARD VIEW -->
+                <div id="view-dashboard" class="tab-view active-view">
+                    <!-- Status overview cards -->
+                    <div class="stats-grid">
+                        <div class="glass-card stat-card">
+                            <div class="card-icon cyan"><i class="fa-solid fa-bullseye"></i></div>
+                            <div class="stat-info">
+                                <h3>Target Path</h3>
+                                <p id="dashboard-target-role" class="stat-highlight">Not Configured</p>
+                                <button class="btn btn-sm btn-outline" onclick="navigateToTab('roadmap')">Setup Path</button>
+                            </div>
+                        </div>
+                        <div class="glass-card stat-card">
+                            <div class="card-icon blue"><i class="fa-solid fa-spinner"></i></div>
+                            <div class="stat-info">
+                                <h3>Roadmap Progress</h3>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar" id="dashboard-roadmap-progress" style="width: 0%"></div>
+                                </div>
+                                <p id="dashboard-roadmap-progress-text" class="stat-meta">0% Completed</p>
+                            </div>
+                        </div>
+                        <div class="glass-card stat-card">
+                            <div class="card-icon green"><i class="fa-solid fa-file-circle-check"></i></div>
+                            <div class="stat-info">
+                                <h3>ATS Resume Quality</h3>
+                                <p id="dashboard-resume-score" class="stat-highlight">0 / 100</p>
+                                <p class="stat-meta">ATS Score rating</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Dashboard Sections -->
+                    <div class="dashboard-details">
+                        <!-- Next Task Card -->
+                        <div class="glass-card large-card">
+                            <div class="card-header">
+                                <h2><i class="fa-solid fa-chevron-right text-cyan"></i> Next Roadmap Node</h2>
+                            </div>
+                            <div class="next-task-body" id="dashboard-next-task-body">
+                                <p class="empty-state">No roadmap initialized yet. Select your goal in the Roadmap Engine to begin!</p>
+                            </div>
+                        </div>
+
+                        <!-- Quick Tips / Mentor Card -->
+                        <div class="glass-card medium-card">
+                            <div class="card-header">
+                                <h2><i class="fa-solid fa-lightbulb text-yellow"></i> Mentor Insights</h2>
+                            </div>
+                            <div class="insight-content">
+                                <p>Welcome to **CampusMate AI**! As your coach, I recommend initializing your **Target Career Pathway** in the Roadmap panel. We will trace your skill gaps, match certifications, and score your resume against internship applications.</p>
+                                <ul class="insight-list">
+                                    <li><i class="fa-solid fa-circle-check text-cyan"></i> Build your resume template.</li>
+                                    <li><i class="fa-solid fa-circle-check text-cyan"></i> Execute practice mock interviews.</li>
+                                    <li><i class="fa-solid fa-circle-check text-cyan"></i> Run code architectures for hackathons.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ROADMAP VIEW -->
+                <div id="view-roadmap" class="tab-view hidden-view">
+                    <!-- Roadmap Generator Overlay if no roadmap is generated -->
+                    <div id="roadmap-setup" class="roadmap-setup-overlay glass-card">
+                        <div class="setup-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+                        <h2>Generate Your Career Roadmap</h2>
+                        <p>Select your dream career path and we will use AI deep reasoning to establish a personalized, non-linear milestone tree complete with learning courses, certifications, and projects.</p>
+                        
+                        <div class="setup-form">
+                            <div class="input-group">
+                                <label for="target-career-input">Dream Job / Career Goal</label>
+                                <input type="text" id="target-career-input" placeholder="e.g. AI Engineer, Cyber Security Analyst, Full Stack Dev">
+                            </div>
+                            <div class="input-group">
+                                <label>Your current skills (comma separated)</label>
+                                <input type="text" id="current-skills-input" placeholder="e.g. HTML, Python, SQL">
+                            </div>
+                            <button class="btn btn-primary" onclick="triggerRoadmapGeneration()">Generate Roadmap <i class="fa-solid fa-wand-magic-sparkles"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Roadmap Active Graph Screen -->
+                    <div id="roadmap-active-container" class="roadmap-active-layout hidden">
+                        <div class="roadmap-controls">
+                            <h2 id="active-roadmap-title">Target Path Learning Tree</h2>
+                            <button class="btn btn-sm btn-outline" onclick="resetRoadmapSetup()"><i class="fa-solid fa-arrows-rotate"></i> Change Target Path</button>
+                        </div>
+                        <div class="roadmap-tree-canvas" id="roadmap-tree-canvas">
+                            <!-- Roadmap Nodes will be generated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RESUME BUILDER VIEW -->
+                <div id="view-resume" class="tab-view hidden-view">
+                    <div class="resume-workspace-split">
+                        <!-- Left Panel: Input Fields -->
+                        <div class="glass-card resume-fields-panel">
+                            <h2>Edit Resume Sections</h2>
+                            <div class="resume-form-scroller">
+                                <div class="input-group">
+                                    <label for="resume-title-field">Resume Version Name</label>
+                                    <input type="text" id="resume-title-field" value="Primary Academic Resume">
+                                </div>
+                                <hr class="divider">
+                                
+                                <h3>Personal Contact Info</h3>
+                                <div class="input-group">
+                                    <label for="res-name">Full Name</label>
+                                    <input type="text" id="res-name" value="Alex Smith">
+                                </div>
+                                <div class="input-row">
+                                    <div class="input-group">
+                                        <label for="res-email">Email</label>
+                                        <input type="email" id="res-email" value="alex.smith@university.edu">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="res-phone">Phone</label>
+                                        <input type="text" id="res-phone" value="+1 (555) 019-2834">
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <label for="res-github">GitHub / Portfolio URL</label>
+                                    <input type="text" id="res-github" value="https://github.com/alexsmith">
+                                </div>
+
+                                <hr class="divider">
+                                <h3>Experience Bullet Points</h3>
+                                <div class="input-group">
+                                    <label for="res-exp-role">Role Title & Company</label>
+                                    <input type="text" id="res-exp-role" value="Software Engineering Intern, TechCorp">
+                                </div>
+                                <div class="input-group">
+                                    <label for="res-exp-desc">Bullet Description (ATS check analyzes this)</label>
+                                    <textarea id="res-exp-desc" rows="4">Responsible for coding the backend of the student project application. Helped team build website.</textarea>
+                                </div>
+
+                                <hr class="divider">
+                                <h3>Project Highlights</h3>
+                                <div class="input-group">
+                                    <label for="res-proj-title">Project Name</label>
+                                    <input type="text" id="res-proj-title" value="Distributed Document Scraper">
+                                </div>
+                                <div class="input-group">
+                                    <label for="res-proj-desc">Project Details</label>
+                                    <textarea id="res-proj-desc" rows="4">Wrote backend scripts to parse directories. Integrated database mapping.</textarea>
+                                </div>
+                                
+                                <button class="btn btn-primary btn-block" onclick="saveResumeContent()">Save Draft & Verify <i class="fa-solid fa-floppy-disk"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Resume Rendering & ATS Optimizer -->
+                        <div class="resume-preview-panel">
+                            <div class="resume-toolbar">
+                                <div class="theme-selector">
+                                    Theme: 
+                                    <select id="resume-theme-select" onchange="changeResumeTheme()">
+                                        <option value="classic">Classic Ivory</option>
+                                        <option value="modern-cyan">Modern Cyan Accent</option>
+                                        <option value="slate-glass">Slate Glassmorphic</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-sm btn-outline" onclick="window.print()"><i class="fa-solid fa-print"></i> PDF Export</button>
+                            </div>
+
+                            <!-- PDF Sheet Paper Wrapper -->
+                            <div class="resume-sheet classic" id="resume-sheet-paper">
+                                <div class="resume-render-header">
+                                    <h1 id="res-render-name">Alex Smith</h1>
+                                    <div class="resume-render-meta">
+                                        <span id="res-render-email">alex.smith@university.edu</span> | 
+                                        <span id="res-render-phone">+1 (555) 019-2834</span> |
+                                        <span id="res-render-links">github.com/alexsmith</span>
+                                    </div>
+                                </div>
+                                <div class="resume-render-section">
+                                    <h2>Professional Experience</h2>
+                                    <div class="section-item">
+                                        <div class="item-header">
+                                            <strong id="res-render-exp-title">Software Engineering Intern, TechCorp</strong>
+                                        </div>
+                                        <ul class="bullet-list">
+                                            <li id="res-render-exp-desc">Responsible for coding the backend of the student project application. Helped team build website.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="resume-render-section">
+                                    <h2>Academic Projects</h2>
+                                    <div class="section-item">
+                                        <div class="item-header">
+                                            <strong id="res-render-proj-title">Distributed Document Scraper</strong>
+                                        </div>
+                                        <ul class="bullet-list">
+                                            <li id="res-render-proj-desc">Wrote backend scripts to parse directories. Integrated database mapping.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ATS Score / Review Drawer -->
+                            <div class="glass-card ats-feedback-card">
+                                <div class="ats-header">
+                                    <h3>ATS Score: <span id="ats-score-display" class="text-cyan">--%</span></h3>
+                                    <button class="btn btn-sm btn-cyan" onclick="triggerResumeATSAnalysis()">Analyze Score <i class="fa-solid fa-wand-magic-sparkles"></i></button>
+                                </div>
+                                <div class="ats-body" id="ats-analysis-body">
+                                    <p class="empty-state">Click 'Analyze Score' to run deep reasoning AI checks against your target job.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INTERVIEW MOCK VIEW -->
+                <div id="view-mock" class="tab-view hidden-view">
+                    <div class="mock-layout">
+                        <!-- Setup Window -->
+                        <div class="glass-card mock-setup" id="mock-setup-window">
+                            <div class="setup-icon"><i class="fa-solid fa-comments"></i></div>
+                            <h2>AI Technical Interview Prep</h2>
+                            <p>Test your competencies with our conversational mock interviewer. Receive structured analysis, scores, and corrective solutions.</p>
+                            <div class="setup-form">
+                                <div class="input-group">
+                                    <label for="mock-role-input">Interview Target Role</label>
+                                    <input type="text" id="mock-role-input" placeholder="e.g. Backend Engineer, Systems Security, Cloud Architect">
+                                </div>
+                                <button class="btn btn-primary" onclick="startMockInterview()">Launch Interview <i class="fa-solid fa-microphone"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Active Interview Window -->
+                        <div class="glass-card mock-active hidden" id="mock-active-window">
+                            <div class="mock-header">
+                                <span class="interview-badge"><i class="fa-solid fa-circle-dot text-red animate-pulse"></i> Live Mock session</span>
+                                <span id="mock-question-counter">Question 1 of 3</span>
+                            </div>
+                            <div class="mock-question-display">
+                                <p class="question-label">INTERVIEWER QUESTION:</p>
+                                <p id="mock-question-text" class="question-text">Retrieving question...</p>
+                            </div>
+                            <div class="mock-response-area">
+                                <label for="mock-answer-input">Your Answer</label>
+                                <textarea id="mock-answer-input" rows="5" placeholder="Type your response here... (or speak)"></textarea>
+                            </div>
+                            <div class="mock-controls">
+                                <button class="btn btn-outline" id="mock-skip-btn" onclick="abortMockInterview()">Cancel Session</button>
+                                <button class="btn btn-cyan" id="mock-submit-btn" onclick="submitMockAnswer()">Submit Answer <i class="fa-solid fa-paper-plane"></i></button>
+                            </div>
+                            <!-- Feedback Card -->
+                            <div class="mock-feedback-card hidden" id="mock-feedback-box">
+                                <h4>AI Interlinear Evaluation:</h4>
+                                <div class="score-line">Score: <strong id="mock-item-score" class="text-cyan">0/100</strong></div>
+                                <p class="feedback-desc" id="mock-item-desc">Feedback details...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HACKATHON VIEW -->
+                <div id="view-hackathon" class="tab-view hidden-view">
+                    <div class="hackathon-layout">
+                        <div class="glass-card hackathon-card">
+                            <div class="setup-icon"><i class="fa-solid fa-laptop-code"></i></div>
+                            <h2>Hackathon Project Generator</h2>
+                            <p>Entering a hackathon? Type the theme, track, or problem statement, and we will formulate system architectures, database designs, PPT outlines, and folder templates.</p>
+                            
+                            <div class="setup-form">
+                                <div class="input-group">
+                                    <label for="hackathon-theme">Hackathon Theme / Topic</label>
+                                    <input type="text" id="hackathon-theme" placeholder="e.g. Climate Tech Tracker, Healthcare AI, Web3 Gaming">
+                                </div>
+                                <button class="btn btn-primary" onclick="generateHackathonConcept()">Generate Blueprint <i class="fa-solid fa-hat-wizard"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Hackathon Output Screen -->
+                        <div class="glass-card hackathon-output-card hidden" id="hackathon-output-container">
+                            <div class="output-header">
+                                <h3>Hackathon MVP Blueprint</h3>
+                                <button class="btn btn-sm btn-outline" onclick="closeHackathonOutput()"><i class="fa-solid fa-arrow-left"></i> Change Theme</button>
+                            </div>
+                            <div class="output-body markdown-body" id="hackathon-markdown-output">
+                                <!-- Markdown content generated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </main>
+        
+        <!-- FLOATING AI MENTOR SIDE DRAWER -->
+        <div id="mentor-drawer" class="mentor-drawer glass-effect">
+            <div class="mentor-header" onclick="toggleMentorDrawer()">
+                <div class="mentor-avatar"><i class="fa-solid fa-robot"></i></div>
+                <div class="mentor-title">
+                    <h4>AI Mentor Coach</h4>
+                    <span>Active Profile Helper</span>
+                </div>
+                <button class="mentor-toggle-btn"><i class="fa-solid fa-chevron-up" id="mentor-arrow-icon"></i></button>
+            </div>
+            <div class="mentor-body">
+                <div class="mentor-messages" id="mentor-chat-messages">
+                    <div class="message mentor">
+                        <p>Hello! I am your career mentor. Ask me questions about roadmaps, certifications, project architectures, or resumes!</p>
+                        <span class="time">Just now</span>
+                    </div>
+                </div>
+                <form class="mentor-input-area" onsubmit="sendMentorMessage(event)">
+                    <input type="text" id="mentor-user-input" placeholder="Ask about system design, code, etc..." required>
+                    <button type="submit" class="mentor-send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Dynamic Roadmap Node Modal Popup -->
+    <div id="node-modal" class="modal-overlay hidden">
+        <div class="glass-card node-modal-card animate-pop">
+            <div class="node-modal-header">
+                <h2 id="node-modal-title">Node Title</h2>
+                <button class="btn-close" onclick="closeNodeModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="node-modal-body">
+                <p id="node-modal-desc" class="node-desc">Node description goes here.</p>
+                <div class="node-meta">
+                    <span>Difficulty: <strong id="node-modal-difficulty" class="text-cyan">BEGINNER</strong></span>
+                    <span>Duration: <strong id="node-modal-duration" class="text-cyan">10 hours</strong></span>
+                </div>
+                
+                <hr class="divider">
+                
+                <!-- Resources Accordion -->
+                <div class="accordion-section">
+                    <h4><i class="fa-solid fa-book-open"></i> Learning Resources</h4>
+                    <ul id="node-modal-resources" class="resource-list"></ul>
+                </div>
+                
+                <!-- Project Accordion -->
+                <div class="accordion-section">
+                    <h4><i class="fa-solid fa-code"></i> Mini Project Target</h4>
+                    <div class="project-info-box" id="node-modal-project"></div>
+                </div>
+
+                <!-- Certifications Accordion -->
+                <div class="accordion-section">
+                    <h4><i class="fa-solid fa-award"></i> Certificate Matching</h4>
+                    <ul id="node-modal-certs" class="cert-list"></ul>
+                </div>
+
+                <div class="node-action-footer">
+                    <button id="node-modal-action-btn" class="btn btn-primary" onclick="markNodeAsCompleted()">Mark Complete <i class="fa-solid fa-check"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Logic Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
