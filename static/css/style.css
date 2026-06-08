@@ -1670,9 +1670,18 @@ body::-webkit-scrollbar-thumb {
     .sidebar {
         display: none;
     }
+    .workspace {
+        padding-bottom: 90px !important;
+    }
     .resume-workspace-split {
         grid-template-columns: 1fr;
         height: auto;
+    }
+    .resume-preview-panel {
+        overflow-x: auto;
+    }
+    .mobile-nav-bar {
+        display: flex !important;
     }
 }
 
@@ -1718,4 +1727,92 @@ body::-webkit-scrollbar-thumb {
 }
 .mt-10 {
     margin-top: 10px;
+}
+
+/* Mobile Bottom Navigation Bar Styles */
+.mobile-nav-bar {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65px;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border-glass);
+    z-index: 1000;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    padding: 0 10px;
+}
+.mobile-nav-item {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-grow: 1;
+    height: 100%;
+}
+.mobile-nav-item i {
+    font-size: 18px;
+    transition: transform 0.2s ease;
+}
+.mobile-nav-item:active i {
+    transform: scale(0.9);
+}
+.mobile-nav-item.active {
+    color: var(--cyan);
+}
+.mobile-nav-item.active i {
+    color: var(--cyan);
+    filter: drop-shadow(0 0 5px var(--cyan-glow));
+}
+
+/* Extra Mobile & Tablet Viewport Enhancements */
+@media (max-width: 600px) {
+    .top-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 15px;
+    }
+    .header-stats {
+        align-self: flex-start;
+        display: flex;
+        gap: 8px;
+    }
+    #tab-title {
+        font-size: 20px !important;
+    }
+    .tab-subtitle {
+        font-size: 11px !important;
+    }
+    .roadmap-controls {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .roadmap-controls div[style*="display:flex;"] {
+        width: 100%;
+        display: flex !important;
+        flex-direction: row !important;
+    }
+    .roadmap-controls input {
+        flex: 1;
+    }
+    .mock-setup, .mock-active, .hackathon-card, .hackathon-output-card {
+        padding: 20px !important;
+        margin: 10px auto;
+    }
 }

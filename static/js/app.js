@@ -587,6 +587,14 @@ function navigateToTab(tabName) {
         }
     });
 
+    document.querySelectorAll(".mobile-nav-item").forEach(item => {
+        if (item.getAttribute("data-mobile-tab") === tabName) {
+            item.classList.add("active");
+        } else {
+            item.classList.remove("active");
+        }
+    });
+
     const titleEl = document.getElementById("tab-title");
     const subEl = document.getElementById("tab-subtitle");
     
