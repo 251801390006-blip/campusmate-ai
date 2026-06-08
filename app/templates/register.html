@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - CampusMate AI{% endblock %}
+
+{% block content %}
+<div class="container py-5 d-flex justify-content-center">
+    <div class="flat-card" style="width: 100%; max-width: 440px; padding: 2rem;">
+        <div class="text-center mb-4">
+            <h2 class="h4 mb-1">Create Account</h2>
+            <p class="text-secondary" style="font-size: 0.82rem;">Sign up using your university or personal email</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('auth.register') }}">
+            {{ form.csrf_token }}
+            
+            <!-- Username Input -->
+            <div class="input-group">
+                {{ form.username.label }}
+                {{ form.username(placeholder="alex_smith") }}
+                {% if form.username.errors %}
+                    {% for error in form.username.errors %}
+                        <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <!-- Email Input -->
+            <div class="input-group">
+                {{ form.email.label }}
+                {{ form.email(placeholder="student@nit.ac.in") }}
+                <span class="input-helper mt-1">Academic domains supported (e.g. .edu.in, .ac.in)</span>
+                {% if form.email.errors %}
+                    {% for error in form.email.errors %}
+                        <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <!-- Password Input -->
+            <div class="input-group">
+                {{ form.password.label }}
+                <div class="password-container">
+                    {{ form.password(placeholder="At least 8 characters", id="reg-password") }}
+                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('reg-password', this)" aria-label="Toggle password visibility">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+                {% if form.password.errors %}
+                    {% for error in form.password.errors %}
+                        <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <!-- Confirm Password Input -->
+            <div class="input-group">
+                {{ form.confirm_password.label }}
+                <div class="password-container">
+                    {{ form.confirm_password(placeholder="Re-enter password", id="reg-confirm-password") }}
+                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('reg-confirm-password', this)" aria-label="Toggle password visibility">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+                {% if form.confirm_password.errors %}
+                    {% for error in form.confirm_password.errors %}
+                        <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <!-- Academic Level Select -->
+            <div class="input-group">
+                {{ form.academic_level.label }}
+                {{ form.academic_level }}
+                {% if form.academic_level.errors %}
+                    {% for error in form.academic_level.errors %}
+                        <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block mt-4">Create Account <i class="fa-solid fa-user-plus"></i></button>
+        </form>
+        
+        <div class="text-center mt-4 pt-2 border-top" style="font-size:0.82rem; border-color: var(--border-color);">
+            <span class="text-secondary">Already have an account?</span> 
+            <a href="{{ url_for('auth.login') }}" class="fw-semibold">Sign In</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

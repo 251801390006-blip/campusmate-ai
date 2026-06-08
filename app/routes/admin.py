@@ -1,0 +1,152 @@
+from flask import Blueprint, render_template, redirect, url_for, flash, request, abort, jsonify
+from flask_login import login_required, current_user
+from app.models import db, User, FeedbackItem, FeedbackReply
+from functools import wraps
+import time
+
+admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
+
+def role_required(role_name):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if not current_user.is_authenticated or current_user.role != role_name:
+                abort(403)
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+@admin_bp.route('/')
+@login_required
+@role_required('admin')
+def dashboard():
+    # Analytics metrics
+    total_users = User.query.count()
+    active_users = User.query.filter_by(is_active=True).count()
+    total_tickets = FeedbackItem.query.filter_by(is_public=False).count()
+    total_suggestions = FeedbackItem.query.filter_by(is_public=True).count()
+    
+    # Registered users list (exclude admins from being deleted)
+    users = User.query.all()
+    
+    # Threat analytics (mock logs)
+    threat_logs = [
+        {"timestamp": "Just now", "ip": "198.51.100.42", "event": "Brute-force attempt blocked on login", "severity": "High"},
+        {"timestamp": "10 minutes ago", "ip": "203.0.113.111", "event": "Cross-Origin request blocked", "severity": "Medium"},
+        {"timestamp": "1 hour ago", "ip": "192.0.2.89", "event": "SQL injection payload sanitized", "severity": "Critical"},
+        {"timestamp": "4 hours ago", "ip": "198.51.100.12", "event": "Suspicious user-agent scanned", "severity": "Low"}
+    ]
+    
+    # Database status
+    db_status = {
+        "status": "Online / Healthy",
+        "engine": "SQLite (Local Dev)",
+        "connection_pool": "Active",
+        "active_transactions": 0
+    }
+    
+    return render_template(
+        'admin.html',
+        total_users=total_users,
+        active_users=active_users,
+        total_tickets=total_tickets,
+        total_suggestions=total_suggestions,
+        users=users,
+        threat_logs=threat_logs,
+        db_status=db_status
+    )
+
+@admin_bp.route('/users/<int:user_id>/toggle-status', methods=['POST'])
+@login_required
+@role_required('admin')
+def toggle_user_status(user_id):
+    user = User.query.get_or_404(user_id)
+    if user.id == current_user.id:
+        flash("You cannot deactivate yourself!", "danger")
+        return redirect(url_for('admin.dashboard'))
+        
+    user.is_active = not user.is_active
+    db.session.commit()
+    flash(f"User {user.username} is now {'active' if user.is_active else 'inactive'}.", "success")
+    return redirect(url_for('admin.dashboard'))
+
+@admin_bp.route('/users/<int:user_id>/delete', methods=['POST'])
+@login_required
+@role_required('admin')
+def delete_user(user_id):
+    user = User.query.get_or_404(user_id)
+    if user.role == 'admin':
+        flash("Administrators cannot be deleted.", "danger")
+        return redirect(url_for('admin.dashboard'))
+        
+    db.session.delete(user)
+    db.session.commit()
+    flash(f"User {user.username} deleted successfully.", "success")
+    return redirect(url_for('admin.dashboard'))
+
+# Emergency Database Control (Reset Database & Seed default users)
+@admin_bp.route('/reset-db', methods=['POST'])
+@login_required
+@role_required('admin')
+def reset_database():
+    try:
+        # Close all active connections first
+        db.session.remove()
+        db.drop_all()
+        db.create_all()
+        
+        # Seed Admin User
+        admin_user = User(username='admin', email='admin@university.edu', role='admin', is_active=True)
+        admin_user.set_password('admin1234')
+        db.session.add(admin_user)
+        
+        # Seed Demo User
+        demo_user = User(username='demo', email='demo@university.edu', role='user', is_active=True)
+        demo_user.set_password('demo1234')
+        db.session.add(demo_user)
+        
+        db.session.commit()
+        
+        # Seed Feedback Suggestions (Public)
+        sug1 = FeedbackItem(
+            user_id=demo_user.id,
+            title="Add Dark Mode Toggle to Sidebar",
+            content="It would be highly beneficial for students studying late at night to have a dark mode option. The current flat light theme is beautiful, but a secondary dark mode would make it perfect.",
+            category="suggestion",
+            is_public=True,
+            status="open"
+        )
+        sug2 = FeedbackItem(
+            user_id=demo_user.id,
+            title="Integrate Canvas API for Assignment Timelines",
+            content="Most university departments use Canvas. If we can pull calendar assignments and show upcoming tasks on the dashboard, it would greatly help academic planning.",
+            category="feature_request",
+            is_public=True,
+            status="open"
+        )
+        
+        # Seed Support Tickets (Private)
+        tkt1 = FeedbackItem(
+            user_id=demo_user.id,
+            title="Cannot upload DOCX resume from mobile",
+            content="When attempting to upload my resume in DOCX format from my iPhone, the parse loader gets stuck. Works fine on my laptop.",
+            category="bug",
+            is_public=False,
+            status="open"
+        )
+        
+        db.session.add_all([sug1, sug2, tkt1])
+        db.session.commit()
+        
+        # Seed Admin Reply to Bug Ticket
+        rep1 = FeedbackReply(
+            feedback_item_id=tkt1.id,
+            user_id=admin_user.id,
+            content="Hello Demo, thank you for reporting this issue. We have logged the mobile iOS zip extractor crash logs and are patching the parser namespaces. In the meantime, please try exporting to PDF first."
+        )
+        db.session.add(rep1)
+        db.session.commit()
+        
+        return jsonify({"success": True, "message": "Database reset and seeded successfully!"})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500

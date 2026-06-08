@@ -1,0 +1,153 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Admin Console - CampusMate AI{% endblock %}
+
+{% block header_title %}Admin Control Console{% endblock %}
+
+{% block content %}
+<!-- Threat Analytics and Emergency Buttons -->
+<div class="row g-4 mb-4">
+    <!-- Quick System Diagnostics -->
+    <div class="col-lg-8">
+        <div class="flat-card h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 style="font-size: 1.05rem;" class="mb-0"><i class="fa-solid fa-server text-muted me-2"></i> Database Status & Details</h3>
+                <span class="badge badge-success">Operational</span>
+            </div>
+            
+            <div class="row g-3" style="font-size:0.85rem;">
+                <div class="col-sm-6">
+                    <span class="text-muted d-block font-semibold">Engine System</span>
+                    <span class="text-secondary fw-semibold">{{ db_status.engine }}</span>
+                </div>
+                <div class="col-sm-6">
+                    <span class="text-muted d-block">Connection Status</span>
+                    <span class="text-secondary fw-semibold">{{ db_status.status }}</span>
+                </div>
+                <div class="col-sm-6">
+                    <span class="text-muted d-block">Active Transactions</span>
+                    <span class="text-secondary fw-semibold">{{ db_status.active_transactions }}</span>
+                </div>
+                <div class="col-sm-6">
+                    <span class="text-muted d-block">Total Registered Users</span>
+                    <span class="text-secondary fw-semibold">{{ total_users }} (Active: {{ active_users }})</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Emergency Control Panel -->
+    <div class="col-lg-4">
+        <div class="flat-card h-100 border-danger" style="border-left: 4px solid var(--danger);">
+            <h3 style="font-size: 1.05rem;" class="mb-2 text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i> Emergency controls</h3>
+            <p class="text-secondary mb-3" style="font-size:0.78rem;">
+                Reset the system environment to its original state. This will wipe all database tables and seed clean default testing accounts.
+            </p>
+            
+            <button class="btn btn-danger btn-block" onclick="triggerDatabaseReset('{{ url_for('admin.reset_database') }}', '{{ csrf_token() }}')">
+                <i class="fa-solid fa-trash-can"></i> Emergency Database Reset
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Threat Logs List -->
+<div class="flat-card mb-4">
+    <h3 style="font-size: 1.05rem;" class="mb-3"><i class="fa-solid fa-shield-halved text-muted me-2"></i> System Threat & Firewall Analytics</h3>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Source IP Address</th>
+                    <th>Sanitized Intrusion Detection Logs</th>
+                    <th>Severity Rating</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in threat_logs %}
+                    <tr>
+                        <td>{{ log.timestamp }}</td>
+                        <td><code>{{ log.ip }}</code></td>
+                        <td><span class="text-secondary">{{ log.event }}</span></td>
+                        <td>
+                            <span class="badge 
+                                {% if log.severity == 'Critical' %}badge-danger
+                                {% elif log.severity == 'High' %}badge-danger
+                                {% elif log.severity == 'Medium' %}badge-warning
+                                {% else %}badge-info{% endif %}">
+                                {{ log.severity }}
+                            </span>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Registered Users Database List -->
+<div class="flat-card">
+    <h3 style="font-size: 1.05rem;" class="mb-3"><i class="fa-solid fa-users text-muted me-2"></i> Registered Profile Registry</h3>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Username</th>
+                    <th>Email Address</th>
+                    <th>Account Role</th>
+                    <th>Access Status</th>
+                    <th>Date Registered</th>
+                    <th>Administrative Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td><code>#{{ user.id }}</code></td>
+                        <td class="fw-semibold text-secondary">{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            <span class="badge {% if user.role == 'admin' %}badge-warning{% else %}badge-info{% endif %}">
+                                {{ user.role | upper }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge {% if user.is_active %}badge-success{% else %}badge-danger{% endif %}">
+                                {% if user.is_active %}ACTIVE{% else %}INACTIVE{% endif %}
+                            </span>
+                        </td>
+                        <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <!-- Toggle Active Status (don't let current admin de-activate themselves) -->
+                                {% if user.id != current_user.id %}
+                                    <form method="POST" action="{{ url_for('admin.toggle_user_status', user_id=user.id) }}" style="display:inline;">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm btn-outline">
+                                            {% if user.is_active %}Deactivate{% else %}Activate{% endif %}
+                                        </button>
+                                    </form>
+                                    
+                                    <!-- Delete Button (don't let deletion of administrators) -->
+                                    {% if user.role != 'admin' %}
+                                        <form method="POST" action="{{ url_for('admin.delete_user', user_id=user.id) }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete user {{ user.username }}?');">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i> Delete</button>
+                                        </form>
+                                    {% else %}
+                                        <button class="btn btn-sm btn-danger" disabled style="opacity: 0.5;"><i class="fa-solid fa-trash"></i> Delete</button>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted" style="font-size:0.75rem;">(Active User)</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

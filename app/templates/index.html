@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to CampusMate AI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Hero Block -->
+    <div class="text-center py-5">
+        <span class="badge badge-info mb-3"><i class="fa-solid fa-circle-info"></i> Staging Environment Active</span>
+        <h1 class="display-4 fw-extrabold mb-3" style="font-size: 2.8rem; line-height: 1.2;">The Complete <span style="color: var(--neon-blue);">Growth Operating System</span> for Students</h1>
+        <p class="lead text-secondary mx-auto mb-4" style="max-width: 680px; font-size: 1.05rem;">
+            Accelerate your academic projects, follow structured career learning paths, analyze your resume dynamically, and resolve ticket issues directly with the student advisor staff.
+        </p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">Create Free Account <i class="fa-solid fa-user-plus"></i></a>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-lg">Sign In <i class="fa-solid fa-right-to-login"></i></a>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row g-4 py-5 mt-2">
+        <h2 class="text-center mb-4">Interconnected Student Growth Modules</h2>
+        <div class="col-md-6 col-lg-3">
+            <div class="flat-card h-100">
+                <div class="stat-card icon-box mb-3" style="width: 40px; height: 40px; border-radius: 6px; background: var(--neon-blue-dim); color: var(--neon-blue); display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
+                    <i class="fa-solid fa-route"></i>
+                </div>
+                <h3 style="font-size: 1.05rem;" class="mb-2">Learning Roadmaps</h3>
+                <p class="text-secondary" style="font-size: 0.85rem; line-height: 1.4;">Follow structured milestones containing duration trackers, Mini-Projects, and certifications.</p>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="flat-card h-100">
+                <div class="stat-card icon-box mb-3" style="width: 40px; height: 40px; border-radius: 6px; background: rgba(16, 185, 129, 0.08); color: var(--success); display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
+                    <i class="fa-solid fa-file-invoice"></i>
+                </div>
+                <h3 style="font-size: 1.05rem;" class="mb-2">ATS Resume Analyzer</h3>
+                <p class="text-secondary" style="font-size: 0.85rem; line-height: 1.4;">Extract document text and verify metrics matching recruiters readability guidelines.</p>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="flat-card h-100">
+                <div class="stat-card icon-box mb-3" style="width: 40px; height: 40px; border-radius: 6px; background: rgba(245, 158, 11, 0.08); color: var(--warning); display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
+                    <i class="fa-solid fa-comments"></i>
+                </div>
+                <h3 style="font-size: 1.05rem;" class="mb-2">Feedback & Tickets</h3>
+                <p class="text-secondary" style="font-size: 0.85rem; line-height: 1.4;">Dual-track system for public suggestion discussions and private help desk support tickets.</p>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="flat-card h-100">
+                <div class="stat-card icon-box mb-3" style="width: 40px; height: 40px; border-radius: 6px; background: rgba(239, 68, 68, 0.08); color: var(--danger); display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <h3 style="font-size: 1.05rem;" class="mb-2">Admin Console</h3>
+                <p class="text-secondary" style="font-size: 0.85rem; line-height: 1.4;">Fully secured control console containing threat logs, user lists, and DB control panels.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

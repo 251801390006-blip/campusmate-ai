@@ -1,0 +1,105 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Dashboard - CampusMate AI{% endblock %}
+
+{% block header_title %}Student Overview{% endblock %}
+
+{% block content %}
+<!-- Welcome Card -->
+<div class="flat-card mb-4" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.02), rgba(124, 58, 237, 0.05)); border-left: 4px solid var(--neon-blue);">
+    <h2 style="font-size: 1.35rem;" class="mb-2">Hello, {{ current_user.username }}!</h2>
+    <p class="text-secondary mb-3" style="font-size: 0.88rem; max-width: 600px;">
+        Welcome to your growth workspace. You are currently logged in as a <strong>{{ current_user.role | upper }}</strong>. Track your progress, create community suggestions, or open tickets to resolve code defects.
+    </p>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('feedback.list_feedback') }}" class="btn btn-sm btn-primary">Feedback & Support <i class="fa-solid fa-comments"></i></a>
+        {% if current_user.role == 'admin' %}
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-sm btn-outline">Admin Console <i class="fa-solid fa-shield-halved"></i></a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid">
+    <!-- Stat 1 -->
+    <div class="stat-card">
+        <div class="info">
+            <span class="label">Academic Status</span>
+            <span class="value" style="font-size:1.15rem; margin-top:8px;">Active</span>
+        </div>
+        <div class="icon-box">
+            <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+    </div>
+    <!-- Stat 2 -->
+    <div class="stat-card">
+        <div class="info">
+            <span class="label">Suggestions</span>
+            <span class="value">{{ total_suggestions }}</span>
+        </div>
+        <div class="icon-box" style="background-color: var(--success-bg); color: var(--success);">
+            <i class="fa-solid fa-comments"></i>
+        </div>
+    </div>
+    <!-- Stat 3 -->
+    <div class="stat-card">
+        <div class="info">
+            <span class="label">Support Tickets</span>
+            <span class="value">{{ my_tickets_count }}</span>
+        </div>
+        <div class="icon-box" style="background-color: var(--warning-bg); color: var(--warning);">
+            <i class="fa-solid fa-ticket"></i>
+        </div>
+    </div>
+    <!-- Stat 4 -->
+    <div class="stat-card">
+        <div class="info">
+            <span class="label">Learning Streak</span>
+            <span class="value">5 days</span>
+        </div>
+        <div class="icon-box" style="background-color: var(--info-bg); color: var(--info);">
+            <i class="fa-solid fa-fire text-orange"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Grid Details Row -->
+<div class="row g-4">
+    <!-- Left Column: Guidelines -->
+    <div class="col-lg-8">
+        <div class="flat-card h-100">
+            <h3 style="font-size:1.05rem;" class="mb-3"><i class="fa-solid fa-circle-info text-muted me-2"></i> Dashboard Instructions</h3>
+            <p class="text-secondary mb-3" style="font-size: 0.85rem;">
+                This workspace represents a flat light Render-inspired design system. Key administrative and communication tools can be tested directly:
+            </p>
+            <ul class="text-secondary ps-3 mb-0" style="font-size: 0.85rem; line-height: 1.6;">
+                <li><strong>Role Switching:</strong> Click the "Quick Account Switch" header menu to instantly jump between the Administrator role and standard Demo User role.</li>
+                <li><strong>Emergency Control:</strong> Administrators can completely purge and seed fresh data tables using the control panel located inside the Admin Console.</li>
+                <li><strong>Email Regex:</strong> Standard email suffixes including <code>.edu.in</code> or <code>.ac.in</code> are supported in registration WTForms.</li>
+                <li><strong>Mobile Toggles:</strong> Scale your browser window to simulate mobile collapsing sidebar navigation drawers.</li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Right Column: User Profile Info -->
+    <div class="col-lg-4">
+        <div class="flat-card h-100">
+            <h3 style="font-size:1.05rem;" class="mb-3"><i class="fa-solid fa-user-gear text-muted me-2"></i> Account Details</h3>
+            <div class="d-flex flex-column gap-3" style="font-size:0.85rem;">
+                <div>
+                    <span class="text-muted d-block">Username</span>
+                    <span class="fw-semibold text-secondary">{{ current_user.username }}</span>
+                </div>
+                <div>
+                    <span class="text-muted d-block">Email Address</span>
+                    <span class="fw-semibold text-secondary">{{ current_user.email }}</span>
+                </div>
+                <div>
+                    <span class="text-muted d-block">Academic Class Status</span>
+                    <span class="fw-semibold text-secondary">Undergraduate Class Of 2027</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

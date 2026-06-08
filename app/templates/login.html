@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In - CampusMate AI{% endblock %}
+
+{% block content %}
+<div class="container py-5 d-flex justify-content-center">
+    <div class="flat-card" style="width: 100%; max-width: 420px; padding: 2rem;">
+        <div class="text-center mb-4">
+            <h2 class="h4 mb-1">Welcome Back</h2>
+            <p class="text-secondary" style="font-size: 0.82rem;">Sign in to access your dashboard and feedback tickets</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('auth.login') }}">
+            {{ form.csrf_token }}
+            
+            <!-- Email Input -->
+            <div class="input-group">
+                {{ form.email.label }}
+                {{ form.email(placeholder="name@university.edu.in") }}
+                {% if form.email.errors %}
+                    {% for error in form.email.errors %}
+                        <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <!-- Password Input with Visibility Eye Toggle -->
+            <div class="input-group">
+                {{ form.password.label }}
+                <div class="password-container">
+                    {{ form.password(placeholder="Enter password", id="login-password-field") }}
+                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('login-password-field', this)" aria-label="Toggle password visibility">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+                {% if form.password.errors %}
+                    {% for error in form.password.errors %}
+                        <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <!-- Remember Me -->
+            <div class="checkbox-group mt-2">
+                {{ form.remember_me(id="remember-me-check") }}
+                {{ form.remember_me.label(for="remember-me-check") }}
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block mt-3">Sign In <i class="fa-solid fa-arrow-right-to-bracket"></i></button>
+        </form>
+        
+        <div class="text-center mt-4 pt-2 border-top" style="font-size:0.82rem; border-color: var(--border-color);">
+            <span class="text-secondary">New to CampusMate?</span> 
+            <a href="{{ url_for('auth.register') }}" class="fw-semibold">Create an account</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

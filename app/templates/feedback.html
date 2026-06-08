@@ -1,0 +1,177 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Feedback Center - CampusMate AI{% endblock %}
+
+{% block header_title %}Feedback & Support{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Left Column: Create Feedback Form -->
+    <div class="col-xl-4">
+        <div class="flat-card">
+            <h3 style="font-size: 1.05rem;" class="mb-3"><i class="fa-solid fa-pen-to-square text-muted me-2"></i> Submit New Request</h3>
+            
+            <form method="POST" action="{{ url_for('feedback.list_feedback') }}">
+                {{ form.csrf_token }}
+                
+                <!-- Title Input -->
+                <div class="input-group">
+                    {{ form.title.label }}
+                    {{ form.title(placeholder="Short summary of request") }}
+                    {% if form.title.errors %}
+                        {% for error in form.title.errors %}
+                            <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <!-- Category Dropdown -->
+                <div class="input-group">
+                    {{ form.category.label }}
+                    {{ form.category }}
+                    {% if form.category.errors %}
+                        {% for error in form.category.errors %}
+                            <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <!-- Description content -->
+                <div class="input-group">
+                    {{ form.content.label }}
+                    {{ form.content(placeholder="Describe your request or bug report in detail...", rows=5) }}
+                    {% if form.content.errors %}
+                        {% for error in form.content.errors %}
+                            <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <!-- Share Publicly Checkbox -->
+                <div class="checkbox-group mt-2">
+                    {{ form.is_public(id="is-public-check") }}
+                    {{ form.is_public.label(for="is-public-check") }}
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block mt-3">Submit Feedback <i class="fa-solid fa-paper-plane"></i></button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Right Column: Dual-Track Suggestions & Tickets Lists -->
+    <div class="col-xl-8">
+        <!-- Community Suggestions Tab (Public) -->
+        <div class="flat-card mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 style="font-size: 1.05rem;" class="mb-0"><i class="fa-solid fa-comments text-muted me-2"></i> Public Suggestions</h3>
+                <span class="badge badge-success">{{ suggestions | length }} Active</span>
+            </div>
+            
+            {% if suggestions %}
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Suggestion Title</th>
+                                <th>Submitted By</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in suggestions %}
+                                <tr>
+                                    <td>
+                                        <span class="badge 
+                                            {% if item.category == 'bug' %}badge-danger
+                                            {% elif item.category == 'feature_request' %}badge-info
+                                            {% elif item.category == 'suggestion' %}badge-success
+                                            {% else %}badge-warning{% endif %}">
+                                            {{ item.category | replace('_', ' ') }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('feedback.detail', item_id=item.id) }}" class="fw-semibold text-secondary">
+                                            {{ item.title }}
+                                        </a>
+                                    </td>
+                                    <td>{{ item.author.username }}</td>
+                                    <td>
+                                        <span class="badge {% if item.status == 'open' %}badge-info{% else %}badge-success{% endif %}">
+                                            {{ item.status | upper }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('feedback.detail', item_id=item.id) }}" class="btn btn-sm btn-outline">View Thread <i class="fa-solid fa-arrow-right"></i></a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-secondary text-center py-4" style="font-size:0.88rem;">No community suggestions have been posted yet. Be the first to share one!</p>
+            {% endif %}
+        </div>
+
+        <!-- Support Tickets Tab (Private) -->
+        <div class="flat-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 style="font-size: 1.05rem;" class="mb-0">
+                    <i class="fa-solid fa-ticket text-muted me-2"></i> 
+                    {% if current_user.role == 'admin' %}All Support Tickets (Private Admin View){% else %}My Support Tickets (Private){% endif %}
+                </h3>
+                <span class="badge badge-warning">{{ tickets | length }} Tickets</span>
+            </div>
+            
+            {% if tickets %}
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Ticket Title</th>
+                                <th>Creator</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in tickets %}
+                                <tr>
+                                    <td>
+                                        <span class="badge 
+                                            {% if item.category == 'bug' %}badge-danger
+                                            {% elif item.category == 'feature_request' %}badge-info
+                                            {% elif item.category == 'suggestion' %}badge-success
+                                            {% else %}badge-warning{% endif %}">
+                                            {{ item.category }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('feedback.detail', item_id=item.id) }}" class="fw-semibold text-secondary">
+                                            {{ item.title }}
+                                        </a>
+                                    </td>
+                                    <td>{{ item.author.username }}</td>
+                                    <td>
+                                        <span class="badge {% if item.status == 'open' %}badge-info{% else %}badge-success{% endif %}">
+                                            {{ item.status | upper }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('feedback.detail', item_id=item.id) }}" class="btn btn-sm btn-outline">Open Ticket <i class="fa-solid fa-arrow-right"></i></a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-secondary text-center py-4" style="font-size:0.88rem;">No private support tickets found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

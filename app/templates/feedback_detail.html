@@ -1,0 +1,127 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}{{ item.title }} - Feedback Detail{% endblock %}
+
+{% block header_title %}Thread Discussion{% endblock %}
+
+{% block content %}
+<!-- Back to Catalog Link -->
+<div class="mb-4">
+    <a href="{{ url_for('feedback.list_feedback') }}" class="text-secondary fw-semibold"><i class="fa-solid fa-arrow-left me-1"></i> Back to Feedback & Support</a>
+</div>
+
+<!-- Parent Feedback Item Card -->
+<div class="flat-card mb-4" style="border-left: 4px solid {% if item.is_public %}var(--success){% else %}var(--warning){% endif %};">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
+                <span class="badge 
+                    {% if item.category == 'bug' %}badge-danger
+                    {% elif item.category == 'feature_request' %}badge-info
+                    {% elif item.category == 'suggestion' %}badge-success
+                    {% else %}badge-warning{% endif %}">
+                    {{ item.category | upper }}
+                </span>
+                <span class="badge {% if item.is_public %}badge-info{% else %}badge-warning{% endif %}">
+                    {% if item.is_public %}<i class="fa-solid fa-users"></i> Community Suggestion{% else %}<i class="fa-solid fa-lock"></i> Private Support Ticket{% endif %}
+                </span>
+                <span class="badge {% if item.status == 'open' %}badge-info{% else %}badge-success{% endif %}">
+                    {{ item.status | upper }}
+                </span>
+            </div>
+            <h2 style="font-size: 1.35rem;" class="mb-1">{{ item.title }}</h2>
+            <p class="text-muted" style="font-size:0.78rem;">
+                Submitted by <strong>{{ item.author.username }}</strong> on {{ item.created_at.strftime('%Y-%m-%d %H:%M') }}
+            </p>
+        </div>
+        
+        <!-- Toggle Status Button (Owner or Admin only) -->
+        {% if current_user.id == item.user_id or current_user.role == 'admin' %}
+            <form method="POST" action="{{ url_for('feedback.toggle_status', item_id=item.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-sm {% if item.status == 'open' %}btn-primary{% else %}btn-outline{% endif %}">
+                    {% if item.status == 'open' %}
+                        <i class="fa-solid fa-circle-check"></i> Mark as Resolved
+                    {% else %}
+                        <i class="fa-solid fa-arrows-rotate"></i> Reopen Request
+                    {% endif %}
+                </button>
+            </form>
+        {% endif %}
+    </div>
+    
+    <div class="text-secondary py-2 border-top border-bottom mb-3" style="font-size: 0.88rem; white-space: pre-line; border-color: var(--border-color) !important;">
+        {{ item.content }}
+    </div>
+</div>
+
+<!-- Discussion replies timeline -->
+<h3 style="font-size: 1.05rem;" class="mb-3"><i class="fa-solid fa-timeline text-muted me-2"></i> Conversation History</h3>
+
+<div class="timeline-container">
+    <!-- Initial Post Node -->
+    <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-card">
+            <div class="timeline-header">
+                <span class="timeline-user">{{ item.author.username }}</span>
+                <span class="timeline-time">{{ item.created_at.strftime('%H:%M - %Y-%m-%d') }}</span>
+            </div>
+            <div class="timeline-body">
+                <em>Opened this {{ item.category | replace('_', ' ') }} thread.</em>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Reply Nodes -->
+    {% for reply in replies %}
+        <div class="timeline-item {% if reply.author.role == 'admin' %}admin-reply{% endif %}">
+            <div class="timeline-dot"></div>
+            <div class="timeline-card {% if reply.author.role == 'admin' %}admin-reply{% endif %}">
+                <div class="timeline-header">
+                    <div>
+                        <span class="timeline-user">{{ reply.author.username }}</span>
+                        {% if reply.author.role == 'admin' %}
+                            <span class="badge badge-warning ms-1" style="font-size: 0.62rem; padding: 1px 4px;"><i class="fa-solid fa-user-shield"></i> Staff</span>
+                        {% endif %}
+                    </div>
+                    <span class="timeline-time">{{ reply.created_at.strftime('%H:%M - %Y-%m-%d') }}</span>
+                </div>
+                <div class="timeline-body">
+                    {{ reply.content }}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Reply submission Form -->
+<div class="flat-card mt-4">
+    <h3 style="font-size: 1.05rem;" class="mb-3"><i class="fa-solid fa-reply text-muted me-2"></i> Post a Reply</h3>
+    
+    {% if can_reply %}
+        <form method="POST" action="{{ url_for('feedback.detail', item_id=item.id) }}">
+            {{ reply_form.csrf_token }}
+            
+            <div class="input-group">
+                {{ reply_form.content.label }}
+                {{ reply_form.content(placeholder="Write your response message here...", rows=4) }}
+                {% if reply_form.content.errors %}
+                    {% for error in reply_form.content.errors %}
+                        <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            
+            <button type="submit" class="btn btn-primary mt-2">Post Reply <i class="fa-solid fa-paper-plane"></i></button>
+        </form>
+    {% else %}
+        <!-- Reply editor disabled for standard users since resolved -->
+        <div class="text-center py-4 border rounded" style="background-color: var(--bg-primary); border-color: var(--border-color) !important;">
+            <i class="fa-solid fa-lock text-muted fa-xl mb-2"></i>
+            <p class="text-secondary fw-semibold mb-1" style="font-size:0.88rem;">This ticket is currently RESOLVED</p>
+            <p class="text-muted mb-0" style="font-size:0.78rem;">Standard users cannot reply to resolved tickets. If you still need help, please reopen the request above.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
