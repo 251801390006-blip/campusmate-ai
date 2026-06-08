@@ -106,6 +106,25 @@ function launchSandboxMode() {
         currentUser = JSON.parse(sandboxUser);
     }
     
+    // Ensure sandbox nodes are seeded with the full 25 milestones
+    let sandboxNodes = localStorage.getItem("campusmate_sandbox_nodes");
+    let needsReseed = false;
+    if (!sandboxNodes) {
+        needsReseed = true;
+    } else {
+        try {
+            const parsed = JSON.parse(sandboxNodes);
+            if (!Array.isArray(parsed) || parsed.length < 25) {
+                needsReseed = true;
+            }
+        } catch (e) {
+            needsReseed = true;
+        }
+    }
+    if (needsReseed) {
+        seedSandboxRoadmap(currentUser.targetRole || "Full-Stack Dev");
+    }
+    
     // Show sandbox UI indicators
     document.getElementById("sandbox-badge").classList.remove("hidden");
     
@@ -116,387 +135,274 @@ function launchSandboxMode() {
     loadDashboard();
 }
 
-function seedSandboxRoadmap(role) {
-    let nodes = [];
+function getPredefinedRoadmapJS(role) {
+    const roleLower = role.toLowerCase();
+    let milestones = [];
+    let provider = "FreeCodeCamp / OpenJS";
+    let cert = "Meta Front-End Developer Professional Certificate";
     
-    if (role === "Cyber Security") {
-        nodes = [
-            {
-                id: "node-1",
-                title: "Network Protocols & Packet Analysis",
-                description: "Master TCP/IP, DNS, HTTP/S, and packet capture tools like Wireshark.",
-                difficulty: "BEGINNER",
-                estimated_duration: "12 hours",
-                resources: [{title: "Wireshark Labs & Tutorials", url: "https://www.wireshark.org"}],
-                projects: [{title: "Packet Trace Audit", description: "Capture local interface traffic and analyze TLS handshake messages.", tasks: ["Install packet analyzer", "Capture HTTP vs HTTPS payloads", "Extract handshake metadata"]}],
-                certifications: [{name: "CompTIA Network+", provider: "CompTIA"}],
-                status: "AVAILABLE"
-            },
-            {
-                id: "node-2",
-                title: "Linux Administration & OS Hardening",
-                description: "Configure system permissions, service policies, audit log entries, and SSH secure tunnels.",
-                difficulty: "INTERMEDIATE",
-                estimated_duration: "15 hours",
-                resources: [{title: "Linux Hardening Guidelines", url: "https://www.cisecurity.org"}],
-                projects: [{title: "Secure Bastion Server Setup", description: "Deploy a Linux kernel VM, disable root SSH logins, and block unauthorized ports.", tasks: ["Establish firewall policies", "Setup logging daemon auditd", "Configure SSH key authentication"]}],
-                certifications: [{name: "CompTIA Security+", provider: "CompTIA"}],
-                status: "LOCKED"
-            },
-            {
-                id: "node-3",
-                title: "OWASP Top 10 & Web Pentesting",
-                description: "Test web gateways against SQL Injection, Cross-Site Scripting (XSS), and Broken Authentication.",
-                difficulty: "INTERMEDIATE",
-                estimated_duration: "20 hours",
-                resources: [{title: "OWASP Web Security Testing Guide", url: "https://owasp.org"}],
-                projects: [{title: "Vulnerable App Vulnerability Assessment", description: "Run automated and manual audits on test nodes, detailing severity findings.", tasks: ["Run OWASP ZAP scanners", "Examine CORS configuration logs", "Draft remediation script proposals"]}],
-                certifications: [{name: "Certified Ethical Hacker (CEH)", provider: "EC-Council"}],
-                status: "LOCKED"
-            },
-            {
-                id: "node-4",
-                title: "Cloud Security, Identity & Governance",
-                description: "Learn cloud IAM structures, VPC security groups, key management vaults, and identity federation.",
-                difficulty: "ADVANCED",
-                estimated_duration: "24 hours",
-                resources: [{title: "Microsoft Learn: Security, Compliance, and Identity", url: "https://learn.microsoft.com"}],
-                projects: [{title: "Zero-Trust Cloud Network", description: "Design an Azure/AWS virtual private network with restricted IAM policies and network firewalls.", tasks: ["Define narrow security group rules", "Enable Azure Key Vault auditing", "Restrict database access to VPC CIDR"]}],
-                certifications: [{name: "Microsoft Certified: Cybersecurity Architect Expert", provider: "Microsoft"}],
-                status: "LOCKED"
-            }
+    if (roleLower.includes("cyber") || roleLower.includes("security")) {
+        milestones = [
+            ["Networking & OSI Model Essentials", "Master TCP/IP, subnets, DNS, and OSI layer fundamentals."],
+            ["IP Subnetting & Packet Routing", "Learn how routers direct packets across subnets and local area networks."],
+            ["Common Protocols & Audits", "Examine and audit DNS, HTTP, SSH, FTP, and DHCP protocols."],
+            ["Command Line & Bash Scripting", "Master Linux file navigation, permissions, and automation scripts."],
+            ["Windows Security & PowerShell", "Learn Windows active directory administration and powershell commands."],
+            ["Intro to Cryptography & Keys", "Differentiate symmetric vs asymmetric encryption and key exchange."],
+            ["Hashing & Integrity Verification", "Use SHA, MD5, and digital signatures to audit document integrity."],
+            ["Reconnaissance & Nmap Scanning", "Scan open ports, discover OS versions, and catalog target assets."],
+            ["Packet Sniffing with Wireshark", "Capture and analyze network frames to trace protocol payloads."],
+            ["Firewall ACLs & Segmentation", "Configure network security groups and block unauthorized port access."],
+            ["SSH Hardening & Security Audits", "Audit SSH configuration, disable root login, and enforce key auth."],
+            ["Identity Access Management (IAM)", "Configure multi-factor auth, role bindings, and credential policies."],
+            ["OWASP Top 10 Security Risks", "Understand SQL injection, XSS, and broken access controls."],
+            ["SQL Injection & Defensive Coding", "Exploit SQL weaknesses and implement parameterized query overrides."],
+            ["Metasploit Framework Exploitation", "Configure exploit modules, payloads, and establish shell listeners."],
+            ["Wireless WPA2/WPA3 Security", "Learn security handshakes, packet capture, and deauth attacks."],
+            ["IDS/IPS Snort Rules Configuration", "Create snort signatures to flag and block network attack profiles."],
+            ["SIEM Log Auditing with Splunk", "Index server logs and create alerts for suspicious login behaviors."],
+            ["Threat Hunting & Log Correlation", "Correlate syslog and auth logs to map persistent attack paths."],
+            ["Malware Analysis: Static Review", "Analyze PE headers, string hashes, and import tables of binaries."],
+            ["Malware Analysis: Dynamic Scans", "Run binaries in a secure sandbox and monitor registry changes."],
+            ["Cloud Shared Responsibility Models", "Audit AWS and Azure security frameworks and identity bindings."],
+            ["Cloud Gateways & WAF Security", "Deploy web application firewalls and lock down virtual networks."],
+            ["Penetration Testing Scope & Ethics", "Learn scopes of work, reporting standards, and legal compliance."],
+            ["Purple Teaming & Incident Response", "Collaborate on attack/defense simulations and incident reporting."]
         ];
-    } else if (role === "AI Engineering") {
-        nodes = [
-            {
-                id: "node-1",
-                title: "Linear Algebra & Calculus for AI",
-                description: "Learn matrices multiplication, eigenvalues, partial gradients, and optimization rules.",
-                difficulty: "BEGINNER",
-                estimated_duration: "14 hours",
-                resources: [{title: "3Blue1Brown: Essence of Linear Algebra", url: "https://www.youtube.com"}],
-                projects: [{title: "Gradient Descent Simulator", description: "Code linear regression gradients optimization from scratch in pure Python.", tasks: ["Setup loss function metrics", "Implement matrix operations manually", "Plot learning rates gradient graphs"]}],
-                certifications: [{name: "DeepLearning.AI Math for Machine Learning", provider: "Coursera"}],
-                status: "AVAILABLE"
-            },
-            {
-                id: "node-2",
-                title: "Machine Learning Classifiers & Pipelines",
-                description: "Train decision trees, random forests, SVN classifiers, and evaluate validation scores.",
-                difficulty: "INTERMEDIATE",
-                estimated_duration: "18 hours",
-                resources: [{title: "Scikit-Learn Tutorials", url: "https://scikit-learn.org"}],
-                projects: [{title: "Customer Churn Classifiers Pipeline", description: "Build data cleaning, scaling, and training pipelines on scikit-learn libraries.", tasks: ["Run cross validation folds", "Compare precision-recall ratios", "Export models using Joblib serialization"]}],
-                certifications: [{name: "Google Cloud: Machine Learning Engineer", provider: "Google"}],
-                status: "LOCKED"
-            },
-            {
-                id: "node-3",
-                title: "Deep Neural Networks & PyTorch",
-                description: "Configure multi-layer perceptrons, backpropagation graphs, activation rules, and optimizers.",
-                difficulty: "INTERMEDIATE",
-                estimated_duration: "22 hours",
-                resources: [{title: "PyTorch Basics & Tutorials", url: "https://pytorch.org"}],
-                projects: [{title: "MNIST Digit Recognition Network", description: "Write convolutional neural network layers using PyTorch frameworks, evaluating accuracy.", tasks: ["Setup DataLoader generators", "Tune learning rate decays", "Plot training loss curves"]}],
-                certifications: [{name: "Microsoft Certified: Azure AI Engineer Associate", provider: "Microsoft"}],
-                status: "LOCKED"
-            },
-            {
-                id: "node-4",
-                title: "LLMs, Vector Databases & RAG Architectures",
-                description: "Master prompt engineering templates, semantic text embeddings, vector matching databases, and LangChain hooks.",
-                difficulty: "ADVANCED",
-                estimated_duration: "26 hours",
-                resources: [{title: "DeepLearning.AI: Prompt Engineering Guides", url: "https://www.deeplearning.ai"}],
-                projects: [{title: "Document Assistant using RAG", description: "Build a document scraper that queries vector stores and structures response summaries using Gemini APIs.", tasks: ["Chunk document texts", "Index in vector stores", "Design LLM response wrappers"]}],
-                certifications: [{name: "TensorFlow Developer Certificate", provider: "Google"}],
-                status: "LOCKED"
-            }
+        provider = "CompTIA / EC-Council";
+        cert = "CompTIA Security+";
+    } else if (roleLower.includes("ai engineering") || roleLower.includes("ai engineer")) {
+        milestones = [
+            ["Python Programming & Tool Setup", "Install dependencies, write syntax commands, and configure VS Code."],
+            ["Control Flow & Logic in Python", "Write conditionals, loops, and conditional flow logic statements."],
+            ["Functions & Modular File Structures", "Create modular python functions, scripts, and exception boundaries."],
+            ["OOP Principles & Custom Classes", "Use classes, inheritance, and object abstractions in Python."],
+            ["File Parsing: JSON, CSV, & Files", "Read local log files and clean structured telemetry inputs."],
+            ["NumPy Vectorized Array Workflows", "Create matrices, compute dot products, and optimize loops."],
+            ["Pandas DataFrames & Aggregations", "Load tabular data, group stats, and index complex datasets."],
+            ["Data Visualization with Seaborn", "Plot correlation heatmaps, line charts, and bar diagrams."],
+            ["Linear Algebra for Model Weights", "Compute matrix determinants, eigenvalues, and dot multiplications."],
+            ["Gradient Descent Optimizations", "Learn loss functions, derivatives, and learning rates."],
+            ["Probability Foundations for Models", "Calculate Bayes theorem probabilities and normal distributions."],
+            ["Supervised Learning Regression Models", "Train linear regression models using Scikit-Learn."],
+            ["Decision Trees & Ensemble Forests", "Train classifier models and verify split indices."],
+            ["Support Vector Classification", "Configure hyperplanes and kernel transformations."],
+            ["Unsupervised Clustering Algorithms", "Group data rows using K-Means and DBSCAN algorithms."],
+            ["Dimensionality Reduction with PCA", "Condense feature columns while preserving data variance."],
+            ["ROC, AUC & F1-Score Evaluations", "Construct confusion matrices and optimize threshold curves."],
+            ["Introduction to PyTorch Tensors", "Setup tensor structures, auto-differentiation, and backpropagation."],
+            ["Convolutional Image Neural Networks", "Construct CNN layers for computer vision digit classifications."],
+            ["RNNs & LSTMs for Time-Series", "Train sequential networks to predict stock trends or logs."],
+            ["NLP Tokenization & Embeddings", "Convert text inputs to vector tokens and bag-of-words."],
+            ["Transformer Encoder-Decoder Layers", "Learn self-attention mechanisms and query-key-value vectors."],
+            ["Prompt Engineering & System Prompts", "Create system instructions for LLM completions."],
+            ["RAG Pipelines & Vector Databases", "Retrieve local PDF text chunks and search ChromaDB vectors."],
+            ["Exposing Models via FastAPI Docker", "Wrap model inference scripts inside FastAPI and run via Docker."]
         ];
-    } else if (role === "Machine Learning") {
-        nodes = [
-            {
-                id: "node-1",
-                title: "Python Math Libraries: NumPy & Pandas",
-                description: "Manipulate multi-dimensional arrays, data frames indexing, filtering, and aggregation.",
-                difficulty: "BEGINNER",
-                estimated_duration: "10 hours",
-                resources: [{title: "Pandas User Guides", url: "https://pandas.pydata.org"}],
-                projects: [{title: "Academic Performance Profiler", description: "Clean datasets, handle missing coordinates, and output aggregate statistics summaries.", tasks: ["Merge relational CSV arrays", "Compute group variance statistics", "Plot performance histogram distributions"]}],
-                certifications: [{name: "IBM Data Science Professional Certificate", provider: "IBM"}],
-                status: "AVAILABLE"
-            },
-            {
-                id: "node-2",
-                title: "Supervised Learning Regression Models",
-                description: "Analyze linear, ridge, lasso regressions, and calculate mean squared error variances.",
-                difficulty: "INTERMEDIATE",
-                estimated_duration: "14 hours",
-                resources: [{title: "Introduction to Statistical Learning", url: "https://statlearning.com"}],
-                projects: [{title: "Housing Price Estimators", description: "Tune multi-feature regression functions, checking residuals distribution logs.", tasks: ["Clean outlier outliers", "Normalize dynamic ranges", "Calculate coefficient of determination"]}],
-                certifications: [{name: "Stanford Machine Learning Certification", provider: "Coursera"}],
-                status: "LOCKED"
-            },
-            {
-                id: "node-3",
-                title: "Unsupervised Clustering & Dimensions Compression",
-                description: "Master K-Means algorithms, Hierarchical clustering, and Principal Component Analysis (PCA).",
-                difficulty: "INTERMEDIATE",
-                estimated_duration: "18 hours",
-                resources: [{title: "Scikit-Learn Clustering Documentation", url: "https://scikit-learn.org"}],
-                projects: [{title: "Market Segments Clustering Explorer", description: "Perform PCA dimensions compression and map customer clusters using K-Means.", tasks: ["Determine cluster counts via elbow metrics", "Run dimensional projection charts", "Detail characteristic features per cluster"]}],
-                certifications: [{name: "AWS Certified Machine Learning - Specialty", provider: "Amazon"}],
-                status: "LOCKED"
-            },
-            {
-                id: "node-4",
-                title: "MLOps Pipelines & Model Registry",
-                description: "Learn model version tracking, artifact staging, container packaging, and automated retraining.",
-                difficulty: "ADVANCED",
-                estimated_duration: "24 hours",
-                resources: [{title: "MLflow Documentation & Guides", url: "https://mlflow.org"}],
-                projects: [{title: "Model Production Delivery System", description: "Register target models, package using FastAPI wrappers, and configure CI auto-build containers.", tasks: ["Setup model version registries", "Define REST request parsing", "Run continuous inference tests"]}],
-                certifications: [{name: "Google Cloud Professional ML Engineer", provider: "Google"}],
-                status: "LOCKED"
-            }
+        provider = "Microsoft / Google";
+        cert = "Azure AI Engineer Associate";
+    } else if (roleLower.includes("machine") || roleLower.includes("ml")) {
+        milestones = [
+            ["Python Setup & Jupyter Notebooks", "Configure environments, install pip packages, and write cells."],
+            ["Variables, Lists & Loops in Python", "Work with python sequences, slicing, and dictionaries."],
+            ["Functions, Errors & Imports", "Define custom methods, raise exceptions, and load modules."],
+            ["NumPy Arrays & Linear Algebra", "Execute matrix arithmetic, reshape tensors, and select slices."],
+            ["Pandas Data Analytics Essentials", "Filter rows, map column values, and handle NaN placeholders."],
+            ["Data Visualization & Distributions", "Construct histograms, scatter plots, and box plots."],
+            ["Linear & Polynomial Regressions", "Perform curve fitting and compute mean squared error metrics."],
+            ["Logistic Regression & Binary Targets", "Train sigmoid models to classify user churn anomalies."],
+            ["Decision Trees & Hyperparameters", "Prune tree nodes, configure min_samples, and plot rules."],
+            ["Random Forests & Bagging Methods", "Combine tree predictors and inspect feature importances."],
+            ["Support Vector Machines & Kernels", "Configure radial basis functions and margin soft parameters."],
+            ["K-Means Clustering & Elbow Curves", "Segment user segments and compute inertia scores."],
+            ["Principal Component Analysis (PCA)", "Reduce dimensions and analyze explained variance ratios."],
+            ["Overfitting & Cross-Validation", "Run K-Fold validations and diagnose train/test curves."],
+            ["Stochastic Gradient Descent (SGD)", "Optimize loss parameters using mini-batches."],
+            ["PyTorch Neural Networks Basics", "Define linear layers, activation functions, and optimizer hooks."],
+            ["Training Custom CNN Model Layers", "Build convolution and pooling loops for image inputs."],
+            ["LSTMs & Text Generation loops", "Setup sequence-to-sequence neural architectures."],
+            ["Feature Engineering & Scaling", "Apply StandardScalers, one-hot encoders, and log fixes."],
+            ["Model Serialization & Joblib", "Export weights files and write fast loading hooks."],
+            ["FastAPI Inference Controllers", "Deploy a backend route that loads model weights and classifies."],
+            ["Dockerizing ML Service Environs", "Build clean container layers containing model assets."],
+            ["Deploying ML models to Cloud VM", "Run inference containers on cloud servers behind proxy gates."],
+            ["Monitoring Model Drift telemetry", "Setup dashboard tracking for live prediction confidence graphs."],
+            ["Advanced Hyperparameter Search", "Run Optuna, grid searches, and optimize batch size metrics."]
         ];
-    } else if (role === "Data Science") {
-        nodes = [
-            {
-                id: "node-1",
-                title: "SQL Querying & Data Restructuring",
-                description: "Master subqueries, inner/outer joins, window functions, and data schema normalization.",
-                difficulty: "BEGINNER",
-                estimated_duration: "10 hours",
-                resources: [{title: "PostgreSQL Tutorial Core Guides", url: "https://www.postgresqltutorial.com"}],
-                projects: [{title: "Multi-Store Transactions Database Analysis", description: "Write complex window queries to extract monthly metrics.", tasks: ["Construct relational schema structures", "Write aggregate rollup calculations", "Format report tables"]}],
-                certifications: [{name: "Google Data Analytics Professional", provider: "Google"}],
-                status: "AVAILABLE"
-            },
-            {
-                id: "node-2",
-                title: "Exploratory Data Analysis & Vis",
-                description: "Design reports, trace correlations using Seaborn, and explain skewness patterns.",
-                difficulty: "INTERMEDIATE",
-                estimated_duration: "12 hours",
-                resources: [{title: "Seaborn Visualization Guide", url: "https://seaborn.pydata.org"}],
-                projects: [{title: "SaaS Performance Dashboard Plots", description: "Generate distribution heatmaps and scatter-correlation charts from raw customer events.", tasks: ["Clean duplicate event arrays", "Plot daily retention heatmaps", "Verify correlation coefficients metrics"]}],
-                certifications: [{name: "Microsoft Certified: Power BI Data Analyst", provider: "Microsoft"}],
-                status: "LOCKED"
-            },
-            {
-                id: "node-3",
-                title: "Statistical Methods & Hypothesis Audits",
-                description: "Apply Z-scores, T-tests, ANOVA calculations, p-values verification, and Central Limit theorems.",
-                difficulty: "INTERMEDIATE",
-                estimated_duration: "16 hours",
-                resources: [{title: "OpenStax Introductory Statistics", url: "https://openstax.org"}],
-                projects: [{title: "A/B Conversion Testing Analysis", description: "Calculate conversions variances between test designs, checking statistical significance ratios.", tasks: ["Establish null hypothesis assumptions", "Compute standard errors ratios", "Determine final p-value outputs"]}],
-                certifications: [{name: "IBM Applied Data Science Specialist", provider: "IBM"}],
-                status: "LOCKED"
-            },
-            {
-                id: "node-4",
-                title: "Big Data Pipelines & Apache Spark",
-                description: "Write PySpark scripts, map MapReduce keys, partition datasets, and run distributed jobs.",
-                difficulty: "ADVANCED",
-                estimated_duration: "22 hours",
-                resources: [{title: "Apache Spark Programming Guide", url: "https://spark.apache.org"}],
-                projects: [{title: "Log Event Scraper using Spark", description: "Parse 10M rows of system event logs, outputting target errors distributions.", tasks: ["Set up PySpark session configurations", "Partition server datasets", "Aggregate error traces daily"]}],
-                certifications: [{name: "Cloudera Certified Associate: Data Analyst", provider: "Cloudera"}],
-                status: "LOCKED"
-            }
+        provider = "Google Cloud / AWS";
+        cert = "GCP Professional Machine Learning Engineer";
+    } else if (roleLower.includes("data science") || roleLower.includes("data scientist")) {
+        milestones = [
+            ["Python & Jupyter Basics", "Configure notebooks, install pandas/matplotlib, and write scripts."],
+            ["Pandas: Loading & Selecting Data", "Read CSV/JSON files, inspect head, and select columns."],
+            ["Pandas: Data Cleaning Strategies", "Drop duplicate rows, fill missing cells, and change types."],
+            ["Exploratory Data Analysis (EDA)", "Create correlation heatmaps and identify data anomalies."],
+            ["Matplotlib & Seaborn Custom Plots", "Customize chart colors, labels, axes, and legends."],
+            ["SQL: Querying Databases for Analysis", "Write SELECT statements, filter conditions, and limits."],
+            ["SQL: Joins, Groups & Aggregations", "Combine tables using INNER/LEFT JOIN and count metrics."],
+            ["Descriptive Statistics Foundations", "Calculate mean, median, mode, variance, and standard deviation."],
+            ["Probability Distributions & Z-Scores", "Analyze normal distributions, outliers, and normalize scales."],
+            ["Hypothesis Testing & T-Tests", "Set null hypotheses, calculate p-values, and check significance."],
+            ["A/B Testing Experiments Design", "Determine sample sizes, control groups, and verify conversions."],
+            ["Linear Regression & Correlation", "Assess Pearson correlation and fit regression lines."],
+            ["Logistic Regression Classifications", "Predict binary classifications and plot confusion matrices."],
+            ["Decision Trees for Analytics", "Create rule trees and print feature importance lists."],
+            ["Time Series Analysis & Forecasting", "Decompose trends, seasonal cycles, and run ARIMA models."],
+            ["Text Mining & Basic NLP Analysis", "Clean text strings, remove stopwords, and build wordclouds."],
+            ["Dimensionality Reduction & Clustering", "Run PCA and group customer behavior using K-Means."],
+            ["Feature Selection Techniques", "Filter features using ANOVA, chi-square, and mutual info."],
+            ["Data Pipelines: ETL Essentials", "Extract raw files, transform schema mappings, and save to SQL."],
+            ["Intro to Big Data & Spark DataFrames", "Run distributed queries on large datasets using PySpark."],
+            ["BI Tools: Building Dashboard Mockups", "Design visual tracking widgets for business managers."],
+            ["Deploying Analytical Reports as APIs", "Expose key stats, summaries, and predictions via FastAPI."],
+            ["Dockerizing ETL Script Containers", "Containerize data import scripts to run on daily schedules."],
+            ["Cloud Data Warehouse Foundations", "Learn query configurations for AWS Redshift or Google BigQuery."],
+            ["Capstone: Interactive Data Dashboard", "Deliver a comprehensive project featuring clean ETL and plots."]
         ];
-    } else if (role === "Cloud Computing") {
-        nodes = [
-            {
-                id: "node-1",
-                title: "Networking & Cloud Basics",
-                description: "Learn subnets masking, DNS zones, HTTP load balancers, and standard cloud storage classes.",
-                difficulty: "BEGINNER",
-                estimated_duration: "10 hours",
-                resources: [{title: "AWS Technical Essentials", url: "https://aws.amazon.com"}],
-                projects: [{title: "Static CDN Portfolio Website", description: "Deploy front-end layouts to object stores behind secure SSL content networks.", tasks: ["Create cloud storage buckets", "Configure custom domain routing", "Enable cache invalidations profiles"]}],
-                certifications: [{name: "AWS Certified Cloud Practitioner", provider: "Amazon"}],
-                status: "AVAILABLE"
-            },
-            {
-                id: "node-2",
-                title: "Infrastructure as Code & Terraform",
-                description: "Define cloud states, write resource blocks, configure outputs, and organize module patterns.",
-                difficulty: "INTERMEDIATE",
-                estimated_duration: "15 hours",
-                resources: [{title: "Terraform HashiCorp Tutorials", url: "https://learn.hashicorp.com"}],
-                projects: [{title: "Automated AWS/Azure VPC Blueprint", description: "Write Terraform files defining target network components, security groups, and virtual instances.", tasks: ["Setup remote state configuration stores", "Define security boundary parameters", "Test plan deployments"]}],
-                certifications: [{name: "HashiCorp Certified: Terraform Associate", provider: "HashiCorp"}],
-                status: "LOCKED"
-            },
-            {
-                id: "node-3",
-                title: "Serverless Deployments & API Gateways",
-                description: "Write function runtimes, handle cold starts, configure route integrations, and authorize users.",
-                difficulty: "INTERMEDIATE",
-                estimated_duration: "18 hours",
-                resources: [{title: "Serverless Framework Guides", url: "https://www.serverless.com"}],
-                projects: [{title: "Serverless User Registration Endpoint", description: "Create Lambda handlers writing profile entries into DynamoDB arrays.", tasks: ["Write serverless template configurations", "Add JSON validator middleware layers", "Test endpoints routing rules"]}],
-                certifications: [{name: "Microsoft Certified: Azure Developer Associate", provider: "Microsoft"}],
-                status: "LOCKED"
-            },
-            {
-                id: "node-4",
-                title: "Multi-Cloud Architectures & VPC Peering",
-                description: "Configure VPN tunnels, VPC peering connections, route tables, and unified cloud governance.",
-                difficulty: "ADVANCED",
-                estimated_duration: "24 hours",
-                resources: [{title: "AWS Well-Architected Framework", url: "https://aws.amazon.com"}],
-                projects: [{title: "High Availability Web Stack", description: "Deploy virtual scale sets across regions behind redundant load balancers.", tasks: ["Setup multi-region database replications", "Configure auto-scaling thresholds", "Run chaos network simulation tests"]}],
-                certifications: [{name: "AWS Certified Solutions Architect - Professional", provider: "Amazon"}],
-                status: "LOCKED"
-            }
+        provider = "Microsoft / Databricks";
+        cert = "Microsoft Certified: Power BI Data Analyst Associate";
+    } else if (roleLower.includes("cloud")) {
+        milestones = [
+            ["Cloud Computing Fundamentals", "Learn IaaS, PaaS, SaaS, and public vs private structures."],
+            ["Virtual Machines & OS Provisioning", "Spin up VMs, configure SSH access, and update repositories."],
+            ["Virtual Networking & Subnetting", "Deploy virtual networks, design subnets, and configure routes."],
+            ["Firewalls & Network Access Control", "Configure ingress/egress rules and block open SSH ports."],
+            ["Cloud Object Storage Essentials", "Create storage buckets, configure access controls, and files."],
+            ["IAM: Users, Groups & Policy JSON", "Write strict access policies and delegate privileges safely."],
+            ["SQL Databases in the Cloud", "Provision relational instances and audit connectivity links."],
+            ["NoSQL Cloud Database Engines", "Setup key-value engines and configure primary partition keys."],
+            ["Load Balancers & High Availability", "Distribute HTTP requests across target server pools."],
+            ["Auto-Scaling & Elastic Operations", "Configure rules to automatically scale node counts on load."],
+            ["Serverless Functions (FaaS)", "Deploy event-driven functions and configure trigger endpoints."],
+            ["DNS Routing & Domain Registries", "Configure target routes, health checks, and domain maps."],
+            ["Content Delivery Networks (CDN)", "Cache static images and CSS stylesheets at edge locations."],
+            ["Monitoring, Metrics & Logs Tracker", "Setup metric graphs and track CPU/memory alerts."],
+            ["Backup, Restore & Disaster Recovery", "Schedule snapshot policies and test database recovery loops."],
+            ["Terraform: Infrastructure as Code (IaC)", "Define VMs, networks, and firewalls using YAML/HCL configurations."],
+            ["Terraform: State Files & Variables", "Manage state configs, output parameters, and modules."],
+            ["Cloud Container Registry setups", "Build Docker images and push to cloud registry stores."],
+            ["Kubernetes Cloud Clusters (EKS/AKS)", "Provision managed Kubernetes clusters and connect kubectl."],
+            ["Hybrid Cloud & VPN Tunnel Gateway", "Bridge local data networks to cloud nodes using secure VPNs."],
+            ["Cloud Billing & Cost Controls", "Set spending limits, configure alarms, and clean unused disks."],
+            ["Shared Responsibility Security Audits", "Evaluate vulnerability logs, WAF alerts, and security groups."],
+            ["Automated VM Configuration (Ansible)", "Write playbooks to deploy web servers on fresh cloud VMs."],
+            ["Server Migration Strategies", "Learn how to lift and shift database nodes to cloud instances."],
+            ["Capstone: Deploy Secure Cloud Cluster", "Deploy a complete SaaS network behind load balancers with WAF."]
         ];
-    } else if (role === "DevOps") {
-        nodes = [
-            {
-                id: "node-1",
-                title: "Linux Shell Scripting & Systems Commands",
-                description: "Automate system actions, parse text streams, setup cron schedules, and verify logs.",
-                difficulty: "BEGINNER",
-                estimated_duration: "10 hours",
-                resources: [{title: "Linux Command Line Core Tutorial", url: "https://linuxjourney.com"}],
-                projects: [{title: "System Performance Logger", description: "Write a bash shell script collecting memory statistics and writing alert logs.", tasks: ["Parse top metrics arrays", "Setup systemd cron triggers", "Email error summaries"]}],
-                certifications: [{name: "Linux Professional Institute LPIC-1", provider: "LPI"}],
-                status: "AVAILABLE"
-            },
-            {
-                id: "node-2",
-                title: "Containerization using Docker",
-                description: "Build custom Docker images, write optimization rules, mount host files, and configure network links.",
-                difficulty: "INTERMEDIATE",
-                estimated_duration: "14 hours",
-                resources: [{title: "Docker Get Started guides", url: "https://docs.docker.com"}],
-                projects: [{title: "Multi-Container Development Sandbox", description: "Assemble compose configuration files connecting python app servers, Redis layers, and Postgres storage databases.", tasks: ["Optimize image layers definitions", "Link secure container subnets", "Define volume persistent mappings"]}],
-                certifications: [{name: "Docker Certified Associate (DCA)", provider: "Mirantis"}],
-                status: "LOCKED"
-            },
-            {
-                id: "node-3",
-                title: "Continuous Integrations (CI/CD) and GitHub Actions",
-                description: "Automate test suites execution, run syntax linters, compile binaries, and publish container registries.",
-                difficulty: "INTERMEDIATE",
-                estimated_duration: "16 hours",
-                resources: [{title: "GitHub Actions documentation", url: "https://docs.github.com"}],
-                projects: [{title: "Automated Release Pipeline", description: "Write continuous actions workflows compiling code, passing verification tests, and deploying on cloud nodes.", tasks: ["Establish step-by-step workflow definitions", "Mask API auth credentials", "Release Docker image releases"]}],
-                certifications: [{name: "GitHub Actions Certification", provider: "GitHub"}],
-                status: "LOCKED"
-            },
-            {
-                id: "node-4",
-                title: "Container Orchestration with Kubernetes",
-                description: "Configure pods mappings, cluster networks, volume mounts, ingress routes, and auto-scalers.",
-                difficulty: "ADVANCED",
-                estimated_duration: "24 hours",
-                resources: [{title: "Kubernetes interactive training tutorials", url: "https://kubernetes.io"}],
-                projects: [{title: "Zero-Downtime Microservices Web App", description: "Write Kubernetes manifest files, routing live user sessions across scaled pods clusters.", tasks: ["Define cluster deployment configs", "Set CPU/Memory resources thresholds", "Test rolling updates processes"]}],
-                certifications: [{name: "Certified Kubernetes Administrator (CKA)", provider: "Cloud Native Computing Foundation"}],
-                status: "LOCKED"
-            }
+        provider = "Amazon AWS / Microsoft";
+        cert = "AWS Certified Solutions Architect – Associate";
+    } else if (roleLower.includes("devops")) {
+        milestones = [
+            ["DevOps Culture & Linux Shell Power", "Learn standard commands, file management, and terminal tools."],
+            ["Git Foundations & Branching Models", "Master merging, rebasing, pull requests, and git-flow patterns."],
+            ["Bash Scripting & Automation Loops", "Write automation scripts to clean temp files and parse logs."],
+            ["Docker: Building Custom Containers", "Write Dockerfiles, configure layers, and run entrypoints."],
+            ["Docker Compose: Multi-Container Setup", "Run backend APIs and database nodes side-by-side using YAML."],
+            ["Docker Volumes & Persistent Storage", "Configure mount volumes and preserve data across restarts."],
+            ["CI/CD: GitHub Actions Workflows", "Create YAML workflows to compile code on push events."],
+            ["CI/CD: Automated Linter & Unit Tests", "Integrate automated check steps and block broken pull builds."],
+            ["Infrastructure as Code (IaC) Basics", "Learn declarative config models and write simple YAML plans."],
+            ["Terraform: Provisioning Local Dev Host", "Write terraform configs to deploy Docker containers."],
+            ["Terraform: State Management & Backends", "Configure remote state locking to avoid resource conflicts."],
+            ["Configuration Management: Ansible", "Write playbooks to configure packages on server networks."],
+            ["Continuous Deployment: SSH Web Deploy", "Auto-deploy code directly to remote servers using SSH scripts."],
+            ["Monitoring Systems: Prometheus Basics", "Expose metrics endpoints and monitor CPU/RAM utilization."],
+            ["Log Aggregation: ELK Stack / Grafana", "Collect application logs, construct dashboards, and monitor errors."],
+            ["Kubernetes: Pods, Services & Deployments", "Write YAML manifests to deploy container sets locally."),
+            ["Kubernetes: ConfigMaps & Secrets", "Inject environment variables and secret tokens securely."],
+            ["Kubernetes: Ingress & Domain Routing", "Deploy ingress controllers to route HTTP traffic to services."],
+            ["Helm: Packaging Kubernetes Apps", "Use Helm charts to install persistent database clusters."],
+            ["GitOps: Intro to ArgoCD pipelines", "Sync Kubernetes clusters directly with git repository state."],
+            ["SaaS Logging & Alerting Triggers", "Setup Slack/email alert webhooks for down server nodes."],
+            ["CI/CD: Artifact Registries & Packages", "Publish compiled images to secure image registries."],
+            ["Security: Scanning Docker Images (Trivy)", "Integrate CVE vulnerability scans inside build jobs."],
+            ["DevSecOps: Secret Key Scanning", "Audit repository histories and block commit keys from git."],
+            ["Capstone: Zero-Downtime CD Pipeline", "Deliver an automated pipeline that builds, tests, and rolls updates."]
         ];
-    } else if (role === "Full Stack Development" || role === "Full Stack Web Developer" || role === "Full Stack") {
-        nodes = [
-            {
-                id: "node-1",
-                title: "Web Essentials: HTML5, CSS3, & Modern JS",
-                description: "Learn semantic layout design, responsive media rules, and ES6 asynchronous callbacks.",
-                difficulty: "BEGINNER",
-                estimated_duration: "10 hours",
-                resources: [{title: "MDN Web Development Guides", url: "https://developer.mozilla.org"}],
-                projects: [{title: "Dynamic Student Operating Dashboard", description: "Build a single page app using HTML layouts, responsive grids, and mock states.", tasks: ["Organize flex layout cards", "Write data filter selectors", "Store values in localStorage arrays"]}],
-                certifications: [{name: "FreeCodeCamp Responsive Web Design", provider: "FreeCodeCamp"}],
-                status: "AVAILABLE"
-            },
-            {
-                id: "node-2",
-                title: "Front-end Frameworks & Client States",
-                description: "Build reusable UI components, manage global states, route views, and handle API requests.",
-                difficulty: "INTERMEDIATE",
-                estimated_duration: "16 hours",
-                resources: [{title: "React.js official documentation", url: "https://react.dev"}],
-                projects: [{title: "Collaborative Project Management UI", description: "Design a kanban-style project board with reactive state transitions.", tasks: ["Write modular interface components", "Implement drag-and-drop state sync", "Authenticate users routing gates"]}],
-                certifications: [{name: "Meta Front-End Developer Certificate", provider: "Meta"}],
-                status: "LOCKED"
-            },
-            {
-                id: "node-3",
-                title: "Backend API Servers with FastAPI",
-                description: "Define HTTP endpoint routes, write validation schemas, verify tokens, and handle exceptions.",
-                difficulty: "INTERMEDIATE",
-                estimated_duration: "18 hours",
-                resources: [{title: "FastAPI Tutorials & Guides", url: "https://fastapi.tiangolo.com"}],
-                projects: [{title: "Document Vault REST API", description: "Create backend routes storing metadata records in persistent relational databases.", tasks: ["Write pydantic request schemas", "Enforce JWT authentication tokens", "Structure route controllers logic"]}],
-                certifications: [{name: "GitHub Foundations", provider: "GitHub"}],
-                status: "LOCKED"
-            },
-            {
-                id: "node-4",
-                title: "Database Performance Tuning & Deployment",
-                description: "Optimize SQL joins, configure connection pools, write index rules, and package in containers.",
-                difficulty: "ADVANCED",
-                estimated_duration: "20 hours",
-                resources: [{title: "PostgreSQL Performance Optimization", url: "https://pgmustard.com"}],
-                projects: [{title: "Scalable SaaS Stack", description: "Deploy database persistent schemas, connect backend services, and release live systems via GitHub.", tasks: ["Write optimize database index queries", "Build Docker multi-stage images", "Configure Railway release pipelines"]}],
-                certifications: [{name: "Microsoft Certified: Azure Developer Associate", provider: "Microsoft"}],
-                status: "LOCKED"
-            }
+        provider = "HashiCorp / RedHat";
+        cert = "HashiCorp Certified: Terraform Associate";
+    } else if (roleLower.includes("full") || roleLower.includes("web") || roleLower.includes("developer") || roleLower.includes("engineering") || roleLower.includes("software")) {
+        milestones = [
+            ["Internet Basics & Web Architectures", "Understand HTTP protocols, DNS servers, and request lifecycles."],
+            ["Semantic HTML5 Document Design", "Learn layout structures, inputs, buttons, and document trees."],
+            ["CSS3 Styling: Flexbox & Page Grids", "Align interface cards, configure grid spans, and margins."],
+            ["Responsive CSS Variables & Queries", "Build responsive layouts using variables and media queries."],
+            ["Modern Styling: Brutalist & Glassmorphism", "Apply neo-brutalist solid black borders and glass cards."],
+            ["JavaScript Variables, Arrays & loops", "Master basic data handling, loops, and conditions."],
+            ["DOM Manipulation & Page Events", "Write event listeners to dynamically modify page elements."],
+            ["JavaScript Promises & Async/Await", "Fetch JSON payloads from backend endpoints asynchronously."],
+            ["React: Creating Functional Components", "Learn components, props, and render layouts in React."],
+            ["React: Hooks, State & Input Binding", "Use useState and useEffect to bind input variables."],
+            ["React: Context API & Routing", "Configure app navigation tabs and global user states."],
+            ["Node.js Runtime & Package Systems", "Write terminal scripts and load external modules."],
+            ["Express.js REST APIs & Routing", "Configure GET/POST routes and handle JSON body payloads."],
+            ["Relational Database Schema Design", "Design PostgreSQL tables, keys, and relational maps."],
+            ["SQL Queries, Indexing & Joins", "Write query commands, join tables, and index query fields."],
+            ["ORM integration: SQLModel / Prisma", "Map database tables to programming models."],
+            ["Authentication: JWT Tokens & Hash", "Hash passwords with bcrypt and sign JWT session tokens."],
+            ["API Gateways, CORS & Rate Limiting", "Secure endpoints from unauthorized cross-origin requests."],
+            ["Unit Testing Backend Controllers", "Write test suites, run assertions, and mock databases."],
+            ["Frontend Integration & Fetch Client", "Call authentication and data endpoints from frontend pages."],
+            ["Dockerizing Full Stack Applications", "Containerize frontend and backend layers into single images."],
+            ["CI/CD Pipelines: Automated Release", "Configure GitHub Actions to compile and deploy to cloud hosts."],
+            ["Performance: Query Caching with Redis", "Cache slow database outputs and speed up response cycles."],
+            ["Real-Time Communication: WebSockets", "Build live interactive chat hubs using WebSocket listeners."],
+            ["Capstone: Deploy E-Commerce Platform", "Deploy a complete app containing user auth, items, and billing."]
         ];
-    } else { // Mobile Development
-        nodes = [
-            {
-                id: "node-1",
-                title: "Mobile UI Design Principles",
-                description: "Learn human interface guidelines, view hierarchies, flex layouts, and responsive alignments.",
-                difficulty: "BEGINNER",
-                estimated_duration: "10 hours",
-                resources: [{title: "Apple Human Interface Guidelines", url: "https://developer.apple.com"}],
-                projects: [{title: "Task Planner UI Mockups", description: "Draft responsive interface layouts with smooth transitions.", tasks: ["Sketch layout wireframes", "Implement custom buttons grids", "Create tab views navigation"]}],
-                certifications: [{name: "Google UX Design Professional Certificate", provider: "Google"}],
-                status: "AVAILABLE"
-            },
-            {
-                id: "node-2",
-                title: "Swift / Kotlin Fundamentals",
-                description: "Master optional values, object types, memory delegation patterns, and asynchronous routines.",
-                difficulty: "INTERMEDIATE",
-                estimated_duration: "16 hours",
-                resources: [{title: "Swift Programming Language documentation", url: "https://swift.org"}],
-                projects: [{title: "Local File Manager App Utility", description: "Develop mobile application reading directories contents and writing JSON configuration scripts.", tasks: ["Setup class protocols definitions", "Configure file access permissions", "Test exception handlers cases"]}],
-                certifications: [{name: "Meta iOS/Android Developer Certificate", provider: "Meta"}],
-                status: "LOCKED"
-            },
-            {
-                id: "node-3",
-                title: "Asynchronous Networking & State Storage",
-                description: "Fetch remote JSON arrays, handle network latency errors, and write values to offline local database stores.",
-                difficulty: "INTERMEDIATE",
-                estimated_duration: "18 hours",
-                resources: [{title: "Kotlin Coroutines Guide", url: "https://kotlinlang.org"}],
-                projects: [{title: "Real-time Weather Forecast Dashboard", description: "Query remote meteorological services API, caching updates locally in SQLite repositories.", tasks: ["Write async fetch controllers", "Serialize JSON data arrays", "Sync offline database registries"]}],
-                certifications: [{name: "Google Associate Android Developer", provider: "Google"}],
-                status: "LOCKED"
-            },
-            {
-                id: "node-4",
-                title: "App Publishing Pipelines & CI/CD Release",
-                description: "Configure provisioning certs, compile target packages, run tests, and publish via App Store pipelines.",
-                difficulty: "ADVANCED",
-                estimated_duration: "22 hours",
-                resources: [{title: "Google Play Store publishing instructions", url: "https://developer.android.com"}],
-                projects: [{title: "Continuous Release Mobile App", description: "Write GitHub actions workflows building target packages, running verification tests, and signing binaries.", tasks: ["Configure certificates encryption keys", "Write release actions configurations", "Build distribution packages"]}],
-                certifications: [{name: "GitHub Actions Certification", provider: "GitHub"}],
-                status: "LOCKED"
-            }
+        provider = "FreeCodeCamp / OpenJS";
+        cert = "Meta Front-End Developer Professional Certificate";
+    } else {
+        milestones = [
+            ["Mobile Ecosystems: iOS & Android", "Learn native app files, lifecycle stages, and app store rules."],
+            ["Command Line Tools & Mobile SDKs", "Configure Android Studio, Xcode, simulator systems, and paths."],
+            ["Dart / Kotlin Language Foundations", "Master variables, loops, classes, and types of native languages."],
+            ["Functions & Modular File Imports", "Create reusable files, helper scripts, and async modules."],
+            ["UI Layout: Widgets & Layout Grids", "Deploy layout cards, flex lists, columns, and margins."],
+            ["Mobile Styling, Themes & Colors", "Apply light/dark mode support, responsive fonts, and buttons."],
+            ["State Management: Local Page States", "Track text inputs, form selections, and local toggle variables."],
+            ["Handling User Events: Gestures & Inputs", "Capture taps, swipes, long presses, and input focus changes."],
+            ["HTTP API Integration: Networking", "Fetch data from REST APIs, decode JSON, and handle connection errors."],
+            ["Local Database Storage (SQLite/Hive)", "Persist user settings and catalog local records offline."],
+            ["Mobile Authentication: JWT & OAuth", "Securely store login tokens and manage user sessions."],
+            ["Navigation Architectures: Tab Routers", "Configure stack navigation, tab bars, and back buttons."],
+            ["Camera, Files & Device Permissions", "Request access to camera features and load local photos."],
+            ["Location Services & Map Rendering", "Fetch GPS coordinates and render locations on map widgets."],
+            ["Push Notifications & Background Jobs", "Setup notification triggers and sync data in the background."],
+            ["Responsive UI for Mobile & Tablets", "Scale padding, layouts, and image assets dynamically."],
+            ["Global State Management (Bloc/Redux)", "Share user profiles and roadmaps across different screens."],
+            ["Unit & Widget UI Testing", "Write assertions for widget render states and test logic blocks."],
+            ["CI/CD: Building Release Bundles", "Auto-compile APK/IPA builds and run checks using CLI tools."],
+            ["App Optimizations: Caching & Loading", "Optimize image download sizes and cache local JSON records."],
+            ["Google Play & Apple Store Deployment", "Publish production builds to developer testing tracks."],
+            ["Error Logging & Crashlytics", "Integrate crash detectors and monitor runtime stack traces."],
+            ["Animations: Transitions & Micro-actions", "Add page transitions and micro-interactions for items."],
+            ["Securing App Files & Keystore Storage", "Encrypt API key tokens and secure password files in keychains."],
+            ["Capstone Mobile App Deployment", "Deploy a fully functional React Native/Flutter app containing auth and maps."]
         ];
+        provider = "Google / Apple";
+        cert = "Google Associate Android Developer";
     }
+    
+    return milestones.map((m, i) => {
+        const diff = i < 8 ? "BEGINNER" : (i < 17 ? "INTERMEDIATE" : "ADVANCED");
+        const dur = `${8 + (i % 5)*2} hours`;
+        return {
+            id: `node-${i+1}`,
+            title: `Step ${i+1}: ${m[0]}`,
+            description: m[1],
+            difficulty: diff,
+            estimated_duration: dur,
+            resources: [{title: `Official documentation for ${m[0]}`, url: "https://learn.microsoft.com"}],
+            projects: [{title: `Implementation Project - Step ${i+1}`, description: `Build a practical system that demonstrates deep knowledge of ${m[0]}.`, tasks: ["Configure the framework settings", "Write code files implementation", "Verify local test suits passes"]}],
+            certifications: [{name: cert, provider: provider}],
+            status: i === 0 ? "AVAILABLE" : "LOCKED"
+        };
+    });
+}
 
+function seedSandboxRoadmap(role) {
+    const nodes = getPredefinedRoadmapJS(role);
+    
     localStorage.setItem("campusmate_sandbox_roadmap", JSON.stringify({
         title: `${role} Dynamic Pathway (Sandbox)`,
         targetRole: role
