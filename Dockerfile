@@ -21,5 +21,6 @@ COPY . .
 # Expose port (documented port)
 EXPOSE 8000
 
-# Run Uvicorn server, dynamically using the PORT environment variable provided by Railway
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Run Gunicorn WSGI server, dynamically using the PORT environment variable provided by Railway
+CMD ["sh", "-c", "gunicorn -w 4 -b 0.0.0.0:${PORT:-8000} main:app"]
+
