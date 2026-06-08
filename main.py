@@ -39,7 +39,7 @@ app.add_middleware(
 # Standard bcrypt is used directly to prevent passlib compatibility errors on python 3.14.
 
 # JWT Configuration
-SECRET_KEY = "campusmate_ai_super_secret_dev_key_change_in_production"
+SECRET_KEY = os.getenv("SECRET_KEY", "campusmate_ai_super_secret_dev_key_change_in_production")
 ALGORITHM = "HS256"
 security_bearer = HTTPBearer()
 
@@ -641,8 +641,15 @@ def upload_resume(
     user: User = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
-    # Mock parse uploaded file contents
     filename = file.filename
+    ext = os.path.splitext(filename)[1].lower()
+    if ext not in [".pdf", ".docx"]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Unsupported file format. Only PDF and DOCX files are allowed."
+        )
+        
+    # Mock parse uploaded file contents
     score = 78
     readability = 85
     match_score = 72
