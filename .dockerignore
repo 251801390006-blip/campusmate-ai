@@ -1,0 +1,11 @@
+.git
+.github
+.venv
+__pycache__
+database.db
+*.log
+*.bat
+README.md
+walkthrough.md
+task.md
+implementation_plan.md
