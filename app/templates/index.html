@@ -5,15 +5,24 @@
 {% block content %}
 <div class="container py-5">
     <!-- Hero Block -->
-    <div class="text-center py-5">
-        <span class="badge badge-info mb-3"><i class="fa-solid fa-circle-info"></i> Staging Environment Active</span>
-        <h1 class="display-4 fw-extrabold mb-3" style="font-size: 2.8rem; line-height: 1.2;">The Complete <span style="color: var(--neon-blue);">Growth Operating System</span> for Students</h1>
-        <p class="lead text-secondary mx-auto mb-4" style="max-width: 680px; font-size: 1.05rem;">
-            Accelerate your academic projects, follow structured career learning paths, analyze your resume dynamically, and resolve ticket issues directly with the student advisor staff.
-        </p>
-        <div class="d-flex justify-content-center gap-3">
-            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">Create Free Account <i class="fa-solid fa-user-plus"></i></a>
-            <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-lg">Sign In <i class="fa-solid fa-right-to-login"></i></a>
+    <div class="row align-items-center py-5 g-5">
+        <!-- Left Details -->
+        <div class="col-lg-6">
+            <span class="badge badge-info mb-3"><i class="fa-solid fa-circle-info"></i> Staging Environment Active</span>
+            <h1 class="fw-extrabold mb-3" style="font-size: 2.6rem; line-height: 1.2; letter-spacing: -0.03em;">The Complete <span style="background: linear-gradient(135deg, var(--neon-blue), #4f46e5); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Growth Operating System</span> for Students</h1>
+            <p class="text-secondary mb-4" style="font-size: 1.02rem; line-height: 1.6; max-width: 520px;">
+                Accelerate your academic projects, follow structured career learning paths, analyze your resume dynamically, and resolve ticket issues directly with the student advisor staff.
+            </p>
+            <div class="d-flex flex-wrap gap-3">
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">Create Free Account <i class="fa-solid fa-user-plus"></i></a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-lg">Sign In <i class="fa-solid fa-right-to-bracket"></i></a>
+            </div>
+        </div>
+        <!-- Right Image -->
+        <div class="col-lg-6 text-center">
+            <div class="hero-image-wrapper">
+                <img src="{{ url_for('static', filename='img/landing_hero.png') }}" alt="CampusMate Growth Dashboard Illustration" class="img-fluid hero-illustration">
+            </div>
         </div>
     </div>
 
