@@ -475,49 +475,208 @@
                                 <hr class="divider">
                                 
                                 <h3>Mode 1: Create Resume From Scratch</h3>
-                                <div class="input-group">
-                                    <label for="resume-title-field">Version Identifier</label>
-                                    <input type="text" id="resume-title-field" value="Primary Academic Resume">
-                                </div>
-                                <div class="input-group">
-                                    <label for="res-name">Full Name</label>
-                                    <input type="text" id="res-name" value="Alex Smith">
-                                </div>
-                                <div class="input-row">
-                                    <div class="input-group">
-                                        <label for="res-email">Email</label>
-                                        <input type="email" id="res-email" value="alex.smith@university.edu">
+                                <div class="input-row" style="margin-bottom:12px;">
+                                    <div class="input-group" style="flex:2;">
+                                        <label for="resume-title-field">Version Name / Title</label>
+                                        <input type="text" id="resume-title-field" value="Vanjith Academic Resume v2">
                                     </div>
-                                    <div class="input-group">
-                                        <label for="res-phone">Phone</label>
-                                        <input type="text" id="res-phone" value="+1 (555) 019-2834">
+                                    <div class="input-group" style="flex:1;">
+                                        <label for="resume-draft-select">Active Draft</label>
+                                        <select id="resume-draft-select" onchange="handleDraftSelection()" style="padding:10px; border-radius:8px; border:1px solid var(--border-glass); background:var(--slate-card); color:var(--text-primary); font-size:13px; font-weight:500; width:100%;">
+                                            <option value="draft-1" selected>Draft Version A</option>
+                                            <option value="draft-2">Draft Version B</option>
+                                            <option value="draft-3">Draft Version C</option>
+                                        </select>
                                     </div>
                                 </div>
-                                <div class="input-group">
-                                    <label for="res-github">GitHub / Portfolio URL</label>
-                                    <input type="text" id="res-github" value="https://github.com/alexsmith">
+                                
+                                <div class="accordion-section">
+                                    <h4 style="font-size:12px; border-bottom:1px solid var(--border-glass); padding-bottom:4px; margin-bottom:8px; color:var(--text-secondary);">1. Personal Details</h4>
+                                    <div class="input-group">
+                                        <label for="res-name">Full Name</label>
+                                        <input type="text" id="res-name" value="VANJITH KUMAR ARIKA">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="res-address">Address Location</label>
+                                        <input type="text" id="res-address" value="Nellore, Andhra Pradesh, India">
+                                    </div>
+                                    <div class="input-row">
+                                        <div class="input-group">
+                                            <label for="res-email">Primary Email</label>
+                                            <input type="email" id="res-email" value="vk7798537@gmail.com">
+                                        </div>
+                                        <div class="input-group">
+                                            <label for="res-phone">Phone / Contact ID</label>
+                                            <input type="text" id="res-phone" value="251801390006@cutmap.ac.in">
+                                        </div>
+                                    </div>
+                                    <div class="input-row">
+                                        <div class="input-group">
+                                            <label for="res-linkedin">LinkedIn Profile</label>
+                                            <input type="text" id="res-linkedin" value="www.linkedin.com/in/vanjith-kumar">
+                                        </div>
+                                        <div class="input-group">
+                                            <label for="res-github">GitHub Repository Link</label>
+                                            <input type="text" id="res-github" value="https://github.com/251801390006-blip">
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <hr class="divider">
-                                <h3>Experience Bullet Points</h3>
-                                <div class="input-group">
-                                    <label for="res-exp-role">Role Title & Company</label>
-                                    <input type="text" id="res-exp-role" value="Software Engineering Intern, TechCorp">
-                                </div>
-                                <div class="input-group">
-                                    <label for="res-exp-desc">Description (uses Google XYZ formula review)</label>
-                                    <textarea id="res-exp-desc" rows="4">Responsible for coding the backend of the student project application. Helped team build website.</textarea>
+                                <div class="accordion-section">
+                                    <h4 style="font-size:12px; border-bottom:1px solid var(--border-glass); padding-bottom:4px; margin-bottom:8px; color:var(--text-secondary);">2. Education</h4>
+                                    <h5 style="font-size:11px; margin-bottom:6px;">College / University</h5>
+                                    <div class="input-group">
+                                        <label for="res-edu1-inst">Institution Name</label>
+                                        <input type="text" id="res-edu1-inst" value="Centurion University of Technology and Management">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="res-edu1-degree">Degree & Major</label>
+                                        <input type="text" id="res-edu1-degree" value="B.Tech in Cyber Security and Blockchain Technology">
+                                    </div>
+                                    <div class="input-row">
+                                        <div class="input-group">
+                                            <label for="res-edu1-dates">Graduation Term / Year</label>
+                                            <input type="text" id="res-edu1-dates" value="2025 – 2029">
+                                        </div>
+                                        <div class="input-group">
+                                            <label for="res-edu1-gpa">CGPA / Score</label>
+                                            <input type="text" id="res-edu1-gpa" value="8.6/10">
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="res-edu1-coursework">Coursework Topics</label>
+                                        <input type="text" id="res-edu1-coursework" value="Network Security, Information Security, Cryptography, Data Structures and Algorithms, Computer Networks">
+                                    </div>
+
+                                    <h5 style="font-size:11px; margin:10px 0 6px;">Junior College / High School</h5>
+                                    <div class="input-group">
+                                        <label for="res-edu2-inst">Institution Name</label>
+                                        <input type="text" id="res-edu2-inst" value="Priyadarshini Junior College">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="res-edu2-degree">Degree & Major</label>
+                                        <input type="text" id="res-edu2-degree" value="Intermediate (MPC)">
+                                    </div>
+                                    <div class="input-row">
+                                        <div class="input-group">
+                                            <label for="res-edu2-dates">Graduation Year</label>
+                                            <input type="text" id="res-edu2-dates" value="2023 – 2025">
+                                        </div>
+                                        <div class="input-group">
+                                            <label for="res-edu2-gpa">GPA / Score</label>
+                                            <input type="text" id="res-edu2-gpa" value="9.17/10">
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <hr class="divider">
-                                <h3>Project Highlights</h3>
-                                <div class="input-group">
-                                    <label for="res-proj-title">Project Name</label>
-                                    <input type="text" id="res-proj-title" value="Distributed Document Scraper">
+                                <div class="accordion-section">
+                                    <h4 style="font-size:12px; border-bottom:1px solid var(--border-glass); padding-bottom:4px; margin-bottom:8px; color:var(--text-secondary);">3. Technical Skills</h4>
+                                    <div class="input-group">
+                                        <label for="res-skills-prog">Programming</label>
+                                        <input type="text" id="res-skills-prog" value="Python, C">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="res-skills-cyber">Cybersecurity</label>
+                                        <input type="text" id="res-skills-cyber" value="Networking, Cyber Security Fundamentals, Web Security Basics, Digital Forensics Fundamentals">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="res-skills-os">Operating Systems</label>
+                                        <input type="text" id="res-skills-os" value="Linux (Ubuntu), Kali Linux, Windows">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="res-skills-tools">Tools</label>
+                                        <input type="text" id="res-skills-tools" value="Wireshark, Git, GitHub, VS Code, Command Line Interface">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="res-skills-web">Web</label>
+                                        <input type="text" id="res-skills-web" value="HTML, CSS, Flask">
+                                    </div>
                                 </div>
-                                <div class="input-group">
-                                    <label for="res-proj-desc">Project Details</label>
-                                    <textarea id="res-proj-desc" rows="4">Wrote backend scripts to parse directories. Integrated database mapping.</textarea>
+
+                                <div class="accordion-section">
+                                    <h4 style="font-size:12px; border-bottom:1px solid var(--border-glass); padding-bottom:4px; margin-bottom:8px; color:var(--text-secondary);">4. Experience</h4>
+                                    <div class="input-group">
+                                        <label for="res-exp-role">Role & Company</label>
+                                        <input type="text" id="res-exp-role" value="AI-Enabled Cyber Crime Detection Intern">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="res-exp-comp">Institution/Company Name</label>
+                                        <input type="text" id="res-exp-comp" value="Centurion University of Technology and Management">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="res-exp-dates">Duration Dates</label>
+                                        <input type="text" id="res-exp-dates" value="June 2026 – Present">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Experience Bullet Points</label>
+                                        <input type="text" id="res-exp-b1" style="margin-bottom:6px;" value="Contributing to the design and development of AI-assisted cybercrime detection workflows." class="res-bullet-input">
+                                        <input type="text" id="res-exp-b2" style="margin-bottom:6px;" value="Implementing secure coding practices using Python and Flask for backend logic." class="res-bullet-input">
+                                        <input type="text" id="res-exp-b3" style="margin-bottom:6px;" value="Supporting data handling and authentication modules to enhance application security." class="res-bullet-input">
+                                        <input type="text" id="res-exp-b4" value="Collaborating with peers to test and refine detection algorithms for improved accuracy." class="res-bullet-input">
+                                        
+                                        <!-- Action-Verb Assistant panel -->
+                                        <div class="action-verb-assistant" style="margin-top:10px; padding:10px; background:rgba(15,23,42,0.15); border:1px solid var(--border-glass); border-radius:8px;">
+                                            <div style="font-size:11px; font-weight:600; color:var(--text-secondary); margin-bottom:5px;"><i class="fa-solid fa-list-check text-cyan"></i> Action-Verb Assistant (Click to insert)</div>
+                                            <div class="verb-category-title">Leadership & Development</div>
+                                            <div class="verb-chips-container">
+                                                <span class="verb-chip" onclick="insertActionVerb('Architected')">Architected</span>
+                                                <span class="verb-chip" onclick="insertActionVerb('Engineered')">Engineered</span>
+                                                <span class="verb-chip" onclick="insertActionVerb('Optimized')">Optimized</span>
+                                                <span class="verb-chip" onclick="insertActionVerb('Automated')">Automated</span>
+                                                <span class="verb-chip" onclick="insertActionVerb('Implemented')">Implemented</span>
+                                            </div>
+                                            <div class="verb-category-title">Security & Cyber Operations</div>
+                                            <div class="verb-chips-container">
+                                                <span class="verb-chip" onclick="insertActionVerb('Vulnerability-scanned')">Vulnerability-scanned</span>
+                                                <span class="verb-chip" onclick="insertActionVerb('Hardened')">Hardened</span>
+                                                <span class="verb-chip" onclick="insertActionVerb('Audited')">Audited</span>
+                                                <span class="verb-chip" onclick="insertActionVerb('Investigated')">Investigated</span>
+                                                <span class="verb-chip" onclick="insertActionVerb('Secured')">Secured</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="accordion-section">
+                                    <h4 style="font-size:12px; border-bottom:1px solid var(--border-glass); padding-bottom:4px; margin-bottom:8px; color:var(--text-secondary);">5. Projects</h4>
+                                    <div class="input-group">
+                                        <label for="res-proj-title">Project Name</label>
+                                        <input type="text" id="res-proj-title" value="AegisShield AI – Cyber Crime Detection Platform">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="res-proj-link">Repository Link / Details</label>
+                                        <input type="text" id="res-proj-link" value="251801390006-blip/aegisshield-ai">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Project Bullet Points</label>
+                                        <input type="text" id="res-proj-b1" style="margin-bottom:6px;" value="Developed a web-based platform using Python, Flask, HTML, and CSS to support cybercrime reporting and analysis." class="res-bullet-input">
+                                        <input type="text" id="res-proj-b2" style="margin-bottom:6px;" value="Implemented user authentication, routing, and activity logging to ensure secure data handling." class="res-bullet-input">
+                                        <input type="text" id="res-proj-b3" value="Focused on applying secure web development principles and structured threat analysis workflows." class="res-bullet-input">
+                                        
+                                        <!-- Action-Verb Assistant panel -->
+                                        <div class="action-verb-assistant" style="margin-top:10px; padding:10px; background:rgba(15,23,42,0.15); border:1px solid var(--border-glass); border-radius:8px;">
+                                            <div style="font-size:11px; font-weight:600; color:var(--text-secondary); margin-bottom:5px;"><i class="fa-solid fa-list-check text-cyan"></i> Action-Verb Assistant (Click to insert)</div>
+                                            <div class="verb-category-title">Execution & Deployment</div>
+                                            <div class="verb-chips-container">
+                                                <span class="verb-chip" onclick="insertActionVerb('Deployed')">Deployed</span>
+                                                <span class="verb-chip" onclick="insertActionVerb('Designed')">Designed</span>
+                                                <span class="verb-chip" onclick="insertActionVerb('Integrated')">Integrated</span>
+                                                <span class="verb-chip" onclick="insertActionVerb('Restructured')">Restructured</span>
+                                                <span class="verb-chip" onclick="insertActionVerb('Configured')">Configured</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="accordion-section">
+                                    <h4 style="font-size:12px; border-bottom:1px solid var(--border-glass); padding-bottom:4px; margin-bottom:8px; color:var(--text-secondary);">6. Certifications</h4>
+                                    <div class="input-group">
+                                        <label>List Certifications</label>
+                                        <input type="text" id="res-cert-c1" style="margin-bottom:6px;" value="Deloitte Australia Cyber Job Simulation (Forage)">
+                                        <input type="text" id="res-cert-c2" style="margin-bottom:6px;" value="Cyber Security & Ethical Hacking Workshop (DV Analytics)">
+                                        <input type="text" id="res-cert-c3" style="margin-bottom:6px;" value="Python Tutorial Module Certificate of Excellence (Scaler)">
+                                        <input type="text" id="res-cert-c4" value="Python Course for Beginners: Mastering the Essentials (Scaler)">
+                                    </div>
                                 </div>
                                 
                                 <button class="btn btn-primary btn-block" onclick="saveResumeContent()">Save Draft & Verify <i class="fa-solid fa-floppy-disk"></i></button>
@@ -529,10 +688,23 @@
                             <div class="resume-toolbar">
                                 <div class="theme-selector">
                                     Theme: 
-                                    <select id="resume-theme-select" onchange="changeResumeTheme()">
-                                        <option value="classic">Classic Ivory</option>
+                                    <select id="resume-theme-select" onchange="changeResumeTheme()" style="padding:6px; border-radius:6px; border:1px solid var(--border-glass); font-size:13px; font-weight:500;">
+                                        <option value="classic" selected>Classic Ivory</option>
                                         <option value="modern-cyan">Modern Cyan Accent</option>
                                         <option value="slate-glass">Slate Glassmorphic</option>
+                                        <option value="minimalist-executive">Minimalist Executive</option>
+                                        <option value="tech-mono">Tech Minimalist</option>
+                                        <option value="creative-violet">Creative Violet</option>
+                                        <option value="emerald-forest">Emerald Forest</option>
+                                        <option value="royal-indigo">Royal Indigo</option>
+                                        <option value="corporate-navy">Corporate Navy</option>
+                                        <option value="modern-warm">Modern Warm</option>
+                                        <option value="clean-slate">Clean Slate</option>
+                                        <option value="elegant-georgia">Elegant Georgia</option>
+                                        <option value="stanford-academic">Stanford Academic</option>
+                                        <option value="sleek-tech">Sleek Tech</option>
+                                        <option value="compact-cv">Compact CV</option>
+                                        <option value="hybrid-columns">Double Column Hybrid</option>
                                     </select>
                                 </div>
                                 <button class="btn btn-sm btn-outline" onclick="window.print()"><i class="fa-solid fa-print"></i> PDF Export</button>
@@ -540,49 +712,140 @@
 
                             <!-- PDF Sheet Paper Wrapper -->
                             <div class="resume-sheet classic" id="resume-sheet-paper">
-                                <div class="resume-render-header">
-                                    <h1 id="res-render-name">Alex Smith</h1>
-                                    <div class="resume-render-meta">
-                                        <span id="res-render-email">alex.smith@university.edu</span> | 
-                                        <span id="res-render-phone">+1 (555) 019-2834</span> |
-                                        <span id="res-render-links">github.com/alexsmith</span>
+                                <div class="resume-render-header" style="text-align: left;">
+                                    <h1 id="res-render-name" style="font-size:20px; font-weight:700; margin-bottom:5px; text-transform:uppercase;">VANJITH KUMAR ARIKA</h1>
+                                    <div class="resume-render-meta" style="font-size:11px; color:#475569; line-height:1.4;">
+                                        <span id="res-render-address">Nellore, Andhra Pradesh, India</span><br>
+                                        <span id="res-render-email">vk7798537@gmail.com</span> | <span id="res-render-phone">251801390006@cutmap.ac.in</span> | 
+                                        <span id="res-render-linkedin">www.linkedin.com/in/vanjith-kumar</span> | <span id="res-render-links">https://github.com/251801390006-blip</span>
                                     </div>
                                 </div>
-                                <div class="resume-render-section">
-                                    <h2>Professional Experience</h2>
-                                    <div class="section-item">
-                                        <div class="item-header">
-                                            <strong id="res-render-exp-title">Software Engineering Intern, TechCorp</strong>
+
+                                <div class="resume-render-section" style="margin-top:15px;">
+                                    <h2 style="font-size: 13px; font-weight: 700; border-bottom: 1px solid #1e293b; padding-bottom: 3px; margin-bottom: 8px; text-transform:uppercase;">Education</h2>
+                                    
+                                    <div style="margin-bottom: 8px;">
+                                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:12px;">
+                                            <span id="res-render-edu1-inst">Centurion University of Technology and Management</span>
+                                            <span id="res-render-edu1-degree" style="font-weight:normal;">B.Tech in Cyber Security and Blockchain Technology</span>
                                         </div>
-                                        <ul class="bullet-list">
-                                            <li id="res-render-exp-desc">Responsible for coding the backend of the student project application. Helped team build website.</li>
+                                        <div style="display:flex; justify-content:space-between; font-size:11px; color:#64748b; margin-top:2px;">
+                                            <span id="res-render-edu1-dates">2025 – 2029</span>
+                                            <span>CGPA: <strong id="res-render-edu1-gpa">8.6/10</strong></span>
+                                        </div>
+                                        <div style="font-size:11px; margin-top:4px;" id="res-render-edu1-coursework">
+                                            Relevant Coursework: Network Security, Information Security, Cryptography, Data Structures and Algorithms, Computer Networks
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:12px;">
+                                            <span id="res-render-edu2-inst">Priyadarshini Junior College</span>
+                                            <span id="res-render-edu2-degree" style="font-weight:normal;">Intermediate (MPC)</span>
+                                        </div>
+                                        <div style="display:flex; justify-content:space-between; font-size:11px; color:#64748b; margin-top:2px;">
+                                            <span id="res-render-edu2-dates">2023 – 2025</span>
+                                            <span>GPA: <strong id="res-render-edu2-gpa">9.17/10</strong></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="resume-render-section" style="margin-top:15px;">
+                                    <h2 style="font-size: 13px; font-weight: 700; border-bottom: 1px solid #1e293b; padding-bottom: 3px; margin-bottom: 8px; text-transform:uppercase;">Technical Skills</h2>
+                                    <div style="font-size:11px; line-height:1.5;">
+                                        <div><strong>Programming:</strong> <span id="res-render-skills-prog">Python, C</span></div>
+                                        <div><strong>Cybersecurity:</strong> <span id="res-render-skills-cyber">Networking, Cyber Security Fundamentals, Web Security Basics, Digital Forensics Fundamentals</span></div>
+                                        <div><strong>Operating Systems:</strong> <span id="res-render-skills-os">Linux (Ubuntu), Kali Linux, Windows</span></div>
+                                        <div><strong>Tools:</strong> <span id="res-render-skills-tools">Wireshark, Git, GitHub, VS Code, Command Line Interface</span></div>
+                                        <div><strong>Web:</strong> <span id="res-render-skills-web">HTML, CSS, Flask</span></div>
+                                    </div>
+                                </div>
+
+                                <div class="resume-render-section" style="margin-top:15px;">
+                                    <h2 style="font-size: 13px; font-weight: 700; border-bottom: 1px solid #1e293b; padding-bottom: 3px; margin-bottom: 8px; text-transform:uppercase;">Experience</h2>
+                                    <div>
+                                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:12px;">
+                                            <span id="res-render-exp-role">AI-Enabled Cyber Crime Detection Intern</span>
+                                            <span id="res-render-exp-dates">June 2026 – Present</span>
+                                        </div>
+                                        <div style="font-size: 11px; font-style: italic; color:#64748b;" id="res-render-exp-comp">Centurion University of Technology and Management</div>
+                                        <ul class="bullet-list" style="font-size:11px; margin-left:18px; margin-top:4px; line-height:1.4;">
+                                            <li id="res-render-exp-b1">Contributing to the design and development of AI-assisted cybercrime detection workflows.</li>
+                                            <li id="res-render-exp-b2">Implementing secure coding practices using Python and Flask for backend logic.</li>
+                                            <li id="res-render-exp-b3">Supporting data handling and authentication modules to enhance application security.</li>
+                                            <li id="res-render-exp-b4">Collaborating with peers to test and refine detection algorithms for improved accuracy.</li>
                                         </ul>
                                     </div>
                                 </div>
-                                <div class="resume-render-section">
-                                    <h2>Academic Projects</h2>
-                                    <div class="section-item">
-                                        <div class="item-header">
-                                            <strong id="res-render-proj-title">Distributed Document Scraper</strong>
+
+                                <div class="resume-render-section" style="margin-top:15px;">
+                                    <h2 style="font-size: 13px; font-weight: 700; border-bottom: 1px solid #1e293b; padding-bottom: 3px; margin-bottom: 8px; text-transform:uppercase;">Projects</h2>
+                                    <div>
+                                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:12px;">
+                                            <span id="res-render-proj-title">AegisShield AI – Cyber Crime Detection Platform</span>
+                                            <span id="res-render-proj-link" style="font-weight:normal; font-size:11px; color:#475569;">251801390006-blip/aegisshield-ai</span>
                                         </div>
-                                        <ul class="bullet-list">
-                                            <li id="res-render-proj-desc">Wrote backend scripts to parse directories. Integrated database mapping.</li>
+                                        <ul class="bullet-list" style="font-size:11px; margin-left:18px; margin-top:4px; line-height:1.4;">
+                                            <li id="res-render-proj-b1">Developed a web-based platform using Python, Flask, HTML, and CSS to support cybercrime reporting and analysis.</li>
+                                            <li id="res-render-proj-b2">Implemented user authentication, routing, and activity logging to ensure secure data handling.</li>
+                                            <li id="res-render-proj-b3">Focused on applying secure web development principles and structured threat analysis workflows.</li>
                                         </ul>
                                     </div>
+                                </div>
+
+                                <div class="resume-render-section" style="margin-top:15px;">
+                                    <h2 style="font-size: 13px; font-weight: 700; border-bottom: 1px solid #1e293b; padding-bottom: 3px; margin-bottom: 8px; text-transform:uppercase;">Certifications</h2>
+                                    <ul class="bullet-list" style="font-size:11px; margin-left:18px; margin-top:4px; line-height:1.4;">
+                                        <li id="res-render-cert-c1">Deloitte Australia Cyber Job Simulation (Forage)</li>
+                                        <li id="res-render-cert-c2">Cyber Security & Ethical Hacking Workshop (DV Analytics)</li>
+                                        <li id="res-render-cert-c3">Python Tutorial Module Certificate of Excellence (Scaler)</li>
+                                        <li id="res-render-cert-c4">Python Course for Beginners: Mastering the Essentials (Scaler)</li>
+                                    </ul>
                                 </div>
                             </div>
 
                             <!-- ATS Score / Review Drawer -->
                             <div class="glass-card ats-feedback-card">
                                 <div class="ats-header">
-                                    <div>
-                                        <h3>ATS Score: <span id="ats-score-display" class="text-blue">--%</span></h3>
-                                        <div class="ats-sub-scores" style="display:flex; gap:15px; margin-top:4px; font-size:12px; color:var(--text-secondary);">
+                                    <div class="ats-score-comparison-wrapper" style="display:flex; flex-direction:column; gap:10px; width:100%;">
+                                        <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                                            <div>
+                                                <div style="font-size:11px; text-transform:uppercase; color:var(--text-secondary); font-weight:600; letter-spacing:0.5px;">ATS Scoring Engine</div>
+                                                <h3 style="font-size:20px; margin-top:2px;">ATS Match: <span id="ats-score-display" class="text-blue">--%</span></h3>
+                                            </div>
+                                            <div style="text-align:right;">
+                                                <span class="badge badge-warning" id="ats-score-badge">Audit Pending</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Score comparison tracker -->
+                                        <div class="score-tracker-bar" style="display:flex; gap:10px; background:rgba(15,23,42,0.03); border:1px solid var(--border-glass); border-radius:8px; padding:10px 15px; font-size:12px; justify-content:space-between; align-items:center; width:100%;">
+                                            <div>Original Score: <strong id="ats-original-score" style="color:var(--text-secondary);">--</strong></div>
+                                            <div style="color:var(--border-glass);">|</div>
+                                            <div>Current Upgraded: <strong id="ats-upgraded-score" style="color:var(--blue);">--</strong></div>
+                                            <button class="btn btn-sm btn-cyan" id="btn-auto-upgrade" onclick="autoUpgradeResume()" style="padding:4px 8px; font-size:10px; border-radius:4px;"><i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Optimize</button>
+                                        </div>
+                                        
+                                        <div class="ats-sub-scores" style="display:flex; gap:15px; font-size:12px; color:var(--text-secondary); margin-top:4px;">
                                             <span>Readability: <strong id="ats-readability-display">--%</strong></span>
                                             <span>Alignment: <strong id="ats-alignment-display">--%</strong></span>
                                         </div>
+                                        
+                                        <!-- Live Keyword Scanner checklist -->
+                                        <div class="live-keyword-scanner-box" style="margin-top:12px; padding:12px; background:rgba(15,23,42,0.15); border:1px solid var(--border-glass); border-radius:8px; width:100%;">
+                                            <div style="font-size:11px; font-weight:600; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;"><i class="fa-solid fa-satellite-dish text-cyan"></i> Live ATS Keyword Check</div>
+                                            <div id="live-keywords-list" style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+                                                <!-- Populated dynamically via JS matching current roadmap track skills -->
+                                                <div class="live-keyword-item" id="kw-python"><i class="fa-solid fa-circle-notch"></i> Python</div>
+                                                <div class="live-keyword-item" id="kw-flask"><i class="fa-solid fa-circle-notch"></i> Flask</div>
+                                                <div class="live-keyword-item" id="kw-wireshark"><i class="fa-solid fa-circle-notch"></i> Wireshark</div>
+                                                <div class="live-keyword-item" id="kw-docker"><i class="fa-solid fa-circle-notch"></i> Docker</div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <button class="btn btn-sm btn-cyan" onclick="triggerResumeATSAnalysis()">Analyze Score <i class="fa-solid fa-wand-magic-sparkles"></i></button>
+                                    <div style="margin-top:10px;">
+                                        <button class="btn btn-sm btn-cyan" onclick="triggerResumeATSAnalysis()">Analyze Score <i class="fa-solid fa-wand-magic-sparkles"></i></button>
+                                    </div>
                                 </div>
                                 <div class="ats-body" id="ats-analysis-body">
                                     <p class="empty-state">Click 'Analyze Score' to run deep reasoning AI checks against your target job.</p>
