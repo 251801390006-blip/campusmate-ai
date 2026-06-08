@@ -118,6 +118,28 @@ const API = {
         });
     },
 
+    async uploadResumeFile(file) {
+        const token = this.getToken();
+        const formData = new FormData();
+        formData.append("file", file);
+        
+        const headers = {};
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+
+        const response = await fetch(`${this.baseUrl}/api/resumes/upload`, {
+            method: "POST",
+            headers,
+            body: formData
+        });
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.detail || "Upload failed.");
+        }
+        return data;
+    },
+
     // --- AI MENTOR ---
     async sendMentorMessage(message) {
         return this.request("/api/mentor/chat", {

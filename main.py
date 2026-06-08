@@ -3,7 +3,7 @@ import uuid
 from datetime import datetime, date, timedelta
 from typing import Optional, List, Dict, Any
 
-from fastapi import FastAPI, Depends, HTTPException, status, Security
+from fastapi import FastAPI, Depends, HTTPException, status, Security, File, UploadFile
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -23,7 +23,7 @@ from models import (
 app = FastAPI(
     title="CampusMate AI API",
     description="The complete AI operating system for students backend.",
-    version="1.0.0"
+    version="2.0.0"
 )
 
 # CORS configuration
@@ -281,7 +281,6 @@ def generate_roadmap(
         profile.target_role = data.targetRole
         session.add(profile)
 
-    # Let's populate the nodes
     # We will trigger Gemini or a structured list fallback if no API key is set
     system_prompt = "You are a software architect that outputs roadmaps strictly in JSON format. Do not write text before or after."
     user_prompt = f"Create a learning roadmap for target role: '{data.targetRole}' with current skills: {data.skills}. Output an array of 4 sequential milestone nodes. Each node must have: 'title', 'description', 'estimated_duration', 'difficulty' ('BEGINNER', 'INTERMEDIATE', 'ADVANCED'), and list of 'resources' [{t, url}], 'projects' [{t, d, tasks}], 'certifications' [{name, provider}]."
@@ -290,10 +289,8 @@ def generate_roadmap(
     
     nodes_data = []
     if raw_response:
-        # Attempt to parse json from gemini response
         try:
             import json
-            # Clean possible markdown wrap
             cleaned = raw_response.strip()
             if cleaned.startswith("```json"):
                 cleaned = cleaned[7:-3]
@@ -306,7 +303,6 @@ def generate_roadmap(
 
     # Fallback to Mock Roadmap if API is empty or parser failed
     if not nodes_data:
-        # Standard mock based on targetRole
         role_lower = data.targetRole.lower()
         if "cyber" in role_lower or "security" in role_lower:
             nodes_data = [
@@ -446,7 +442,7 @@ def generate_roadmap(
             status=status_val
         )
         session.add(new_node)
-        parent_id = node_id # next node parent is current node
+        parent_id = node_id
     
     session.commit()
     return {"success": True, "roadmapId": roadmap_id}
@@ -466,12 +462,10 @@ def get_active_roadmap(
         select(RoadmapNode).where(RoadmapNode.roadmap_id == roadmap.id)
     ).all()
     
-    # Sort nodes by dependency hierarchy manually
     sorted_nodes = []
     nodes_by_parent = {n.parent_node_id: n for n in nodes}
     
     curr_parent = None
-    # Follow chain starting from parent_node_id == None
     for _ in range(len(nodes)):
         if curr_parent in nodes_by_parent:
             n = nodes_by_parent[curr_parent]
@@ -480,7 +474,6 @@ def get_active_roadmap(
         else:
             break
             
-    # Add any remaining nodes that didn't sort cleanly (fallback)
     for n in nodes:
         if n not in sorted_nodes:
             sorted_nodes.append(n)
@@ -505,9 +498,7 @@ def update_node_status(
     node.updated_at = datetime.utcnow()
     session.add(node)
     
-    # If node is completed, unlock the immediate child node
     if data.status == "COMPLETED":
-        # Gain XP
         profile = session.get(Profile, user.id)
         if profile:
             profile.total_xp += 100
@@ -539,7 +530,6 @@ def save_resume(
     user: User = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
-    # Find existing or create new
     existing = session.exec(select(Resume).where(Resume.user_id == user.id)).first()
     if existing:
         existing.title = data.title
@@ -593,8 +583,6 @@ def analyze_resume(
             analysis_data = None
 
     if not analysis_data:
-        # High quality offline mock analysis fallback
-        # Inspect target job to customize mock keywords
         job_lower = data.targetJobDescription.lower()
         if "cyber" in job_lower or "security" in job_lower:
             keywords = ["Wireshark", "Nmap", "Penetration Testing", "Active Directory", "Firewall Configuration"]
@@ -621,10 +609,11 @@ def analyze_resume(
         }
 
     resume.ats_score = analysis_data.get("score", 70)
+    resume.recruiter_readability_score = 80
+    resume.industry_match_score = 75
     resume.analysis_feedback = analysis_data
     resume.updated_at = datetime.utcnow()
     
-    # Award XP on first analysis
     profile = session.get(Profile, user.id)
     if profile:
         profile.total_xp += 50
@@ -635,6 +624,81 @@ def analyze_resume(
     session.refresh(resume)
     
     return {"success": True, "resume": resume}
+
+@app.post("/api/resumes/upload")
+def upload_resume(
+    file: UploadFile = File(...),
+    user: User = Depends(get_current_user),
+    session: Session = Depends(get_session)
+):
+    # Mock parse uploaded file contents
+    filename = file.filename
+    score = 78
+    readability = 85
+    match_score = 72
+    
+    # Analyze based on file name characteristics
+    fn_lower = filename.lower()
+    if "cyber" in fn_lower or "security" in fn_lower:
+        keywords = ["Wireshark", "Nmap", "Metasploit", "Penetration Testing"]
+    elif "ai" in fn_lower or "resume" in fn_lower:
+        keywords = ["FastAPI", "Docker", "SQLModel", "Gemini API"]
+    else:
+        keywords = ["Git", "Rest APIs", "Uvicorn", "Postgres"]
+        
+    analysis_data = {
+        "score": score,
+        "missingKeywords": keywords,
+        "improvements": [
+            {
+                "originalText": "Worked on local database scripts.",
+                "suggestedText": "Optimized SQLModel relational queries, decreasing API load latencies by 30%.",
+                "reason": "Quantified accomplishment metrics and target tool stacks."
+            }
+        ]
+    }
+    
+    # Save in DB
+    existing = session.exec(select(Resume).where(Resume.user_id == user.id)).first()
+    if existing:
+        existing.title = filename
+        existing.ats_score = score
+        existing.recruiter_readability_score = readability
+        existing.industry_match_score = match_score
+        existing.analysis_feedback = analysis_data
+        existing.updated_at = datetime.utcnow()
+        session.add(existing)
+    else:
+        new_res = Resume(
+            id=str(uuid.uuid4()),
+            user_id=user.id,
+            title=filename,
+            ats_score=score,
+            recruiter_readability_score=readability,
+            industry_match_score=match_score,
+            content={
+                "name": user.email.split("@")[0].capitalize(),
+                "email": user.email,
+                "phone": "+1 (555) 012-3456",
+                "github": "https://github.com/",
+                "experienceRole": "System Architect",
+                "experienceDesc": "Worked on local database scripts.",
+                "projectTitle": "CampusMate OS",
+                "projectDesc": "Building educational applications."
+            },
+            analysis_feedback=analysis_data
+        )
+        session.add(new_res)
+        
+    session.commit()
+    return {
+        "success": True, 
+        "filename": filename,
+        "atsScore": score,
+        "readabilityScore": readability,
+        "industryMatchScore": match_score,
+        "feedback": analysis_data
+    }
 
 # --- AI MENTOR ROUTES ---
 
@@ -647,7 +711,6 @@ def chat_with_mentor(
     profile = session.get(Profile, user.id)
     active_roadmap = session.exec(select(Roadmap).where(Roadmap.user_id == user.id, Roadmap.is_active == True)).first()
     
-    # Retrieve recent chat history (last 5 messages) to maintain context
     conversation = session.exec(select(AIConversation).where(AIConversation.user_id == user.id)).first()
     if not conversation:
         conversation = AIConversation(id=str(uuid.uuid4()), user_id=user.id, title="Career Mentorship")
@@ -655,7 +718,6 @@ def chat_with_mentor(
         session.commit()
         session.refresh(conversation)
 
-    # Save user message
     user_msg = AIMessage(
         id=str(uuid.uuid4()),
         conversation_id=conversation.id,
@@ -665,17 +727,16 @@ def chat_with_mentor(
     session.add(user_msg)
     session.commit()
 
-    # Get history
     history_msgs = session.exec(
         select(AIMessage)
         .where(AIMessage.conversation_id == conversation.id)
         .order_by(AIMessage.created_at.desc())
         .limit(6)
     ).all()
-    history_msgs.reverse() # Sort in ascending order (older first)
+    history_msgs.reverse()
     
     history_str = ""
-    for msg in history_msgs[:-1]: # exclude the current user message which is already processed
+    for msg in history_msgs[:-1]:
         history_str += f"{msg.sender.capitalize()}: {msg.message}\n"
 
     system_prompt = f"""You are CampusMate AI, a highly experienced principal engineer and career coach.
@@ -689,11 +750,9 @@ Always:
 """
     
     user_prompt = f"{history_str}User: {data.message}\nAssistant:"
-    
     response_text = call_gemini(system_prompt, user_prompt)
     
     if not response_text:
-        # High quality mock response logic (inspects message contents)
         query = data.message.lower()
         if "roadmap" in query:
             response_text = f"Hello {profile.full_name}! Regarding your roadmap for **{profile.target_role or 'your career'}**, the best next step is to master the fundamentals of Web Architectures. Start with how HTTP connections operate, then build a basic routing gateway. Focus on official Microsoft Learn resources, and try containerizing a project using Docker. Would you like me to suggest a specific project repo structure for this?"
@@ -718,7 +777,6 @@ Here is a recommended setup for building a quick, scalable MVP:
         else:
             response_text = f"That is a great question. In **{profile.target_role or 'Software Engineering'}**, we solve this by prioritizing modular development. Ensure you separate your server code from your database models, validate inputs using libraries like Pydantic, and write clean integration tests. What specific component of this stack are you currently working on?"
 
-    # Save assistant message
     assistant_msg = AIMessage(
         id=str(uuid.uuid4()),
         conversation_id=conversation.id,
@@ -758,7 +816,6 @@ def get_dashboard_stats(
         total_nodes = len(nodes)
         nodes_completed = len([n for n in nodes if n.status == "COMPLETED"])
         
-        # Find next node (first available or in progress node)
         for n in nodes:
             if n.status in ["AVAILABLE", "IN_PROGRESS"]:
                 next_node = n
@@ -772,8 +829,10 @@ def get_dashboard_stats(
         "roadmapProgress": int((nodes_completed / total_nodes * 100)) if total_nodes > 0 else 0,
         "nextNode": next_node.title if next_node else "Generate a roadmap first!",
         "resumeScore": resume.ats_score if resume else 0,
-        "learningHours": 12 # Mock hours tracking for display widgets
+        "readabilityScore": resume.recruiter_readability_score if resume else 0,
+        "industryMatchScore": resume.industry_match_score if resume else 0,
+        "learningHours": 12
     }
 
-# Mount Static Files (Must be mounted at the end to prevent overriding API paths)
+# Mount Static Files
 app.mount("/", StaticFiles(directory="static", html=True), name="static")

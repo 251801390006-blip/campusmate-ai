@@ -63,6 +63,8 @@ class Resume(SQLModel, table=True):
     user_id: str = Field(foreign_key="user.id")
     title: str = Field(default="My Resume")
     ats_score: int = Field(default=0)
+    recruiter_readability_score: int = Field(default=0)
+    industry_match_score: int = Field(default=0)
     theme: str = Field(default="classic")
     content: Dict[str, Any] = Field(default_factory=dict, sa_type=JSON)
     analysis_feedback: Optional[Dict[str, Any]] = Field(default=None, sa_type=JSON)

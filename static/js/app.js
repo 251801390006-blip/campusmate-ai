@@ -21,6 +21,8 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function initApp() {
+    setupResumeUploadDragAndDrop();
+    
     // Check if there is a saved sandbox session
     if (localStorage.getItem("campusmate_sandbox_active") === "true") {
         launchSandboxMode();
@@ -108,53 +110,386 @@ function launchSandboxMode() {
 }
 
 function seedSandboxRoadmap(role) {
-    const nodes = [
-        {
-            id: "node-1",
-            title: "HTML5, CSS3, and JavaScript Basics",
-            description: "Learn semantic document design, CSS custom selectors, and ES6 scripting.",
-            difficulty: "BEGINNER",
-            estimated_duration: "10 hours",
-            resources: [{title: "MDN Web Docs: Learn Web Development", url: "https://developer.mozilla.org"}],
-            projects: [{title: "Interactive SaaS Dashboard", description: "Design a responsive frontend screen using custom CSS variables.", tasks: ["Configure layout grid", "Implement glassmorphic styling", "Add dark mode toggler"]}],
-            certifications: [{name: "FreeCodeCamp Frontend Developer Certification", provider: "FreeCodeCamp"}],
-            status: "AVAILABLE"
-        },
-        {
-            id: "node-2",
-            title: "Backend Web Servers & API Design",
-            description: "Configure HTTP backend routes, middleware handlers, and JSON request validation.",
-            difficulty: "INTERMEDIATE",
-            estimated_duration: "15 hours",
-            resources: [{title: "FastAPI Web Tutorials", url: "https://fastapi.tiangolo.com"}],
-            projects: [{title: "Dockerized Book Registry API", description: "Create a FastAPI backend with persistent SQLite container mappings.", tasks: ["Setup FastAPI controllers", "Define SQLAlchemy tables", "Create Dockerfile wrapper"]}],
-            certifications: [{name: "GitHub Foundations", provider: "GitHub"}],
-            status: "LOCKED"
-        },
-        {
-            id: "node-3",
-            title: "Database Optimization & Indexing",
-            description: "Learn SQL relationships, indexing strategies, connections pooling, and ACID features.",
-            difficulty: "INTERMEDIATE",
-            estimated_duration: "18 hours",
-            resources: [{title: "PostgreSQL Tutorials", url: "https://postgresqltutorial.com"}],
-            projects: [{"title": "Performance Tuning Sandbox", "description": "Seed database with 100k rows and run queries, analyzing latency metrics.", "tasks": ["Generate test seed data", "Measure unindexed vs indexed timing", "Configure Connection Pools"]}],
-            certifications: [{name: "Microsoft Certified: Database Administrator", provider: "Microsoft"}],
-            status: "LOCKED"
-        },
-        {
-            id: "node-4",
-            title: "CI/CD Automations & Cloud Container Deployments",
-            description: "Setup automated verification steps, Docker registries, and configure auto-releasing pipelines.",
-            difficulty: "ADVANCED",
-            estimated_duration: "22 hours",
-            resources: [{title: "GitHub Actions Docs", url: "https://docs.github.com"}],
-            projects: [{"title": "Automated Pipeline Project", "description": "Write a workflow that compiles code, runs test suites, and deploys on Railway.", "tasks": ["Write GitHub actions yaml file", "Pass linter checks", "Configure Docker registry auth"]}],
-            certifications: [{name: "Microsoft Certified: DevOps Engineer Expert", provider: "Microsoft"}],
-            status: "LOCKED"
-        }
-    ];
+    let nodes = [];
     
+    if (role === "Cyber Security") {
+        nodes = [
+            {
+                id: "node-1",
+                title: "Network Protocols & Packet Analysis",
+                description: "Master TCP/IP, DNS, HTTP/S, and packet capture tools like Wireshark.",
+                difficulty: "BEGINNER",
+                estimated_duration: "12 hours",
+                resources: [{title: "Wireshark Labs & Tutorials", url: "https://www.wireshark.org"}],
+                projects: [{title: "Packet Trace Audit", description: "Capture local interface traffic and analyze TLS handshake messages.", tasks: ["Install packet analyzer", "Capture HTTP vs HTTPS payloads", "Extract handshake metadata"]}],
+                certifications: [{name: "CompTIA Network+", provider: "CompTIA"}],
+                status: "AVAILABLE"
+            },
+            {
+                id: "node-2",
+                title: "Linux Administration & OS Hardening",
+                description: "Configure system permissions, service policies, audit log entries, and SSH secure tunnels.",
+                difficulty: "INTERMEDIATE",
+                estimated_duration: "15 hours",
+                resources: [{title: "Linux Hardening Guidelines", url: "https://www.cisecurity.org"}],
+                projects: [{title: "Secure Bastion Server Setup", description: "Deploy a Linux kernel VM, disable root SSH logins, and block unauthorized ports.", tasks: ["Establish firewall policies", "Setup logging daemon auditd", "Configure SSH key authentication"]}],
+                certifications: [{name: "CompTIA Security+", provider: "CompTIA"}],
+                status: "LOCKED"
+            },
+            {
+                id: "node-3",
+                title: "OWASP Top 10 & Web Pentesting",
+                description: "Test web gateways against SQL Injection, Cross-Site Scripting (XSS), and Broken Authentication.",
+                difficulty: "INTERMEDIATE",
+                estimated_duration: "20 hours",
+                resources: [{title: "OWASP Web Security Testing Guide", url: "https://owasp.org"}],
+                projects: [{title: "Vulnerable App Vulnerability Assessment", description: "Run automated and manual audits on test nodes, detailing severity findings.", tasks: ["Run OWASP ZAP scanners", "Examine CORS configuration logs", "Draft remediation script proposals"]}],
+                certifications: [{name: "Certified Ethical Hacker (CEH)", provider: "EC-Council"}],
+                status: "LOCKED"
+            },
+            {
+                id: "node-4",
+                title: "Cloud Security, Identity & Governance",
+                description: "Learn cloud IAM structures, VPC security groups, key management vaults, and identity federation.",
+                difficulty: "ADVANCED",
+                estimated_duration: "24 hours",
+                resources: [{title: "Microsoft Learn: Security, Compliance, and Identity", url: "https://learn.microsoft.com"}],
+                projects: [{title: "Zero-Trust Cloud Network", description: "Design an Azure/AWS virtual private network with restricted IAM policies and network firewalls.", tasks: ["Define narrow security group rules", "Enable Azure Key Vault auditing", "Restrict database access to VPC CIDR"]}],
+                certifications: [{name: "Microsoft Certified: Cybersecurity Architect Expert", provider: "Microsoft"}],
+                status: "LOCKED"
+            }
+        ];
+    } else if (role === "AI Engineering") {
+        nodes = [
+            {
+                id: "node-1",
+                title: "Linear Algebra & Calculus for AI",
+                description: "Learn matrices multiplication, eigenvalues, partial gradients, and optimization rules.",
+                difficulty: "BEGINNER",
+                estimated_duration: "14 hours",
+                resources: [{title: "3Blue1Brown: Essence of Linear Algebra", url: "https://www.youtube.com"}],
+                projects: [{title: "Gradient Descent Simulator", description: "Code linear regression gradients optimization from scratch in pure Python.", tasks: ["Setup loss function metrics", "Implement matrix operations manually", "Plot learning rates gradient graphs"]}],
+                certifications: [{name: "DeepLearning.AI Math for Machine Learning", provider: "Coursera"}],
+                status: "AVAILABLE"
+            },
+            {
+                id: "node-2",
+                title: "Machine Learning Classifiers & Pipelines",
+                description: "Train decision trees, random forests, SVN classifiers, and evaluate validation scores.",
+                difficulty: "INTERMEDIATE",
+                estimated_duration: "18 hours",
+                resources: [{title: "Scikit-Learn Tutorials", url: "https://scikit-learn.org"}],
+                projects: [{title: "Customer Churn Classifiers Pipeline", description: "Build data cleaning, scaling, and training pipelines on scikit-learn libraries.", tasks: ["Run cross validation folds", "Compare precision-recall ratios", "Export models using Joblib serialization"]}],
+                certifications: [{name: "Google Cloud: Machine Learning Engineer", provider: "Google"}],
+                status: "LOCKED"
+            },
+            {
+                id: "node-3",
+                title: "Deep Neural Networks & PyTorch",
+                description: "Configure multi-layer perceptrons, backpropagation graphs, activation rules, and optimizers.",
+                difficulty: "INTERMEDIATE",
+                estimated_duration: "22 hours",
+                resources: [{title: "PyTorch Basics & Tutorials", url: "https://pytorch.org"}],
+                projects: [{title: "MNIST Digit Recognition Network", description: "Write convolutional neural network layers using PyTorch frameworks, evaluating accuracy.", tasks: ["Setup DataLoader generators", "Tune learning rate decays", "Plot training loss curves"]}],
+                certifications: [{name: "Microsoft Certified: Azure AI Engineer Associate", provider: "Microsoft"}],
+                status: "LOCKED"
+            },
+            {
+                id: "node-4",
+                title: "LLMs, Vector Databases & RAG Architectures",
+                description: "Master prompt engineering templates, semantic text embeddings, vector matching databases, and LangChain hooks.",
+                difficulty: "ADVANCED",
+                estimated_duration: "26 hours",
+                resources: [{title: "DeepLearning.AI: Prompt Engineering Guides", url: "https://www.deeplearning.ai"}],
+                projects: [{title: "Document Assistant using RAG", description: "Build a document scraper that queries vector stores and structures response summaries using Gemini APIs.", tasks: ["Chunk document texts", "Index in vector stores", "Design LLM response wrappers"]}],
+                certifications: [{name: "TensorFlow Developer Certificate", provider: "Google"}],
+                status: "LOCKED"
+            }
+        ];
+    } else if (role === "Machine Learning") {
+        nodes = [
+            {
+                id: "node-1",
+                title: "Python Math Libraries: NumPy & Pandas",
+                description: "Manipulate multi-dimensional arrays, data frames indexing, filtering, and aggregation.",
+                difficulty: "BEGINNER",
+                estimated_duration: "10 hours",
+                resources: [{title: "Pandas User Guides", url: "https://pandas.pydata.org"}],
+                projects: [{title: "Academic Performance Profiler", description: "Clean datasets, handle missing coordinates, and output aggregate statistics summaries.", tasks: ["Merge relational CSV arrays", "Compute group variance statistics", "Plot performance histogram distributions"]}],
+                certifications: [{name: "IBM Data Science Professional Certificate", provider: "IBM"}],
+                status: "AVAILABLE"
+            },
+            {
+                id: "node-2",
+                title: "Supervised Learning Regression Models",
+                description: "Analyze linear, ridge, lasso regressions, and calculate mean squared error variances.",
+                difficulty: "INTERMEDIATE",
+                estimated_duration: "14 hours",
+                resources: [{title: "Introduction to Statistical Learning", url: "https://statlearning.com"}],
+                projects: [{title: "Housing Price Estimators", description: "Tune multi-feature regression functions, checking residuals distribution logs.", tasks: ["Clean outlier outliers", "Normalize dynamic ranges", "Calculate coefficient of determination"]}],
+                certifications: [{name: "Stanford Machine Learning Certification", provider: "Coursera"}],
+                status: "LOCKED"
+            },
+            {
+                id: "node-3",
+                title: "Unsupervised Clustering & Dimensions Compression",
+                description: "Master K-Means algorithms, Hierarchical clustering, and Principal Component Analysis (PCA).",
+                difficulty: "INTERMEDIATE",
+                estimated_duration: "18 hours",
+                resources: [{title: "Scikit-Learn Clustering Documentation", url: "https://scikit-learn.org"}],
+                projects: [{title: "Market Segments Clustering Explorer", description: "Perform PCA dimensions compression and map customer clusters using K-Means.", tasks: ["Determine cluster counts via elbow metrics", "Run dimensional projection charts", "Detail characteristic features per cluster"]}],
+                certifications: [{name: "AWS Certified Machine Learning - Specialty", provider: "Amazon"}],
+                status: "LOCKED"
+            },
+            {
+                id: "node-4",
+                title: "MLOps Pipelines & Model Registry",
+                description: "Learn model version tracking, artifact staging, container packaging, and automated retraining.",
+                difficulty: "ADVANCED",
+                estimated_duration: "24 hours",
+                resources: [{title: "MLflow Documentation & Guides", url: "https://mlflow.org"}],
+                projects: [{title: "Model Production Delivery System", description: "Register target models, package using FastAPI wrappers, and configure CI auto-build containers.", tasks: ["Setup model version registries", "Define REST request parsing", "Run continuous inference tests"]}],
+                certifications: [{name: "Google Cloud Professional ML Engineer", provider: "Google"}],
+                status: "LOCKED"
+            }
+        ];
+    } else if (role === "Data Science") {
+        nodes = [
+            {
+                id: "node-1",
+                title: "SQL Querying & Data Restructuring",
+                description: "Master subqueries, inner/outer joins, window functions, and data schema normalization.",
+                difficulty: "BEGINNER",
+                estimated_duration: "10 hours",
+                resources: [{title: "PostgreSQL Tutorial Core Guides", url: "https://www.postgresqltutorial.com"}],
+                projects: [{title: "Multi-Store Transactions Database Analysis", description: "Write complex window queries to extract monthly metrics.", tasks: ["Construct relational schema structures", "Write aggregate rollup calculations", "Format report tables"]}],
+                certifications: [{name: "Google Data Analytics Professional", provider: "Google"}],
+                status: "AVAILABLE"
+            },
+            {
+                id: "node-2",
+                title: "Exploratory Data Analysis & Vis",
+                description: "Design reports, trace correlations using Seaborn, and explain skewness patterns.",
+                difficulty: "INTERMEDIATE",
+                estimated_duration: "12 hours",
+                resources: [{title: "Seaborn Visualization Guide", url: "https://seaborn.pydata.org"}],
+                projects: [{title: "SaaS Performance Dashboard Plots", description: "Generate distribution heatmaps and scatter-correlation charts from raw customer events.", tasks: ["Clean duplicate event arrays", "Plot daily retention heatmaps", "Verify correlation coefficients metrics"]}],
+                certifications: [{name: "Microsoft Certified: Power BI Data Analyst", provider: "Microsoft"}],
+                status: "LOCKED"
+            },
+            {
+                id: "node-3",
+                title: "Statistical Methods & Hypothesis Audits",
+                description: "Apply Z-scores, T-tests, ANOVA calculations, p-values verification, and Central Limit theorems.",
+                difficulty: "INTERMEDIATE",
+                estimated_duration: "16 hours",
+                resources: [{title: "OpenStax Introductory Statistics", url: "https://openstax.org"}],
+                projects: [{title: "A/B Conversion Testing Analysis", description: "Calculate conversions variances between test designs, checking statistical significance ratios.", tasks: ["Establish null hypothesis assumptions", "Compute standard errors ratios", "Determine final p-value outputs"]}],
+                certifications: [{name: "IBM Applied Data Science Specialist", provider: "IBM"}],
+                status: "LOCKED"
+            },
+            {
+                id: "node-4",
+                title: "Big Data Pipelines & Apache Spark",
+                description: "Write PySpark scripts, map MapReduce keys, partition datasets, and run distributed jobs.",
+                difficulty: "ADVANCED",
+                estimated_duration: "22 hours",
+                resources: [{title: "Apache Spark Programming Guide", url: "https://spark.apache.org"}],
+                projects: [{title: "Log Event Scraper using Spark", description: "Parse 10M rows of system event logs, outputting target errors distributions.", tasks: ["Set up PySpark session configurations", "Partition server datasets", "Aggregate error traces daily"]}],
+                certifications: [{name: "Cloudera Certified Associate: Data Analyst", provider: "Cloudera"}],
+                status: "LOCKED"
+            }
+        ];
+    } else if (role === "Cloud Computing") {
+        nodes = [
+            {
+                id: "node-1",
+                title: "Networking & Cloud Basics",
+                description: "Learn subnets masking, DNS zones, HTTP load balancers, and standard cloud storage classes.",
+                difficulty: "BEGINNER",
+                estimated_duration: "10 hours",
+                resources: [{title: "AWS Technical Essentials", url: "https://aws.amazon.com"}],
+                projects: [{title: "Static CDN Portfolio Website", description: "Deploy front-end layouts to object stores behind secure SSL content networks.", tasks: ["Create cloud storage buckets", "Configure custom domain routing", "Enable cache invalidations profiles"]}],
+                certifications: [{name: "AWS Certified Cloud Practitioner", provider: "Amazon"}],
+                status: "AVAILABLE"
+            },
+            {
+                id: "node-2",
+                title: "Infrastructure as Code & Terraform",
+                description: "Define cloud states, write resource blocks, configure outputs, and organize module patterns.",
+                difficulty: "INTERMEDIATE",
+                estimated_duration: "15 hours",
+                resources: [{title: "Terraform HashiCorp Tutorials", url: "https://learn.hashicorp.com"}],
+                projects: [{title: "Automated AWS/Azure VPC Blueprint", description: "Write Terraform files defining target network components, security groups, and virtual instances.", tasks: ["Setup remote state configuration stores", "Define security boundary parameters", "Test plan deployments"]}],
+                certifications: [{name: "HashiCorp Certified: Terraform Associate", provider: "HashiCorp"}],
+                status: "LOCKED"
+            },
+            {
+                id: "node-3",
+                title: "Serverless Deployments & API Gateways",
+                description: "Write function runtimes, handle cold starts, configure route integrations, and authorize users.",
+                difficulty: "INTERMEDIATE",
+                estimated_duration: "18 hours",
+                resources: [{title: "Serverless Framework Guides", url: "https://www.serverless.com"}],
+                projects: [{title: "Serverless User Registration Endpoint", description: "Create Lambda handlers writing profile entries into DynamoDB arrays.", tasks: ["Write serverless template configurations", "Add JSON validator middleware layers", "Test endpoints routing rules"]}],
+                certifications: [{name: "Microsoft Certified: Azure Developer Associate", provider: "Microsoft"}],
+                status: "LOCKED"
+            },
+            {
+                id: "node-4",
+                title: "Multi-Cloud Architectures & VPC Peering",
+                description: "Configure VPN tunnels, VPC peering connections, route tables, and unified cloud governance.",
+                difficulty: "ADVANCED",
+                estimated_duration: "24 hours",
+                resources: [{title: "AWS Well-Architected Framework", url: "https://aws.amazon.com"}],
+                projects: [{title: "High Availability Web Stack", description: "Deploy virtual scale sets across regions behind redundant load balancers.", tasks: ["Setup multi-region database replications", "Configure auto-scaling thresholds", "Run chaos network simulation tests"]}],
+                certifications: [{name: "AWS Certified Solutions Architect - Professional", provider: "Amazon"}],
+                status: "LOCKED"
+            }
+        ];
+    } else if (role === "DevOps") {
+        nodes = [
+            {
+                id: "node-1",
+                title: "Linux Shell Scripting & Systems Commands",
+                description: "Automate system actions, parse text streams, setup cron schedules, and verify logs.",
+                difficulty: "BEGINNER",
+                estimated_duration: "10 hours",
+                resources: [{title: "Linux Command Line Core Tutorial", url: "https://linuxjourney.com"}],
+                projects: [{title: "System Performance Logger", description: "Write a bash shell script collecting memory statistics and writing alert logs.", tasks: ["Parse top metrics arrays", "Setup systemd cron triggers", "Email error summaries"]}],
+                certifications: [{name: "Linux Professional Institute LPIC-1", provider: "LPI"}],
+                status: "AVAILABLE"
+            },
+            {
+                id: "node-2",
+                title: "Containerization using Docker",
+                description: "Build custom Docker images, write optimization rules, mount host files, and configure network links.",
+                difficulty: "INTERMEDIATE",
+                estimated_duration: "14 hours",
+                resources: [{title: "Docker Get Started guides", url: "https://docs.docker.com"}],
+                projects: [{title: "Multi-Container Development Sandbox", description: "Assemble compose configuration files connecting python app servers, Redis layers, and Postgres storage databases.", tasks: ["Optimize image layers definitions", "Link secure container subnets", "Define volume persistent mappings"]}],
+                certifications: [{name: "Docker Certified Associate (DCA)", provider: "Mirantis"}],
+                status: "LOCKED"
+            },
+            {
+                id: "node-3",
+                title: "Continuous Integrations (CI/CD) and GitHub Actions",
+                description: "Automate test suites execution, run syntax linters, compile binaries, and publish container registries.",
+                difficulty: "INTERMEDIATE",
+                estimated_duration: "16 hours",
+                resources: [{title: "GitHub Actions documentation", url: "https://docs.github.com"}],
+                projects: [{title: "Automated Release Pipeline", description: "Write continuous actions workflows compiling code, passing verification tests, and deploying on cloud nodes.", tasks: ["Establish step-by-step workflow definitions", "Mask API auth credentials", "Release Docker image releases"]}],
+                certifications: [{name: "GitHub Actions Certification", provider: "GitHub"}],
+                status: "LOCKED"
+            },
+            {
+                id: "node-4",
+                title: "Container Orchestration with Kubernetes",
+                description: "Configure pods mappings, cluster networks, volume mounts, ingress routes, and auto-scalers.",
+                difficulty: "ADVANCED",
+                estimated_duration: "24 hours",
+                resources: [{title: "Kubernetes interactive training tutorials", url: "https://kubernetes.io"}],
+                projects: [{title: "Zero-Downtime Microservices Web App", description: "Write Kubernetes manifest files, routing live user sessions across scaled pods clusters.", tasks: ["Define cluster deployment configs", "Set CPU/Memory resources thresholds", "Test rolling updates processes"]}],
+                certifications: [{name: "Certified Kubernetes Administrator (CKA)", provider: "Cloud Native Computing Foundation"}],
+                status: "LOCKED"
+            }
+        ];
+    } else if (role === "Full Stack Development" || role === "Full Stack Web Developer" || role === "Full Stack") {
+        nodes = [
+            {
+                id: "node-1",
+                title: "Web Essentials: HTML5, CSS3, & Modern JS",
+                description: "Learn semantic layout design, responsive media rules, and ES6 asynchronous callbacks.",
+                difficulty: "BEGINNER",
+                estimated_duration: "10 hours",
+                resources: [{title: "MDN Web Development Guides", url: "https://developer.mozilla.org"}],
+                projects: [{title: "Dynamic Student Operating Dashboard", description: "Build a single page app using HTML layouts, responsive grids, and mock states.", tasks: ["Organize flex layout cards", "Write data filter selectors", "Store values in localStorage arrays"]}],
+                certifications: [{name: "FreeCodeCamp Responsive Web Design", provider: "FreeCodeCamp"}],
+                status: "AVAILABLE"
+            },
+            {
+                id: "node-2",
+                title: "Front-end Frameworks & Client States",
+                description: "Build reusable UI components, manage global states, route views, and handle API requests.",
+                difficulty: "INTERMEDIATE",
+                estimated_duration: "16 hours",
+                resources: [{title: "React.js official documentation", url: "https://react.dev"}],
+                projects: [{title: "Collaborative Project Management UI", description: "Design a kanban-style project board with reactive state transitions.", tasks: ["Write modular interface components", "Implement drag-and-drop state sync", "Authenticate users routing gates"]}],
+                certifications: [{name: "Meta Front-End Developer Certificate", provider: "Meta"}],
+                status: "LOCKED"
+            },
+            {
+                id: "node-3",
+                title: "Backend API Servers with FastAPI",
+                description: "Define HTTP endpoint routes, write validation schemas, verify tokens, and handle exceptions.",
+                difficulty: "INTERMEDIATE",
+                estimated_duration: "18 hours",
+                resources: [{title: "FastAPI Tutorials & Guides", url: "https://fastapi.tiangolo.com"}],
+                projects: [{title: "Document Vault REST API", description: "Create backend routes storing metadata records in persistent relational databases.", tasks: ["Write pydantic request schemas", "Enforce JWT authentication tokens", "Structure route controllers logic"]}],
+                certifications: [{name: "GitHub Foundations", provider: "GitHub"}],
+                status: "LOCKED"
+            },
+            {
+                id: "node-4",
+                title: "Database Performance Tuning & Deployment",
+                description: "Optimize SQL joins, configure connection pools, write index rules, and package in containers.",
+                difficulty: "ADVANCED",
+                estimated_duration: "20 hours",
+                resources: [{title: "PostgreSQL Performance Optimization", url: "https://pgmustard.com"}],
+                projects: [{title: "Scalable SaaS Stack", description: "Deploy database persistent schemas, connect backend services, and release live systems via GitHub.", tasks: ["Write optimize database index queries", "Build Docker multi-stage images", "Configure Railway release pipelines"]}],
+                certifications: [{name: "Microsoft Certified: Azure Developer Associate", provider: "Microsoft"}],
+                status: "LOCKED"
+            }
+        ];
+    } else { // Mobile Development
+        nodes = [
+            {
+                id: "node-1",
+                title: "Mobile UI Design Principles",
+                description: "Learn human interface guidelines, view hierarchies, flex layouts, and responsive alignments.",
+                difficulty: "BEGINNER",
+                estimated_duration: "10 hours",
+                resources: [{title: "Apple Human Interface Guidelines", url: "https://developer.apple.com"}],
+                projects: [{title: "Task Planner UI Mockups", description: "Draft responsive interface layouts with smooth transitions.", tasks: ["Sketch layout wireframes", "Implement custom buttons grids", "Create tab views navigation"]}],
+                certifications: [{name: "Google UX Design Professional Certificate", provider: "Google"}],
+                status: "AVAILABLE"
+            },
+            {
+                id: "node-2",
+                title: "Swift / Kotlin Fundamentals",
+                description: "Master optional values, object types, memory delegation patterns, and asynchronous routines.",
+                difficulty: "INTERMEDIATE",
+                estimated_duration: "16 hours",
+                resources: [{title: "Swift Programming Language documentation", url: "https://swift.org"}],
+                projects: [{title: "Local File Manager App Utility", description: "Develop mobile application reading directories contents and writing JSON configuration scripts.", tasks: ["Setup class protocols definitions", "Configure file access permissions", "Test exception handlers cases"]}],
+                certifications: [{name: "Meta iOS/Android Developer Certificate", provider: "Meta"}],
+                status: "LOCKED"
+            },
+            {
+                id: "node-3",
+                title: "Asynchronous Networking & State Storage",
+                description: "Fetch remote JSON arrays, handle network latency errors, and write values to offline local database stores.",
+                difficulty: "INTERMEDIATE",
+                estimated_duration: "18 hours",
+                resources: [{title: "Kotlin Coroutines Guide", url: "https://kotlinlang.org"}],
+                projects: [{title: "Real-time Weather Forecast Dashboard", description: "Query remote meteorological services API, caching updates locally in SQLite repositories.", tasks: ["Write async fetch controllers", "Serialize JSON data arrays", "Sync offline database registries"]}],
+                certifications: [{name: "Google Associate Android Developer", provider: "Google"}],
+                status: "LOCKED"
+            },
+            {
+                id: "node-4",
+                title: "App Publishing Pipelines & CI/CD Release",
+                description: "Configure provisioning certs, compile target packages, run tests, and publish via App Store pipelines.",
+                difficulty: "ADVANCED",
+                estimated_duration: "22 hours",
+                resources: [{title: "Google Play Store publishing instructions", url: "https://developer.android.com"}],
+                projects: [{title: "Continuous Release Mobile App", description: "Write GitHub actions workflows building target packages, running verification tests, and signing binaries.", tasks: ["Configure certificates encryption keys", "Write release actions configurations", "Build distribution packages"]}],
+                certifications: [{name: "GitHub Actions Certification", provider: "GitHub"}],
+                status: "LOCKED"
+            }
+        ];
+    }
+
     localStorage.setItem("campusmate_sandbox_roadmap", JSON.stringify({
         title: `${role} Dynamic Pathway (Sandbox)`,
         targetRole: role
@@ -237,6 +572,9 @@ function showMainApp() {
     // Update top header status
     document.getElementById("streak-counter").innerText = currentUser.streak || 1;
     document.getElementById("xp-counter").innerText = currentUser.xp || 100;
+    
+    // Load persisted chat history
+    loadChatHistory();
 }
 
 // --- VIEW ROUTER ---
@@ -335,6 +673,7 @@ async function loadDashboard() {
         } else {
             nextTaskBody.innerHTML = `<p class="empty-state">No roadmap initialized yet. Select your goal in the Roadmap Engine to begin!</p>`;
         }
+        updateMentorMemoryBar();
     } catch (e) {
         console.error("Dashboard loading failed", e);
     }
@@ -764,17 +1103,149 @@ async function sendMentorMessage(e) {
     const input = document.getElementById("mentor-user-input");
     const msg = input.value.trim();
     if (!msg) return;
-
     input.value = "";
+    await executeMentorQuery(msg);
+}
+
+function escapeHtml(text) {
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function typeWriterEffect(element, html, callback) {
+    let i = 0;
+    const speed = 10; // milliseconds
+    const step = 6;   // characters per tick
+    element.innerHTML = "";
+    const timer = setInterval(() => {
+        if (i < html.length) {
+            element.innerHTML = html.substring(0, i + step);
+            i += step;
+        } else {
+            clearInterval(timer);
+            element.innerHTML = html;
+            if (callback) callback();
+        }
+    }, speed);
+}
+
+async function handleChipClick(text) {
+    const drawer = document.getElementById("mentor-drawer");
+    if (!drawer.classList.contains("active")) {
+        toggleMentorDrawer();
+    }
+    await executeMentorQuery(text);
+}
+
+function updateSuggestionChips(lastQuery) {
+    const q = lastQuery.toLowerCase();
+    const container = document.getElementById("mentor-chat-chips");
+    if (!container) return;
+    
+    let chips = [];
+    if (q.includes("cert") || q.includes("credential")) {
+        chips = [
+            "How should I study for AZ-900?",
+            "Recommend AWS practice projects",
+            "Draft resume bullet points for certs"
+        ];
+    } else if (q.includes("project") || q.includes("recommend")) {
+        chips = [
+            "Draft backend Express files structure",
+            "What database models should I use?",
+            "Suggest a DevOps CI/CD workflow"
+        ];
+    } else if (q.includes("resume") || q.includes("cv") || q.includes("experience")) {
+        chips = [
+            "Explain Google XYZ formula",
+            "Suggest rewrites for intern role",
+            "How to add missing keywords"
+        ];
+    } else if (q.includes("docker") || q.includes("container")) {
+        chips = [
+            "Explain Docker multi-stage builds",
+            "How to map host directory volumes",
+            "Draft standard compose files"
+        ];
+    } else {
+        chips = [
+            "Recommend a project template",
+            "What certifications fit my target track?",
+            "Check my experience bullet points"
+        ];
+    }
+    
+    container.innerHTML = chips.map(c => `
+        <button class="chip" onclick="handleChipClick('${c.replace(/'/g, "\\'")}')">${c}</button>
+    `).join("");
+}
+
+function loadChatHistory() {
     const messagesBox = document.getElementById("mentor-chat-messages");
+    if (!messagesBox) return;
+    
+    if (appMode === "sandbox") {
+        const history = JSON.parse(localStorage.getItem("campusmate_sandbox_chat_history") || "[]");
+        if (history.length > 0) {
+            messagesBox.innerHTML = "";
+            history.forEach(h => {
+                const messageClass = h.sender === "user" ? "user" : "mentor";
+                messagesBox.innerHTML += `
+                    <div class="message ${messageClass}">
+                        <p>${h.message}</p>
+                        <span class="time">Just now</span>
+                    </div>
+                `;
+            });
+            messagesBox.scrollTop = messagesBox.scrollHeight;
+        } else {
+            messagesBox.innerHTML = `
+                <div class="message mentor">
+                    <p>Hello! I am your career mentor. Ask me questions about roadmaps, certifications, project architectures, or resumes!</p>
+                    <span class="time">Just now</span>
+                </div>
+            `;
+        }
+    }
+    updateMentorMemoryBar();
+}
+
+function updateMentorMemoryBar() {
+    const el = document.getElementById("mentor-memory-text");
+    if (!el || !currentUser) return;
+    
+    const role = currentUser.targetRole || "None selected";
+    const xp = currentUser.xp || 100;
+    const resumeScore = localStorage.getItem("campusmate_sandbox_resumescore") || 0;
+    
+    el.innerHTML = `Memory: Track: <strong>${role}</strong> | XP: <strong>${xp}</strong> | Resume: <strong>${resumeScore}%</strong>`;
+}
+
+async function executeMentorQuery(msg) {
+    const messagesBox = document.getElementById("mentor-chat-messages");
+    
+    // Save history locally in Sandbox
+    let history = [];
+    if (appMode === "sandbox") {
+        history = JSON.parse(localStorage.getItem("campusmate_sandbox_chat_history") || "[]");
+    }
     
     messagesBox.innerHTML += `
         <div class="message user">
-            <p>${msg}</p>
+            <p>${escapeHtml(msg)}</p>
             <span class="time">Just now</span>
         </div>
     `;
     messagesBox.scrollTop = messagesBox.scrollHeight;
+
+    if (appMode === "sandbox") {
+        history.push({ sender: "user", message: msg });
+        localStorage.setItem("campusmate_sandbox_chat_history", JSON.stringify(history));
+    }
 
     const thinkingId = "thinking-" + Date.now();
     messagesBox.innerHTML += `
@@ -787,39 +1258,110 @@ async function sendMentorMessage(e) {
     try {
         let reply = "";
         if (appMode === "sandbox") {
-            // Local offline mentor logic
             const q = msg.toLowerCase();
-            if (q.includes("docker")) {
-                reply = "For a dockerized Express backend, utilize a multi-stage Docker build separating dev dependencies from runtime modules. Mount local volumes for live hot-reloading. Here is a baseline structure:\n\n```\nFROM node:18-alpine AS build\nWORKDIR /app\nCOPY package.json .\nRUN npm install\nCOPY . .\n\nCMD [\"npm\", \"run\", \"dev\"]\n```";
-            } else if (q.includes("resume") || q.includes("cv")) {
-                reply = "To pass the ATS checks, ensure you compile using standard columns. Do not use floating graphics or charts that confuse text parsers. Quantify achievements with concrete figures (e.g. 'Improved DB read efficiency by 30%').";
+            const role = currentUser.targetRole || "Software Engineering";
+            const level = currentUser.academicLevel || "Undergraduate";
+            const xp = currentUser.xp || 100;
+            const resumeScore = localStorage.getItem("campusmate_sandbox_resumescore") || 0;
+
+            if (q.includes("cert") || q.includes("credential")) {
+                reply = `<h3>Matched Credentials for ${role}</h3>
+                <p>Based on your profile (XP: ${xp}), I recommend targeting these high-value industry certifications:</p>
+                <div class="project-info-box" style="margin-top:10px; background: rgba(15,23,42,0.02);">
+                    <strong>1. GitHub Foundations</strong><br>
+                    Difficulty: Beginner | Cost: $99 | Career Value: High<br>
+                    <p style="font-size:12px; margin-top:4px; color:var(--text-secondary);">Validates your knowledge of Git workflows, version control, and collaboration.</p>
+                </div>
+                <div class="project-info-box" style="margin-top:10px; background: rgba(15,23,42,0.02);">
+                    <strong>2. Microsoft Certified: Azure Fundamentals (AZ-900)</strong><br>
+                    Difficulty: Beginner | Cost: $99 | Career Value: Very High<br>
+                    <p style="font-size:12px; margin-top:4px; color:var(--text-secondary);">Demonstrates foundational cloud concepts, resource deployment, and governance mechanisms.</p>
+                </div>
+                <div class="project-info-box" style="margin-top:10px; background: rgba(15,23,42,0.02);">
+                    <strong>3. AWS Cloud Practitioner</strong><br>
+                    Difficulty: Beginner | Cost: $100 | Career Value: Very High<br>
+                    <p style="font-size:12px; margin-top:4px; color:var(--text-secondary);">Excellent validation of AWS global infrastructure, core services, and pricing model.</p>
+                </div>
+                <p style="margin-top:10px;">Click standard Roadmap node detail overlays to match study links directly.</p>`;
+            } else if (q.includes("project") || q.includes("recommend")) {
+                reply = `<h3>Capstone Project Blueprint: ${role}</h3>
+                <p>Here is a premium portfolio project configured for your current track:</p>
+                <div class="project-info-box" style="margin-top:10px; background: rgba(15,23,42,0.02);">
+                    <strong>Interactive SaaS Portal with FastAPI</strong><br>
+                    <p style="font-size:12px; margin-top:4px; color:var(--text-secondary);">Develop a responsive single-page web app with backend auth, SQLModel relations, and fully automated deployment.</p>
+                    <ul style="font-size:12px; margin-left: 15px; margin-top: 6px;">
+                        <li>Task 1: Set up modular folder design and SQLite persistence schema.</li>
+                        <li>Task 2: Implement asynchronous API controllers and JWT bearer tokens.</li>
+                        <li>Task 3: Package in Docker containers and release via continuous Railway actions.</li>
+                    </ul>
+                </div>
+                <p style="margin-top:10px;">Would you like me to generate a script outline or directory tree for this project?</p>`;
+            } else if (q.includes("resume") || q.includes("cv") || q.includes("experience")) {
+                reply = `<h3>Resume Diagnostic & Keyword Audit</h3>
+                <p>Your current resume score is <strong>${resumeScore}/100</strong>.</p>
+                <p>To improve recruiter readability and pass keyword filters, apply these recommendations:</p>
+                <ul style="margin-left:15px; margin-top:5px; font-size:13px; line-height:1.6;">
+                    <li>Apply the <strong>Google XYZ formula</strong>: 'Accomplished [X] as measured by [Y], by doing [Z]'. Use exact metrics!</li>
+                    <li>Avoid floating graphical design systems. Stick to clean, printable single-column formats.</li>
+                    <li>Add these missing keywords directly: <strong>Docker, PostgreSQL, FastAPI, Git version control</strong>.</li>
+                </ul>`;
+            } else if (q.includes("docker")) {
+                reply = `<h3>Docker Containers Deployment</h3>
+                <p>For a dockerized Node/Express backend, utilize a multi-stage Docker build separating dev dependencies from runtime modules. Mount local volumes for live hot-reloading.</p>
+<pre style="background:rgba(15,23,42,0.04); padding:10px; border-radius:6px; margin:10px 0; overflow-x:auto;"><code>FROM node:18-alpine AS build
+WORKDIR /app
+COPY package.json .
+RUN npm install
+COPY . .
+CMD ["npm", "run", "dev"]</code></pre>`;
             } else if (q.includes("hackathon") || q.includes("mvp")) {
                 reply = "During hackathons, speed is critical. Focus on building a vertical slice of one core feature. Deploy early to Railway, and structure your pitch around the problem statement, database relational map, and future API expandability.";
             } else {
-                reply = "That is a solid question. In software engineering, prioritize modularity and validation. Write clean functions, validate parameters using Pydantic, and log outputs securely. What specific component of this stack are you currently building?";
+                reply = `As your career mentor, I am tracking your target role of **${role}** at the **${level}** level. 
+                To progress efficiently, focus on finishing your active roadmap milestones and verifying your learning with mini-projects.
+                
+                What specific technical stack, code, or architecture design details would you like to build today?`;
             }
-            
+
             setTimeout(() => {
                 document.getElementById(thinkingId).remove();
+                
+                const mentorMsgId = "mentor-msg-" + Date.now();
                 messagesBox.innerHTML += `
-                    <div class="message mentor">
-                        <p>${reply}</p>
+                    <div class="message mentor" id="${mentorMsgId}">
+                        <p></p>
                         <span class="time">Just now</span>
                     </div>
                 `;
                 messagesBox.scrollTop = messagesBox.scrollHeight;
+                
+                const targetMsgEl = document.querySelector(`#${mentorMsgId} p`);
+                typeWriterEffect(targetMsgEl, reply, () => {
+                    history.push({ sender: "mentor", message: reply });
+                    localStorage.setItem("campusmate_sandbox_chat_history", JSON.stringify(history));
+                    messagesBox.scrollTop = messagesBox.scrollHeight;
+                    updateSuggestionChips(msg);
+                });
+
             }, 800);
         } else {
             const res = await API.sendMentorMessage(msg);
             document.getElementById(thinkingId).remove();
             
+            const mentorMsgId = "mentor-msg-" + Date.now();
             messagesBox.innerHTML += `
-                <div class="message mentor">
-                    <p>${res.reply}</p>
+                <div class="message mentor" id="${mentorMsgId}">
+                    <p></p>
                     <span class="time">Just now</span>
                 </div>
             `;
             messagesBox.scrollTop = messagesBox.scrollHeight;
+            
+            const targetMsgEl = document.querySelector(`#${mentorMsgId} p`);
+            typeWriterEffect(targetMsgEl, res.reply, () => {
+                messagesBox.scrollTop = messagesBox.scrollHeight;
+                updateSuggestionChips(msg);
+            });
         }
     } catch (e) {
         document.getElementById(thinkingId).innerHTML = `<p class="text-red">Error: Server connection failed.</p>`;
@@ -1008,4 +1550,139 @@ async function generateHackathonConcept() {
 
 function closeHackathonOutput() {
     document.getElementById("hackathon-output-container").classList.add("hidden");
+}
+
+function setupResumeUploadDragAndDrop() {
+    const zone = document.getElementById("resume-drag-drop-zone");
+    const input = document.getElementById("resume-file-input");
+    if (!zone || !input) return;
+
+    // Click to select file
+    zone.addEventListener("click", () => {
+        input.click();
+    });
+
+    // Handle file selection
+    input.addEventListener("change", (e) => {
+        if (e.target.files.length > 0) {
+            handleUploadedResume(e.target.files[0]);
+        }
+    });
+
+    // Drag events
+    zone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        zone.classList.add("drag-over");
+    });
+
+    zone.addEventListener("dragleave", () => {
+        zone.classList.remove("drag-over");
+    });
+
+    zone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        zone.classList.remove("drag-over");
+        if (e.dataTransfer.files.length > 0) {
+            handleUploadedResume(e.dataTransfer.files[0]);
+        }
+    });
+}
+
+async function handleUploadedResume(file) {
+    const statusText = document.getElementById("upload-status-text");
+    if (!statusText) return;
+
+    statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Processing & parsing "${file.name}"...`;
+    
+    try {
+        let response = null;
+        if (appMode === "sandbox") {
+            // Simulate sandbox file upload parse delay
+            await new Promise(resolve => setTimeout(resolve, 1200));
+            
+            // Build sandbox mock resume from file name
+            const fnLower = file.name.toLowerCase();
+            let parsedName = "Alex Smith";
+            let parsedEmail = "alex.smith@university.edu";
+            let parsedRole = "Software Engineering Intern";
+            let parsedExpDesc = "Responsible for coding the backend of the student project application. Helped team build website.";
+            let parsedProjTitle = "Distributed Document Scraper";
+            let parsedProjDesc = "Wrote backend scripts to parse directories. Integrated database mapping.";
+            let keywords = ["Git", "REST APIs", "Uvicorn", "Postgres"];
+            
+            if (fnLower.includes("cyber") || fnLower.includes("security")) {
+                parsedRole = "Security Analyst Intern";
+                parsedExpDesc = "Conducted vulnerability assessments using Wireshark and network security audits.";
+                parsedProjTitle = "Bastion Firewall Setup";
+                parsedProjDesc = "Configured SSH tunnels, iptables protocols, and log auditing policies.";
+                keywords = ["Wireshark", "Nmap", "Metasploit", "Penetration Testing"];
+            } else if (fnLower.includes("ai") || fnLower.includes("machine") || fnLower.includes("ml")) {
+                parsedRole = "ML/AI Engineering Intern";
+                parsedExpDesc = "Constructed data preprocessing pipelines and trained neural networks models.";
+                parsedProjTitle = "RAG Document Assistant";
+                parsedProjDesc = "Configured vector stores matching and structured Gemini API request prompts.";
+                keywords = ["FastAPI", "Docker", "SQLModel", "Gemini API"];
+            }
+
+            const analysisData = {
+                score: 78,
+                missingKeywords: keywords,
+                improvements: [
+                    {
+                        originalText: parsedExpDesc,
+                        suggestedText: `Optimized backend workflows using standard tools, reducing resource utilization metrics by 25%.`,
+                        reason: "Uses exact technical stacks and metric goals."
+                    }
+                ]
+            };
+
+            const parsedResume = {
+                title: file.name,
+                theme: "classic",
+                content: {
+                    name: parsedName,
+                    email: parsedEmail,
+                    phone: "+1 (555) 012-3456",
+                    github: "https://github.com/alexsmith",
+                    experienceRole: parsedRole,
+                    experienceDesc: parsedExpDesc,
+                    projectTitle: parsedProjTitle,
+                    projectDesc: parsedProjDesc
+                },
+                analysis_feedback: analysisData
+            };
+            
+            // Save in localStorage
+            localStorage.setItem("campusmate_sandbox_resume", JSON.stringify(parsedResume));
+            localStorage.setItem("campusmate_sandbox_resumescore", 78);
+            localStorage.setItem("campusmate_sandbox_resume_feedback", JSON.stringify(analysisData));
+            
+            response = {
+                success: true,
+                filename: file.name,
+                atsScore: 78,
+                readabilityScore: 85,
+                industryMatchScore: 72,
+                feedback: analysisData
+            };
+
+            currentUser.xp += 50;
+            localStorage.setItem("campusmate_sandbox_user", JSON.stringify(currentUser));
+        } else {
+            response = await API.uploadResumeFile(file);
+        }
+
+        // Fill out inputs
+        statusText.innerHTML = `<span class="text-green"><i class="fa-solid fa-circle-check"></i> "${file.name}" uploaded & parsed successfully!</span>`;
+        
+        // Reload resume view
+        loadResumeView();
+        // Load dashboard stats
+        loadDashboard();
+        
+        alert(`Resume uploaded successfully! ATS Score: ${response.atsScore}%`);
+    } catch (e) {
+        console.error(e);
+        statusText.innerHTML = `<span class="text-red"><i class="fa-solid fa-circle-xmark"></i> Failed to parse file: ${e.message}</span>`;
+    }
 }
