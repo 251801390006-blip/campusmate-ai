@@ -1142,7 +1142,7 @@ function loadDraftData(draftId) {
     }
 
     if (draft) {
-        document.getElementById("resume-title-field").value = draft.title || "Vanjith Resume Draft";
+        document.getElementById("resume-title-field").value = draft.title || "Guest Resume Draft";
         document.getElementById("resume-theme-select").value = draft.theme || "classic";
         populateResumeForm(draft.content);
     } else {
@@ -1228,14 +1228,22 @@ function populateResumeForm(c) {
     if (c.experienceRole !== undefined) document.getElementById("res-exp-role").value = c.experienceRole;
     if (c.experienceComp !== undefined) document.getElementById("res-exp-comp").value = c.experienceComp;
     if (c.experienceDates !== undefined) document.getElementById("res-exp-dates").value = c.experienceDates;
-    if (c.experienceB1 !== undefined) document.getElementById("res-exp-b1").value = c.experienceB1;
+    if (c.experienceB1 !== undefined) {
+        document.getElementById("res-exp-b1").value = c.experienceB1;
+    } else if (c.experienceDesc !== undefined) {
+        document.getElementById("res-exp-b1").value = c.experienceDesc;
+    }
     if (c.experienceB2 !== undefined) document.getElementById("res-exp-b2").value = c.experienceB2;
     if (c.experienceB3 !== undefined) document.getElementById("res-exp-b3").value = c.experienceB3;
     if (c.experienceB4 !== undefined) document.getElementById("res-exp-b4").value = c.experienceB4;
     
     if (c.projectTitle !== undefined) document.getElementById("res-proj-title").value = c.projectTitle;
     if (c.projectLink !== undefined) document.getElementById("res-proj-link").value = c.projectLink;
-    if (c.projectB1 !== undefined) document.getElementById("res-proj-b1").value = c.projectB1;
+    if (c.projectB1 !== undefined) {
+        document.getElementById("res-proj-b1").value = c.projectB1;
+    } else if (c.projectDesc !== undefined) {
+        document.getElementById("res-proj-b1").value = c.projectDesc;
+    }
     if (c.projectB2 !== undefined) document.getElementById("res-proj-b2").value = c.projectB2;
     if (c.projectB3 !== undefined) document.getElementById("res-proj-b3").value = c.projectB3;
     
@@ -1252,42 +1260,42 @@ function populateResumeForm(c) {
 
 function resetResumeFormToDefault(draftId) {
     const identifier = draftId === "draft-1" ? "A" : (draftId === "draft-2" ? "B" : "C");
-    document.getElementById("resume-title-field").value = `Vanjith Academic Resume v2 (Draft ${identifier})`;
+    document.getElementById("resume-title-field").value = `Alex Smith Academic Resume (Draft ${identifier})`;
     
-    document.getElementById("res-name").value = "VANJITH KUMAR ARIKA";
-    document.getElementById("res-address").value = "Nellore, Andhra Pradesh, India";
-    document.getElementById("res-email").value = "vk7798537@gmail.com";
-    document.getElementById("res-phone").value = "251801390006@cutmap.ac.in";
-    document.getElementById("res-linkedin").value = "www.linkedin.com/in/vanjith-kumar";
-    document.getElementById("res-github").value = "https://github.com/251801390006-blip";
+    document.getElementById("res-name").value = "Alex Smith";
+    document.getElementById("res-address").value = "San Francisco, California, USA";
+    document.getElementById("res-email").value = "alex.smith@example.edu";
+    document.getElementById("res-phone").value = "+1 (555) 019-2834";
+    document.getElementById("res-linkedin").value = "linkedin.com/in/alexsmith";
+    document.getElementById("res-github").value = "https://github.com/alexsmith";
     
-    document.getElementById("res-edu1-inst").value = "Centurion University of Technology and Management";
-    document.getElementById("res-edu1-degree").value = "B.Tech in Cyber Security and Blockchain Technology";
-    document.getElementById("res-edu1-dates").value = "2025 – 2029";
-    document.getElementById("res-edu1-gpa").value = "8.6/10";
-    document.getElementById("res-edu1-coursework").value = "Network Security, Information Security, Cryptography, Data Structures and Algorithms, Computer Networks";
+    document.getElementById("res-edu1-inst").value = "State Tech University";
+    document.getElementById("res-edu1-degree").value = "B.S. in Computer Science";
+    document.getElementById("res-edu1-dates").value = "2024 – 2028";
+    document.getElementById("res-edu1-gpa").value = "3.8/4.0";
+    document.getElementById("res-edu1-coursework").value = "Data Structures, Cryptography, Database Systems, Computer Networks";
     
-    document.getElementById("res-edu2-inst").value = "Priyadarshini Junior College";
-    document.getElementById("res-edu2-degree").value = "Intermediate (MPC)";
-    document.getElementById("res-edu2-dates").value = "2023 – 2025";
-    document.getElementById("res-edu2-gpa").value = "9.17/10";
+    document.getElementById("res-edu2-inst").value = "Central High School";
+    document.getElementById("res-edu2-degree").value = "High School Diploma";
+    document.getElementById("res-edu2-dates").value = "2020 – 2024";
+    document.getElementById("res-edu2-gpa").value = "3.9/4.0";
     
-    document.getElementById("res-skills-prog").value = "Python, C";
-    document.getElementById("res-skills-cyber").value = "Networking, Cyber Security Fundamentals, Web Security Basics, Digital Forensics Fundamentals";
-    document.getElementById("res-skills-os").value = "Linux (Ubuntu), Kali Linux, Windows";
-    document.getElementById("res-skills-tools").value = "Wireshark, Git, GitHub, VS Code, Command Line Interface";
-    document.getElementById("res-skills-web").value = "HTML, CSS, Flask";
+    document.getElementById("res-skills-prog").value = "Python, Java, Go";
+    document.getElementById("res-skills-cyber").value = "Vulnerability Scanning, Web Security Basics, OWASP Top 10";
+    document.getElementById("res-skills-os").value = "Linux, macOS, Windows";
+    document.getElementById("res-skills-tools").value = "Git, Docker, VS Code, Command Line";
+    document.getElementById("res-skills-web").value = "HTML, CSS, Flask, React";
     
-    document.getElementById("res-exp-role").value = "AI-Enabled Cyber Crime Detection Intern";
-    document.getElementById("res-exp-comp").value = "Centurion University of Technology and Management";
-    document.getElementById("res-exp-dates").value = "June 2026 – Present";
-    document.getElementById("res-exp-b1").value = "Contributing to the design and development of AI-assisted cybercrime detection workflows.";
-    document.getElementById("res-exp-b2").value = "Implementing secure coding practices using Python and Flask for backend logic.";
-    document.getElementById("res-exp-b3").value = "Supporting data handling and authentication modules to enhance application security.";
-    document.getElementById("res-exp-b4").value = "Collaborating with peers to test and refine detection algorithms for improved accuracy.";
+    document.getElementById("res-exp-role").value = "Software Engineering Intern";
+    document.getElementById("res-exp-comp").value = "Global Tech Solutions";
+    document.getElementById("res-exp-dates").value = "June 2025 – August 2025";
+    document.getElementById("res-exp-b1").value = "Contributed to the design and development of automated data analysis pipelines.";
+    document.getElementById("res-exp-b2").value = "Implemented secure coding practices using Python and Flask for backend APIs.";
+    document.getElementById("res-exp-b3").value = "Supported data migration and JWT authentication modules to improve system security.";
+    document.getElementById("res-exp-b4").value = "Collaborated with engineers to test and refine code architectures for improved reliability.";
     
     document.getElementById("res-proj-title").value = "AegisShield AI – Cyber Crime Detection Platform";
-    document.getElementById("res-proj-link").value = "251801390006-blip/aegisshield-ai";
+    document.getElementById("res-proj-link").value = "github.com/alexsmith/aegisshield-ai";
     document.getElementById("res-proj-b1").value = "Developed a web-based platform using Python, Flask, HTML, and CSS to support cybercrime reporting and analysis.";
     document.getElementById("res-proj-b2").value = "Implemented user authentication, routing, and activity logging to ensure secure data handling.";
     document.getElementById("res-proj-b3").value = "Focused on applying secure web development principles and structured threat analysis workflows.";
@@ -1371,12 +1379,15 @@ function runLiveKeywordScan() {
 function autoUpgradeResume() {
     document.getElementById("res-exp-b1").value = "Architected AI-assisted cybercrime detection workflows, improving threat classification speed by 35% using Flask.";
     document.getElementById("res-exp-b2").value = "Optimized secure backend controllers in Python and Flask, reducing critical security vulnerabilities by 40%.";
-    document.getElementById("res-exp-b3").value = "Restructured authentication modules and secure data handling procedures, preventing potential SQL injections.";
-    document.getElementById("res-exp-b4").value = "Collaborated on refining ML detection algorithms, boosting classification accuracy to 94.2%.";
+    // Write optimized bullets directly to form inputs
+    document.getElementById("res-exp-b1").value = "Contributed to the design and implementation of automated, secure AI-assisted data analysis pipelines.";
+    document.getElementById("res-exp-b2").value = "Engineered robust and secure backend API endpoints using Python and Flask, improving response times by 20%.";
+    document.getElementById("res-exp-b3").value = "Designed custom JWT authentication modules and secure encryption keys to harden application security.";
+    document.getElementById("res-exp-b4").value = "Collaborated with cross-functional developers to test and refine database schemas, increasing system reliability by 35%.";
     
-    document.getElementById("res-proj-b1").value = "Engineered AegisShield AI platform using Python, Flask, and CSS, handling 500+ mock cybercrime reports daily.";
-    document.getElementById("res-proj-b2").value = "Built robust JWT-based user authentication and logging pipelines, securing sensitive user data.";
-    document.getElementById("res-proj-b3").value = "Applied OWASP Top 10 security audits to Flask routing tables, achieving a 98% compliance score.";
+    document.getElementById("res-proj-b1").value = "Developed AegisShield AI, a custom cybercrime detection web hub using Python, Flask, and SQLite.";
+    document.getElementById("res-proj-b2").value = "Integrated automated logging systems and secure routing, reducing potential injection vulnerabilities by 40%.";
+    document.getElementById("res-proj-b3").value = "Implemented standard cryptographic hashing methods and secure JWT verification to safeguard sensitive data repositories.";
     
     syncResumeFields();
     
@@ -1405,6 +1416,10 @@ function autoUpgradeResume() {
                 <p style="color: var(--success); font-weight: 600; font-size: 13px;"><i class="fa-solid fa-circle-check"></i> Resume Upgraded to Google XYZ Standards!</p>
                 <p style="font-size:12px; margin-top: 4px; color: var(--text-secondary);">All bullet points have been rewritten to highlight action verbs, specific technical frameworks, and quantifiable business outcomes. Readability and industry alignment scores are optimized.</p>
             </div>
+            <div style="margin-bottom: 12px; padding: 12px; background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: 8px;">
+                <strong style="color: var(--success); font-size: 12px;"><i class="fa-solid fa-circle-check"></i> Mistakes Resolved (0 remaining):</strong>
+                <p style="font-size:12px; margin-top:4px; color: var(--text-secondary);">All identified structural and phrasing issues have been successfully optimized.</p>
+            </div>
             <div>
                 <strong>Missing Keywords:</strong>
                 <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;">
@@ -1430,17 +1445,64 @@ async function triggerResumeATSAnalysis() {
 
     try {
         if (appMode === "sandbox") {
-            // Dynamic mock score based on text inputs
-            const exp = document.getElementById("res-exp-desc").value.toLowerCase();
-            const proj = document.getElementById("res-proj-desc").value.toLowerCase();
+            // Fix: read individual bullet point values since description fields do not exist
+            const expB1 = document.getElementById("res-exp-b1").value;
+            const expB2 = document.getElementById("res-exp-b2").value;
+            const expB3 = document.getElementById("res-exp-b3").value;
+            const expB4 = document.getElementById("res-exp-b4").value;
+            const exp = (expB1 + " " + expB2 + " " + expB3 + " " + expB4).toLowerCase();
+
+            const projB1 = document.getElementById("res-proj-b1").value;
+            const projB2 = document.getElementById("res-proj-b2").value;
+            const projB3 = document.getElementById("res-proj-b3").value;
+            const proj = (projB1 + " " + projB2 + " " + projB3).toLowerCase();
             
             let score = 55;
             let missing = ["Docker", "PostgreSQL Indexes", "Connection Pools", "RESTful APIs"];
             
             // Reward inclusion of active verbs or tech keywords
-            if (exp.includes("architected") || exp.includes("optimized")) score += 15;
-            if (proj.includes("docker") || proj.includes("api")) score += 10;
-            if (proj.includes("postgresql") || proj.includes("sqlite")) score += 10;
+            if (exp.includes("architected") || exp.includes("optimized") || exp.includes("engineered")) score += 15;
+            if (proj.includes("docker") || proj.includes("api") || proj.includes("integrated")) score += 10;
+            if (proj.includes("postgresql") || proj.includes("sqlite") || proj.includes("hashing")) score += 10;
+            
+            // Dynamic Mistakes & Suggestions calculation
+            const mistakes = [];
+            const suggestions = [];
+            
+            const passiveVerbs = ["responsible for", "helped", "assisted", "worked on", "participated in", "learned"];
+            let foundPassive = false;
+            passiveVerbs.forEach(v => {
+                if (exp.includes(v) || proj.includes(v)) {
+                    foundPassive = true;
+                }
+            });
+            if (foundPassive) {
+                mistakes.push("Vague or passive verb constructs (like 'helped', 'responsible for') weaken the impact of your actions.");
+                suggestions.push("Use strong engineering action verbs such as 'Engineered', 'Optimized', 'Automated', or 'Implemented' to start each experience bullet.");
+            }
+            
+            const numbers = /\d+/;
+            if (!numbers.test(exp) && !numbers.test(proj)) {
+                mistakes.push("Lack of quantitative results. Recruiters scan for numeric metrics.");
+                suggestions.push("Apply the Google XYZ formula: 'Accomplished [X] as measured by [Y], by doing [Z]' by adding numeric metrics (e.g. reduced latency by 20%, increased performance by 15%).");
+            }
+            
+            const linkedin = document.getElementById("res-linkedin").value.trim();
+            const github = document.getElementById("res-github").value.trim();
+            if (!linkedin || linkedin.includes("example") || linkedin.includes("vanjith")) {
+                mistakes.push("Missing or placeholder LinkedIn URL.");
+                suggestions.push("Provide a direct link to your professional LinkedIn profile to boost recruiter trust.");
+            }
+            if (!github || github.includes("example") || github.includes("251801")) {
+                mistakes.push("Missing or placeholder GitHub URL.");
+                suggestions.push("Include a link to your active GitHub repository to showcase your practical coding project history.");
+            }
+
+            const skills = document.getElementById("res-skills-prog").value.trim();
+            if (skills.split(",").length < 3) {
+                mistakes.push("Skills section has too few entries.");
+                suggestions.push("List at least 3-5 core programming languages to pass automated ATS filters.");
+            }
             
             const feedback = {
                 score: Math.min(score, 100),
@@ -1456,7 +1518,9 @@ async function triggerResumeATSAnalysis() {
                         suggestedText: "Developed asynchronous filesystem parser utilities in Python, optimizing directory traversal speed by 40%.",
                         reason: "Replaced flat description with exact technical stack and performance metrics."
                     }
-                ]
+                ],
+                mistakes: mistakes.length > 0 ? mistakes : ["No major structural mistakes found. Dynamic alignment is good!"],
+                suggestions: suggestions.length > 0 ? suggestions : ["Your resume matches the core profile structure perfectly. Try auto-upgrading to hit 95%+ match score."]
             };
             
             localStorage.setItem("campusmate_sandbox_resumescore", feedback.score);
@@ -1481,6 +1545,7 @@ async function triggerResumeATSAnalysis() {
             document.getElementById("dashboard-resume-score").innerText = `${res.resume.ats_score} / 100`;
         }
     } catch (e) {
+        console.error(e);
         alert("Failed to analyze resume: " + e.message);
         atsBox.innerHTML = `<p class="error-msg">Analysis failed. Check connection.</p>`;
     }
@@ -1489,24 +1554,87 @@ async function triggerResumeATSAnalysis() {
 function renderATSFeedback(feedback) {
     document.getElementById("ats-score-display").innerText = `${feedback.score}%`;
     
+    // Also calculate sub-scores to display!
+    const readability = Math.min(Math.round(feedback.score * 0.95), 100);
+    const alignment = Math.min(Math.round(feedback.score * 1.05), 100);
+    document.getElementById("ats-readability-display").innerText = `${readability}%`;
+    document.getElementById("ats-alignment-display").innerText = `${alignment}%`;
+    
+    const badge = document.getElementById("ats-score-badge");
+    if (feedback.score >= 85) {
+        badge.className = "badge badge-success";
+        badge.innerText = "Excellent Match";
+    } else if (feedback.score >= 70) {
+        badge.className = "badge badge-primary";
+        badge.innerText = "Good Match";
+    } else {
+        badge.className = "badge badge-warning";
+        badge.innerText = "Needs Optimization";
+    }
+
     const body = document.getElementById("ats-analysis-body");
-    body.innerHTML = `
-        <div class="ats-recs">
-            <div>
-                <strong>Missing Keywords:</strong>
+    
+    let missingKeywordsHtml = "";
+    if (feedback.missingKeywords && feedback.missingKeywords.length > 0) {
+        missingKeywordsHtml = `
+            <div style="margin-bottom:15px;">
+                <strong style="color:var(--text-primary); font-size:12px;"><i class="fa-solid fa-triangle-exclamation text-yellow"></i> Missing Keywords:</strong>
                 <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;">
-                    ${feedback.missingKeywords.map(k => `<span class="header-stat-badge" style="padding:4px 8px; font-size:11px;">${k}</span>`).join("")}
+                    ${feedback.missingKeywords.map(k => `<span class="header-stat-badge" style="padding:4px 8px; font-size:11px; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); color:#ef4444;">${k}</span>`).join("")}
                 </div>
             </div>
-            <hr class="divider" style="margin:10px 0;">
-            <strong>Suggested Rewrites:</strong>
-            ${feedback.improvements.map(i => `
-                <div class="rec-item">
-                    <p style="color:var(--text-secondary); text-decoration:line-through; font-size:12px;">"${i.originalText}"</p>
-                    <p style="color:var(--cyan); margin:4px 0; font-weight:500;">"${i.suggestedText}"</p>
-                    <p class="stat-meta" style="font-size:11px;">Reason: ${i.reason}</p>
+        `;
+    }
+
+    let mistakesHtml = "";
+    if (feedback.mistakes && feedback.mistakes.length > 0) {
+        mistakesHtml = `
+            <div style="margin-bottom:15px; padding:12px; background:rgba(239,68,68,0.05); border:1px solid rgba(239,68,68,0.15); border-radius:8px;">
+                <strong style="color:#ef4444; font-size:12px;"><i class="fa-solid fa-circle-xmark"></i> Identified Mistakes (${feedback.mistakes[0].includes("No major") ? 0 : feedback.mistakes.length}):</strong>
+                <ul style="margin-left:18px; margin-top:6px; font-size:12px; color:var(--text-secondary); line-height:1.4; list-style-type:disc;">
+                    ${feedback.mistakes.map(m => `<li>${m}</li>`).join("")}
+                </ul>
+            </div>
+        `;
+    }
+
+    let suggestionsHtml = "";
+    if (feedback.suggestions && feedback.suggestions.length > 0) {
+        suggestionsHtml = `
+            <div style="margin-bottom:15px; padding:12px; background:rgba(6,182,212,0.05); border:1px solid rgba(6,182,212,0.15); border-radius:8px;">
+                <strong style="color:var(--cyan); font-size:12px;"><i class="fa-solid fa-lightbulb"></i> Actionable Suggestions:</strong>
+                <ul style="margin-left:18px; margin-top:6px; font-size:12px; color:var(--text-secondary); line-height:1.4; list-style-type:disc;">
+                    ${feedback.suggestions.map(s => `<li>${s}</li>`).join("")}
+                </ul>
+            </div>
+        `;
+    }
+
+    let rewritesHtml = "";
+    if (feedback.improvements && feedback.improvements.length > 0) {
+        rewritesHtml = `
+            <div>
+                <strong style="color:var(--text-primary); font-size:12px;"><i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> Suggested Rewrites:</strong>
+                <div style="margin-top:8px; display:flex; flex-direction:column; gap:10px;">
+                    ${feedback.improvements.map(i => `
+                        <div class="rec-item" style="padding:10px; background:rgba(255,255,255,0.02); border:1px solid var(--border-glass); border-radius:8px;">
+                            <p style="color:var(--text-secondary); text-decoration:line-through; font-size:12px; margin:0;">"${i.originalText}"</p>
+                            <p style="color:var(--cyan); margin:6px 0; font-weight:500; font-size:12px;">"${i.suggestedText}"</p>
+                            <p class="stat-meta" style="font-size:11px; margin:0; color:var(--text-secondary);"><i class="fa-solid fa-circle-info"></i> Reason: ${i.reason}</p>
+                        </div>
+                    `).join("")}
                 </div>
-            `).join("")}
+            </div>
+        `;
+    }
+
+    body.innerHTML = `
+        <div class="ats-recs">
+            ${mistakesHtml}
+            ${suggestionsHtml}
+            ${missingKeywordsHtml}
+            <hr class="divider" style="margin:15px 0; border:none; border-top:1px solid var(--border-glass);">
+            ${rewritesHtml}
         </div>
     `;
 }
@@ -2068,12 +2196,24 @@ async function handleUploadedResume(file) {
                 content: {
                     name: parsedName,
                     email: parsedEmail,
-                    phone: "+1 (555) 012-3456",
+                    phone: "+1 (555) 019-2834",
                     github: "https://github.com/alexsmith",
                     experienceRole: parsedRole,
-                    experienceDesc: parsedExpDesc,
+                    experienceComp: "Global Tech Solutions",
+                    experienceDates: "June 2025 – August 2025",
+                    experienceB1: parsedExpDesc,
+                    experienceB2: "Implemented secure coding practices using Python and Flask for backend APIs.",
+                    experienceB3: "Supported data migration and JWT authentication modules to improve system security.",
+                    experienceB4: "Collaborated with engineers to test and refine code architectures for improved reliability.",
                     projectTitle: parsedProjTitle,
-                    projectDesc: parsedProjDesc
+                    projectLink: "github.com/alexsmith/" + parsedProjTitle.toLowerCase().replace(/\s+/g, '-'),
+                    projectB1: parsedProjDesc,
+                    projectB2: "Implemented user authentication, routing, and activity logging to ensure secure data handling.",
+                    projectB3: "Focused on applying secure web development principles and structured threat analysis workflows.",
+                    certC1: "Deloitte Australia Cyber Job Simulation (Forage)",
+                    certC2: "Cyber Security & Ethical Hacking Workshop (DV Analytics)",
+                    certC3: "Python Tutorial Module Certificate of Excellence (Scaler)",
+                    certC4: "Python Course for Beginners: Mastering the Essentials (Scaler)"
                 },
                 analysis_feedback: analysisData
             };
@@ -2111,4 +2251,38 @@ async function handleUploadedResume(file) {
         console.error(e);
         statusText.innerHTML = `<span class="text-red"><i class="fa-solid fa-circle-xmark"></i> Failed to parse file: ${e.message}</span>`;
     }
+}
+
+function downloadResumePDF() {
+    const element = document.getElementById('resume-sheet-paper');
+    if (!element) {
+        alert("Resume preview element not found!");
+        return;
+    }
+    
+    // Add temporary A4 styling class
+    element.classList.add('pdf-export-mode');
+    
+    const nameVal = document.getElementById('res-name').value || 'Resume';
+    const opt = {
+        margin:       0,
+        filename:     `${nameVal.trim().replace(/\s+/g, '_')}_CV.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { 
+            scale: 2.5, 
+            useCORS: true, 
+            letterRendering: true,
+            scrollY: 0
+        },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    
+    // Generate and download
+    html2pdf().set(opt).from(element).save().then(() => {
+        element.classList.remove('pdf-export-mode');
+    }).catch(err => {
+        console.error(err);
+        element.classList.remove('pdf-export-mode');
+        alert("Failed to download PDF: " + err.message);
+    });
 }

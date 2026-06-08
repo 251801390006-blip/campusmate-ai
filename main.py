@@ -564,7 +564,7 @@ def analyze_resume(
         raise HTTPException(status_code=400, detail="Please create and save a resume first before running analysis.")
         
     system_prompt = "You are an elite ATS resume parser. Output strictly in JSON format. Do not include markdown tags."
-    user_prompt = f"Analyze this resume JSON: {resume.content} against target job description: '{data.targetJobDescription}'. Return a JSON with: 'score' (0-100), 'missingKeywords' (list of missing skills), 'improvements' (list of {{'originalText', 'suggestedText', 'reason'}})."
+    user_prompt = f"Analyze this resume JSON: {resume.content} against target job description: '{data.targetJobDescription}'. Return a JSON with: 'score' (0-100), 'missingKeywords' (list of missing skills), 'improvements' (list of {{'originalText', 'suggestedText', 'reason'}}), 'mistakes' (list of strings explaining exact mistakes in formatting or phrasing found), and 'suggestions' (list of strings representing actionable tips to fix those mistakes)."
     
     raw_response = call_gemini(system_prompt, user_prompt)
     
@@ -605,6 +605,16 @@ def analyze_resume(
                     "suggestedText": "Collaborated with cross-functional developers to implement glassmorphic custom layout panels, increasing user engagement levels by 30%.",
                     "reason": "Weak verb definition. Replaced with active verbs and quantified engagement levels."
                 }
+            ],
+            "mistakes": [
+                "Vague/passive verb constructs used in experience description (e.g., 'Responsible for', 'Helped').",
+                "Lack of quantitative outcomes/metrics to prove efficiency gains.",
+                "Portfolio link references are missing complete domain paths."
+            ],
+            "suggestions": [
+                "Replace passive phrases with strong engineering action verbs like 'Engineered', 'Optimized', or 'Automated'.",
+                "Apply the Google XYZ formula to quantify your achievements (e.g., 'increased throughput by X%').",
+                "Format technical skills into distinct, scan-friendly categories."
             ]
         }
 
@@ -679,12 +689,24 @@ def upload_resume(
             content={
                 "name": user.email.split("@")[0].capitalize(),
                 "email": user.email,
-                "phone": "+1 (555) 012-3456",
-                "github": "https://github.com/",
-                "experienceRole": "System Architect",
-                "experienceDesc": "Worked on local database scripts.",
-                "projectTitle": "CampusMate OS",
-                "projectDesc": "Building educational applications."
+                "phone": "+1 (555) 019-2834",
+                "github": "https://github.com/alexsmith",
+                "experienceRole": "Software Engineering Intern",
+                "experienceComp": "Global Tech Solutions",
+                "experienceDates": "June 2025 – August 2025",
+                "experienceB1": "Contributed to the design and development of automated data analysis pipelines.",
+                "experienceB2": "Implemented secure coding practices using Python and Flask for backend APIs.",
+                "experienceB3": "Supported data migration and JWT authentication modules to improve system security.",
+                "experienceB4": "Collaborated with engineers to test and refine code architectures for improved reliability.",
+                "projectTitle": "AegisShield AI – Cyber Crime Detection Platform",
+                "projectLink": "github.com/alexsmith/aegisshield-ai",
+                "projectB1": "Developed a web-based platform using Python, Flask, HTML, and CSS to support cybercrime reporting and analysis.",
+                "projectB2": "Implemented user authentication, routing, and activity logging to ensure secure data handling.",
+                "projectB3": "Focused on applying secure web development principles and structured threat analysis workflows.",
+                "certC1": "Deloitte Australia Cyber Job Simulation (Forage)",
+                "certC2": "Cyber Security & Ethical Hacking Workshop (DV Analytics)",
+                "certC3": "Python Tutorial Module Certificate of Excellence (Scaler)",
+                "certC4": "Python Course for Beginners: Mastering the Essentials (Scaler)"
             },
             analysis_feedback=analysis_data
         )

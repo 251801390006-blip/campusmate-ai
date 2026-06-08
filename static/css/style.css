@@ -102,15 +102,19 @@ body::-webkit-scrollbar-thumb {
     border-radius: 16px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 
                 0 2px 4px -1px rgba(0, 0, 0, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.05); /* 3D bevel edge */
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: perspective(1000px) translateZ(0);
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translate3d(0, 0, 0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 .glass-card:hover {
-    transform: perspective(1000px) translateY(-5px) translateZ(15px);
+    transform: translate3d(0, -5px, 0);
     border-color: var(--border-active);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 
-                0 10px 10px -5px rgba(0, 0, 0, 0.3),
+    box-shadow: 0 15px 20px -5px rgba(0, 0, 0, 0.4), 
+                0 8px 8px -5px rgba(0, 0, 0, 0.3),
                 inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
@@ -813,6 +817,10 @@ body::-webkit-scrollbar-thumb {
     gap: 15px;
     cursor: pointer;
     position: relative;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    transform: translate3d(0, 0, 0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 .roadmap-node-badge::after {
     content: '';
@@ -857,7 +865,7 @@ body::-webkit-scrollbar-thumb {
     color: var(--text-primary);
 }
 .roadmap-node-badge.AVAILABLE:hover {
-    transform: scale(1.02);
+    transform: translate3d(0, -2px, 0);
     box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
 }
 
@@ -872,7 +880,7 @@ body::-webkit-scrollbar-thumb {
     border: 1px solid var(--cyan);
 }
 .roadmap-node-badge.IN_PROGRESS:hover {
-    transform: scale(1.02);
+    transform: translate3d(0, -2px, 0);
 }
 
 .roadmap-node-badge.COMPLETED {
@@ -884,7 +892,7 @@ body::-webkit-scrollbar-thumb {
     border: 1px solid var(--green);
 }
 .roadmap-node-badge.COMPLETED:hover {
-    transform: scale(1.02);
+    transform: translate3d(0, -2px, 0);
     box-shadow: 0 4px 20px var(--green-glow);
 }
 
@@ -1026,6 +1034,21 @@ body::-webkit-scrollbar-thumb {
     font-size: 13px;
     line-height: 1.5;
     transition: all 0.3s ease;
+}
+
+/* Force PDF A4 single page constraints */
+.resume-sheet.pdf-export-mode {
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    width: 210mm !important;
+    height: 297mm !important;
+    min-height: 297mm !important;
+    max-height: 297mm !important;
+    padding: 18mm !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
 }
 
 .resume-render-header h1 {
