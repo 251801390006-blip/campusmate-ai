@@ -629,6 +629,12 @@ function navigateToTab(tabName) {
             view.classList.remove("active-view");
         }
     });
+
+    // Scroll workspace back to top on tab switch
+    const workspaceEl = document.querySelector(".workspace");
+    if (workspaceEl) {
+        workspaceEl.scrollTop = 0;
+    }
 }
 
 // --- LOAD DASHBOARD DETAILS ---
@@ -658,6 +664,13 @@ async function loadDashboard() {
             const progress = nodes.length > 0 ? Math.round((completedCount / nodes.length) * 100) : 0;
             const nextNode = nodes.find(n => n.status === "AVAILABLE" || n.status === "IN_PROGRESS");
             
+            let certsCount = 0;
+            nodes.forEach(n => {
+                if (n.status !== "COMPLETED" && n.certifications) {
+                    certsCount += n.certifications.length;
+                }
+            });
+            
             stats = {
                 fullName: currentUser.fullName,
                 streak: currentUser.streak,
@@ -668,6 +681,7 @@ async function loadDashboard() {
                 resumeScore: parseInt(resumeScore),
                 readabilityScore: readabilityScore,
                 industryMatchScore: industryMatchScore,
+                certsCount: certsCount,
                 learningHours: 14
             };
         } else {
@@ -682,8 +696,16 @@ async function loadDashboard() {
         
         const readWidget = document.getElementById("dashboard-readability-score");
         if (readWidget) readWidget.innerText = `${stats.readabilityScore || 0}%`;
+        const readBar = document.getElementById("dashboard-readability-bar");
+        if (readBar) readBar.style.width = `${stats.readabilityScore || 0}%`;
+
         const indWidget = document.getElementById("dashboard-industry-score");
         if (indWidget) indWidget.innerText = `${stats.industryMatchScore || 0}%`;
+        const indBar = document.getElementById("dashboard-industry-bar");
+        if (indBar) indBar.style.width = `${stats.industryMatchScore || 0}%`;
+
+        const certsWidget = document.getElementById("dashboard-certs-count");
+        if (certsWidget) certsWidget.innerText = stats.certsCount || 0;
 
         document.getElementById("streak-counter").innerText = stats.streak;
         document.getElementById("xp-counter").innerText = stats.xp;
