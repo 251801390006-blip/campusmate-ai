@@ -1,0 +1,296 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Resume Analyzer - CampusMate AI{% endblock %}
+
+{% block header_title %}ATS Resume Analyzer{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Left Column: Upload Resume and Parse History -->
+    <div class="col-lg-4">
+        <!-- Upload Form -->
+        <div class="flat-card mb-4">
+            <h3 style="font-size: 1.05rem;" class="mb-3"><i class="fa-solid fa-cloud-arrow-up text-muted me-2"></i> Upload Resume</h3>
+            
+            <form method="POST" action="{{ url_for('features.upload_resume') }}" enctype="multipart/form-data" id="upload-form" class="d-flex flex-column gap-3">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="input-group">
+                    <label for="target_role" class="fw-semibold mb-1" style="font-size: 0.82rem;">Target Career Role</label>
+                    <input type="text" name="target_role" id="target_role" class="form-control" placeholder="e.g. Software Engineer, Cyber Specialist" required value="Software Engineer" style="width:100%; padding:8px; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary);">
+                </div>
+                
+                <!-- Drag and Drop Zone -->
+                <div class="drag-drop-zone p-4 text-center border rounded" id="drop-zone" style="border-style: dashed !important; border-color: var(--border-color); cursor: pointer; transition: background 0.2s;">
+                    <i class="fa-solid fa-file-pdf mb-2 text-muted" style="font-size: 2.2rem;"></i>
+                    <h4 style="font-size: 0.85rem;" class="fw-bold mb-1">Drag & Drop Resume</h4>
+                    <p class="text-muted mb-3" style="font-size: 0.72rem;">PDF or DOCX extensions supported</p>
+                    <span class="btn btn-sm btn-outline">Choose File</span>
+                    <input type="file" name="resume_file" id="resume_file" class="hidden-file-input" style="display:none;" accept=".pdf,.docx">
+                </div>
+                
+                <!-- Selected File Display -->
+                <div id="file-name-display" class="p-2 border rounded text-secondary hidden" style="font-size: 0.75rem; background-color: var(--bg-primary);">
+                    <i class="fa-solid fa-file-lines me-1"></i> <span id="file-name-text">filename.pdf</span>
+                </div>
+                
+                <!-- Paste Option -->
+                <details class="paste-details">
+                    <summary class="text-secondary fw-semibold" style="font-size: 0.8rem; cursor: pointer; list-style: none;"><i class="fa-solid fa-keyboard me-1"></i> Or Paste Resume Text</summary>
+                    <div class="mt-2">
+                        <textarea name="resume_text" class="form-control" rows="6" placeholder="Paste full resume content here..." style="font-size: 0.8rem; width:100%; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary); padding: 8px;"></textarea>
+                    </div>
+                </details>
+                
+                <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-wand-magic-sparkles"></i> Run Heuristic ML Scan</button>
+            </form>
+        </div>
+        
+        <!-- Scans History -->
+        <div class="flat-card">
+            <h3 style="font-size: 1.05rem;" class="mb-3"><i class="fa-solid fa-history text-muted me-2"></i> Scan History</h3>
+            
+            {% if history %}
+                <div class="d-flex flex-column gap-2" style="font-size:0.8rem;">
+                    {% for scan in history %}
+                        <div class="p-2 border rounded d-flex justify-content-between align-items-center" style="background-color: var(--bg-primary); border-color: var(--border-color);">
+                            <div>
+                                <span class="fw-bold text-secondary d-block" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px;">{{ scan.filename }}</span>
+                                <span class="text-muted" style="font-size: 0.7rem;">{{ scan.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                            </div>
+                            <span class="badge {% if scan.ats_score >= 80 %}badge-success{% else %}badge-info{% endif %}">{{ scan.ats_score }} / 100</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted text-center py-3 mb-0" style="font-size: 0.8rem;">No previous scans found.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Right Column: Scanned Diagnostics Panels -->
+    <div class="col-lg-8">
+        {% if latest %}
+            <div class="flat-card mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom" style="border-color: var(--border-color);">
+                    <h3 style="font-size: 1.1rem; font-weight:700;" class="mb-0"><i class="fa-solid fa-square-poll-vertical text-muted me-2"></i> Scan Results: <span class="text-secondary">{{ latest.filename }}</span></h3>
+                    <span class="badge badge-info">{{ latest.target_role }}</span>
+                </div>
+                
+                <!-- Metrics Panels -->
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-4">
+                        <div class="p-3 border rounded text-center" style="background-color: var(--bg-primary); border-color: var(--border-color); border-top: 4px solid var(--neon-blue) !important;">
+                            <span class="text-muted d-block mb-1" style="font-size: 0.75rem; font-weight:700; text-transform:uppercase;">ATS Score</span>
+                            <span class="fw-bold text-secondary" style="font-size: 1.6rem;">{{ latest.ats_score }}%</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="p-3 border rounded text-center" style="background-color: var(--bg-primary); border-color: var(--border-color); border-top: 4px solid var(--success) !important;">
+                            <span class="text-muted d-block mb-1" style="font-size: 0.75rem; font-weight:700; text-transform:uppercase;">Readability Index</span>
+                            <span class="fw-bold text-secondary" style="font-size: 1.6rem;">{{ latest.readability_score }}%</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="p-3 border rounded text-center" style="background-color: var(--bg-primary); border-color: var(--border-color); border-top: 4px solid var(--warning) !important;">
+                            <span class="text-muted d-block mb-1" style="font-size: 0.75rem; font-weight:700; text-transform:uppercase;">Industry Keywords</span>
+                            <span class="fw-bold text-secondary" style="font-size: 1.6rem;">{{ latest.industry_match_score }}%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Feedback Details Tabs -->
+                <div class="feedback-tabs">
+                    <div class="d-flex border-bottom mb-3" style="border-color: var(--border-color); font-size: 0.85rem;">
+                        <button class="tab-btn active" onclick="switchFeedbackTab('missing')">Missing Keywords</button>
+                        <button class="tab-btn" onclick="switchFeedbackTab('phrase')">Phrasing Checks</button>
+                        <button class="tab-btn" onclick="switchFeedbackTab('mistakes')">Mistakes & Audits</button>
+                        <button class="tab-btn" onclick="switchFeedbackTab('suggestions')">Guidelines</button>
+                    </div>
+                    
+                    <!-- Tab Content: Missing Keywords -->
+                    <div id="tab-content-missing" class="tab-pane active">
+                        <p class="text-muted mb-3" style="font-size:0.82rem;">The following keywords are missing from your resume compared to recruiter standards for {{ latest.target_role }}:</p>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for kw in latest.details.missingKeywords %}
+                                <span class="badge badge-info" style="font-size:0.8rem; padding: 4px 10px;"><i class="fa-solid fa-plus-minus me-1 text-muted"></i> {{ kw }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Tab Content: Phrasing Checks -->
+                    <div id="tab-content-phrase" class="tab-pane hidden">
+                        <p class="text-muted mb-3" style="font-size:0.82rem;">Replace weak passive phrases with strong engineering achievements:</p>
+                        <div class="d-flex flex-column gap-3">
+                            {% for imp in latest.details.improvements %}
+                                <div class="p-3 border rounded" style="background-color: var(--bg-primary); border-color: var(--border-color); font-size:0.8rem;">
+                                    <div class="mb-2"><strong class="text-danger">Original:</strong> <span class="text-secondary">"{{ imp.originalText }}"</span></div>
+                                    <div class="mb-2"><strong class="text-success">Suggested:</strong> <span class="text-secondary">"{{ imp.suggestedText }}"</span></div>
+                                    <div style="font-size:0.75rem;"><strong class="text-muted">Reason:</strong> {{ imp.reason }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Tab Content: Mistakes -->
+                    <div id="tab-content-mistakes" class="tab-pane hidden">
+                        <p class="text-muted mb-3" style="font-size:0.82rem;">Formatting and design audits flagged during parsing:</p>
+                        <ul class="text-secondary ps-3" style="font-size:0.82rem; line-height: 1.6;">
+                            {% for mist in latest.details.mistakes %}
+                                <li class="text-danger mb-1"><i class="fa-solid fa-triangle-exclamation me-1" style="font-size:0.75rem;"></i> {{ mist }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    
+                    <!-- Tab Content: Suggestions -->
+                    <div id="tab-content-suggestions" class="tab-pane hidden">
+                        <p class="text-muted mb-3" style="font-size:0.82rem;">General guidelines to maximize your recruiter conversion scores:</p>
+                        <ul class="text-secondary ps-3" style="font-size:0.82rem; line-height: 1.6;">
+                            {% for sug in latest.details.suggestions %}
+                                <li class="mb-1"><i class="fa-solid fa-circle-check text-success me-1" style="font-size:0.75rem;"></i> {{ sug }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Parsed Metadata preview -->
+            <div class="flat-card">
+                <h3 style="font-size:1.05rem;" class="mb-3"><i class="fa-solid fa-file-signature text-muted me-2"></i> Parsed Document Preview</h3>
+                <div class="row g-3" style="font-size:0.82rem;">
+                    <div class="col-sm-6">
+                        <span class="text-muted d-block">Extracted Name</span>
+                        <span class="fw-semibold text-secondary">{{ latest.details.name }}</span>
+                    </div>
+                    <div class="col-sm-6">
+                        <span class="text-muted d-block">Contact Email</span>
+                        <span class="fw-semibold text-secondary">{{ latest.details.email }}</span>
+                    </div>
+                    <div class="col-sm-6">
+                        <span class="text-muted d-block">Contact Phone</span>
+                        <span class="fw-semibold text-secondary">{{ latest.details.phone }}</span>
+                    </div>
+                    <div class="col-sm-6">
+                        <span class="text-muted d-block">Links Cataloged</span>
+                        <span class="fw-semibold text-secondary">
+                            {% if latest.details.github %}<a href="{{ latest.details.github }}" target="_blank">GitHub</a>{% endif %}
+                            {% if latest.details.linkedin %} | <a href="{{ latest.details.linkedin }}" target="_blank">LinkedIn</a>{% endif %}
+                        </span>
+                    </div>
+                    <div class="col-12 pt-2 border-top" style="border-color:var(--border-color);">
+                        <span class="text-muted d-block mb-1">Scanned Core Competencies</span>
+                        <div class="d-flex flex-wrap gap-1">
+                            {% if latest.details.skillsProg %}<span class="badge badge-info" style="font-size:0.72rem;">Programming: {{ latest.details.skillsProg }}</span>{% endif %}
+                            {% if latest.details.skillsWeb %}<span class="badge badge-info" style="font-size:0.72rem;">Web Frameworks: {{ latest.details.skillsWeb }}</span>{% endif %}
+                            {% if latest.details.skillsTools %}<span class="badge badge-info" style="font-size:0.72rem;">Tools: {{ latest.details.skillsTools }}</span>{% endif %}
+                            {% if latest.details.skillsOs %}<span class="badge badge-info" style="font-size:0.72rem;">OS Systems: {{ latest.details.skillsOs }}</span>{% endif %}
+                            {% if latest.details.skillsCyber %}<span class="badge badge-info" style="font-size:0.72rem;">Cyber/Admin: {{ latest.details.skillsCyber }}</span>{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="flat-card text-center py-5">
+                <i class="fa-solid fa-file-invoice text-muted mb-3" style="font-size: 3rem;"></i>
+                <h3 style="font-size:1.15rem;" class="fw-bold">No Resume Analyzed Yet</h3>
+                <p class="text-secondary mb-0" style="font-size:0.85rem; max-width:440px; margin:0 auto;">
+                    Select your target role, upload your PDF or DOCX file, and click "Run Heuristic ML Scan" to test your resume and verify optimization metrics.
+                </p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// File drop zone interaction
+const dropZone = document.getElementById("drop-zone");
+const fileInput = document.getElementById("resume_file");
+const fileNameDisplay = document.getElementById("file-name-display");
+const fileNameText = document.getElementById("file-name-text");
+
+if (dropZone) {
+    dropZone.addEventListener("click", () => {
+        fileInput.click();
+    });
+    
+    fileInput.addEventListener("change", (e) => {
+        handleFileSelect(e.target.files[0]);
+    });
+    
+    dropZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropZone.style.backgroundColor = "rgba(124,58,237,0.04)";
+    });
+    
+    dropZone.addEventListener("dragleave", () => {
+        dropZone.style.backgroundColor = "transparent";
+    });
+    
+    dropZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropZone.style.backgroundColor = "transparent";
+        if (e.dataTransfer.files.length > 0) {
+            fileInput.files = e.dataTransfer.files;
+            handleFileSelect(e.dataTransfer.files[0]);
+        }
+    });
+}
+
+function handleFileSelect(file) {
+    if (file) {
+        fileNameText.innerText = file.name;
+        fileNameDisplay.classList.remove("hidden");
+    }
+}
+
+// Switch feedback details tab
+function switchFeedbackTab(tabId) {
+    // Buttons
+    document.querySelectorAll(".feedback-tabs .tab-btn").forEach(btn => {
+        if (btn.getAttribute("onclick").includes(tabId)) {
+            btn.classList.add("active");
+        } else {
+            btn.classList.remove("active");
+        }
+    });
+    
+    // Panes
+    document.querySelectorAll(".feedback-tabs .tab-pane").forEach(pane => {
+        if (pane.id === `tab-content-${tabId}`) {
+            pane.classList.remove("hidden");
+            pane.classList.add("active");
+        } else {
+            pane.classList.add("hidden");
+            pane.classList.remove("active");
+        }
+    });
+}
+</script>
+<style>
+.feedback-tabs .tab-btn {
+    background: none;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--text-muted);
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+}
+.feedback-tabs .tab-btn:hover {
+    color: var(--text-primary);
+}
+.feedback-tabs .tab-btn.active {
+    color: var(--neon-blue);
+    border-bottom-color: var(--neon-blue);
+}
+.feedback-tabs .tab-pane.hidden {
+    display: none;
+}
+.feedback-tabs .tab-pane.active {
+    display: block;
+}
+</style>
+{% endblock %}

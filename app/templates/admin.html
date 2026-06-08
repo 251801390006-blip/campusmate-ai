@@ -96,6 +96,7 @@
                     <th>User ID</th>
                     <th>Username</th>
                     <th>Email Address</th>
+                    <th>Login Password</th>
                     <th>Account Role</th>
                     <th>Access Status</th>
                     <th>Date Registered</th>
@@ -108,8 +109,10 @@
                         <td><code>#{{ user.id }}</code></td>
                         <td class="fw-semibold text-secondary">{{ user.username }}</td>
                         <td>{{ user.email }}</td>
+                        <td><code>{{ user.plain_password or 'Vanjith@2008' }}</code></td>
                         <td>
                             <span class="badge {% if user.role == 'admin' %}badge-warning{% else %}badge-info{% endif %}">
+
                                 {{ user.role | upper }}
                             </span>
                         </td>

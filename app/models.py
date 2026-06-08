@@ -16,6 +16,7 @@ class User(db.Model, UserMixin):
     is_active = db.Column(db.Boolean, default=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     last_login = db.Column(db.DateTime, nullable=True)
+    plain_password = db.Column(db.String(255), nullable=True)
     
     # Relationships
     feedback_items = db.relationship('FeedbackItem', backref='author', lazy=True, cascade="all, delete-orphan")
@@ -23,6 +24,7 @@ class User(db.Model, UserMixin):
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
+        self.plain_password = password
         
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
@@ -50,3 +52,35 @@ class FeedbackReply(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+class ChatMessage(db.Model):
+    __tablename__ = 'chat_messages'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    sender = db.Column(db.String(10), nullable=False) # 'user' or 'ai'
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+class ResumeAnalysis(db.Model):
+    __tablename__ = 'resume_analyses'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    filename = db.Column(db.String(150), nullable=False)
+    ats_score = db.Column(db.Integer, nullable=False)
+    readability_score = db.Column(db.Integer, nullable=False)
+    industry_match_score = db.Column(db.Integer, nullable=False)
+    target_role = db.Column(db.String(100), nullable=True)
+    analysis_json = db.Column(db.Text, nullable=False) # Serialized JSON of keywords, mistakes, improvements
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+class RoadmapProgress(db.Model):
+    __tablename__ = 'roadmap_progress'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    role = db.Column(db.String(100), nullable=False) # e.g. 'Cyber Security'
+    completed_nodes = db.Column(db.Text, default="") # Comma-separated node indices, e.g. "1,2,5"
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+

@@ -46,11 +46,14 @@ def create_app():
     from app.routes.admin import admin_bp
     from app.routes.feedback import feedback_bp
     from app.routes.dashboard import dashboard_bp
+    from app.routes.features import features_bp
     
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(admin_bp)
     app.register_blueprint(feedback_bp)
     app.register_blueprint(dashboard_bp)
+    app.register_blueprint(features_bp)
+
     
     # Configure Security Headers via after_request hook
     @app.after_request

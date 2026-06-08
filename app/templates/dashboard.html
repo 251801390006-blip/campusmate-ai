@@ -9,10 +9,11 @@
 <div class="flat-card mb-4" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.02), rgba(124, 58, 237, 0.05)); border-left: 4px solid var(--neon-blue);">
     <h2 style="font-size: 1.35rem;" class="mb-2">Hello, {{ current_user.username }}!</h2>
     <p class="text-secondary mb-3" style="font-size: 0.88rem; max-width: 600px;">
-        Welcome to your growth workspace. You are currently logged in as a <strong>{{ current_user.role | upper }}</strong>. Track your progress, create community suggestions, or open tickets to resolve code defects.
+        Welcome to your growth workspace. You are currently logged in as a <strong>{{ current_user.role | upper }}</strong>. Track your progress, follow your career roadmaps, check your resume metrics, or open support tickets.
     </p>
     <div class="d-flex gap-2">
-        <a href="{{ url_for('feedback.list_feedback') }}" class="btn btn-sm btn-primary">Feedback & Support <i class="fa-solid fa-comments"></i></a>
+        <a href="{{ url_for('features.list_roadmaps') }}" class="btn btn-sm btn-primary">Resume Learning <i class="fa-solid fa-route"></i></a>
+        <a href="{{ url_for('features.resume_analyzer') }}" class="btn btn-sm btn-outline">Analyze Resume <i class="fa-solid fa-file-invoice"></i></a>
         {% if current_user.role == 'admin' %}
             <a href="{{ url_for('admin.dashboard') }}" class="btn btn-sm btn-outline">Admin Console <i class="fa-solid fa-shield-halved"></i></a>
         {% endif %}
@@ -21,43 +22,45 @@
 
 <!-- Stats Grid -->
 <div class="stats-grid">
-    <!-- Stat 1 -->
+    <!-- Stat 1: Target Career Track -->
     <div class="stat-card">
         <div class="info">
-            <span class="label">Academic Status</span>
-            <span class="value" style="font-size:1.15rem; margin-top:8px;">Active</span>
+            <span class="label">Career Track</span>
+            <span class="value" style="font-size:1.05rem; margin-top:8px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:160px;" title="{{ target_role }}">
+                {{ target_role }}
+            </span>
         </div>
-        <div class="icon-box">
-            <i class="fa-solid fa-graduation-cap"></i>
+        <div class="icon-box" style="background-color: var(--info-bg); color: var(--info);">
+            <i class="fa-solid fa-route"></i>
         </div>
     </div>
-    <!-- Stat 2 -->
+    <!-- Stat 2: Roadmap Progress -->
     <div class="stat-card">
         <div class="info">
-            <span class="label">Suggestions</span>
-            <span class="value">{{ total_suggestions }}</span>
+            <span class="label">Roadmap Progress</span>
+            <span class="value">{{ roadmap_percent }}%</span>
+        </div>
+        <div class="icon-box" style="background-color: rgba(124, 58, 237, 0.08); color: var(--neon-blue);">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+    </div>
+    <!-- Stat 3: ATS Resume Score -->
+    <div class="stat-card">
+        <div class="info">
+            <span class="label">ATS Resume Score</span>
+            <span class="value">{% if resume_score > 0 %}{{ resume_score }}{% else %}N/A{% endif %}</span>
         </div>
         <div class="icon-box" style="background-color: var(--success-bg); color: var(--success);">
-            <i class="fa-solid fa-comments"></i>
+            <i class="fa-solid fa-file-circle-check"></i>
         </div>
     </div>
-    <!-- Stat 3 -->
-    <div class="stat-card">
-        <div class="info">
-            <span class="label">Support Tickets</span>
-            <span class="value">{{ my_tickets_count }}</span>
-        </div>
-        <div class="icon-box" style="background-color: var(--warning-bg); color: var(--warning);">
-            <i class="fa-solid fa-ticket"></i>
-        </div>
-    </div>
-    <!-- Stat 4 -->
+    <!-- Stat 4: Learning Streak -->
     <div class="stat-card">
         <div class="info">
             <span class="label">Learning Streak</span>
-            <span class="value">5 days</span>
+            <span class="value">5 Days</span>
         </div>
-        <div class="icon-box" style="background-color: var(--info-bg); color: var(--info);">
+        <div class="icon-box" style="background-color: var(--warning-bg); color: var(--warning);">
             <i class="fa-solid fa-fire text-orange"></i>
         </div>
     </div>
@@ -65,20 +68,70 @@
 
 <!-- Grid Details Row -->
 <div class="row g-4">
-    <!-- Left Column: Guidelines -->
+    <!-- Left Column: Detailed Progress and Tasks -->
     <div class="col-lg-8">
-        <div class="flat-card h-100">
-            <h3 style="font-size:1.05rem;" class="mb-3"><i class="fa-solid fa-circle-info text-muted me-2"></i> Dashboard Instructions</h3>
-            <p class="text-secondary mb-3" style="font-size: 0.85rem;">
-                This workspace represents a flat light Render-inspired design system. Key administrative and communication tools can be tested directly:
-            </p>
-            <ul class="text-secondary ps-3 mb-0" style="font-size: 0.85rem; line-height: 1.6;">
-                <li><strong>Role Switching:</strong> Click the "Quick Account Switch" header menu to instantly jump between the Administrator role and standard Demo User role.</li>
-                <li><strong>Emergency Control:</strong> Administrators can completely purge and seed fresh data tables using the control panel located inside the Admin Console.</li>
-                <li><strong>Email Regex:</strong> Standard email suffixes including <code>.edu.in</code> or <code>.ac.in</code> are supported in registration WTForms.</li>
-                <li><strong>Mobile Toggles:</strong> Scale your browser window to simulate mobile collapsing sidebar navigation drawers.</li>
-            </ul>
+        <div class="flat-card mb-4">
+            <h3 style="font-size:1.05rem;" class="mb-3"><i class="fa-solid fa-circle-nodes text-muted me-2"></i> Current Milestones & Progress</h3>
+            
+            {% if target_role != 'Not Configured' %}
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.82rem;">
+                        <span class="text-secondary fw-semibold">Overall Pathway Progress</span>
+                        <span class="text-secondary fw-semibold">{{ roadmap_percent }}% Completed</span>
+                    </div>
+                    <div class="progress-bar-container" style="background: var(--border-color); height: 10px; border-radius: 5px; overflow: hidden;">
+                        <div class="progress-bar-fill" style="background: var(--neon-blue); height: 100%; width: {{ roadmap_percent }}%; transition: width 0.3s ease;"></div>
+                    </div>
+                </div>
+                
+                <div class="next-task-box p-3 border rounded" style="background-color: var(--bg-primary); border-color: var(--border-color);">
+                    <span class="badge badge-info mb-2">Next Milestone Action</span>
+                    <h4 style="font-size: 0.95rem;" class="mb-1 fw-bold text-secondary">{{ next_node_title }}</h4>
+                    <p class="text-muted mb-3" style="font-size: 0.8rem;">
+                        This is the next upcoming step in your career roadmap path. Complete it to unlock advanced learning projects and earn XP credits!
+                    </p>
+                    <a href="{{ url_for('features.list_roadmaps') }}" class="btn btn-sm btn-primary">Open Roadmap Engine <i class="fa-solid fa-arrow-right-long"></i></a>
+                </div>
+            {% else %}
+                <div class="text-center py-4">
+                    <i class="fa-solid fa-route text-muted mb-3" style="font-size: 2.2rem;"></i>
+                    <h4 style="font-size: 0.95rem;" class="fw-bold mb-2">No Active Roadmap Track Selected</h4>
+                    <p class="text-secondary mb-3" style="font-size: 0.8rem; max-width: 400px; margin: 0 auto;">
+                        Choose one of the 8 career pathways in the Roadmap Engine to get a personalized timeline and track your learning achievements.
+                    </p>
+                    <a href="{{ url_for('features.list_roadmaps') }}" class="btn btn-sm btn-primary">Select Career Track <i class="fa-solid fa-plus"></i></a>
+                </div>
+            {% endif %}
         </div>
+
+        {% if resume_score > 0 %}
+            <div class="flat-card">
+                <h3 style="font-size:1.05rem;" class="mb-3"><i class="fa-solid fa-chart-pie text-muted me-2"></i> Latest Resume Scan Breakdown</h3>
+                <div class="row g-3">
+                    <div class="col-sm-4">
+                        <div class="p-3 border rounded text-center" style="background-color: var(--bg-primary); border-color: var(--border-color);">
+                            <span class="text-muted d-block mb-1" style="font-size:0.75rem;">ATS Optimization</span>
+                            <span class="fw-bold text-secondary" style="font-size: 1.25rem;">{{ resume_score }}/100</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="p-3 border rounded text-center" style="background-color: var(--bg-primary); border-color: var(--border-color);">
+                            <span class="text-muted d-block mb-1" style="font-size:0.75rem;">Readability Index</span>
+                            <span class="fw-bold text-secondary" style="font-size: 1.25rem;">{{ readability_score }}%</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="p-3 border rounded text-center" style="background-color: var(--bg-primary); border-color: var(--border-color);">
+                            <span class="text-muted d-block mb-1" style="font-size:0.75rem;">Industry Keyword Match</span>
+                            <span class="fw-bold text-secondary" style="font-size: 1.25rem;">{{ industry_match_score }}%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-end mt-3">
+                    <a href="{{ url_for('features.resume_analyzer') }}" style="font-size: 0.8rem; font-weight: 600;">View detailed improvements <i class="fa-solid fa-angles-right"></i></a>
+                </div>
+            </div>
+        {% endif %}
     </div>
     
     <!-- Right Column: User Profile Info -->
@@ -95,9 +148,18 @@
                     <span class="fw-semibold text-secondary">{{ current_user.email }}</span>
                 </div>
                 <div>
-                    <span class="text-muted d-block">Academic Class Status</span>
-                    <span class="fw-semibold text-secondary">Undergraduate Class Of 2027</span>
+                    <span class="text-muted d-block">Account Status</span>
+                    <span class="fw-semibold text-success"><i class="fa-solid fa-circle-check"></i> Active</span>
                 </div>
+                <div>
+                    <span class="text-muted d-block">Academic Class Status</span>
+                    <span class="fw-semibold text-secondary">Class of 2027</span>
+                </div>
+                {% if current_user.role == 'admin' %}
+                    <div class="mt-2 pt-2 border-top" style="border-color: var(--border-color);">
+                        <span class="badge badge-warning"><i class="fa-solid fa-user-shield"></i> System Administrator</span>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>

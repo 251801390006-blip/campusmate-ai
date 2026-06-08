@@ -65,39 +65,3 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('dashboard.landing'))
 
-# Quick Login Bypass for testing
-@auth_bp.route('/switch-account/<role>')
-def switch_account(role):
-    logout_user()
-    
-    role = role.lower()
-    if role == 'admin':
-        username = 'admin'
-        email = '251801390006@cutmap.ac.in'
-        target_role = 'admin'
-        password = 'Vanjith@2008'
-    else:
-        username = 'demo'
-        email = 'demo@university.edu'
-        target_role = 'user'
-        password = 'demo1234'
-        
-    # Check if user exists, else seed
-    user = User.query.filter_by(email=email).first()
-    if not user:
-        user = User(
-            username=username,
-            email=email,
-            role=target_role,
-            is_active=True
-        )
-        user.set_password(password)
-        db.session.add(user)
-        db.session.commit()
-        
-    user.last_login = datetime.utcnow()
-    db.session.commit()
-    login_user(user)
-    
-    flash(f"Switched account to {username.upper()} ({target_role.upper()})!", "success")
-    return redirect(url_for('dashboard.home'))

@@ -31,17 +31,40 @@
                 <i class="fa-solid fa-chart-line"></i> Dashboard
             </a>
             
+            <hr class="sidebar-divider">
+            
+            <div class="sidebar-section-label">Core Modules</div>
+            <a href="{{ url_for('features.list_roadmaps') }}" class="sidebar-link {% if request.endpoint == 'features.list_roadmaps' %}active{% endif %}">
+                <i class="fa-solid fa-route"></i> Learning Roadmaps
+            </a>
+            <a href="{{ url_for('features.resume_analyzer') }}" class="sidebar-link {% if request.endpoint == 'features.resume_analyzer' %}active{% endif %}">
+                <i class="fa-solid fa-file-invoice"></i> Resume Analyzer
+            </a>
+            <a href="{{ url_for('features.ai_mentor') }}" class="sidebar-link {% if request.endpoint == 'features.ai_mentor' %}active{% endif %}">
+                <i class="fa-solid fa-robot"></i> AI Mentor Chat
+            </a>
+            
+            <hr class="sidebar-divider">
+            
             <div class="sidebar-section-label">Collaboration & Help</div>
             <a href="{{ url_for('feedback.list_feedback') }}" class="sidebar-link {% if request.blueprint == 'feedback' %}active{% endif %}">
                 <i class="fa-solid fa-comments"></i> Feedback & Support
             </a>
             
             {% if current_user.role == 'admin' %}
+                <hr class="sidebar-divider">
                 <div class="sidebar-section-label">Administration</div>
                 <a href="{{ url_for('admin.dashboard') }}" class="sidebar-link {% if request.blueprint == 'admin' %}active{% endif %}">
                     <i class="fa-solid fa-shield-halved"></i> Admin Console
                 </a>
             {% endif %}
+            
+            <hr class="sidebar-divider">
+            <div class="sidebar-section-label">API Settings</div>
+            <div class="px-3 py-1">
+                <label for="sidebar-gemini-key" class="text-muted" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; display:block; margin-bottom:4px;">Gemini API Key</label>
+                <input type="password" id="sidebar-gemini-key" class="form-control" placeholder="Paste key here..." style="font-size:0.75rem; padding: 6px; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius:4px; width:100%; height:28px;" onchange="saveGeminiKey(this.value)">
+            </div>
         </div>
         
         <!-- Sidebar User Footer -->
@@ -65,24 +88,13 @@
         <!-- Top Profile Header Bar -->
         <header class="dashboard-header">
             <div class="header-left">
-                <button class="hamburger-toggle d-lg-none" onclick="toggleSidebar()" aria-label="Open Sidebar Menu">
+                <button class="hamburger-toggle d-lg-none" onclick="toggleSidebar()" aria-label="Open Sidebar Menu" style="font-size: 1.3rem; margin-right: 12px; color: var(--text-primary); background: none; border: none; cursor: pointer; padding: 4px;">
                     <i class="fa-solid fa-bars"></i>
                 </button>
                 <h1 class="header-title">{% block header_title %}Dashboard{% endblock %}</h1>
             </div>
             
-            <!-- Quick Login bypass switcher (for staging/testing) -->
-            <div class="header-right d-flex align-items-center gap-3">
-                <div class="account-switcher-dropdown">
-                    <button class="btn btn-sm btn-outline dropdown-toggle" onclick="toggleSwitcherDropdown(event)">
-                        <i class="fa-solid fa-user-gear"></i> Quick Account Switch <i class="fa-solid fa-chevron-down ms-1 text-muted" style="font-size:10px;"></i>
-                    </button>
-                    <div id="switcher-dropdown-menu" class="switcher-menu hidden">
-                        <a href="{{ url_for('auth.switch_account', role='demo') }}" class="switcher-item"><i class="fa-solid fa-user text-muted"></i> Demo User</a>
-                        <a href="{{ url_for('auth.switch_account', role='admin') }}" class="switcher-item"><i class="fa-solid fa-user-shield text-muted"></i> Admin User</a>
-                    </div>
-                </div>
-                
+            <div class="header-right d-flex align-items-center gap-2">
                 <span class="role-badge badge {% if current_user.role == 'admin' %}badge-warning{% else %}badge-info{% endif %}">
                     {{ current_user.role | upper }}
                 </span>
@@ -109,6 +121,20 @@
 
     <!-- Core Scripts -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Load Gemini API Key from localStorage
+        document.addEventListener("DOMContentLoaded", () => {
+            const savedKey = localStorage.getItem("campusmate_gemini_key");
+            const keyInput = document.getElementById("sidebar-gemini-key");
+            if (savedKey && keyInput) {
+                keyInput.value = savedKey;
+            }
+        });
+
+        function saveGeminiKey(val) {
+            localStorage.setItem("campusmate_gemini_key", val.trim());
+        }
+    </script>
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>
