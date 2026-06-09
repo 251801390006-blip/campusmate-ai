@@ -219,6 +219,33 @@
                     </div>
                 </details>
 
+                <!-- Section: Extra Details (Optional) -->
+                <details class="accordion-section p-2 border rounded" style="border-color: var(--border-color); background-color: var(--bg-secondary);">
+                    <summary class="fw-bold text-secondary" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-square-plus me-2 text-muted"></i> Extra Details (Optional)</summary>
+                    <div class="mt-2 d-flex flex-column gap-2">
+                        <div class="input-group">
+                            <label for="res-achievements" class="fw-semibold mb-1" style="font-size:0.7rem;">Achievements & Awards</label>
+                            <input type="text" id="res-achievements" value="Dean's List 2025, First Place CodeQuest Hackathon" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="input-group">
+                            <label for="res-hackathons" class="fw-semibold mb-1" style="font-size:0.7rem;">Hackathons</label>
+                            <input type="text" id="res-hackathons" value="Participated in DevFest 24, Smart India Hackathon 25" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="input-group">
+                            <label for="res-workshops" class="fw-semibold mb-1" style="font-size:0.7rem;">Workshops & Seminars</label>
+                            <input type="text" id="res-workshops" value="Attended AWS Cloud Practitioner Immersion Day" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="input-group">
+                            <label for="res-languages" class="fw-semibold mb-1" style="font-size:0.7rem;">Languages</label>
+                            <input type="text" id="res-languages" value="English (Fluent), Spanish (Conversational)" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="input-group">
+                            <label for="res-interests" class="fw-semibold mb-1" style="font-size:0.7rem;">Interests & Hobbies</label>
+                            <input type="text" id="res-interests" value="Cryptography, Robotics, Open Source Contributing" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                    </div>
+                </details>
+
                 <!-- Section: Reorder Drag Layout toolbar -->
                 <details class="accordion-section p-2 border rounded mb-3" style="border-color: var(--border-color); background-color: var(--bg-secondary);">
                     <summary class="fw-bold text-secondary" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-arrows-up-down me-2 text-muted"></i> Arrange / Reorder Sections</summary>
@@ -319,8 +346,6 @@
             
             <div class="d-flex gap-2">
                 <button class="btn btn-sm btn-outline" onclick="downloadResumePDF()"><i class="fa-solid fa-download"></i> PDF Resume</button>
-                <button class="btn btn-sm btn-outline" onclick="downloadATSReportPDF()"><i class="fa-solid fa-file-pdf"></i> ATS Report</button>
-                <button class="btn btn-sm btn-outline" onclick="downloadImprovementReportPDF()"><i class="fa-solid fa-file-signature"></i> Improvements</button>
             </div>
         </div>
 
@@ -438,6 +463,27 @@
                             <li id="res-render-cert-c4">Python Course for Beginners: Mastering the Essentials (Scaler)</li>
                         </ul>
                     </div>
+
+                    <!-- Section: Achievements -->
+                    <div class="resume-render-section" data-section="achievements" style="margin-bottom:14px; display:none;">
+                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Achievements</h3>
+                        <div id="res-render-achievements" style="font-size:10px; line-height:1.4; color:#374151;"></div>
+                    </div>
+
+                    <!-- Section: Hackathons -->
+                    <div class="resume-render-section" data-section="hackathons" style="margin-bottom:14px; display:none;">
+                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Hackathons & Workshops</h3>
+                        <div id="res-render-hackathons" style="font-size:10px; line-height:1.4; color:#374151;"></div>
+                    </div>
+
+                    <!-- Section: Languages -->
+                    <div class="resume-render-section" data-section="languages" style="margin-bottom:14px; display:none;">
+                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Languages & Interests</h3>
+                        <div style="font-size:10px; line-height:1.4; color:#374151;">
+                            <div id="res-render-languages-row" style="display:none;"><strong>Languages:</strong> <span id="res-render-languages"></span></div>
+                            <div id="res-render-interests-row" style="display:none;"><strong>Interests:</strong> <span id="res-render-interests"></span></div>
+                        </div>
+                    </div>
                 </div>
             </div>
             </div>
@@ -535,7 +581,7 @@
 let activeBulletInput = null;
 let savedVersions = [];
 let lastATSFeedback = null;
-let sectionOrder = ["education", "skills", "experience", "projects", "certifications"];
+let sectionOrder = ["education", "skills", "experience", "projects", "certifications", "achievements", "hackathons", "languages"];
 let undoStack = [];
 let redoStack = [];
 let isApplyingState = false;
@@ -665,7 +711,7 @@ function syncResumeFields() {
     document.getElementById("res-render-links").innerHTML = `<i class="fa-brands fa-github me-1 text-muted"></i> ` + (document.getElementById("res-github").value || "github.com/username");
     
     // Portfolio
-    const portfolioVal = document.getElementById("res-portfolio").value;
+    const portfolioVal = document.getElementById("res-portfolio") ? document.getElementById("res-portfolio").value : "";
     const portfolioWrap = document.getElementById("res-render-portfolio-wrapper");
     if (portfolioVal && portfolioWrap) {
         document.getElementById("res-render-portfolio").innerText = portfolioVal;
@@ -675,48 +721,229 @@ function syncResumeFields() {
     }
 
     // Education
-    document.getElementById("res-render-edu1-inst").innerText = document.getElementById("res-edu1-inst").value || "";
-    document.getElementById("res-render-edu1-degree").innerText = document.getElementById("res-edu1-degree").value || "";
-    document.getElementById("res-render-edu1-dates").innerText = document.getElementById("res-edu1-dates").value || "";
-    document.getElementById("res-render-edu1-gpa").innerText = document.getElementById("res-edu1-gpa").value || "";
-    
-    const courseworkVal = document.getElementById("res-edu1-coursework").value;
-    const cwEl = document.getElementById("res-render-edu1-coursework");
-    if (courseworkVal && cwEl) {
-        cwEl.innerHTML = `Relevant Coursework: ` + courseworkVal;
-        cwEl.style.display = "block";
-    } else if (cwEl) {
-        cwEl.style.display = "none";
+    const eduInst = document.getElementById("res-edu1-inst").value.trim();
+    const eduDegree = document.getElementById("res-edu1-degree").value.trim();
+    const eduDates = document.getElementById("res-edu1-dates").value.trim();
+    const eduGpa = document.getElementById("res-edu1-gpa").value.trim();
+    const eduSec = document.querySelector('[data-section="education"]');
+    if (eduSec) {
+        if (!eduInst && !eduDegree) {
+            eduSec.style.display = "none";
+        } else {
+            eduSec.style.display = "block";
+            document.getElementById("res-render-edu1-inst").innerText = eduInst || "";
+            document.getElementById("res-render-edu1-degree").innerText = eduDegree || "";
+            document.getElementById("res-render-edu1-dates").innerText = eduDates || "";
+            document.getElementById("res-render-edu1-gpa").innerText = eduGpa || "";
+            
+            const courseworkVal = document.getElementById("res-edu1-coursework").value;
+            const cwEl = document.getElementById("res-render-edu1-coursework");
+            if (courseworkVal && cwEl) {
+                cwEl.innerHTML = `Relevant Coursework: ` + courseworkVal;
+                cwEl.style.display = "block";
+            } else if (cwEl) {
+                cwEl.style.display = "none";
+            }
+        }
     }
     
     // Skills
-    document.getElementById("res-render-skills-prog").innerText = document.getElementById("res-skills-prog").value || "";
-    document.getElementById("res-render-skills-cyber").innerText = document.getElementById("res-skills-cyber").value || "";
-    document.getElementById("res-render-skills-tools").innerText = document.getElementById("res-skills-tools").value || "";
-    document.getElementById("res-render-skills-web").innerText = document.getElementById("res-skills-web").value || "";
+    const skillsProg = document.getElementById("res-skills-prog").value.trim();
+    const skillsCyber = document.getElementById("res-skills-cyber").value.trim();
+    const skillsTools = document.getElementById("res-skills-tools").value.trim();
+    const skillsWeb = document.getElementById("res-skills-web").value.trim();
+    const skillsSec = document.querySelector('[data-section="skills"]');
+    if (skillsSec) {
+        if (!skillsProg && !skillsCyber && !skillsTools && !skillsWeb) {
+            skillsSec.style.display = "none";
+        } else {
+            skillsSec.style.display = "block";
+            document.getElementById("res-render-skills-prog").innerText = skillsProg || "";
+            document.getElementById("res-render-skills-cyber").innerText = skillsCyber || "";
+            document.getElementById("res-render-skills-tools").innerText = skillsTools || "";
+            document.getElementById("res-render-skills-web").innerText = skillsWeb || "";
+            
+            document.getElementById("res-render-skills-prog").parentElement.style.display = skillsProg ? "block" : "none";
+            document.getElementById("res-render-skills-cyber").parentElement.style.display = skillsCyber ? "block" : "none";
+            document.getElementById("res-render-skills-tools").parentElement.style.display = skillsTools ? "block" : "none";
+            document.getElementById("res-render-skills-web").parentElement.style.display = skillsWeb ? "block" : "none";
+        }
+    }
     
     // Experience
-    document.getElementById("res-render-exp-role").innerText = document.getElementById("res-exp-role").value || "";
-    document.getElementById("res-render-exp-dates").innerText = document.getElementById("res-exp-dates").value || "";
-    document.getElementById("res-render-exp-comp").innerText = document.getElementById("res-exp-comp").value || "";
-    
-    document.getElementById("res-render-exp-b1").innerText = document.getElementById("res-exp-b1").value || "";
-    document.getElementById("res-render-exp-b2").innerText = document.getElementById("res-exp-b2").value || "";
-    document.getElementById("res-render-exp-b3").innerText = document.getElementById("res-exp-b3").value || "";
-    document.getElementById("res-render-exp-b4").innerText = document.getElementById("res-exp-b4").value || "";
+    const expRole = document.getElementById("res-exp-role").value.trim();
+    const expComp = document.getElementById("res-exp-comp").value.trim();
+    const expDates = document.getElementById("res-exp-dates").value.trim();
+    const expSec = document.querySelector('[data-section="experience"]');
+    if (expSec) {
+        if (!expRole && !expComp) {
+            expSec.style.display = "none";
+        } else {
+            expSec.style.display = "block";
+            document.getElementById("res-render-exp-role").innerText = expRole || "";
+            document.getElementById("res-render-exp-comp").innerText = expComp || "";
+            document.getElementById("res-render-exp-dates").innerText = expDates || "";
+            
+            const b1 = document.getElementById("res-exp-b1").value.trim();
+            const b2 = document.getElementById("res-exp-b2").value.trim();
+            const b3 = document.getElementById("res-exp-b3").value.trim();
+            const b4 = document.getElementById("res-exp-b4").value.trim();
+            
+            const b1El = document.getElementById("res-render-exp-b1");
+            const b2El = document.getElementById("res-render-exp-b2");
+            const b3El = document.getElementById("res-render-exp-b3");
+            const b4El = document.getElementById("res-render-exp-b4");
+            
+            if (b1El) {
+                b1El.innerText = b1;
+                b1El.style.display = b1 ? "list-item" : "none";
+            }
+            if (b2El) {
+                b2El.innerText = b2;
+                b2El.style.display = b2 ? "list-item" : "none";
+            }
+            if (b3El) {
+                b3El.innerText = b3;
+                b3El.style.display = b3 ? "list-item" : "none";
+            }
+            if (b4El) {
+                b4El.innerText = b4;
+                b4El.style.display = b4 ? "list-item" : "none";
+            }
+        }
+    }
     
     // Projects
-    document.getElementById("res-render-proj-title").innerText = document.getElementById("res-proj-title").value || "";
-    document.getElementById("res-render-proj-link").innerText = document.getElementById("res-proj-link").value || "";
-    document.getElementById("res-render-proj-b1").innerText = document.getElementById("res-proj-b1").value || "";
-    document.getElementById("res-render-proj-b2").innerText = document.getElementById("res-proj-b2").value || "";
-    document.getElementById("res-render-proj-b3").innerText = document.getElementById("res-proj-b3").value || "";
+    const projTitle = document.getElementById("res-proj-title").value.trim();
+    const projLink = document.getElementById("res-proj-link").value.trim();
+    const projSec = document.querySelector('[data-section="projects"]');
+    if (projSec) {
+        if (!projTitle) {
+            projSec.style.display = "none";
+        } else {
+            projSec.style.display = "block";
+            document.getElementById("res-render-proj-title").innerText = projTitle || "";
+            document.getElementById("res-render-proj-link").innerText = projLink || "";
+            
+            const pb1 = document.getElementById("res-proj-b1").value.trim();
+            const pb2 = document.getElementById("res-proj-b2").value.trim();
+            const pb3 = document.getElementById("res-proj-b3").value.trim();
+            
+            const pb1El = document.getElementById("res-render-proj-b1");
+            const pb2El = document.getElementById("res-render-proj-b2");
+            const pb3El = document.getElementById("res-render-proj-b3");
+            
+            if (pb1El) {
+                pb1El.innerText = pb1;
+                pb1El.style.display = pb1 ? "list-item" : "none";
+            }
+            if (pb2El) {
+                pb2El.innerText = pb2;
+                pb2El.style.display = pb2 ? "list-item" : "none";
+            }
+            if (pb3El) {
+                pb3El.innerText = pb3;
+                pb3El.style.display = pb3 ? "list-item" : "none";
+            }
+        }
+    }
     
     // Certs
-    document.getElementById("res-render-cert-c1").innerText = document.getElementById("res-cert-c1").value || "";
-    document.getElementById("res-render-cert-c2").innerText = document.getElementById("res-cert-c2").value || "";
-    document.getElementById("res-render-cert-c3").innerText = document.getElementById("res-cert-c3").value || "";
-    document.getElementById("res-render-cert-c4").innerText = document.getElementById("res-cert-c4").value || "";
+    const c1 = document.getElementById("res-cert-c1").value.trim();
+    const c2 = document.getElementById("res-cert-c2").value.trim();
+    const c3 = document.getElementById("res-cert-c3").value.trim();
+    const c4 = document.getElementById("res-cert-c4").value.trim();
+    const certSec = document.querySelector('[data-section="certifications"]');
+    if (certSec) {
+        if (!c1 && !c2 && !c3 && !c4) {
+            certSec.style.display = "none";
+        } else {
+            certSec.style.display = "block";
+            
+            const c1El = document.getElementById("res-render-cert-c1");
+            const c2El = document.getElementById("res-render-cert-c2");
+            const c3El = document.getElementById("res-render-cert-c3");
+            const c4El = document.getElementById("res-render-cert-c4");
+            
+            if (c1El) {
+                c1El.innerText = c1;
+                c1El.style.display = c1 ? "list-item" : "none";
+            }
+            if (c2El) {
+                c2El.innerText = c2;
+                c2El.style.display = c2 ? "list-item" : "none";
+            }
+            if (c3El) {
+                c3El.innerText = c3;
+                c3El.style.display = c3 ? "list-item" : "none";
+            }
+            if (c4El) {
+                c4El.innerText = c4;
+                c4El.style.display = c4 ? "list-item" : "none";
+            }
+        }
+    }
+
+    // Achievements (Optional)
+    const achievementsVal = document.getElementById("res-achievements") ? document.getElementById("res-achievements").value.trim() : "";
+    const achievementsEl = document.getElementById("res-render-achievements");
+    const achievementsSec = document.querySelector('[data-section="achievements"]');
+    if (achievementsSec) {
+        if (achievementsVal && achievementsEl) {
+            achievementsEl.innerText = achievementsVal;
+            achievementsSec.style.display = "block";
+        } else {
+            achievementsSec.style.display = "none";
+        }
+    }
+
+    // Hackathons & Workshops (Optional)
+    const hackathonsVal = document.getElementById("res-hackathons") ? document.getElementById("res-hackathons").value.trim() : "";
+    const workshopsVal = document.getElementById("res-workshops") ? document.getElementById("res-workshops").value.trim() : "";
+    const hackathonsEl = document.getElementById("res-render-hackathons");
+    const hackathonsSec = document.querySelector('[data-section="hackathons"]');
+    if (hackathonsSec) {
+        if ((hackathonsVal || workshopsVal) && hackathonsEl) {
+            let combined = [];
+            if (hackathonsVal) combined.push(hackathonsVal);
+            if (workshopsVal) combined.push(workshopsVal);
+            hackathonsEl.innerText = combined.join(" | ");
+            hackathonsSec.style.display = "block";
+        } else {
+            hackathonsSec.style.display = "none";
+        }
+    }
+
+    // Languages & Interests (Optional)
+    const languagesVal = document.getElementById("res-languages") ? document.getElementById("res-languages").value.trim() : "";
+    const interestsVal = document.getElementById("res-interests") ? document.getElementById("res-interests").value.trim() : "";
+    const langRow = document.getElementById("res-render-languages-row");
+    const intRow = document.getElementById("res-render-interests-row");
+    const langEl = document.getElementById("res-render-languages");
+    const intEl = document.getElementById("res-render-interests");
+    const langSec = document.querySelector('[data-section="languages"]');
+    
+    if (languagesVal && langEl) {
+        langEl.innerText = languagesVal;
+        if (langRow) langRow.style.display = "block";
+    } else if (langRow) {
+        langRow.style.display = "none";
+    }
+    
+    if (interestsVal && intEl) {
+        intEl.innerText = interestsVal;
+        if (intRow) intRow.style.display = "block";
+    } else if (intRow) {
+        intRow.style.display = "none";
+    }
+    
+    if (langSec) {
+        if (languagesVal || interestsVal) {
+            langSec.style.display = "block";
+        } else {
+            langSec.style.display = "none";
+        }
+    }
 
     // Scan keyword list
     scanKeywordsInline();
@@ -843,7 +1070,18 @@ function populateForm(c) {
     setValSafe("res-custom", c.custom);
 
     if (c.sectionOrder) {
-        sectionOrder = c.sectionOrder.filter(sec => ["education", "skills", "experience", "projects", "certifications"].includes(sec));
+        let loadedOrder = c.sectionOrder.filter(sec => ["education", "skills", "experience", "projects", "certifications", "achievements", "hackathons", "languages"].includes(sec));
+        const allSecs = ["education", "skills", "experience", "projects", "certifications", "achievements", "hackathons", "languages"];
+        allSecs.forEach(sec => {
+            if (!loadedOrder.includes(sec)) {
+                loadedOrder.push(sec);
+            }
+        });
+        sectionOrder = loadedOrder;
+        renderReorderUI();
+        reorderDOM();
+    } else {
+        sectionOrder = ["education", "skills", "experience", "projects", "certifications", "achievements", "hackathons", "languages"];
         renderReorderUI();
         reorderDOM();
     }
@@ -909,7 +1147,10 @@ function renderReorderUI() {
     if (!list) return;
     list.innerHTML = "";
     sectionOrder.forEach((sec, idx) => {
-        const displayName = sec.charAt(0).toUpperCase() + sec.slice(1).replace("-", " ");
+        let displayName = sec.charAt(0).toUpperCase() + sec.slice(1).replace("-", " ");
+        if (sec === "skills") displayName = "Technical Skills";
+        if (sec === "hackathons") displayName = "Hackathons & Workshops";
+        if (sec === "languages") displayName = "Languages & Interests";
         const row = document.createElement("div");
         row.className = "d-flex justify-content-between align-items-center p-1 px-2 border rounded bg-white text-secondary";
         row.style.fontSize = "0.75rem";
@@ -1218,7 +1459,11 @@ function downloadResumePDF() {
                 scale: 2.5, 
                 useCORS: true, 
                 letterRendering: true,
-                scrollY: 0
+                scrollY: 0,
+                width: 794,
+                height: 1123,
+                windowWidth: 794,
+                windowHeight: 1123
             },
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
             pagebreak:    { mode: 'avoid-all' }
@@ -1240,64 +1485,6 @@ function downloadResumePDF() {
             alert("Failed to export PDF: " + err.message);
         });
     }, 150);
-}
-
-function downloadATSReportPDF() {
-    const reportHtml = `
-        <div style="font-family:'Outfit',sans-serif; padding:40px; color:#1f2937;">
-            <h1 style="color:#1e3a8a; border-bottom:2px solid #2563eb; padding-bottom:10px;">ATS Audit & Diagnostics Report</h1>
-            <p style="font-size:12px; color:#4b5563;">CampusMate AI Resume Analyzer Audit for <strong>${document.getElementById("res-name").value}</strong></p>
-            <div style="margin-top:20px; font-size:14px; background:#f3f4f6; padding:15px; border-radius:6px;">
-                Overall ATS Compatibility Score: <strong style="font-size:18px; color:#7c3aed;">${document.getElementById("score-text-main").innerText}</strong>
-            </div>
-            <div style="margin-top:20px;">
-                <h3 style="color:#1e3a8a; font-size:14px;">Identified Warnings</h3>
-                <ul style="font-size:12px; line-height:1.6;">
-                    <li>Passive action verbs check flag in bullet points</li>
-                    <li>Missing recommended keywords alignment</li>
-                </ul>
-            </div>
-        </div>
-    `;
-    const container = document.createElement("div");
-    container.innerHTML = reportHtml;
-    document.body.appendChild(container);
-    
-    const opt = {
-        margin: 0,
-        filename: `ATS_Audit_Report.pdf`,
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-    html2pdf().set(opt).from(container).save().then(() => {
-        container.remove();
-    });
-}
-
-function downloadImprovementReportPDF() {
-    const reportHtml = `
-        <div style="font-family:'Outfit',sans-serif; padding:40px; color:#1f2937;">
-            <h1 style="color:#10b981; border-bottom:2px solid #10b981; padding-bottom:10px;">Before-vs-After Phrasing Improvement Summary</h1>
-            <p style="font-size:12px; color:#4b5563;">Optimized wording metrics for <strong>${document.getElementById("res-name").value}</strong></p>
-            <div style="margin-top:20px; font-size:12px; border:1px solid #e5e7eb; padding:15px; border-radius:6px; background:#f9fafb;">
-                <div style="color:#ef4444; font-weight:700;">Original bullet:</div>
-                <div style="margin-bottom:10px; font-style:italic;">"Contributed to coding the backend of the student project application."</div>
-                <div style="color:#10b981; font-weight:700;">Optimized bullet:</div>
-                <div style="font-weight:700;">"Architected relational database schemas and API routing structures in Flask, reducing API controller latency by 20%."</div>
-            </div>
-        </div>
-    `;
-    const container = document.createElement("div");
-    container.innerHTML = reportHtml;
-    document.body.appendChild(container);
-    
-    const opt = {
-        margin: 0,
-        filename: `Resume_Improvement_Report.pdf`,
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-    html2pdf().set(opt).from(container).save().then(() => {
-        container.remove();
-    });
 }
 </script>
 <style>
@@ -1477,16 +1664,20 @@ function downloadImprovementReportPDF() {
 .resume-sheet.exec-partner h3 { border-bottom: 2px solid #1e3a8a !important; }
 
 .pdf-export-mode {
-    width: 210mm !important;
-    height: 297mm !important;
-    max-height: 297mm !important;
-    min-height: 297mm !important;
-    padding: 8mm 10mm !important;
+    position: absolute !important;
+    left: -9999px !important;
+    top: 0 !important;
+    width: 794px !important;
+    height: 1123px !important;
+    max-height: 1123px !important;
+    min-height: 1123px !important;
+    padding: 30px 40px !important;
     margin: 0 !important;
     border: none !important;
     box-shadow: none !important;
     overflow: hidden !important;
     box-sizing: border-box !important;
+    background: #ffffff !important;
 }
 .pdf-export-mode .resume-render-header {
     margin-bottom: 4px !important;
