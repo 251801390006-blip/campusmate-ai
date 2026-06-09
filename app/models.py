@@ -212,5 +212,39 @@ class Internship(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
 
+class SiteConfig(db.Model):
+    """
+    Stores site-wide admin settings as key-value pairs in the database.
+    These persist permanently on the server — independent of any browser/device.
+    Example key: 'global_ai_key'  value: 'gsk_xxxx...'
+    """
+    __tablename__ = 'site_config'
 
+    id    = db.Column(db.Integer, primary_key=True)
+    key   = db.Column(db.String(100), unique=True, nullable=False, index=True)
+    value = db.Column(db.Text, nullable=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    @classmethod
+    def get(cls, key, default=None):
+        """Read a config value by key."""
+        row = cls.query.filter_by(key=key).first()
+        return row.value if row and row.value else default
+
+    @classmethod
+    def set(cls, key, value):
+        """Write (upsert) a config value."""
+        row = cls.query.filter_by(key=key).first()
+        if row:
+            row.value = value
+            row.updated_at = datetime.utcnow()
+        else:
+            row = cls(key=key, value=value)
+            db.session.add(row)
+        db.session.commit()
+
+    @classmethod
+    def delete(cls, key):
+        """Delete a config key."""
+        cls.query.filter_by(key=key).delete()
+        db.session.commit()

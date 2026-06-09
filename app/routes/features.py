@@ -1038,7 +1038,13 @@ def chat():
     try:
         data = request.get_json() or {}
         message_content = data.get('message', '').strip()
-        custom_key = data.get('custom_key', '').strip()
+        # Key priority: 1) user's personal browser key, 2) admin global DB key, 3) env var
+        user_key = (data.get('custom_key') or '').strip()
+        if not user_key:
+            from app.models import SiteConfig
+            user_key = SiteConfig.get('global_ai_key', '') or ''
+        custom_key = user_key
+
         
         if not message_content:
             return jsonify({"success": False, "error": "Message is required"}), 400

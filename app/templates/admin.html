@@ -613,61 +613,82 @@ function openEditInternshipModal(id, company, logo, role, type, location, skills
     document.getElementById("internship-modal").classList.remove("hidden");
 }
 
-// ── Global AI Key Management ──────────────────────────────────────────────
-const GLOBAL_KEY_NAME = "campusmate_global_ai_key";
+// ── Global AI Key Management (SERVER-SIDE — persists permanently) ─────────
+const _csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
 
-function updateGlobalAIStatus() {
-    const key = localStorage.getItem(GLOBAL_KEY_NAME) || "";
+async function updateGlobalAIStatus() {
     const statusEl = document.getElementById("global-ai-status");
-    if (!statusEl) return;
-    if (key && key.length > 8) {
-        const provider = key.startsWith("gsk_") ? "Groq LLaMA 3.3-70B" : "Gemini 2.5 Flash";
-        const masked = key.substring(0, 8) + "..." + key.slice(-4);
-        statusEl.style.background = "rgba(22,163,74,0.1)";
-        statusEl.style.color = "#16a34a";
-        statusEl.innerHTML = `<i class="fa-solid fa-circle me-1" style="font-size:0.5rem;"></i> 🟢 ${provider} Active (${masked})`;
-    } else {
-        statusEl.style.background = "rgba(239,68,68,0.1)";
-        statusEl.style.color = "#dc2626";
-        statusEl.innerHTML = `<i class="fa-solid fa-circle me-1" style="font-size:0.5rem;"></i> ❌ No Global Key — Students see offline message`;
+    try {
+        const resp = await fetch("/admin/global-ai-key/status");
+        const data = await resp.json();
+        if (data.active) {
+            statusEl.style.background = "rgba(22,163,74,0.1)";
+            statusEl.style.color = "#16a34a";
+            statusEl.innerHTML = `<i class="fa-solid fa-circle me-1" style="font-size:0.5rem;"></i> 🟢 ${data.provider} Active (${data.masked})`;
+        } else {
+            statusEl.style.background = "rgba(239,68,68,0.1)";
+            statusEl.style.color = "#dc2626";
+            statusEl.innerHTML = `<i class="fa-solid fa-circle me-1" style="font-size:0.5rem;"></i> ❌ No Global Key — Students see offline message`;
+        }
+    } catch(e) {
+        if (statusEl) statusEl.innerHTML = `<i class="fa-solid fa-circle me-1" style="font-size:0.5rem;"></i> ⚠ Could not check status`;
     }
 }
 
-function saveGlobalAIKey() {
+async function saveGlobalAIKey() {
     const input = document.getElementById("global-ai-key-input");
     const key = input ? input.value.trim() : "";
     if (!key || key.length < 10) {
         alert("Please enter a valid API key (Groq: gsk_... or Gemini: AIza...)");
         return;
     }
-    // Save as global key AND also as user key so admin's own chat works too
-    localStorage.setItem(GLOBAL_KEY_NAME, key);
-    localStorage.setItem("campusmate_gemini_key", key);
-
-    // Broadcast to all open tabs so they get it immediately
-    localStorage.setItem("campusmate_global_ai_broadcast", Date.now().toString());
-
-    updateGlobalAIStatus();
-    const provider = key.startsWith("gsk_") ? "Groq LLaMA 3.3-70B" : "Gemini 2.5 Flash";
-    input.value = "";
-
-    const btn = event.target;
+    const btn = event.currentTarget;
     const orig = btn.innerHTML;
-    btn.innerHTML = '<i class="fa-solid fa-circle-check me-1"></i> Activated for ALL Users!';
-    btn.style.background = "#16a34a";
-    btn.style.borderColor = "#16a34a";
-    setTimeout(() => { btn.innerHTML = orig; btn.style.background = ""; btn.style.borderColor = ""; }, 3000);
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Saving...';
+    btn.disabled = true;
 
-    alert(`✅ ${provider} key saved!\n\nAll students now get live AI chatbot responses automatically.`);
+    try {
+        const resp = await fetch("/admin/global-ai-key", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": _csrf },
+            body: JSON.stringify({ api_key: key })
+        });
+        const data = await resp.json();
+        if (data.success) {
+            input.value = "";
+            await updateGlobalAIStatus();
+            btn.innerHTML = '<i class="fa-solid fa-circle-check me-1"></i> Saved for ALL Users!';
+            btn.style.background = "#16a34a";
+            btn.style.borderColor = "#16a34a";
+            alert(`✅ ${data.provider} key saved to database!\n\nAll students now get live AI chatbot responses — permanently. Works even when your laptop is off.`);
+            setTimeout(() => { btn.innerHTML = orig; btn.style.background = ""; btn.style.borderColor = ""; btn.disabled = false; }, 4000);
+        } else {
+            alert("Error: " + (data.error || "Could not save key."));
+            btn.innerHTML = orig;
+            btn.disabled = false;
+        }
+    } catch(e) {
+        alert("Network error. Make sure the server is running.");
+        btn.innerHTML = orig;
+        btn.disabled = false;
+    }
 }
 
-function clearGlobalAIKey() {
-    if (!confirm("Remove the global AI key? All students will lose AI access until a new key is set.")) return;
-    localStorage.removeItem(GLOBAL_KEY_NAME);
-    localStorage.removeItem("campusmate_gemini_key");
-    updateGlobalAIStatus();
-    const input = document.getElementById("global-ai-key-input");
-    if (input) input.value = "";
+async function clearGlobalAIKey() {
+    if (!confirm("Remove the global AI key?\n\nAll students will lose AI access until you set a new key.")) return;
+    try {
+        const resp = await fetch("/admin/global-ai-key", {
+            method: "DELETE",
+            headers: { "X-CSRFToken": _csrf }
+        });
+        const data = await resp.json();
+        if (data.success) {
+            await updateGlobalAIStatus();
+            alert("Global AI key removed from database.");
+        }
+    } catch(e) {
+        alert("Network error removing key.");
+    }
 }
 
 function toggleShowGlobalKey() {
@@ -676,9 +697,6 @@ function toggleShowGlobalKey() {
     if (!input) return;
     if (input.type === "password") {
         input.type = "text";
-        // Load existing key to show it
-        const existing = localStorage.getItem(GLOBAL_KEY_NAME) || "";
-        if (existing) input.value = existing;
         if (eye) eye.className = "fa-solid fa-eye-slash";
     } else {
         input.type = "password";
@@ -687,7 +705,8 @@ function toggleShowGlobalKey() {
     }
 }
 
-// Init on page load
+// Init — load current status from server on page load
 document.addEventListener("DOMContentLoaded", updateGlobalAIStatus);
+
 </script>
 {% endblock %}

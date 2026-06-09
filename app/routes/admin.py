@@ -377,3 +377,44 @@ def pin_internship(job_id):
     return redirect(url_for('admin.dashboard'))
 
 
+# ── Global AI Key — stored in DB, works for ALL users on ALL devices ──────
+
+@admin_bp.route('/global-ai-key', methods=['POST'])
+@login_required
+@role_required('admin')
+def save_global_ai_key():
+    """Save the global AI API key to the database."""
+    from app.models import SiteConfig
+    data = request.get_json(silent=True) or {}
+    key = (data.get('api_key') or '').strip()
+    if not key or len(key) < 10:
+        return jsonify({'success': False, 'error': 'Invalid key — must be at least 10 characters.'}), 400
+    # Validate key prefix
+    if not (key.startswith('gsk_') or key.startswith('AIza')):
+        return jsonify({'success': False, 'error': 'Key must start with gsk_ (Groq) or AIza (Gemini).'}), 400
+    SiteConfig.set('global_ai_key', key)
+    provider = 'Groq LLaMA 3.3-70B' if key.startswith('gsk_') else 'Gemini 2.5 Flash'
+    return jsonify({'success': True, 'provider': provider, 'masked': key[:8] + '...' + key[-4:]})
+
+
+@admin_bp.route('/global-ai-key', methods=['DELETE'])
+@login_required
+@role_required('admin')
+def clear_global_ai_key():
+    """Remove the global AI API key from the database."""
+    from app.models import SiteConfig
+    SiteConfig.delete('global_ai_key')
+    return jsonify({'success': True})
+
+
+@admin_bp.route('/global-ai-key/status', methods=['GET'])
+@login_required
+@role_required('admin')
+def get_global_ai_key_status():
+    """Return masked status of the stored global key."""
+    from app.models import SiteConfig
+    key = SiteConfig.get('global_ai_key', '')
+    if key:
+        provider = 'Groq LLaMA 3.3-70B' if key.startswith('gsk_') else 'Gemini 2.5 Flash'
+        return jsonify({'active': True, 'provider': provider, 'masked': key[:8] + '...' + key[-4:]})
+    return jsonify({'active': False})
