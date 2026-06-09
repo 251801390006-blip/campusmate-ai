@@ -82,7 +82,13 @@
         <!-- Sidebar User Footer -->
         <div class="sidebar-footer">
             <div class="user-info-card">
-                <div class="avatar"><i class="fa-solid fa-user"></i></div>
+                <div class="avatar" style="overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                    {% if current_user.profile_photo %}
+                        <img src="{{ url_for('static', filename=current_user.profile_photo) }}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    {% else %}
+                        <i class="fa-solid fa-user"></i>
+                    {% endif %}
+                </div>
                 <div class="details">
                     <span class="username">{{ current_user.username }}</span>
                     <span class="role">{{ current_user.role | upper }}</span>
@@ -124,7 +130,7 @@
                     </button>
                     <div id="notification-dropdown" class="notification-dropdown-card hidden">
                         <div class="notif-header d-flex justify-content-between align-items-center p-3 border-bottom">
-                            <span class="fw-bold" style="font-size: 0.85rem;">Notifications</span>
+                            <span class="fw-bold" style="font-size: 0.85rem;"><a href="{{ url_for('dashboard.notifications') }}" class="text-dark text-decoration-none"><i class="fa-solid fa-inbox me-1"></i> Inbox</a></span>
                             {% if unread_notifications_count > 0 %}
                                 <a href="javascript:void(0)" class="mark-all-read-btn text-decoration-none" onclick="markAllNotificationsRead(event)" style="font-size: 0.72rem; font-weight: 600; color: var(--neon-blue);">Mark all read</a>
                             {% endif %}
@@ -158,7 +164,9 @@
 
                 <!-- Profile Avatar Link -->
                 <a href="{{ url_for('dashboard.profile') }}" class="header-profile-avatar d-flex align-items-center justify-content-center border" title="View Profile" style="width: 32px; height: 32px; border-radius: 50%; overflow: hidden; background: var(--bg-tertiary);">
-                    {% if current_user.avatar %}
+                    {% if current_user.profile_photo %}
+                        <img src="{{ url_for('static', filename=current_user.profile_photo) }}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% elif current_user.avatar %}
                         <img src="{{ url_for('static', filename='images/avatars/' + current_user.avatar) }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
                         <i class="fa-solid fa-user text-secondary" style="display: none; font-size: 0.85rem;"></i>
                     {% else %}
@@ -191,38 +199,7 @@
         </div>
     </div>
 
-    <!-- Global Floating AI Mentor Side Drawer -->
-    <div id="mentor-drawer" class="mentor-drawer glass-effect">
-        <div class="mentor-header" onclick="toggleMentorDrawer()">
-            <div class="mentor-avatar"><i class="fa-solid fa-robot"></i></div>
-            <div class="mentor-title">
-                <h4>AI Mentor Coach 2.0</h4>
-                <span class="text-secondary" style="font-size:11px;">Active Profile Helper</span>
-            </div>
-            <button class="mentor-toggle-btn"><i class="fa-solid fa-chevron-up" id="mentor-arrow-icon"></i></button>
-        </div>
-        <div class="mentor-body">
-            <div class="mentor-memory-bar" id="mentor-memory-bar" style="background: rgba(124, 58, 237, 0.03); border-bottom: 1px solid var(--border-color); padding: 8px 15px; font-size: 11px; color: var(--text-secondary); display: flex; gap: 8px; align-items: center; justify-content: space-between;">
-                <span style="display:flex; align-items:center; gap:6px;"><i class="fa-solid fa-brain" style="color: var(--neon-blue);"></i> <span id="mentor-memory-text">Memory: Target Track: None | XP: 100</span></span>
-                <button class="btn btn-sm btn-outline" onclick="resetMentorChat()" style="padding:2px 6px; font-size:9px; border-radius:4px;"><i class="fa-solid fa-trash"></i> Reset Chat</button>
-            </div>
-            <div class="mentor-messages" id="mentor-chat-messages">
-                <div class="message mentor">
-                    <p>Hello! I am your career mentor. Ask me questions about roadmaps, certifications, project architectures, or resumes!</p>
-                </div>
-            </div>
-            <!-- Dialogue chips -->
-            <div class="chat-chips-container" id="mentor-chat-chips">
-                <button class="chip" onclick="handleChipClick('What certifications fit my target track?')">What certs fit this?</button>
-                <button class="chip" onclick="handleChipClick('Recommend a project template.')">Recommend a project</button>
-                <button class="chip" onclick="handleChipClick('Check my experience bullet points.')">Check my resume</button>
-            </div>
-            <form class="mentor-input-area" onsubmit="sendMentorMessage(event)">
-                <input type="text" id="mentor-user-input" placeholder="Ask about system design, code, etc..." required>
-                <button type="submit" class="mentor-send-btn"><i class="fa-solid fa-paper-plane"></i></button>
-            </form>
-        </div>
-    </div>
+
 
     <!-- Mobile Bottom Navigation Bar -->
     <nav class="mobile-bottom-nav d-lg-none">
@@ -238,10 +215,6 @@
             <i class="fa-solid fa-file-invoice"></i>
             <span>Resumes</span>
         </a>
-        <a href="{{ url_for('features.ai_mentor') }}" class="mobile-bottom-link {% if request.endpoint == 'features.ai_mentor' %}active{% endif %}">
-            <i class="fa-solid fa-robot"></i>
-            <span>AI Coach</span>
-        </a>
         <a href="{{ url_for('dashboard.profile') }}" class="mobile-bottom-link {% if request.endpoint == 'dashboard.profile' %}active{% endif %}">
             <i class="fa-solid fa-user-circle"></i>
             <span>Profile</span>
@@ -251,7 +224,6 @@
     <!-- Core Scripts -->
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/mentor.js') }}"></script>
     <script>
         // Load Gemini API Key from localStorage
         document.addEventListener("DOMContentLoaded", () => {
@@ -264,34 +236,6 @@
 
         function saveGeminiKey(val) {
             localStorage.setItem("campusmate_gemini_key", val.trim());
-        }
-
-        async function resetMentorChat() {
-            if (!confirm("Are you sure you want to clear your chat history with the AI Mentor?")) return;
-            const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
-            try {
-                const response = await fetch("/ai-mentor/reset", {
-                    method: "POST",
-                    headers: {
-                        "X-CSRFToken": csrfToken
-                    }
-                });
-                if (response.ok) {
-                    const messagesBox = document.getElementById("mentor-chat-messages");
-                    if (messagesBox) {
-                        messagesBox.innerHTML = `
-                            <div class="message mentor">
-                                <p>Hello! I am your career mentor. Ask me questions about roadmaps, certifications, project architectures, or resumes!</p>
-                            </div>
-                        `;
-                    }
-                } else {
-                    alert("Failed to reset chat on server.");
-                }
-            } catch (e) {
-                console.error(e);
-                alert("Connection failed.");
-            }
         }
     </script>
     {% block extra_scripts %}{% endblock %}

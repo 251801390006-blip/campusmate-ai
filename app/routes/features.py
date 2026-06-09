@@ -682,9 +682,12 @@ def get_predefined_roadmap(role: str) -> list:
             "prerequisites": f"Step {i-1}" if i > 1 else "None",
             "xp_reward": reward,
             "resources": [
-                {"title": f"Microsoft Learn: {theme} Introduction", "url": "https://learn.microsoft.com"},
-                {"title": f"GitHub Repository Template for {theme}", "url": "https://github.com"}
+                {"title": f"GeeksforGeeks: {theme} Developer Guide", "url": f"https://www.geeksforgeeks.org/search-results/?q={theme.lower().replace(' ', '+')}"},
+                {"title": f"Google Developers: {theme} Technical Docs", "url": "https://developers.google.com"},
+                {"title": f"YouTube: {theme} Video Crash Course", "url": "https://www.youtube.com/results?search_query=" + theme.lower().replace(' ', '+')},
+                {"title": f"Coursera & Udemy: Learn {theme} Specialization", "url": "https://www.coursera.org"}
             ],
+
             "projects": [{
                 "title": f"Step {i} Practice Project: {proj}",
                 "description": f"Design and implement a structured module targeting {theme}.",
@@ -1016,7 +1019,7 @@ def chat():
         command_response = (
             f"🎯 **Command Center Triggered: Track Seeding**\n\n"
             f"I have initialized and seeded your active learning pathway to **{matched_track}**!\n\n"
-            f"The learning engine generated a visual tree containing 200 checkpoints, custom practice projects, and Microsoft Learn resources.\n\n"
+            f"The learning engine generated a visual tree containing 200 checkpoints, custom practice projects, and GeeksforGeeks, Google, YouTube, and Coursera resources.\n\n"
             f"👉 [Click here to view your new Roadmap](/roadmaps)"
         )
         
@@ -1325,41 +1328,74 @@ def internship_center():
     progress = RoadmapProgress.query.filter_by(user_id=current_user.id).first()
     user_track = progress.role if progress else "Full Stack Development"
     
-    # Mock list of internship jobs matching user profiles
+    # Predefined mock jobs with mode, deadline metrics
     all_jobs = [
-        {"title": "Software Engineer Intern", "company": "Microsoft", "track": "Full Stack Development", "stipend": "$8,500/mo", "location": "Redmond, WA (Hybrid)", "skills": "Python, React, Data Structures"},
-        {"title": "AI Engineering Intern", "company": "Google DeepMind", "track": "AI Engineering", "stipend": "$9,200/mo", "location": "London, UK (On-site)", "skills": "PyTorch, Transformers, LLMs"},
-        {"title": "Machine Learning Intern", "company": "Meta", "track": "Machine Learning", "stipend": "$9,000/mo", "location": "Menlo Park, CA (Hybrid)", "skills": "Scikit-Learn, PyTorch, SQL"},
-        {"title": "Cyber Security Analyst Intern", "company": "CrowdStrike", "track": "Cyber Security", "stipend": "$7,500/mo", "location": "Austin, TX (Remote)", "skills": "Nmap, Wireshark, Linux Scripting"},
-        {"title": "DevOps Engineer Intern", "company": "HashiCorp", "track": "DevOps", "stipend": "$7,800/mo", "location": "San Francisco, CA (Hybrid)", "skills": "Docker, Kubernetes, Terraform"},
-        {"title": "Cloud Operations Intern", "company": "Amazon Web Services", "track": "Cloud Computing", "stipend": "$8,200/mo", "location": "Seattle, WA (On-site)", "skills": "AWS IAM, EC2, CloudFormation"},
-        {"title": "Blockchain Developer Intern", "company": "ConsenSys", "track": "Web3", "stipend": "$8,000/mo", "location": "Remote", "skills": "Solidity, Ethereum, Smart Contracts"},
-        {"title": "UI/UX Product Design Intern", "company": "Figma", "track": "UI/UX Design", "stipend": "$7,200/mo", "location": "San Francisco, CA (Hybrid)", "skills": "Figma, User Research, Wireframing"},
-        {"title": "QA Automation Engineer Intern", "company": "BrowserStack", "track": "QA Automation", "stipend": "$6,500/mo", "location": "Dublin, Ireland (Hybrid)", "skills": "Selenium, Playwright, Python"},
-        {"title": "Product Management Intern", "company": "Stripe", "track": "Product Management", "stipend": "$8,800/mo", "location": "New York, NY (Hybrid)", "skills": "Agile Scrum, Figma, Business Analytics"}
+        {"title": "Software Engineer Intern", "company": "Microsoft", "track": "Full Stack Development", "stipend": "$8,500/mo", "location": "Redmond, WA (Hybrid)", "skills": "Python, React, Data Structures", "mode": "Hybrid", "deadline": "2026-09-30"},
+        {"title": "AI Engineering Intern", "company": "Google DeepMind", "track": "AI Engineering", "stipend": "$9,200/mo", "location": "London, UK (On-site)", "skills": "PyTorch, Transformers, LLMs", "mode": "On-site", "deadline": "2026-10-15"},
+        {"title": "Machine Learning Intern", "company": "Meta", "track": "Machine Learning", "stipend": "$9,000/mo", "location": "Menlo Park, CA (Hybrid)", "skills": "Scikit-Learn, PyTorch, SQL", "mode": "Hybrid", "deadline": "2026-10-01"},
+        {"title": "Cyber Security Analyst Intern", "company": "CrowdStrike", "track": "Cyber Security", "stipend": "$7,500/mo", "location": "Austin, TX (Remote)", "skills": "Nmap, Wireshark, Linux Scripting", "mode": "Remote", "deadline": "2026-09-15"},
+        {"title": "DevOps Engineer Intern", "company": "HashiCorp", "track": "DevOps", "stipend": "$7,800/mo", "location": "San Francisco, CA (Hybrid)", "skills": "Docker, Kubernetes, Terraform", "mode": "Hybrid", "deadline": "2026-10-10"},
+        {"title": "Cloud Operations Intern", "company": "Amazon Web Services", "track": "Cloud Computing", "stipend": "$8,200/mo", "location": "Seattle, WA (On-site)", "skills": "AWS IAM, EC2, CloudFormation", "mode": "On-site", "deadline": "2026-09-25"},
+        {"title": "Blockchain Developer Intern", "company": "ConsenSys", "track": "Web3", "stipend": "$8,000/mo", "location": "Remote", "skills": "Solidity, Ethereum, Smart Contracts", "mode": "Remote", "deadline": "2026-11-01"},
+        {"title": "UI/UX Product Design Intern", "company": "Figma", "track": "UI/UX Design", "stipend": "$7,200/mo", "location": "San Francisco, CA (Hybrid)", "skills": "Figma, User Research, Wireframing", "mode": "Hybrid", "deadline": "2026-10-05"},
+        {"title": "QA Automation Engineer Intern", "company": "BrowserStack", "track": "QA Automation", "stipend": "$6,500/mo", "location": "Dublin, Ireland (Hybrid)", "skills": "Selenium, Playwright, Python", "mode": "Hybrid", "deadline": "2026-09-20"},
+        {"title": "Product Management Intern", "company": "Stripe", "track": "Product Management", "stipend": "$8,800/mo", "location": "New York, NY (Hybrid)", "skills": "Agile Scrum, Figma, Business Analytics", "mode": "Hybrid", "deadline": "2026-10-20"}
     ]
     
     resume = ResumeAnalysis.query.filter_by(user_id=current_user.id).order_by(ResumeAnalysis.created_at.desc()).first()
     resume_score = resume.ats_score if resume else 0
     
+    # Parse user skills
+    user_skills_list = [s.strip().lower() for s in (current_user.skills or "").split(",") if s.strip()]
+    
+    # Calculate tech readiness score (completed nodes ratio)
+    completed_nodes_count = 0
+    if progress and progress.completed_nodes:
+        completed_nodes_count = len([x for x in progress.completed_nodes.split(",") if x.strip()])
+    tech_readiness = min(100, int((completed_nodes_count / 200) * 100)) if progress else 0
+    
+    # Fetch admin reviews submitted by user to check current application states
+    from app.models import AdminReview
+    user_applications = AdminReview.query.filter_by(user_id=current_user.id).all()
+    applied_job_ids = {app.job_id: app.status for app in user_applications}
+    
     jobs = []
     for idx, job in enumerate(all_jobs):
-        compatibility = 40
-        if user_track.lower() in job["track"].lower() or job["track"].lower() in user_track.lower():
-            compatibility += 40
-        compatibility += min(15, int((current_user.xp or 0) / 100))
-        compatibility += min(15, int(resume_score / 10))
-        compatibility = min(98, compatibility)
+        job_id = idx + 1
+        
+        # Parse job required skills
+        req_skills = [s.strip() for s in job["skills"].split(",") if s.strip()]
+        
+        # Calculate matching & missing skills
+        matched = [s for s in req_skills if s.lower() in user_skills_list]
+        missing = [s for s in req_skills if s.lower() not in user_skills_list]
+        
+        # Compatibility/Readiness Score calculation:
+        # 30% from track match
+        # 40% from matching skills fraction
+        # 20% from resume score
+        # 10% from tech roadmap progress
+        compatibility = 30 if user_track.lower() in job["track"].lower() or job["track"].lower() in user_track.lower() else 10
+        if req_skills:
+            compatibility += int((len(matched) / len(req_skills)) * 40)
+        compatibility += int((resume_score / 100) * 20)
+        compatibility += int((tech_readiness / 100) * 10)
+        compatibility = min(98, max(25, compatibility))
         
         jobs.append({
-            "id": idx + 1,
+            "id": job_id,
             "title": job["title"],
             "company": job["company"],
             "track": job["track"],
             "stipend": job["stipend"],
             "location": job["location"],
             "skills": job["skills"],
-            "compatibility": compatibility
+            "mode": job["mode"],
+            "deadline": job["deadline"],
+            "compatibility": compatibility,
+            "matched_skills": matched,
+            "missing_skills": missing,
+            "application_status": applied_job_ids.get(job_id)
         })
         
     return render_template('internship_center.html', jobs=jobs, user_track=user_track, resume_score=resume_score)
@@ -1529,4 +1565,81 @@ def project_architect_generate():
         "schema": schema,
         "mermaid": mermaid
     })
+
+
+@features_bp.route('/internship-center/apply', methods=['POST'])
+@login_required
+def apply_internship():
+    from app.models import AdminReview, Notification, UserResume
+    
+    job_id = request.form.get('job_id', type=int)
+    if not job_id:
+        return jsonify({"success": False, "error": "Job ID is required."}), 400
+        
+    # Check if they already applied
+    existing = AdminReview.query.filter_by(user_id=current_user.id, job_id=job_id).first()
+    if existing:
+        return jsonify({"success": False, "error": "You have already requested a referral review for this position."}), 400
+        
+    # Get user's latest resume from UserResume table
+    latest_resume = UserResume.query.filter_by(user_id=current_user.id).order_by(UserResume.updated_at.desc()).first()
+    
+    review = AdminReview(
+        user_id=current_user.id,
+        resume_id=latest_resume.id if latest_resume else None,
+        job_id=job_id,
+        status='pending'
+    )
+    db.session.add(review)
+    db.session.commit()
+    
+    # Notify user
+    notif = Notification(
+        user_id=current_user.id,
+        title="Referral Request Logged! 📩",
+        content=f"Your referral request for Job #{job_id} has been submitted to the admin console.",
+        category="general"
+    )
+    db.session.add(notif)
+    db.session.commit()
+    
+    return jsonify({"success": True, "message": "Your referral review request has been routed to the admin panel!"})
+
+
+@features_bp.route('/portfolio-builder/publish', methods=['POST'])
+@login_required
+def portfolio_builder_publish():
+    data = request.get_json() or {}
+    html_content = data.get('html')
+    if not html_content:
+        return jsonify({"success": False, "error": "No HTML content provided."}), 400
+        
+    current_user.published_portfolio_html = html_content
+    db.session.commit()
+    
+    public_url = url_for('features.public_portfolio', username=current_user.username, _external=True)
+    return jsonify({"success": True, "public_url": public_url})
+
+
+@features_bp.route('/published-portfolio/<username>', methods=['GET'])
+def public_portfolio(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    if not user.public_profile:
+        abort(403, description="This portfolio has been set to private by the user.")
+        
+    if not user.published_portfolio_html:
+        # Return a simple fallback HTML page
+        fallback_html = f"""<!DOCTYPE html>
+<html>
+<head>
+    <title>{user.username.title()} - CampusMate Portfolio</title>
+</head>
+<body style="font-family: sans-serif; text-align: center; padding: 50px;">
+    <h2>Portfolio not published yet</h2>
+    <p>The user {user.username} has not published their portfolio yet.</p>
+</body>
+</html>"""
+        return fallback_html
+        
+    return user.published_portfolio_html
 

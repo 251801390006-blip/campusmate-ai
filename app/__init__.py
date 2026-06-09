@@ -89,7 +89,11 @@ def create_app():
             ("onboarded", "BOOLEAN DEFAULT 0"),
             ("name", "VARCHAR(100)"),
             ("avatar", "VARCHAR(200) DEFAULT 'avatar-1.png'"),
-            ("bio", "TEXT")
+            ("bio", "TEXT"),
+            ("profile_photo", "VARCHAR(255)"),
+            ("published_portfolio_html", "TEXT"),
+            ("public_profile", "BOOLEAN DEFAULT 1"),
+            ("notifications_enabled", "BOOLEAN DEFAULT 1")
         ]:
             try:
                 db.session.execute(db.text(f"ALTER TABLE users ADD COLUMN {col} {col_type}"))
@@ -97,6 +101,7 @@ def create_app():
             except Exception:
                 db.session.rollback()
         seed_default_users(db, User)
+
         
     # Global context processor for notifications
     @app.context_processor

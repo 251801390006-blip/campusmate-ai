@@ -33,6 +33,11 @@ class User(db.Model, UserMixin):
     name = db.Column(db.String(100), nullable=True)
     avatar = db.Column(db.String(200), nullable=True, default='avatar-1.png')
     bio = db.Column(db.Text, nullable=True)
+    profile_photo = db.Column(db.String(255), nullable=True)
+    published_portfolio_html = db.Column(db.Text, nullable=True)
+    public_profile = db.Column(db.Boolean, default=True, nullable=False)
+    notifications_enabled = db.Column(db.Boolean, default=True, nullable=False)
+
     
     # Relationships
     feedback_items = db.relationship('FeedbackItem', backref='author', lazy=True, cascade="all, delete-orphan")
@@ -170,5 +175,23 @@ class UserBadge(db.Model):
     
     # Relationship
     user = db.relationship('User', backref=db.backref('badges', lazy=True, cascade="all, delete-orphan"))
+
+
+class AdminReview(db.Model):
+    __tablename__ = 'admin_reviews'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    resume_id = db.Column(db.Integer, db.ForeignKey('user_resumes.id', ondelete='CASCADE'), nullable=True)
+    job_id = db.Column(db.Integer, nullable=True) # ID of matched job from features
+    status = db.Column(db.String(20), default='pending', nullable=False) # 'pending', 'approved', 'rejected'
+    feedback = db.Column(db.Text, nullable=True)
+    suggested_improvements = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    
+    # Relationships
+    user = db.relationship('User', backref=db.backref('admin_reviews', lazy=True, cascade="all, delete-orphan"))
+    resume = db.relationship('UserResume', backref=db.backref('reviews', lazy=True, cascade="all, delete-orphan"))
+
 
 

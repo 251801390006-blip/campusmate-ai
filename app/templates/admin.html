@@ -191,6 +191,133 @@
         </table>
     </div>
 </div>
+
+<!-- Referral Reviews Registry -->
+<div class="flat-card shadow-sm border-light mb-4 mt-4">
+    <h3 style="font-size: 1.05rem;" class="mb-3 text-dark fw-bold"><i class="fa-solid fa-file-invoice-dollar text-primary me-2"></i> Resume Referral Requests</h3>
+    
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Student</th>
+                    <th>Job ID</th>
+                    <th>Resume</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rev in reviews %}
+                    <tr>
+                        <td>{{ rev.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td><strong>{{ rev.user.username }}</strong><br><small class="text-muted">{{ rev.user.email }}</small></td>
+                        <td><code>#{{ rev.job_id }}</code></td>
+                        <td>
+                            {% if rev.resume %}
+                                <button type="button" onclick="alert('Resume Content Preview:\n\n' + JSON.stringify(JSON.parse({{ rev.resume.content_json|tojson }}), null, 2).substring(0, 1000) + '\n...')" class="btn btn-sm btn-link text-primary fw-semibold p-0 border-0 bg-transparent"><i class="fa-solid fa-file-lines me-1"></i> View Resume Data</button>
+                            {% else %}
+                                <span class="text-muted">No resume attached</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge {% if rev.status == 'approved' %}bg-success text-white{% elif rev.status == 'rejected' %}bg-danger text-white{% else %}bg-warning text-dark{% endif %}">
+                                {{ rev.status.upper() }}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-primary py-1 px-3" onclick="openReviewModal({{ rev.id }}, '{{ rev.status }}', '{{ rev.feedback|default('')|e }}', '{{ rev.suggested_improvements|default('')|e }}')">
+                                <i class="fa-solid fa-pen-to-square"></i> Review
+                            </button>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">No referral reviews pending.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Announcement Broadcaster Panel -->
+<div class="flat-card shadow-sm border-light mb-4">
+    <h3 style="font-size: 1.05rem;" class="mb-3 text-dark fw-bold"><i class="fa-solid fa-bullhorn text-primary me-2"></i> Announcement Broadcaster</h3>
+    <form method="POST" action="{{ url_for('admin.broadcast_announcement') }}" class="d-flex flex-column gap-3">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label for="broadcast-title" class="fw-semibold text-secondary mb-1" style="font-size:0.8rem;">Announcement Title</label>
+                <input type="text" name="title" id="broadcast-title" required class="form-control" placeholder="e.g. Placement Drive Phase-1 Active!">
+            </div>
+            <div class="col-md-3">
+                <label for="broadcast-category" class="fw-semibold text-secondary mb-1" style="font-size:0.8rem;">Category</label>
+                <select name="category" id="broadcast-category" class="form-select">
+                    <option value="general">General Notification</option>
+                    <option value="milestone">Milestone Update</option>
+                    <option value="alert">Alert / Critical</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="broadcast-target" class="fw-semibold text-secondary mb-1" style="font-size:0.8rem;">Target Audience</label>
+                <select name="target_user" id="broadcast-target" class="form-select">
+                    <option value="all">All Students</option>
+                    {% for u in users %}
+                        {% if u.role != 'admin' %}
+                            <option value="{{ u.id }}">{{ u.username }} (#{{ u.id }})</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+        <div>
+            <label for="broadcast-content" class="fw-semibold text-secondary mb-1" style="font-size:0.8rem;">Message Content</label>
+            <textarea name="content" id="broadcast-content" required class="form-control" rows="3" placeholder="Type notification details here..."></textarea>
+        </div>
+        
+        <div>
+            <button type="submit" class="btn btn-primary px-4"><i class="fa-solid fa-paper-plane me-1"></i> Broadcast Announcement</button>
+        </div>
+    </form>
+</div>
+
+<!-- Modal for Referral Review Process -->
+<div id="referral-modal" class="modal-overlay hidden" onclick="if(event.target === this) closeReferralModal()">
+    <div class="glass-card animate-pop bg-white p-4 shadow-lg border" style="max-width: 500px; width: 95%; border-radius: 12px; position: relative; z-index: 10500;">
+        <h3 class="fw-bold mb-3 text-dark" style="font-size: 1.15rem;"><i class="fa-solid fa-pen-fancy text-primary me-2"></i> Review Referral Request</h3>
+        <form id="referral-form" method="POST" action="">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <div class="mb-3">
+                <label for="referral-status" class="fw-semibold text-secondary mb-1 d-block" style="font-size: 0.8rem;">Decision Status</label>
+                <select name="status" id="referral-status" class="form-select">
+                    <option value="pending">PENDING</option>
+                    <option value="approved">APPROVED</option>
+                    <option value="rejected">REJECTED</option>
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label for="referral-feedback" class="fw-semibold text-secondary mb-1 d-block" style="font-size: 0.8rem;">Review Feedback</label>
+                <textarea name="feedback" id="referral-feedback" class="form-control" rows="3" placeholder="Provide feedback to user..."></textarea>
+            </div>
+            
+            <div class="mb-3">
+                <label for="referral-improvements" class="fw-semibold text-secondary mb-1 d-block" style="font-size: 0.8rem;">Suggested Improvements</label>
+                <textarea name="suggested_improvements" id="referral-improvements" class="form-control" rows="2" placeholder="List certs/skills needed..."></textarea>
+            </div>
+            
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <button type="button" class="btn btn-outline-secondary" onclick="closeReferralModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary px-4">Save & Notify</button>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_scripts %}
@@ -217,6 +344,19 @@ async function triggerDatabaseReset(url, csrfToken) {
         console.error(e);
         alert("Connection error.");
     }
+}
+
+function openReviewModal(reviewId, status, feedback, improvements) {
+    const form = document.getElementById("referral-form");
+    form.action = `/admin/referrals/${reviewId}/update`;
+    document.getElementById("referral-status").value = status;
+    document.getElementById("referral-feedback").value = feedback;
+    document.getElementById("referral-improvements").value = improvements;
+    document.getElementById("referral-modal").classList.remove("hidden");
+}
+
+function closeReferralModal() {
+    document.getElementById("referral-modal").classList.add("hidden");
 }
 </script>
 {% endblock %}

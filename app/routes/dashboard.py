@@ -326,4 +326,144 @@ def read_all_notifications():
     return jsonify({"success": True})
 
 
+@dashboard_bp.route('/notifications')
+@login_required
+def notifications():
+    from app.models import Notification
+    category_filter = request.args.get('category')
+    search_query = request.args.get('q', '').strip()
+    
+    query = Notification.query.filter_by(user_id=current_user.id)
+    
+    if category_filter:
+        query = query.filter_by(category=category_filter)
+        
+    if search_query:
+        query = query.filter(Notification.title.ilike(f"%{search_query}%") | Notification.content.ilike(f"%{search_query}%"))
+        
+    notifs = query.order_by(Notification.created_at.desc()).all()
+    return render_template('notifications.html', notifications=notifs, category_filter=category_filter, search_query=search_query)
+
+
+@dashboard_bp.route('/notifications/delete/<int:notif_id>', methods=['POST'])
+@login_required
+def delete_notification(notif_id):
+    from flask import jsonify
+    from app.models import Notification
+    notif = Notification.query.filter_by(id=notif_id, user_id=current_user.id).first_or_404()
+    db.session.delete(notif)
+    db.session.commit()
+    return jsonify({"success": True})
+
+
+@dashboard_bp.route('/notifications/delete-all', methods=['POST'])
+@login_required
+def delete_all_notifications():
+    from flask import jsonify
+    from app.models import Notification
+    Notification.query.filter_by(user_id=current_user.id).delete()
+    db.session.commit()
+    return jsonify({"success": True})
+
+
+@dashboard_bp.route('/settings/upload-photo', methods=['POST'])
+@login_required
+def upload_photo():
+    import uuid
+    import os
+    from werkzeug.utils import secure_filename
+    from flask import current_app
+    
+    if 'profile_photo' not in request.files:
+        flash("No file part in request.", "danger")
+        return redirect(url_for('dashboard.settings'))
+        
+    file = request.files['profile_photo']
+    if file.filename == '':
+        flash("No selected file.", "danger")
+        return redirect(url_for('dashboard.settings'))
+        
+    allowed_extensions = {'png', 'jpg', 'jpeg', 'gif'}
+    ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else ''
+    
+    if ext in allowed_extensions:
+        filename = secure_filename(file.filename)
+        upload_folder = os.path.join(current_app.root_path, 'static', 'images', 'avatars', 'uploads')
+        os.makedirs(upload_folder, exist_ok=True)
+        
+        unique_filename = f"{current_user.id}_{uuid.uuid4().hex}.{ext}"
+        file_path = os.path.join(upload_folder, unique_filename)
+        file.save(file_path)
+        
+        current_user.profile_photo = f"images/avatars/uploads/{unique_filename}"
+        db.session.commit()
+        flash("Profile photo updated successfully!", "success")
+    else:
+        flash("Allowed file types: PNG, JPG, JPEG, GIF", "danger")
+        
+    return redirect(url_for('dashboard.settings'))
+
+
+@dashboard_bp.route('/settings/update-preferences', methods=['POST'])
+@login_required
+def update_preferences():
+    public_profile = request.form.get('public_profile') == 'y'
+    notifications_enabled = request.form.get('notifications_enabled') == 'y'
+    current_user.public_profile = public_profile
+    current_user.notifications_enabled = notifications_enabled
+    db.session.commit()
+    flash("Privacy and notification preferences updated successfully!", "success")
+    return redirect(url_for('dashboard.settings'))
+
+
+@dashboard_bp.route('/settings/export-data', methods=['GET'])
+@login_required
+def export_data():
+    from flask import jsonify
+    resumes = UserResume.query.filter_by(user_id=current_user.id).all()
+    progress = RoadmapProgress.query.filter_by(user_id=current_user.id).first()
+    
+    data = {
+        "username": current_user.username,
+        "email": current_user.email,
+        "role": current_user.role,
+        "name": current_user.name,
+        "bio": current_user.bio,
+        "branch": current_user.branch,
+        "year": current_user.year,
+        "career_goal": current_user.career_goal,
+        "interests": current_user.interests,
+        "daily_study_time": current_user.daily_study_time,
+        "skills": current_user.skills,
+        "xp": current_user.xp,
+        "learning_streak": current_user.learning_streak,
+        "resumes": [
+            {
+                "title": r.title,
+                "theme": r.theme,
+                "content": r.content_json,
+                "ats_score": r.ats_score,
+                "created_at": r.created_at.isoformat()
+            } for r in resumes
+        ],
+        "roadmap": {
+            "track": progress.role if progress else None,
+            "completed_checkpoints": progress.completed_nodes if progress else ""
+        }
+    }
+    return jsonify(data)
+
+
+@dashboard_bp.route('/settings/delete-account', methods=['POST'])
+@login_required
+def delete_account():
+    from flask_login import logout_user
+    user = User.query.get(current_user.id)
+    logout_user()
+    db.session.delete(user)
+    db.session.commit()
+    flash("Your account has been deleted.", "info")
+    return redirect(url_for('dashboard.landing'))
+
+
 

@@ -81,9 +81,11 @@
                         <h3 style="font-size: 1.1rem; font-weight: 700;" class="mb-0 text-dark"><i class="fa-solid fa-circle-nodes text-primary me-2"></i> Interactive Pathway Tree</h3>
                         <span class="badge bg-soft-info text-info mt-1" style="font-size: 0.7rem; border: 1px solid rgba(0, 120, 212, 0.2); background: rgba(0, 120, 212, 0.05); color: #0078d4 !important;">200 Milestones Sequential Unlock</span>
                     </div>
-                    <div class="d-flex gap-2">
-                        <input type="text" id="roadmap-node-search" placeholder="Search topics..." oninput="searchRoadmapNodes()" class="form-control form-control-sm" style="max-width: 200px; font-size: 0.8rem; border-radius: 4px;">
+                    <div class="d-flex gap-2 align-items-center">
+                        <input type="text" id="roadmap-node-search" placeholder="Search checkpoints..." oninput="searchRoadmapNodes()" class="form-control form-control-sm" style="max-width: 180px; font-size: 0.8rem; border-radius: 4px;">
+                        <button class="btn btn-sm btn-primary fw-semibold" onclick="jumpToActive()" style="font-size:0.75rem; background:#0078d4; border:none; display:flex; align-items:center; gap:6px; height:31px; border-radius:4px; cursor:pointer;"><i class="fa-solid fa-play"></i> Continue Learning</button>
                     </div>
+
                 </div>
 
                 <div class="canvas-instructions mb-2 text-muted" style="font-size: 0.75rem; display: flex; align-items: center; gap: 8px;">
@@ -102,10 +104,31 @@
                         <button class="btn btn-light shadow-sm" onclick="zoomIn()" title="Zoom In"><i class="fa-solid fa-plus"></i></button>
                         <button class="btn btn-light shadow-sm" onclick="zoomOut()" title="Zoom Out"><i class="fa-solid fa-minus"></i></button>
                         <button class="btn btn-light shadow-sm" onclick="resetZoom()" title="Reset Zoom"><i class="fa-solid fa-arrows-to-dot"></i></button>
+                        <button class="btn btn-light shadow-sm" onclick="fitToScreen()" title="Fit to Screen"><i class="fa-solid fa-maximize"></i></button>
+                        <button class="btn btn-light shadow-sm" onclick="toggleFullScreen()" title="Full Screen"><i class="fa-solid fa-display"></i></button>
                         <button class="btn btn-primary shadow-sm" onclick="jumpToActive()" title="Center on Active Step" style="background: #0078d4; border: none;"><i class="fa-solid fa-location-crosshairs"></i></button>
+                    </div>
+
+                    <!-- Navigator Compass (Interactive Minimap) -->
+                    <div class="roadmap-minimap-navigation shadow-sm border bg-white p-2" id="roadmap-minimap" style="position: absolute; bottom: 15px; right: 15px; z-index: 95; border-radius: 8px; width: 110px; height: 110px; opacity: 0.85; transition: opacity 0.2s ease;">
+                        <span style="font-size: 8px; font-weight:700; display:block; text-align:center; color:var(--text-muted); text-transform:uppercase;">Navigator</span>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; width: 80px; height: 80px; margin: 2px auto;">
+                            <div></div>
+                            <button class="btn btn-sm p-1 border-0" onclick="panCanvas('up')" style="background:none; cursor:pointer;"><i class="fa-solid fa-chevron-up text-primary" style="font-size:10px;"></i></button>
+                            <div></div>
+                            
+                            <button class="btn btn-sm p-1 border-0" onclick="panCanvas('left')" style="background:none; cursor:pointer;"><i class="fa-solid fa-chevron-left text-primary" style="font-size:10px;"></i></button>
+                            <button class="btn btn-sm p-1 border-0" onclick="resetZoom()" style="background:none; font-size:8px; cursor:pointer;"><i class="fa-solid fa-circle text-primary"></i></button>
+                            <button class="btn btn-sm p-1 border-0" onclick="panCanvas('right')" style="background:none; cursor:pointer;"><i class="fa-solid fa-chevron-right text-primary" style="font-size:10px;"></i></button>
+                            
+                            <div></div>
+                            <button class="btn btn-sm p-1 border-0" onclick="panCanvas('down')" style="background:none; cursor:pointer;"><i class="fa-solid fa-chevron-down text-primary" style="font-size:10px;"></i></button>
+                            <div></div>
+                        </div>
                     </div>
                 </div>
             </div>
+
         {% else %}
             <div class="flat-card text-center py-5 shadow-sm border-light">
                 <i class="fa-solid fa-route text-muted mb-3" style="font-size: 3.5rem;"></i>
@@ -149,7 +172,8 @@
             
             <!-- Resources Section -->
             <div class="accordion-section mb-3">
-                <h4 class="fw-bold mb-2 text-dark" style="font-size:0.85rem;"><i class="fa-solid fa-book-open text-primary me-2"></i> Microsoft Learn & Documentation</h4>
+                <h4 class="fw-bold mb-2 text-dark" style="font-size:0.85rem;"><i class="fa-solid fa-graduation-cap text-primary me-2"></i> Real-World Learning Resources</h4>
+
                 <ul id="node-modal-resources" class="resource-list ps-3 mb-0" style="font-size: 0.82rem; line-height: 1.7; color: var(--text-secondary);"></ul>
             </div>
             
@@ -165,10 +189,11 @@
                 <div class="cert-info-box p-3 border rounded text-dark" id="node-modal-certs" style="font-size: 0.82rem; line-height: 1.5; background-color: #f0fdf4; border-color: #dcfce7; color: #15803d;"></div>
             </div>
 
-            <div class="node-action-footer d-flex justify-content-between align-items-center">
-                <span class="text-muted" style="font-size:0.75rem;">Requires completing all previous nodes.</span>
-                <button id="node-modal-action-btn" class="btn btn-primary py-2 px-4 shadow-sm" onclick="triggerNodeCompletion()" style="background: linear-gradient(135deg, #0078d4, #00bcf2); border: none;">Mark Complete <i class="fa-solid fa-check ms-1"></i></button>
+            <div class="node-action-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <button id="node-modal-bookmark-btn" class="btn btn-sm btn-outline-secondary" onclick="bookmarkCurrentNode()" style="font-size: 0.78rem; padding: 6px 12px; border-radius: 4px; border: 1px solid var(--border-color); color: var(--text-secondary); background: transparent; cursor: pointer;"><i class="fa-regular fa-bookmark me-1"></i> Bookmark</button>
+                <button id="node-modal-action-btn" class="btn btn-primary py-2 px-4 shadow-sm" onclick="triggerNodeCompletion()" style="background: linear-gradient(135deg, #0078d4, #00bcf2); border: none; font-size: 0.82rem; font-weight:600; border-radius:4px;">Mark Complete <i class="fa-solid fa-check ms-1"></i></button>
             </div>
+
         </div>
     </div>
 </div>
@@ -198,6 +223,8 @@ let completedNodes = [
 
 let selectedNode = null;
 let selectedStepIdx = -1;
+let coords = [];
+
 
 function computeNodeStatuses() {
     activeNodes.forEach((node, index) => {
@@ -245,7 +272,8 @@ function renderRoadmapTree() {
     canvasSvg.setAttribute("height", totalHeight.toString());
 
     // 1. Calculate coordinates
-    const coords = [];
+    coords = [];
+
     activeNodes.forEach((node, index) => {
         const y = index * 150 + 100;
         let x = 450;
@@ -286,6 +314,7 @@ function renderRoadmapTree() {
     activeNodes.forEach((node, index) => {
         const pt = coords[index];
         const div = document.createElement("div");
+        div.id = `node-badge-${index + 1}`;
         div.className = `roadmap-node-badge shadow-sm ${node.status}`;
         div.style.left = `${pt.x - 100}px`; // center node horizontally (width is 200px)
         div.style.top = `${pt.y - 45}px`;   // center node vertically (height is 90px)
@@ -475,11 +504,25 @@ async function triggerNodeCompletion() {
 }
 
 function searchRoadmapNodes() {
-    const query = document.getElementById("roadmap-node-search").value.toLowerCase();
+    const query = document.getElementById("roadmap-node-search").value.toLowerCase().trim();
     const badges = document.querySelectorAll(".roadmap-node-badge");
-    badges.forEach(badge => {
-        const title = badge.querySelector("h4").innerText.toLowerCase();
-        const desc = badge.querySelector(".node-desc").innerText.toLowerCase();
+    
+    if (!query) {
+        badges.forEach(badge => {
+            badge.style.opacity = "1";
+            badge.style.filter = "none";
+        });
+        return;
+    }
+    
+    activeNodes.forEach((node, index) => {
+        const stepNum = index + 1;
+        const badge = document.getElementById(`node-badge-${stepNum}`);
+        if (!badge) return;
+        
+        const title = node.title.toLowerCase();
+        const desc = node.description.toLowerCase();
+        
         if (title.includes(query) || desc.includes(query)) {
             badge.style.opacity = "1";
             badge.style.filter = "none";
@@ -566,14 +609,50 @@ function resetZoom() {
     updateTransform();
 }
 
+function fitToScreen() {
+    const totalHeight = activeNodes.length * 150 + 200;
+    const padding = 40;
+    const scaleY = (viewport.clientHeight - padding) / totalHeight;
+    const scaleX = (viewport.clientWidth - padding) / 900;
+    scale = Math.max(0.25, Math.min(1.2, Math.min(scaleX, scaleY)));
+    translateX = (viewport.clientWidth - 900 * scale) / 2;
+    translateY = padding / 2;
+    updateTransform();
+}
+
+function toggleFullScreen() {
+    const el = document.getElementById("canvas-viewport");
+    if (!document.fullscreenElement) {
+        el.requestFullscreen().then(() => {
+            el.style.height = "100vh";
+            setTimeout(fitToScreen, 150);
+        }).catch(err => {
+            alert(`Fullscreen error: ${err.message}`);
+        });
+    } else {
+        document.exitFullscreen().then(() => {
+            el.style.height = "620px";
+            setTimeout(resetZoom, 150);
+        });
+    }
+}
+
+function panCanvas(direction) {
+    const step = 100 * scale;
+    if (direction === 'up') translateY += step;
+    else if (direction === 'down') translateY -= step;
+    else if (direction === 'left') translateX += step;
+    else if (direction === 'right') translateX -= step;
+    updateTransform();
+}
+
 function jumpToActive() {
-    // Find active step or the first uncompleted step
     let activeIndex = activeNodes.findIndex(n => n.status === "IN_PROGRESS");
     if (activeIndex === -1) {
         activeIndex = activeNodes.findIndex(n => n.status === "LOCKED");
     }
     if (activeIndex === -1) {
-        activeIndex = activeNodes.length - 1; // fallback to end
+        activeIndex = activeNodes.length - 1;
     }
     
     if (activeIndex >= 0) {
@@ -589,11 +668,79 @@ function jumpToActive() {
     }
 }
 
+async function bookmarkCurrentNode() {
+    if (!selectedNode) return;
+    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
+    try {
+        const response = await fetch("/bookmarks/add", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": csrfToken
+            },
+            body: `item_type=roadmap&title=${encodeURIComponent(selectedNode.title)}`
+        });
+        if (response.ok) {
+            alert(`Bookmarked checkpoint: ${selectedNode.title} successfully!`);
+        } else {
+            alert("Failed to bookmark checkpoint.");
+        }
+    } catch(e) {
+        console.error(e);
+        alert("Failed to send request.");
+    }
+}
+
 // Initialize layout
 document.addEventListener("DOMContentLoaded", () => {
     renderRoadmapTree();
-    setTimeout(resetZoom, 200); // reset scale on layout load
+    setTimeout(resetZoom, 200);
+    
+    // Listen for Enter key on search input to center and open the matched node
+    const searchInput = document.getElementById("roadmap-node-search");
+    if (searchInput) {
+        searchInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                const query = e.target.value.toLowerCase().trim();
+                if (!query) return;
+                
+                // Find first non-locked node matching query
+                const matchedIndex = activeNodes.findIndex((n, idx) => {
+                    return n.status !== "LOCKED" && (n.title.toLowerCase().includes(query) || n.description.toLowerCase().includes(query));
+                });
+                
+                if (matchedIndex !== -1) {
+                    const node = activeNodes[matchedIndex];
+                    const stepNum = matchedIndex + 1;
+                    
+                    // Center the camera on this node
+                    const pt = coords[matchedIndex];
+                    scale = 1.0;
+                    translateX = viewport.clientWidth / 2 - pt.x * scale;
+                    translateY = viewport.clientHeight / 2 - pt.y * scale;
+                    updateTransform();
+                    
+                    // Apply highlight class to the node badge
+                    const badge = document.getElementById(`node-badge-${stepNum}`);
+                    if (badge) {
+                        document.querySelectorAll(".roadmap-node-badge").forEach(b => b.classList.remove("highlighted-node"));
+                        badge.classList.add("highlighted-node");
+                        
+                        setTimeout(() => {
+                            badge.classList.remove("highlighted-node");
+                        }, 3000);
+                    }
+                    
+                    // Open modal
+                    setTimeout(() => {
+                        openNodeModal(node, stepNum);
+                    }, 400);
+                }
+            }
+        });
+    }
 });
+
 </script>
 
 <style>
@@ -696,6 +843,20 @@ document.addEventListener("DOMContentLoaded", () => {
 .roadmap-node-badge.COMPLETED {
     border: 1.5px solid #0078d4;
     background: #f8fafc;
+}
+.roadmap-node-badge.highlighted-node {
+    border-color: #00bcf2 !important;
+    box-shadow: 0 0 15px #00bcf2 !important;
+    animation: pulse-highlight 1s infinite alternate !important;
+    z-index: 9999 !important;
+}
+@keyframes pulse-highlight {
+    0% {
+        box-shadow: 0 0 5px #00bcf2;
+    }
+    100% {
+        box-shadow: 0 0 20px #00bcf2;
+    }
 }
 
 .node-status-indicator {

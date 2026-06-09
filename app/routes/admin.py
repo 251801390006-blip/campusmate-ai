@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, abort, jsonify
 from flask_login import login_required, current_user
-from app.models import db, User, FeedbackItem, FeedbackReply, RoadmapProgress, UserResume, ChatMessage
+from app.models import db, User, FeedbackItem, FeedbackReply, RoadmapProgress, UserResume, ChatMessage, AdminReview, Notification
 from functools import wraps
 from sqlalchemy import func
 import time
@@ -82,6 +82,8 @@ def dashboard():
         "active_transactions": 0
     }
     
+    reviews = AdminReview.query.order_by(AdminReview.created_at.desc()).all()
+    
     return render_template(
         'admin.html',
         total_users=total_users,
@@ -94,7 +96,8 @@ def dashboard():
         popular_roadmaps=popular_roadmaps,
         total_resumes=total_resumes,
         total_chat_messages=total_chat_messages,
-        daily_signups=daily_signups
+        daily_signups=daily_signups,
+        reviews=reviews
     )
 
 @admin_bp.route('/users/<int:user_id>/toggle-status', methods=['POST'])
@@ -211,5 +214,79 @@ def change_user_role(user_id):
     else:
         flash("Invalid role selection.", "danger")
         
+    return redirect(url_for('admin.dashboard'))
+
+
+@admin_bp.route('/referrals/<int:review_id>/update', methods=['POST'])
+@login_required
+@role_required('admin')
+def update_referral(review_id):
+    review = AdminReview.query.get_or_404(review_id)
+    status = request.form.get('status')
+    feedback = request.form.get('feedback', '')
+    suggested_improvements = request.form.get('suggested_improvements', '')
+    
+    if status in ['approved', 'rejected', 'pending']:
+        review.status = status
+        review.feedback = feedback
+        review.suggested_improvements = suggested_improvements
+        db.session.commit()
+        
+        # Notify the user
+        notif = Notification(
+            user_id=review.user_id,
+            title=f"Referral Review Update: {status.upper()} 📝",
+            content=f"Your referral request for Job #{review.job_id} has been reviewed. Status: {status.upper()}. Feedback: {feedback}",
+            category="alert"
+        )
+        db.session.add(notif)
+        db.session.commit()
+        flash("Referral review updated and student notified!", "success")
+    else:
+        flash("Invalid status selected.", "danger")
+        
+    return redirect(url_for('admin.dashboard'))
+
+
+@admin_bp.route('/broadcast', methods=['POST'])
+@login_required
+@role_required('admin')
+def broadcast_announcement():
+    title = request.form.get('title')
+    content = request.form.get('content')
+    category = request.form.get('category', 'general')
+    target_user_id = request.form.get('target_user')
+    
+    if not title or not content:
+        flash("Title and content are required for broadcasting.", "danger")
+        return redirect(url_for('admin.dashboard'))
+        
+    if target_user_id == "all":
+        users = User.query.filter_by(role='user').all()
+        for u in users:
+            notif = Notification(
+                user_id=u.id,
+                title=title,
+                content=content,
+                category=category
+            )
+            db.session.add(notif)
+        db.session.commit()
+        flash("Successfully broadcasted announcement to all students!", "success")
+    else:
+        try:
+            uid = int(target_user_id)
+            notif = Notification(
+                user_id=uid,
+                title=title,
+                content=content,
+                category=category
+            )
+            db.session.add(notif)
+            db.session.commit()
+            flash(f"Successfully sent announcement to user #{uid}!", "success")
+        except ValueError:
+            flash("Invalid target user selected.", "danger")
+            
     return redirect(url_for('admin.dashboard'))
 

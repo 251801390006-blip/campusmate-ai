@@ -1,0 +1,189 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Notifications Inbox - CampusMate AI{% endblock %}
+
+{% block header_title %}Notifications Inbox{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Filters Toolbar -->
+    <div class="col-12">
+        <div class="flat-card shadow-sm border-light bg-white p-3 d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <a href="{{ url_for('dashboard.notifications') }}" class="btn btn-sm {% if not category_filter %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+                    All Notifications
+                </a>
+                <a href="{{ url_for('dashboard.notifications', category='announcement', q=search_query) }}" class="btn btn-sm {% if category_filter == 'announcement' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+                    <i class="fa-solid fa-bullhorn me-1"></i> Announcements
+                </a>
+                <a href="{{ url_for('dashboard.notifications', category='milestone', q=search_query) }}" class="btn btn-sm {% if category_filter == 'milestone' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+                    <i class="fa-solid fa-trophy me-1"></i> Milestones
+                </a>
+                <a href="{{ url_for('dashboard.notifications', category='alert', q=search_query) }}" class="btn btn-sm {% if category_filter == 'alert' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+                    <i class="fa-solid fa-triangle-exclamation me-1"></i> Alerts
+                </a>
+            </div>
+            
+            <div class="d-flex align-items-center gap-2">
+                <form method="GET" action="{{ url_for('dashboard.notifications') }}" class="d-flex gap-1 mb-0">
+                    {% if category_filter %}
+                        <input type="hidden" name="category" value="{{ category_filter }}">
+                    {% endif %}
+                    <input type="text" name="q" value="{{ search_query }}" placeholder="Search inbox..." class="form-control form-control-sm" style="max-width: 180px;">
+                    <button type="submit" class="btn btn-sm btn-primary"><i class="fa-solid fa-magnifying-glass"></i></button>
+                </form>
+                
+                <button onclick="clearAllNotifications()" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash-can me-1"></i> Clear All</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications List -->
+    <div class="col-12">
+        <div class="flat-card shadow-sm border-light bg-white p-4">
+            <div id="notifications-container" class="d-flex flex-column gap-3">
+                {% for notif in notifications %}
+                    <div id="notif-card-{{ notif.id }}" class="p-3 rounded border position-relative d-flex justify-content-between align-items-start gap-3 transition-all {% if not notif.is_read %}border-primary bg-light-subtle{% else %}border-light bg-white{% endif %}" style="transition: all 0.2s ease;">
+                        <div class="d-flex gap-3 align-items-start">
+                            <div class="p-2 rounded-circle" style="
+                                width: 40px; 
+                                height: 40px; 
+                                display: flex; 
+                                align-items: center; 
+                                justify-content: center; 
+                                font-size: 1.15rem;
+                                {% if notif.category == 'alert' %}
+                                    background-color: #fee2e2; color: #ef4444;
+                                {% elif notif.category == 'milestone' %}
+                                    background-color: #fef3c7; color: #d97706;
+                                {% else %}
+                                    background-color: #e0f2fe; color: #0284c7;
+                                {% endif %}
+                            ">
+                                {% if notif.category == 'alert' %}
+                                    <i class="fa-solid fa-triangle-exclamation"></i>
+                                {% elif notif.category == 'milestone' %}
+                                    <i class="fa-solid fa-award"></i>
+                                {% else %}
+                                    <i class="fa-solid fa-bullhorn"></i>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <h4 class="fw-bold mb-1 text-dark" style="font-size:0.95rem;">{{ notif.title }}</h4>
+                                <p class="text-secondary mb-1" style="font-size:0.85rem; line-height:1.4;">{{ notif.content }}</p>
+                                <small class="text-muted" style="font-size:0.75rem;"><i class="fa-regular fa-clock me-1"></i> {{ notif.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex align-items-center gap-3">
+                            {% if not notif.is_read %}
+                                <button onclick="markAsRead({{ notif.id }})" class="btn btn-sm btn-link text-primary p-0 border-0 bg-transparent text-decoration-none" style="font-size:0.75rem; font-weight:600;"><i class="fa-solid fa-circle me-1" style="font-size: 8px;"></i> Mark read</button>
+                            {% endif %}
+                            <button onclick="deleteNotification({{ notif.id }})" class="btn-close" style="background:none; border:none; font-size:0.85rem; color:var(--text-secondary); cursor:pointer;" title="Dismiss"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5 text-muted">
+                        <i class="fa-regular fa-envelope-open d-block mb-3" style="font-size:3rem;"></i>
+                        <h4 class="fw-bold text-dark mb-1">Your inbox is clear!</h4>
+                        <p class="text-secondary mb-0" style="font-size:0.85rem;">You have no active notifications matching this filter.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+async function markAsRead(id) {
+    const csrfToken = "{{ csrf_token() }}";
+    try {
+        const response = await fetch(`/notifications/read/${id}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken
+            }
+        });
+        if (response.ok) {
+            const card = document.getElementById(`notif-card-${id}`);
+            if (card) {
+                card.classList.remove("border-primary", "bg-light-subtle");
+                card.classList.add("border-light", "bg-white");
+                const btn = card.querySelector("button[onclick^='markAsRead']");
+                if (btn) btn.remove();
+            }
+            updateHeaderBadge(-1);
+        }
+    } catch(e) {
+        console.error(e);
+    }
+}
+
+async function deleteNotification(id) {
+    const csrfToken = "{{ csrf_token() }}";
+    try {
+        const response = await fetch(`/notifications/delete/${id}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken
+            }
+        });
+        if (response.ok) {
+            const card = document.getElementById(`notif-card-${id}`);
+            if (card) {
+                card.style.opacity = "0";
+                card.style.transform = "translateX(20px)";
+                setTimeout(() => {
+                    card.remove();
+                    const container = document.getElementById("notifications-container");
+                    if (container && container.children.length === 0) {
+                        window.location.reload();
+                    }
+                }, 200);
+            }
+            updateHeaderBadge(-1);
+        }
+    } catch(e) {
+        console.error(e);
+    }
+}
+
+async function clearAllNotifications() {
+    if (!confirm("Are you sure you want to dismiss all notifications?")) return;
+    const csrfToken = "{{ csrf_token() }}";
+    try {
+        const response = await fetch(`/notifications/delete-all`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken
+            }
+        });
+        if (response.ok) {
+            window.location.reload();
+        }
+    } catch(e) {
+        console.error(e);
+    }
+}
+
+function updateHeaderBadge(change) {
+    const badges = document.querySelectorAll(".notif-badge");
+    badges.forEach(b => {
+        let val = parseInt(b.innerText) || 0;
+        val += change;
+        if (val <= 0) {
+            b.classList.add("hidden");
+            b.innerText = "0";
+        } else {
+            b.classList.remove("hidden");
+            b.innerText = val.toString();
+        }
+    });
+}
+</script>
+{% endblock %}
