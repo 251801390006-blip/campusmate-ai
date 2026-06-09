@@ -2255,6 +2255,19 @@ def render_resume_pdf_html(content, theme):
 
     # SINGLE-COLUMN RENDERING (Standard and canva-elegant)
     is_elegant = (theme == "canva-elegant")
+    
+    container_styles = []
+    if border_top != "none":
+        container_styles.append(f"border-top: {border_top}; padding-top: 8px;")
+    if border_left != "none":
+        container_styles.append(f"border-left: {border_left}; padding-left: 12px;")
+    if border_bottom != "none":
+        container_styles.append(f"border-bottom: {border_bottom};")
+    if border != "none":
+        container_styles.append(f"border: {border}; padding: 12px;")
+        
+    container_css_str = "\n        ".join(container_styles)
+    
     css = f"""
     @page {{
         size: a4;
@@ -2269,6 +2282,9 @@ def render_resume_pdf_html(content, theme):
         line-height: {line_h};
         color: {text_color};
         background-color: {bg};
+    }}
+    .resume-container {{
+        {container_css_str}
     }}
     h1 {{
         font-size: 18px;
@@ -2311,18 +2327,6 @@ def render_resume_pdf_html(content, theme):
         font-size: 8.5px;
     }}
     """
-    
-    container_styles = []
-    if border_top != "none":
-        container_styles.append(f"border-top: {border_top}; padding-top: 8px;")
-    if border_left != "none":
-        container_styles.append(f"border-left: {border_left}; padding-left: 12px;")
-    if border_bottom != "none":
-        container_styles.append(f"border-bottom: {border_bottom};")
-    if border != "none":
-        container_styles.append(f"border: {border}; padding: 12px;")
-        
-    container_style_str = " ".join(container_styles)
     
     # Render sections
     sections_html = ""
@@ -2504,7 +2508,7 @@ def render_resume_pdf_html(content, theme):
         </style>
     </head>
     <body>
-        <div class="resume-container" style="{container_style_str}">
+        <div class="resume-container">
             <div style="text-align: {"center" if is_elegant else align}; margin-bottom: 8px;">
                 <h1>{content.get('name', 'Alex Smith')}</h1>
                 <div class="meta">{meta_str}</div>
