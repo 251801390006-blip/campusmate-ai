@@ -259,8 +259,8 @@ def parse_text_to_resume_fields(text: str) -> dict:
         "experienceB3": "",
         "experienceB4": "",
         
-        "projectTitle": "AegisShield AI – Cyber Crime Detection Platform",
-        "projectLink": "github.com/alexsmith/aegisshield-ai",
+        "projectTitle": "CampusMate AI – Student Learning Workspace",
+        "projectLink": "github.com/alexsmith/campusmate-ai",
         "projectB1": "",
         "projectB2": "",
         "projectB3": "",
