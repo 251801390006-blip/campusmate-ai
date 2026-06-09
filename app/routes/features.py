@@ -556,6 +556,12 @@ def get_predefined_roadmap(role: str) -> list:
         track_type = "web3"
     elif "design" in role_lower or "product" in role_lower or "testing" in role_lower or "qa" in role_lower or "business" in role_lower or "sap" in role_lower or "salesforce" in role_lower:
         track_type = "product_qa"
+    elif "vlsi" in role_lower or "ece" in role_lower or "electrical" in role_lower or "electronics" in role_lower or "power systems" in role_lower or "circuits" in role_lower or "robotics" in role_lower or "iot" in role_lower or "embedded" in role_lower:
+        track_type = "hardware_ece"
+    elif "csbs" in role_lower or "bio science" in role_lower or "biotech" in role_lower or "biological" in role_lower or "bioinformatics" in role_lower:
+        track_type = "csbs"
+    elif "mechanical" in role_lower or "civil" in role_lower or "chemical" in role_lower or "systems engineering" in role_lower:
+        track_type = "traditional_eng"
     else:
         track_type = "dev" # standard programming and full-stack development
 
@@ -670,6 +676,72 @@ def get_predefined_roadmap(role: str) -> list:
         ]
         cert_name = "Professional Scrum Product Owner"
         cert_provider = "Scrum.org"
+    elif track_type == "hardware_ece":
+        beginner_themes = [
+            "DC Circuits & Ohm's Law Essentials", "Digital Logic Design & Logic Gates",
+            "Electronic Devices & Diodes/BJTs", "Circuit Simulation with SPICE Tools",
+            "Microcontrollers & Arduino Coding", "Oscilloscopes & Lab Measurements"
+        ]
+        inter_themes = [
+            "Analog Circuits & Op-Amp Systems", "Signals & Systems Fourier Analysis",
+            "Verilog HDL & FPGA Implementations", "Embedded C & ARM Cortex Architecture",
+            "Printed Circuit Board (PCB) Layouts", "Sensors & Actuators Integrations"
+        ]
+        adv_themes = [
+            "VLSI Design & CMOS Technologies", "Digital Signal Processing (DSP) Filters",
+            "Power Electronics & Converter Design", "Embedded RTOS & Multi-Threading",
+            "Wireless Communication & RF Circuits"
+        ]
+        prof_themes = [
+            "ASIC Design Flows & Tape-Out Audits", "EMI/EMC Compliance & Thermal Controls",
+            "IoT Firmware Security & OTA Updates", "Production Capstone Hardware System"
+        ]
+        cert_name = "IEEE Certified Electronics Specialist"
+        cert_provider = "IEEE"
+    elif track_type == "csbs":
+        beginner_themes = [
+            "Cell Biology & Molecular Genetics Basics", "Python Programming & Biopython Libraries",
+            "Introduction to Bioinformatics Databases", "Sequence Alignment & FASTA File Formats",
+            "Biostatistics & Normal Distributions", "Intro to Genomics & DNA Sequencing"
+        ]
+        inter_themes = [
+            "Dynamic Programming Sequence Alignment", "Phylogenetic Tree Reconstruction Methods",
+            "Structural Biology & 3D Protein Viewing", "Gene Expression Profiling & RNA-Seq",
+            "Machine Learning for Biomarker Detection", "Pathway Enrichment & Reactome Analysis"
+        ]
+        adv_themes = [
+            "Deep Learning for Protein Fold Prediction", "Metagenomics & Microbial Ecology Pipelines",
+            "Genome Assembly & Variant Calling Flows", "Computational Drug Design & Molecular Docking",
+            "Vector Databases for Biomedical Literature"
+        ]
+        prof_themes = [
+            "Clinical Trials Data Compliance & HIPAA", "Production Pipeline for Genomic Analytics",
+            "Cloud Platforms for Big Biotech Data", "Biotech Capstone Model Implementation"
+        ]
+        cert_name = "Bioinformatics Specialist Certification"
+        cert_provider = "ISCB"
+    elif track_type == "traditional_eng":
+        beginner_themes = [
+            "Engineering Mathematics & Physics", "Engineering Mechanics & Statics",
+            "Introduction to CAD & 2D Drafting", "Thermodynamics & Heat Transfer Basics",
+            "Materials Science & Fluid Mechanics", "Engineering Chemistry Essentials"
+        ]
+        inter_themes = [
+            "3D Solid Modeling & CAD Software", "Finite Element Analysis (FEA) Basics",
+            "Manufacturing Processes & Tooling", "Structural Analysis & Concrete Design",
+            "Chemical Reaction Engineering Principles", "Hydraulics & Pneumatic Control Systems"
+        ]
+        adv_themes = [
+            "Computational Fluid Dynamics (CFD)", "Geotechnical & Foundation Engineering",
+            "Chemical Process Simulation & Tools", "Automotive Systems & Powertrains",
+            "Dynamic Systems & Kinematics Control"
+        ]
+        prof_themes = [
+            "Industrial Plant Design Operations", "Project Estimation & Cost Audits",
+            "HVAC Systems & Environmental Safety", "Engineering Capstone System Project"
+        ]
+        cert_name = "Professional Engineer (PE) License Prep"
+        cert_provider = "NCEES"
     else: # dev / Full Stack
         beginner_themes = [
             "HTTP Protocols & Web Architectures", "Semantic HTML5 Page Layouts",
@@ -774,10 +846,16 @@ def get_predefined_roadmap(role: str) -> list:
             }],
             "interview_questions": [
                 {"question": f"What is the primary role of {theme} in industry systems?", "answer": f"{theme} helps organize, build, and optimize backend or frontend systems by following modern software standards."},
-                {"question": f"Explain one common pitfall or vulnerability when dealing with {theme}.", "answer": "Misconfiguration, lack of sanitization, or unoptimized complexity can lead to severe bottlenecks and data risks."},
-                {"question": f"Name three tools commonly used to develop, test, or deploy {theme}.", "answer": "Typical developer workflows include Git, VS Code, and container tools like Docker."},
-                {"question": f"How does scaling impact {theme} architectures?", "answer": "Horizontal scaling, database sharding, and caching help reduce latency as user requests scale."},
-                {"question": f"What is a standard best practice for monitoring {theme}?", "answer": "Implement structured logs, index metrics in dashboards, and setup alert thresholds for anomalies."}
+                {"question": f"Explain one common pitfall or vulnerability when dealing with {theme}.", "answer": f"Misconfiguration, lack of sanitization, or unoptimized complexity in {theme} can lead to severe bottlenecks and data risks."},
+                {"question": f"Name three tools commonly used to develop, test, or deploy {theme}.", "answer": f"Typical developer workflows include Git, VS Code, and container tools like Docker for managing {theme} code."},
+                {"question": f"How does scaling impact {theme} architectures?", "answer": f"Horizontal scaling, database sharding, and caching help reduce latency as user requests scale in {theme} modules."},
+                {"question": f"What is a standard best practice for monitoring {theme}?", "answer": f"Implement structured logs, index metrics in dashboards, and setup alert thresholds for anomalies in {theme} services."},
+                {"question": f"How do you handle unit testing and verification for {theme} logic?", "answer": f"Write mock tests to verify core algorithms, assertions on inputs/outputs, and automate checking within CI pipelines for {theme}."},
+                {"question": f"What is the security risk associated with misconfigured {theme}?", "answer": f"Improper permissions, lack of sanitization, or exposed endpoints in {theme} can lead to data leaks or remote code execution."},
+                {"question": f"Differentiate between synchronous and asynchronous operations in {theme}.", "answer": f"Synchronous blocks execution until {theme} tasks complete, while asynchronous operations run in the background via callbacks or promises."},
+                {"question": f"How does caching optimize workflows involving {theme}?", "answer": f"Caching stores frequent query results of {theme} in memory (like Redis), reducing database hits and resource consumption."},
+                {"question": f"Describe how you would design a logging strategy for debugging {theme} in production.", "answer": f"Log key {theme} execution events, error stack traces, execution duration, and log severity levels (INFO, WARN, ERROR) to central indexers."},
+                {"question": f"What performance metrics are most critical to monitor for {theme}?", "answer": f"Response latency of {theme} calls, throughput (requests per second), memory utilization, and CPU load."}
             ]
         })
         
@@ -803,8 +881,12 @@ def list_roadmaps():
             "DevOps", "Kubernetes", "Docker", "Linux Engineering", "Network Engineering",
             "Blockchain", "Web3", "UI/UX Design", "Product Design", "Product Management",
             "Software Testing", "QA Automation", "Game Development", "AR/VR Development",
-            "Robotics", "IoT", "Embedded Systems", "Database Engineering",
-            "Site Reliability Engineering", "Business Analysis", "SAP", "Salesforce", "Competitive Programming"
+            "Robotics & Automation", "IoT", "Embedded Systems", "Database Engineering",
+            "Site Reliability Engineering", "Business Analysis", "SAP", "Salesforce", "Competitive Programming",
+            "VLSI Design", "Electronics & Communication (ECE)", "Electrical Engineering",
+            "Power Systems Engineering", "Computer Science & Bio Science (CSBS)",
+            "Mechanical Engineering", "Civil Engineering", "Chemical Engineering",
+            "Data Engineering", "Biotechnology"
         ]
         
         selected_role = None
