@@ -414,6 +414,45 @@
     </form>
 </div>
 
+<!-- Broadcast Campaign History Section -->
+<div class="flat-card shadow-sm border-light mb-4">
+    <h3 style="font-size: 1.05rem;" class="mb-3 text-dark fw-bold"><i class="fa-solid fa-clock-rotate-left text-primary me-2"></i> Broadcast Campaign History</h3>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" style="font-size:0.85rem;">
+            <thead class="table-light text-secondary" style="font-size:0.75rem; text-transform:uppercase; font-weight:700; border-bottom: 1px solid var(--border-color);">
+                <tr>
+                    <th style="min-width: 140px;">Date & Time</th>
+                    <th style="min-width: 150px;">Title</th>
+                    <th>Message Content</th>
+                    <th style="width: 100px;">Category</th>
+                    <th style="width: 110px;" class="text-center">Total Sent</th>
+                    <th style="width: 130px;" class="text-center">Read / Dismissed</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in broadcasts %}
+                <tr>
+                    <td class="text-muted">{{ b.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td class="fw-bold text-dark">{{ b.title }}</td>
+                    <td class="text-secondary" style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ b.content }}">{{ b.content }}</td>
+                    <td>
+                        <span class="badge {% if b.category == 'alert' %}bg-danger{% elif b.category == 'milestone' %}bg-info{% else %}bg-secondary{% endif %}">
+                            {{ b.category|upper }}
+                        </span>
+                    </td>
+                    <td class="text-center fw-bold">{{ b.total_sent }}</td>
+                    <td class="text-center text-success fw-bold">{{ b.total_read or 0 }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center py-4 text-muted">No announcements have been broadcasted yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
 <!-- Modal for Referral Review Process -->
 <div id="referral-modal" class="modal-overlay hidden" onclick="if(event.target === this) closeReferralModal()">
     <div class="glass-card animate-pop bg-white p-4 shadow-lg border" style="max-width: 500px; width: 95%; border-radius: 12px; position: relative; z-index: 10500;">

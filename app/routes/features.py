@@ -1029,225 +1029,213 @@ def list_resume_versions():
         })
     return jsonify({"success": True, "versions": results})
 
-# 3. AI Chatbot / AI Mentor
-@features_bp.route('/ai-mentor', methods=['GET'])
+# 3. Smart AI Actions
+@features_bp.route('/smart-ai/study-plan', methods=['POST'])
 @login_required
-def ai_mentor():
+def generate_study_plan():
     try:
-        history = ChatMessage.query.filter_by(user_id=current_user.id).order_by(ChatMessage.created_at.asc()).all()
-    except Exception as e:
-        print(f"Error loading AI mentor history: {e}")
-        history = []
-    return render_template('ai_mentor.html', history=history)
-
-@features_bp.route('/ai-mentor/chat', methods=['POST'])
-@login_required
-def chat():
-    try:
+        from app.models import SiteConfig
         data = request.get_json() or {}
-        message_content = data.get('message', '').strip()
-        # Key priority: 1) user's personal browser key, 2) admin global DB key, 3) env var
-        user_key = (data.get('custom_key') or '').strip()
-        if not user_key:
-            from app.models import SiteConfig
-            user_key = SiteConfig.get('global_ai_key', '') or ''
-        custom_key = user_key
+        custom_key = (data.get('custom_key') or '').strip()
+        if not custom_key:
+            custom_key = SiteConfig.get('global_ai_key', '') or ''
 
-        
-        if not message_content:
-            return jsonify({"success": False, "error": "Message is required"}), 400
-            
-        # Rate limiting check: enforce 3 seconds delay between messages
-        last_msg = ChatMessage.query.filter_by(user_id=current_user.id).order_by(ChatMessage.created_at.desc()).first()
-        if last_msg:
-            delta = datetime.utcnow() - last_msg.created_at
-            if delta.total_seconds() < 3.0:
-                return jsonify({
-                    "success": False, 
-                    "error": "Rate limit exceeded. Please wait 3 seconds between messages."
-                }), 429
+        branch = current_user.branch or "Computer Science"
+        year = current_user.year or "3rd Year"
+        goal = current_user.career_goal or "Software Engineering"
+        skills = current_user.skills or "Python, HTML/CSS, SQL"
+
+        system_prompt = (
+            "You are a professional Academic Curriculum Director and Study Coach. "
+            "Your task is to generate a highly structured, week-by-week study plan (for next 12 weeks) "
+            "designed to help a student transition from their current status to their target career path.\n\n"
+            "Format the output in clean, professional Markdown with subheadings for each week. "
+            "Include weekly goals, study hour suggestions, key conceptual topics, practice coding exercises, "
+            "and project milestones. Keep it actionable and tailored to the student's constraints."
+        )
+        user_prompt = (
+            f"Student Profile:\n"
+            f"- Academic Major/Branch: {branch}\n"
+            f"- Current Year: {year}\n"
+            f"- Target Career Role: {goal}\n"
+            f"- Known Technical Skills: {skills}\n"
+            f"- Target Study Budget: {current_user.daily_study_time or '2 hours/day'}"
+        )
+
+        ai_res = call_gemini(system_prompt, user_prompt, user_key=custom_key)
+        if not ai_res:
+            ai_res = (
+                f"### 12-Week AI Study Plan: {goal}\n\n"
+                f"* **Week 1-4: Core Technical Pillars**\n"
+                f"  - Focus: Refresh {skills}. Master basic data structures and system architecture components.\n"
+                f"  - Hours: Allocate 2 hours/day.\n"
+                f"* **Week 5-8: Intermediate Project Engineering**\n"
+                f"  - Focus: Start designing a custom portfolio project. Integrate SQL/NoSQL database layers.\n"
+                f"* **Week 9-12: System Scaling & Placement Preparation**\n"
+                f"  - Focus: Configure deployment configurations (Docker, CI/CD) and solve active LeetCode topics.\n\n"
+                f"*(Note: Configure your Groq/Gemini key in Settings to unlock deep customized AI plans!)*"
+            )
+
+        return jsonify({"success": True, "study_plan": ai_res})
     except Exception as e:
-        print(f"Error in chat init: {e}")
-        return jsonify({"success": False, "error": "Server error. Please try again."}), 500
+        print(f"Error generating study plan: {e}")
+        return jsonify({"success": False, "error": "Server error while generating study plan."}), 500
 
+
+@features_bp.route('/smart-ai/internship-readiness', methods=['POST'])
+@login_required
+def generate_internship_readiness():
+    try:
+        from app.models import SiteConfig
+        data = request.get_json() or {}
+        custom_key = (data.get('custom_key') or '').strip()
+        if not custom_key:
+            custom_key = SiteConfig.get('global_ai_key', '') or ''
+
+        branch = current_user.branch or "Computer Science"
+        year = current_user.year or "3rd Year"
+        goal = current_user.career_goal or "Software Engineering"
+        skills = current_user.skills or "Python, HTML/CSS, SQL"
         
-    # 1. Command Center Keywords Interceptor
-    message_lower = message_content.lower()
-    command_response = None
-    
-    if "create roadmap for" in message_lower or "generate roadmap for" in message_lower or "create track for" in message_lower:
-        parts = message_content.split("for")
-        track_part = parts[-1].strip().strip("!.")
+        # Read latest resume analysis
+        resume = ResumeAnalysis.query.filter_by(user_id=current_user.id).order_by(ResumeAnalysis.created_at.desc()).first()
+        resume_score = resume.ats_score if resume else 0
+
+        system_prompt = (
+            "You are an ATS Recruitment Architect and Career Placement Director. "
+            "Analyze the student's profile and resume score, and output a detailed Internship Readiness Report in JSON format.\n"
+            "The JSON must contain exactly 5 keys:\n"
+            "- \"score\": a calculated integer rating (0 to 100) representing how ready the student is for a high-paying internship.\n"
+            "- \"missing_skills\": a list of 3-5 critical technical skills or keywords missing from the student's skill inventory.\n"
+            "- \"missing_certs\": a list of 2-3 industry certifications that would maximize recruiter matches.\n"
+            "- \"missing_projects\": a list of 2-3 advanced project architectures the student should build next.\n"
+            "- \"action_plan\": a detailed, step-by-step action plan in Markdown format containing immediate tasks to improve matching rates.\n\n"
+            "Return ONLY the valid JSON block without any extra text wrapper or markdown markers."
+        )
+        user_prompt = (
+            f"Student Details:\n"
+            f"- Branch: {branch}, Year: {year}\n"
+            f"- Target Career Path: {goal}\n"
+            f"- Known Skills: {skills}\n"
+            f"- Current Resume ATS Compatibility Score: {resume_score}/100"
+        )
+
+        ai_res = call_gemini(system_prompt, user_prompt, user_key=custom_key)
         
-        all_tracks = [
-            "Cyber Security", "Ethical Hacking", "SOC Analyst", "Digital Forensics",
-            "AI Engineering", "Machine Learning", "Deep Learning", "Generative AI", "Prompt Engineering", "Agentic AI",
-            "Data Science", "Data Analytics", "Python Developer", "Java Developer", "C++ Developer",
-            "Full Stack Development", "Frontend Development", "Backend Development", "React Developer", "Node.js Developer",
-            "Mobile App Development", "Android Development", "Flutter Development",
-            "Cloud Computing", "AWS", "Azure", "Google Cloud",
-            "DevOps", "Kubernetes", "Docker", "Linux Engineering", "Network Engineering",
-            "Blockchain", "Web3", "UI/UX Design", "Product Design", "Product Management",
-            "Software Testing", "QA Automation", "Game Development", "AR/VR Development",
-            "Robotics", "IoT", "Embedded Systems", "Database Engineering",
-            "Site Reliability Engineering", "Business Analysis", "SAP", "Salesforce", "Competitive Programming"
-        ]
-        
-        matched_track = None
-        for t in all_tracks:
-            if t.lower() in track_part.lower() or track_part.lower() in t.lower():
-                matched_track = t
-                break
+        # Default mock parser fallback
+        score = 65
+        missing_skills = ["Docker", "Kubernetes", "Linux Hardening", "System Design"]
+        missing_certs = ["AWS Certified Developer", "CompTIA Security+"]
+        missing_projects = ["Multi-tier Microservices App", "CI/CD Pipeline Automation"]
+        action_plan = (
+            "1. **Core Skills Expansion**: Add containerization (Docker) to your skill list by containerizing a mock web app.\n"
+            "2. **Resume Polish**: Improve your resume summary with specific quantitative achievements (e.g. 'Reduced latency by 25%').\n"
+            "3. **Milestone Targets**: Complete the remaining learning roadmap modules to reach at least 80% completion."
+        )
+
+        if ai_res:
+            try:
+                json_match = re.search(r'\{.*\}', ai_res, re.DOTALL)
+                if json_match:
+                    parsed = json.loads(json_match.group(0))
+                    score = parsed.get('score', score)
+                    missing_skills = parsed.get('missing_skills', missing_skills)
+                    missing_certs = parsed.get('missing_certs', missing_certs)
+                    missing_projects = parsed.get('missing_projects', missing_projects)
+                    action_plan = parsed.get('action_plan', action_plan)
+            except Exception as e:
+                print(f"Error parsing AI readiness JSON: {e}")
                 
-        if not matched_track:
-            matched_track = track_part.title()
-            
-        progress = RoadmapProgress.query.filter_by(user_id=current_user.id).first()
-        if not progress:
-            progress = RoadmapProgress(user_id=current_user.id, role=matched_track, completed_nodes="")
-            db.session.add(progress)
-        else:
-            progress.role = matched_track
-            progress.completed_nodes = ""
-        db.session.commit()
-        
-        command_response = (
-            f"🎯 **Command Center Triggered: Track Seeding**\n\n"
-            f"I have initialized and seeded your active learning pathway to **{matched_track}**!\n\n"
-            f"The learning engine generated a visual tree containing 200 checkpoints, custom practice projects, and GeeksforGeeks, Google, YouTube, and Coursera resources.\n\n"
-            f"👉 [Click here to view your new Roadmap](/roadmaps)"
-        )
-        
-    elif "improve resume" in message_lower or "analyze resume" in message_lower or "check resume" in message_lower or "resume score" in message_lower:
-        command_response = (
-            f"📝 **Command Center Triggered: Resume Analysis**\n\n"
-            f"I have loaded the resume analyzer module settings.\n\n"
-            f"You can upload your PDF or DOCX file, check real-time ATS scores, compare before/after modifications, and get keywords checklist suggestions.\n\n"
-            f"👉 [Click here to access Resume Builder](/resume-analyzer)"
-        )
-        
-    elif "mock interview" in message_lower or "practice interview" in message_lower or "interview simulator" in message_lower:
-        command_response = (
-            f"🎙️ **Command Center Triggered: Interview Simulator**\n\n"
-            f"I have prepared the technical and HR interview simulator.\n\n"
-            f"Test your real-time responses with local Web Speech API text-to-speech feedback, score metrics, and FAANG level questions.\n\n"
-            f"👉 [Click here to start the AI Interview Simulator](/interview-simulator)"
-        )
-        
-    elif "project architect" in message_lower or "design database" in message_lower or "folders structure" in message_lower:
-        command_response = (
-            f"🏗️ **Command Center Triggered: Project Architect**\n\n"
-            f"I have loaded the project blueprint blueprinting engine.\n\n"
-            f"Generate database schemas, file tree layouts, and configurations for Node.js, Python, or Web projects instantly.\n\n"
-            f"👉 [Click here to use AI Project Architect](/project-architect)"
-        )
-        
-    elif "internship center" in message_lower or "apply internships" in message_lower or "check openings" in message_lower:
-        command_response = (
-            f"💼 **Command Center Triggered: Internship Matcher**\n\n"
-            f"I have processed the live student internships catalog.\n\n"
-            f"Review available roles matched with your current branch and year, and see your customized AI eligibility ranking details.\n\n"
-            f"👉 [Click here to browse the Internship Center](/internship-center)"
-        )
-        
-    elif "help" == message_lower or "commands" == message_lower:
-        command_response = (
-            f"🤖 **CampusMate AI Chat Command Center**\n\n"
-            f"You can use these shortcut keywords directly in chat to operate features:\n"
-            f"- `create roadmap for [Track]` (e.g. `create roadmap for Web3`)\n"
-            f"- `improve resume` or `analyze resume`\n"
-            f"- `mock interview` or `practice interview`\n"
-            f"- `project architect` or `design database`\n"
-            f"- `internship center` or `apply internships`"
-        )
-
-    if command_response:
-        # Save user message to database
-        user_msg = ChatMessage(user_id=current_user.id, sender='user', content=message_content)
-        db.session.add(user_msg)
-        # Save command response to database
-        ai_msg = ChatMessage(user_id=current_user.id, sender='ai', content=command_response)
-        db.session.add(ai_msg)
-        db.session.commit()
-        
         return jsonify({
             "success": True,
-            "response": command_response
+            "score": score,
+            "missing_skills": missing_skills,
+            "missing_certs": missing_certs,
+            "missing_projects": missing_projects,
+            "action_plan": action_plan
         })
+    except Exception as e:
+        print(f"Error generating readiness report: {e}")
+        return jsonify({"success": False, "error": "Server error while calculating readiness."}), 500
 
-    # Get user profile information to form a context system prompt
-    progress = RoadmapProgress.query.filter_by(user_id=current_user.id).first()
-    role = progress.role if progress else "Not Selected"
-    history = ResumeAnalysis.query.filter_by(user_id=current_user.id).order_by(ResumeAnalysis.created_at.desc()).first()
-    resume_grade = f"{history.ats_score}/100" if history else "No Resume Uploaded"
-    
-    system_prompt = (
-        f"You are CampusMate AI, a professional academic advisor and career coach. "
-        f"The student's details are: Username: {current_user.username}, Email: {current_user.email}, "
-        f"Academic Level: {current_user.role.upper()}, Target Track: {role}, "
-        f"Latest Resume score: {resume_grade}. "
-        f"Answer the student's career, homework, coding, and resume questions professionally. "
-        f"Keep your responses clean, helpful, formatting in crisp markdown. Avoid overly generic advice."
-    )
-    
-    # Save user message to database
-    user_msg = ChatMessage(user_id=current_user.id, sender='user', content=message_content)
-    db.session.add(user_msg)
-    db.session.commit()
-    
-    # Call Gemini API
-    ai_response_content = call_gemini(system_prompt, message_content, user_key=custom_key)
-    
-    # Fallback if no key is set anywhere or API call failed
-    if not ai_response_content:
-        ai_response_content = (
-            f"🔑 **Activate AI in 2 minutes — it's free!**\n\n"
-            f"1. Go to **[console.groq.com/keys](https://console.groq.com/keys)** (sign in with any Gmail)\n"
-            f"2. Click **Create API Key** → copy it\n"
-            f"3. Open the **AI Mentor chat** drawer below → click the key icon → paste → Save\n\n"
-            f"_Once done, ask me anything — I can help with coding, resume, interview prep, career advice, and more!_ 🚀"
+
+@features_bp.route('/smart-ai/certification-plan', methods=['POST'])
+@login_required
+def generate_certification_plan():
+    try:
+        from app.models import SiteConfig
+        data = request.get_json() or {}
+        custom_key = (data.get('custom_key') or '').strip()
+        if not custom_key:
+            custom_key = SiteConfig.get('global_ai_key', '') or ''
+
+        branch = current_user.branch or "Computer Science"
+        year = current_user.year or "3rd Year"
+        goal = current_user.career_goal or "Software Engineering"
+        skills = current_user.skills or "Python, HTML/CSS, SQL"
+
+        system_prompt = (
+            "You are a Professional Certification Specialist and Career Matcher. "
+            "For the student's profile, recommend exactly 3 highly valued industry certifications.\n"
+            "Output your recommendation in JSON format containing exactly 1 key:\n"
+            "- \"certifications\": a list of 3 objects, where each object has keys:\n"
+            "  * \"name\": name of the certification (e.g. AWS Certified Developer - Associate)\n"
+            "  * \"provider\": provider name (e.g. Amazon Web Services)\n"
+            "  * \"hours\": estimated prep time (e.g. 80 hours)\n"
+            "  * \"difficulty\": Beginner, Intermediate, or Advanced\n"
+            "  * \"cost\": estimated exam cost (e.g. $150 USD)\n"
+            "  * \"value\": a short description of why it is extremely valuable for this target career role.\n\n"
+            "Return ONLY the valid JSON block without any extra text wrappers or markdown tags."
         )
+        user_prompt = (
+            f"Student Details:\n"
+            f"- Branch: {branch}, Year: {year}\n"
+            f"- Goal Career: {goal}\n"
+            f"- Current Skills: {skills}"
+        )
+
+        ai_res = call_gemini(system_prompt, user_prompt, user_key=custom_key)
         
-    # Save AI response to database
-    ai_msg = ChatMessage(user_id=current_user.id, sender='ai', content=ai_response_content)
-    db.session.add(ai_msg)
-    db.session.commit()
-    
-    return jsonify({
-        "success": True,
-        "response": ai_response_content
-    })
+        certs = [
+            {
+                "name": "AWS Certified Solutions Architect - Associate",
+                "provider": "Amazon Web Services",
+                "hours": "80-120 hours",
+                "difficulty": "Intermediate",
+                "cost": "$150 USD",
+                "value": "Validates broad knowledge of cloud networking, security groups, and microservices databases architectures."
+            },
+            {
+                "name": "CompTIA Security+",
+                "provider": "CompTIA",
+                "hours": "60-80 hours",
+                "difficulty": "Beginner",
+                "cost": "$392 USD",
+                "value": "Core baseline certification mapping standard networks threat profiles, cryptography hashing protocols, and security audits."
+            },
+            {
+                "name": "Microsoft Certified: Azure Developer Associate",
+                "provider": "Microsoft",
+                "hours": "70-90 hours",
+                "difficulty": "Intermediate",
+                "cost": "$165 USD",
+                "value": "Validates ability to design, build, test, and maintain cloud applications and services on Microsoft Azure."
+            }
+        ]
 
-@features_bp.route('/ai-mentor/history', methods=['GET'])
-@login_required
-def ai_mentor_history():
-    messages = ChatMessage.query.filter_by(user_id=current_user.id).order_by(ChatMessage.created_at.asc()).all()
-    history = [{"sender": m.sender, "content": m.content} for m in messages]
-    
-    progress = RoadmapProgress.query.filter_by(user_id=current_user.id).first()
-    track = progress.role if progress else "None selected"
-    
-    completed_count = 0
-    if progress and progress.completed_nodes:
-        completed_count = len([x for x in progress.completed_nodes.split(",") if x.strip()])
-    xp = 100 + completed_count * 20
-    
-    resume = ResumeAnalysis.query.filter_by(user_id=current_user.id).order_by(ResumeAnalysis.created_at.desc()).first()
-    resume_score = resume.ats_score if resume else 0
-    
-    return jsonify({
-        "history": history,
-        "track": track,
-        "xp": xp,
-        "resume_score": resume_score
-    })
+        if ai_res:
+            try:
+                json_match = re.search(r'\{.*\}', ai_res, re.DOTALL)
+                if json_match:
+                    parsed = json.loads(json_match.group(0))
+                    certs = parsed.get('certifications', certs)
+            except Exception as e:
+                print(f"Error parsing AI certs JSON: {e}")
 
-@features_bp.route('/ai-mentor/reset', methods=['POST'])
-@login_required
-def ai_mentor_reset():
-    ChatMessage.query.filter_by(user_id=current_user.id).delete()
-    db.session.commit()
-    return jsonify({"success": True})
+        return jsonify({"success": True, "certifications": certs})
+    except Exception as e:
+        print(f"Error generating certification plan: {e}")
+        return jsonify({"success": False, "error": "Server error while generating certification plan."}), 500
 
 # 4. AJAX Resume Analysis (Side-by-side Builder Verification)
 @features_bp.route('/resume-analyzer/analyze', methods=['POST'])
@@ -1468,30 +1456,68 @@ def internship_center():
     return render_template('internship_center.html', jobs=jobs, user_track=user_track, resume_score=resume_score)
 
 
-# 8. Portfolio Builder (Disabled)
+# 8. Portfolio Builder
 @features_bp.route('/portfolio-builder', methods=['GET'])
 @login_required
 def portfolio_builder():
-    abort(404)
+    return render_template('portfolio_builder.html')
 
 @features_bp.route('/portfolio-builder/generate', methods=['POST'])
 @login_required
 def portfolio_builder_generate():
-    abort(404)
+    data = request.get_json() or {}
+    theme = data.get('theme', 'modern')
     
-    name = current_user.username.title()
+    name = current_user.name or current_user.username.title()
     email = current_user.email
     branch = current_user.branch or "Computer Science"
     year = current_user.year or "3rd Year"
     track = current_user.career_goal or "Software Engineer"
-    skills = current_user.skills or "Python, JavaScript, HTML/CSS, SQL"
     xp = current_user.xp
     
-    projects_list = [
-        {"title": "CampusMate AI Core Engine", "desc": "Built a unified student platform mapping curriculum trees and ATS feedback workflows.", "tech": "Python, Flask, SQLite"},
-        {"title": "Distributed Task Scheduler", "desc": "Implemented a concurrent cron scheduler containerized with Docker and monitored via Prometheus.", "tech": "Go, Docker, Prometheus"},
-        {"title": "Real-time Chat Application", "desc": "Developed a full-stack real-time messaging workspace utilizing WebSockets and Redis memory cache.", "tech": "Node.js, Express, WebSockets, Redis"}
-    ]
+    # Try to extract projects and skills from the latest resume draft
+    latest_resume = UserResume.query.filter_by(user_id=current_user.id).order_by(UserResume.updated_at.desc()).first()
+    resume_content = {}
+    if latest_resume:
+        try:
+            resume_content = json.loads(latest_resume.content_json)
+        except Exception:
+            pass
+            
+    # Extract projects
+    projects_list = []
+    proj_title = resume_content.get('projectTitle')
+    if proj_title:
+        desc_parts = []
+        for bk in ['projectB1', 'projectB2', 'projectB3']:
+            val = resume_content.get(bk)
+            if val:
+                desc_parts.append(val)
+        proj_desc = " ".join(desc_parts) if desc_parts else "Built a project using modern web standards."
+        projects_list.append({
+            "title": proj_title,
+            "desc": proj_desc,
+            "tech": resume_content.get('skillsProg') or "Various Technologies"
+        })
+        
+    if not projects_list:
+        projects_list = [
+            {"title": "CampusMate AI Core Engine", "desc": "Built a unified student platform mapping curriculum trees and ATS feedback workflows.", "tech": "Python, Flask, SQLite"},
+            {"title": "Distributed Task Scheduler", "desc": "Implemented a concurrent cron scheduler containerized with Docker and monitored via Prometheus.", "tech": "Go, Docker, Prometheus"},
+            {"title": "Real-time Chat Application", "desc": "Developed a full-stack real-time messaging workspace utilizing WebSockets and Redis memory cache.", "tech": "Node.js, Express, WebSockets, Redis"}
+        ]
+        
+    # Extract skills
+    skills_list = []
+    for k in ['skillsProg', 'skillsWeb', 'skillsTools', 'skillsCyber']:
+        val = resume_content.get(k)
+        if val:
+            skills_list.extend([s.strip() for s in val.split(',') if s.strip()])
+    if not skills_list and current_user.skills:
+        skills_list = [s.strip() for s in current_user.skills.split(',') if s.strip()]
+    if not skills_list:
+        skills_list = ["Python", "JavaScript", "HTML/CSS", "SQL"]
+    skills = ", ".join(skills_list)
     
     if theme == "dark":
         bg = "#111827"
@@ -1675,10 +1701,22 @@ def apply_internship():
 @features_bp.route('/portfolio-builder/publish', methods=['POST'])
 @login_required
 def portfolio_builder_publish():
-    abort(404)
+    data = request.get_json() or {}
+    html = data.get('html')
+    if not html:
+        return jsonify({"success": False, "error": "HTML content is required"}), 400
+        
+    current_user.published_portfolio_html = html
+    db.session.commit()
+    
+    public_url = url_for('features.public_portfolio', username=current_user.username, _external=True)
+    return jsonify({"success": True, "public_url": public_url})
 
 
 @features_bp.route('/published-portfolio/<username>', methods=['GET'])
 def public_portfolio(username):
-    abort(404)
+    user = User.query.filter_by(username=username).first()
+    if not user or not user.published_portfolio_html:
+        abort(404)
+    return user.published_portfolio_html
 

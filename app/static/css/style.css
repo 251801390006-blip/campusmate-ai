@@ -2702,3 +2702,63 @@ body.dark .notification-dropdown-card {
 /* ============================================================
    END PREMIUM UI/UX UPGRADE
    ============================================================ */
+
+/* Mobile responsiveness & touch alignment overrides */
+@media (max-width: 768px) {
+    /* Prevent horizontal overflow on mobile body/layouts */
+    body, html {
+        overflow-x: hidden;
+    }
+    
+    /* Ensure containers wrap and stack nicely */
+    .row {
+        margin-right: -10px;
+        margin-left: -10px;
+    }
+    .col, [class*="col-"] {
+        padding-right: 10px;
+        padding-left: 10px;
+    }
+    
+    /* Make tables responsive with horizontal scroll wrapper rather than breaking layouts */
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin-bottom: 1rem;
+    }
+    
+    /* Add extra bottom spacing so mobile bottom navigation doesn't overlap important buttons */
+    .content-wrapper, .container-fluid, .container {
+        padding-bottom: 80px !important;
+    }
+    
+    /* Enhance mobile touch sizes */
+    .btn, button, select, input, .form-select, .form-control {
+        min-height: 40px; /* Touch target size */
+    }
+    
+    /* Compact headings to prevent wrap issues on tiny screens */
+    h1, .h1 { font-size: 1.8rem !important; }
+    h2, .h2 { font-size: 1.4rem !important; }
+    h3, .h3 { font-size: 1.15rem !important; }
+}
+
+/* Specific styling polish for the mobile bottom nav bar */
+.mobile-bottom-nav {
+    background: rgba(255, 255, 255, 0.96) !important;
+    border-top: 1px solid var(--border-color) !important;
+    box-shadow: 0 -3px 20px rgba(0, 0, 0, 0.08) !important;
+    height: 68px !important; /* Slightly taller for more breathing room */
+}
+.mobile-bottom-link {
+    padding: 8px 0;
+}
+.mobile-bottom-link i {
+    font-size: 1.3rem !important; /* Slightly larger for easier touch */
+}
+.mobile-bottom-link span {
+    font-size: 0.68rem !important;
+    font-weight: 600 !important;
+}
+

@@ -261,57 +261,8 @@
         </div>
     </div>
 
-    <!-- Floating AI Career Mentor Drawer -->
-    <div id="mentor-drawer" class="mentor-drawer glassmorphic" style="background: var(--bg-secondary); border-color: var(--border-color); color: var(--text-primary);">
-        <div class="mentor-header d-flex align-items-center gap-3 px-3 py-2.5" onclick="toggleMentorDrawer()" style="background: rgba(255, 255, 255, 0.02); border-bottom: 1px solid var(--border-color); cursor: pointer;">
-            <div class="mentor-avatar d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 50%; background: var(--neon-blue-dim); color: var(--neon-blue); border: 1px solid var(--neon-blue); flex-shrink: 0;">
-                <i class="fa-solid fa-graduation-cap"></i>
-            </div>
-            <div class="mentor-title">
-                <h4 style="font-size: 13.5px; font-weight: 600; margin: 0; color: var(--text-primary);">AI Career Mentor</h4>
-                <span style="font-size: 10.5px; color: var(--text-secondary);" id="mentor-memory-text">Advisor online</span>
-            </div>
-            <button class="mentor-toggle-btn ms-auto" id="mentor-arrow-btn" style="background:none; border:none; color: var(--text-secondary); cursor: pointer;">
-                <i class="fa-solid fa-chevron-up" id="mentor-arrow-icon"></i>
-            </button>
-        </div>
-        <div class="mentor-body d-flex flex-column" style="height: calc(480px - 50px); background: var(--bg-secondary);">
-            <div class="mentor-messages p-3 d-flex flex-column gap-3 overflow-auto" id="mentor-chat-messages" style="flex-grow: 1;">
-                <!-- Messages will be loaded here -->
-            </div>
-            <!-- Suggestion Chips -->
-            <div class="px-3 py-2 d-flex flex-wrap gap-1.5" id="mentor-chat-chips" style="background: rgba(0,0,0,0.08); border-top:1px solid var(--border-color); font-size:0.75rem;">
-                <!-- Loaded dynamically in mentor.js -->
-            </div>
-            <!-- Input Area -->
-            <form class="mentor-input-area d-flex p-3 gap-2" onsubmit="sendMentorMessage(event)" style="border-top: 1px solid var(--border-color); background: rgba(0, 0, 0, 0.1);">
-                <input type="text" id="mentor-user-input" placeholder="Ask anything about roadmaps, resume, etc..." autocomplete="off" style="flex-grow: 1; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-size: 0.8rem; outline: none;">
-                <button type="submit" class="mentor-send-btn d-flex align-items-center justify-content-center" style="background: var(--neon-blue); color: white; border: none; width: 34px; height: 34px; border-radius: 6px; cursor: pointer;"><i class="fa-solid fa-paper-plane"></i></button>
-            </form>
-            <!-- AI API Key Section -->
-            <div id="mentor-api-key-section" style="border-top: 1px solid var(--border-color); background: rgba(0,0,0,0.06); padding: 8px 12px;">
-                <div id="mentor-api-key-collapsed" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="toggleMentorApiKey()">
-                    <span id="mentor-api-status" style="font-size: 0.68rem; color: var(--text-secondary);"><i class="fa-solid fa-circle" style="font-size: 0.45rem; color: #ef4444; margin-right: 4px;"></i>No API Key &mdash; AI offline</span>
-                    <span style="font-size: 0.68rem; color: var(--neon-blue); cursor: pointer;"><i class="fa-solid fa-key me-1"></i>Set Key</span>
-                </div>
-                <div id="mentor-api-key-form" style="display: none; margin-top: 6px;">
-                    <div style="display: flex; gap: 6px; align-items: center;">
-                        <input type="password" id="mentor-api-key-input" placeholder="Paste Groq or Gemini API key..." style="flex-grow: 1; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-size: 0.72rem; outline: none;">
-                        <button onclick="saveMentorApiKey()" style="background: var(--neon-blue); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.72rem; cursor: pointer;">Save</button>
-                        <button onclick="clearMentorApiKey()" style="background: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.72rem; cursor: pointer;">Clear</button>
-                    </div>
-                    <p style="font-size: 0.62rem; color: var(--text-secondary); margin: 4px 0 0 0;">
-                        🌟 <strong>Free &amp; easy:</strong> <a href="https://console.groq.com/keys" target="_blank" style="color: var(--neon-blue);">console.groq.com</a> (any Gmail/Outlook) &bull;
-                        Google: <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--neon-blue);">AI Studio</a> (personal account only)
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Core Scripts -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/mentor.js') }}"></script>
     <script>
         // Theme & Appearance management
         document.addEventListener("DOMContentLoaded", () => {

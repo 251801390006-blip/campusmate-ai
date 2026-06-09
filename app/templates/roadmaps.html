@@ -155,65 +155,61 @@
     </div>
 </div>
 
-<!-- Dynamic Roadmap Node Modal Popup -->
-<div id="node-modal" class="modal-overlay hidden" onclick="if(event.target === this) closeNodeModal()">
-    <div class="glass-card node-modal-card animate-pop shadow-lg" style="background: var(--bg-secondary); border: 1px solid #dee2e6; border-radius: 12px; max-width:580px; width:95%; padding:25px; max-height: 90vh; overflow-y: auto;">
-        <div class="node-modal-header d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-            <div>
-                <span id="node-modal-step" class="text-primary fw-bold" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">Step 1 Checkpoint</span>
-                <h2 id="node-modal-title" class="fw-bold mb-0 text-dark" style="font-size: 1.2rem; margin-top: 2px;">Node Title</h2>
-            </div>
-            <button class="btn-close" onclick="closeNodeModal()" style="background:none; border:none; color:var(--text-secondary); font-size:1.3rem; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+<!-- Dynamic Roadmap Node Slide-out Right Drawer -->
+<div id="node-modal" class="node-sidebar-drawer">
+    <div class="node-modal-header d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+        <div>
+            <span id="node-modal-step" class="text-primary fw-bold" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">Step 1 Checkpoint</span>
+            <h2 id="node-modal-title" class="fw-bold mb-0 text-dark" style="font-size: 1.2rem; margin-top: 2px;">Node Title</h2>
         </div>
-        <div class="node-modal-body">
-            <div class="mb-3">
-                <h4 class="fw-bold text-secondary mb-1" style="font-size:0.75rem; text-transform:uppercase;">Objective</h4>
-                <p id="node-modal-desc" class="node-desc text-dark" style="font-size: 0.88rem; line-height: 1.5;">Node description goes here.</p>
-            </div>
+        <button class="btn-close" onclick="closeNodeModal()" style="background:none; border:none; color:var(--text-secondary); font-size:1.3rem; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="node-modal-body" style="padding-bottom: 20px;">
+        <div class="mb-3">
+            <h4 class="fw-bold text-secondary mb-1" style="font-size:0.75rem; text-transform:uppercase;">Objective</h4>
+            <p id="node-modal-desc" class="node-desc text-dark" style="font-size: 0.88rem; line-height: 1.5;">Node description goes here.</p>
+        </div>
 
-            <div class="mb-3">
-                <h4 class="fw-bold text-secondary mb-1" style="font-size:0.75rem; text-transform:uppercase;">Why Learn It?</h4>
-                <p id="node-modal-why" class="text-muted" style="font-size: 0.82rem; line-height: 1.4;"></p>
-            </div>
+        <div class="mb-3">
+            <h4 class="fw-bold text-secondary mb-1" style="font-size:0.75rem; text-transform:uppercase;">Why Learn It?</h4>
+            <p id="node-modal-why" class="text-muted" style="font-size: 0.82rem; line-height: 1.4;"></p>
+        </div>
 
-            <div class="node-meta mb-3 p-2 rounded d-flex justify-content-between" style="font-size: 0.8rem; background-color: #f8f9fa; border: 1px solid #e9ecef;">
-                <span>Difficulty: <strong id="node-modal-difficulty" style="color: #0078d4;">BEGINNER</strong></span>
-                <span>Time Budget: <strong id="node-modal-duration" style="color: #0078d4;">4 hours</strong></span>
-                <span>XP Value: <strong id="node-modal-xp" style="color: #0078d4;">25 XP</strong></span>
-            </div>
-            
-            <hr style="border-top:1px solid #dee2e6; margin:15px 0;">
-            
-            <!-- Resources Section -->
-            <div class="accordion-section mb-3">
-                <h4 class="fw-bold mb-2 text-dark" style="font-size:0.85rem;"><i class="fa-solid fa-graduation-cap text-primary me-2"></i> Real-World Learning Resources</h4>
+        <div class="node-meta mb-3 p-2 rounded d-flex justify-content-between" style="font-size: 0.8rem; background-color: #f8f9fa; border: 1px solid #e9ecef;">
+            <span>Difficulty: <strong id="node-modal-difficulty" style="color: #0078d4;">BEGINNER</strong></span>
+            <span>Time Budget: <strong id="node-modal-duration" style="color: #0078d4;">4 hours</strong></span>
+            <span>XP Value: <strong id="node-modal-xp" style="color: #0078d4;">25 XP</strong></span>
+        </div>
+        
+        <hr style="border-top:1px solid #dee2e6; margin:15px 0;">
+        
+        <!-- Resources Section -->
+        <div class="accordion-section mb-3">
+            <h4 class="fw-bold mb-2 text-dark" style="font-size:0.85rem;"><i class="fa-solid fa-graduation-cap text-primary me-2"></i> Learning Resources</h4>
+            <ul id="node-modal-resources" class="resource-list ps-3 mb-0" style="font-size: 0.82rem; line-height: 1.7; color: var(--text-secondary);"></ul>
+        </div>
+        
+        <!-- Project Section -->
+        <div class="accordion-section mb-3">
+            <h4 class="fw-bold mb-2 text-dark" style="font-size:0.85rem;"><i class="fa-solid fa-flask text-primary me-2"></i> Mini Project</h4>
+            <div class="project-info-box p-3 border rounded text-dark" id="node-modal-project" style="font-size: 0.82rem; line-height: 1.5; background-color: #f8f9fa; border-color: #e9ecef;"></div>
+        </div>
 
-                <ul id="node-modal-resources" class="resource-list ps-3 mb-0" style="font-size: 0.82rem; line-height: 1.7; color: var(--text-secondary);"></ul>
-            </div>
-            
-            <!-- Project Section -->
-            <div class="accordion-section mb-3">
-                <h4 class="fw-bold mb-2 text-dark" style="font-size:0.85rem;"><i class="fa-solid fa-flask text-primary me-2"></i> Hands-on Mini Project</h4>
-                <div class="project-info-box p-3 border rounded text-dark" id="node-modal-project" style="font-size: 0.82rem; line-height: 1.5; background-color: #f8f9fa; border-color: #e9ecef;"></div>
-            </div>
+        <!-- Certifications Section -->
+        <div class="accordion-section mb-3">
+            <h4 class="fw-bold mb-2 text-dark" style="font-size:0.85rem;"><i class="fa-solid fa-award text-primary me-2"></i> Industry Certificate</h4>
+            <div class="cert-info-box p-3 border rounded text-dark" id="node-modal-certs" style="font-size: 0.82rem; line-height: 1.5; background-color: #f0fdf4; border-color: #dcfce7; color: #15803d;"></div>
+        </div>
 
-            <!-- Certifications Section -->
-            <div class="accordion-section mb-3">
-                <h4 class="fw-bold mb-2 text-dark" style="font-size:0.85rem;"><i class="fa-solid fa-award text-primary me-2"></i> Targeted Industry Certificate</h4>
-                <div class="cert-info-box p-3 border rounded text-dark" id="node-modal-certs" style="font-size: 0.82rem; line-height: 1.5; background-color: #f0fdf4; border-color: #dcfce7; color: #15803d;"></div>
-            </div>
+        <!-- Interview Questions Section -->
+        <div class="accordion-section mb-4">
+            <h4 class="fw-bold mb-2 text-dark" style="font-size:0.85rem;"><i class="fa-solid fa-circle-question text-primary me-2"></i> Interview Q&A</h4>
+            <div class="p-3 border rounded text-dark" id="node-modal-questions" style="font-size: 0.82rem; line-height: 1.5; background-color: #f8fafc; border-color: #e2e8f0; max-height: 200px; overflow-y: auto;"></div>
+        </div>
 
-            <!-- Interview Questions Section -->
-            <div class="accordion-section mb-4">
-                <h4 class="fw-bold mb-2 text-dark" style="font-size:0.85rem;"><i class="fa-solid fa-circle-question text-primary me-2"></i> Interview Q&A</h4>
-                <div class="p-3 border rounded text-dark" id="node-modal-questions" style="font-size: 0.82rem; line-height: 1.5; background-color: #f8fafc; border-color: #e2e8f0; max-height: 200px; overflow-y: auto;"></div>
-            </div>
-
-            <div class="node-action-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <button id="node-modal-bookmark-btn" class="btn btn-sm btn-outline-secondary" onclick="bookmarkCurrentNode()" style="font-size: 0.78rem; padding: 6px 12px; border-radius: 4px; border: 1px solid var(--border-color); color: var(--text-secondary); background: transparent; cursor: pointer;"><i class="fa-regular fa-bookmark me-1"></i> Bookmark</button>
-                <button id="node-modal-action-btn" class="btn btn-primary py-2 px-4 shadow-sm" onclick="triggerNodeCompletion()" style="background: linear-gradient(135deg, #0078d4, #00bcf2); border: none; font-size: 0.82rem; font-weight:600; border-radius:4px;">Mark Complete <i class="fa-solid fa-check ms-1"></i></button>
-            </div>
-
+        <div class="node-action-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <button id="node-modal-bookmark-btn" class="btn btn-sm btn-outline-secondary" onclick="bookmarkCurrentNode()" style="font-size: 0.78rem; padding: 6px 12px; border-radius: 4px; border: 1px solid var(--border-color); color: var(--text-secondary); background: transparent; cursor: pointer;"><i class="fa-regular fa-bookmark me-1"></i> Bookmark</button>
+            <button id="node-modal-action-btn" class="btn btn-primary py-2 px-4 shadow-sm" onclick="triggerNodeCompletion()" style="background: linear-gradient(135deg, #0078d4, #00bcf2); border: none; font-size: 0.82rem; font-weight:600; border-radius:4px;">Mark Complete <i class="fa-solid fa-check ms-1"></i></button>
         </div>
     </div>
 </div>
@@ -273,7 +269,8 @@ function renderRoadmapTree() {
     const canvasNodes = document.getElementById("canvas-nodes");
     const canvasSvg = document.getElementById("canvas-svg");
     const canvasContainer = document.getElementById("canvas-container");
-    if (!canvasNodes || !canvasSvg || !canvasContainer) return;
+    const viewport = document.getElementById("canvas-viewport");
+    if (!canvasNodes || !canvasSvg || !canvasContainer || !viewport) return;
 
     canvasNodes.innerHTML = "";
     canvasSvg.innerHTML = "";
@@ -293,7 +290,6 @@ function renderRoadmapTree() {
 
     // 1. Calculate coordinates
     coords = [];
-
     activeNodes.forEach((node, index) => {
         const y = index * 150 + 100;
         let x = 450;
@@ -302,11 +298,31 @@ function renderRoadmapTree() {
         coords.push({ x, y });
     });
 
+    const buffer = 200;
+
     // 2. Draw SVG connection lines (underneath nodes)
     for (let i = 0; i < coords.length - 1; i++) {
         const p1 = coords[i];
         const p2 = coords[i+1];
         const nextNode = activeNodes[i+1];
+
+        // Check visibility of the line bounding box
+        const minX = Math.min(p1.x, p2.x);
+        const maxX = Math.max(p1.x, p2.x);
+        const minY = Math.min(p1.y, p2.y);
+        const maxY = Math.max(p1.y, p2.y);
+
+        const lineLeft = translateX + minX * scale;
+        const lineRight = translateX + maxX * scale;
+        const lineTop = translateY + minY * scale;
+        const lineBottom = translateY + maxY * scale;
+
+        const isVisible = (lineRight >= -buffer) && 
+                          (lineLeft <= viewport.clientWidth + buffer) && 
+                          (lineBottom >= -buffer) && 
+                          (lineTop <= viewport.clientHeight + buffer);
+
+        if (!isVisible) continue;
 
         const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
         line.setAttribute("x1", p1.x);
@@ -333,11 +349,25 @@ function renderRoadmapTree() {
     // 3. Render Node Cards
     activeNodes.forEach((node, index) => {
         const pt = coords[index];
+
+        // Check visibility of the node card (width is 200px, height is 90px)
+        const nodeLeft = translateX + (pt.x - 100) * scale;
+        const nodeRight = translateX + (pt.x + 100) * scale;
+        const nodeTop = translateY + (pt.y - 45) * scale;
+        const nodeBottom = translateY + (pt.y + 45) * scale;
+
+        const isVisible = (nodeRight >= -buffer) && 
+                          (nodeLeft <= viewport.clientWidth + buffer) && 
+                          (nodeBottom >= -buffer) && 
+                          (nodeTop <= viewport.clientHeight + buffer);
+
+        if (!isVisible) return;
+
         const div = document.createElement("div");
         div.id = `node-badge-${index + 1}`;
         div.className = `roadmap-node-badge shadow-sm ${node.status}`;
-        div.style.left = `${pt.x - 100}px`; // center node horizontally (width is 200px)
-        div.style.top = `${pt.y - 45}px`;   // center node vertically (height is 90px)
+        div.style.left = `${pt.x - 100}px`;
+        div.style.top = `${pt.y - 45}px`;
         
         let statusIcon = "lock";
         if (node.status === "COMPLETED") statusIcon = "check";
@@ -458,11 +488,11 @@ function openNodeModal(node, stepIdx) {
         actionBtn.className = "btn btn-primary";
     }
 
-    document.getElementById("node-modal").classList.remove("hidden");
+    document.getElementById("node-modal").classList.add("open");
 }
 
 function closeNodeModal() {
-    document.getElementById("node-modal").classList.add("hidden");
+    document.getElementById("node-modal").classList.remove("open");
     selectedNode = null;
     selectedStepIdx = -1;
 }
@@ -589,12 +619,21 @@ let scale = 0.85; // slightly zoomed out by default to see tree shape
 const viewport = document.getElementById("canvas-viewport");
 const container = document.getElementById("canvas-container");
 
+let renderFrameId = null;
 function updateTransform() {
     container.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+    
+    if (renderFrameId) {
+        cancelAnimationFrame(renderFrameId);
+    }
+    renderFrameId = requestAnimationFrame(() => {
+        renderRoadmapTree();
+    });
 }
 
 viewport.addEventListener("mousedown", (e) => {
     if (e.target.closest(".roadmap-node-badge") || e.target.closest("button") || e.target.closest("input")) return;
+    closeNodeModal();
     isDragging = true;
     viewport.style.cursor = "grabbing";
     startX = e.clientX - translateX;
@@ -797,20 +836,23 @@ document.addEventListener("DOMContentLoaded", () => {
 .hidden {
     display: none !important;
 }
-.modal-overlay {
+.node-sidebar-drawer {
     position: fixed;
     top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10000;
+    right: -450px;
+    width: 420px;
+    max-width: 100%;
+    height: 100vh;
+    background: var(--bg-secondary);
+    border-left: 1.5px solid var(--border-color);
+    box-shadow: -10px 0 30px rgba(0,0,0,0.12);
+    z-index: 10050;
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    padding: 24px;
 }
-.node-modal-card {
-    border-radius: 12px;
+.node-sidebar-drawer.open {
+    right: 0;
 }
 .canvas-viewport {
     position: relative;

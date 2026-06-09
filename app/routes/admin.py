@@ -86,6 +86,22 @@ def dashboard():
     from app.models import Internship
     internships = Internship.query.order_by(Internship.is_pinned.desc(), Internship.created_at.desc()).all()
     
+    # Campaign analytics: Group notifications to track broadcast campaigns
+    broadcasts = db.session.query(
+        Notification.title,
+        Notification.content,
+        Notification.category,
+        func.count(Notification.id).label('total_sent'),
+        func.sum(db.case((Notification.is_read == True, 1), else_=0)).label('total_read'),
+        func.min(Notification.created_at).label('created_at')
+    ).group_by(
+        Notification.title,
+        Notification.content,
+        Notification.category
+    ).order_by(
+        func.min(Notification.created_at).desc()
+    ).all()
+    
     return render_template(
         'admin.html',
         total_users=total_users,
@@ -100,7 +116,8 @@ def dashboard():
         total_chat_messages=total_chat_messages,
         daily_signups=daily_signups,
         reviews=reviews,
-        internships=internships
+        internships=internships,
+        broadcasts=broadcasts
     )
 
 @admin_bp.route('/users/<int:user_id>/toggle-status', methods=['POST'])

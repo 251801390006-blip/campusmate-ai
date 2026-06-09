@@ -346,6 +346,7 @@
             
             <div class="d-flex gap-2">
                 <button class="btn btn-sm btn-outline" onclick="downloadResumePDF()"><i class="fa-solid fa-download"></i> PDF Resume</button>
+                <button class="btn btn-sm btn-outline" onclick="printResume()"><i class="fa-solid fa-print"></i> Print Resume</button>
             </div>
         </div>
 
@@ -1446,37 +1447,9 @@ function downloadResumePDF() {
         btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Downloading...`;
     }
 
-    // Clone the element so we don't disturb the live preview
-    const clone = element.cloneNode(true);
+    // Apply PDF export styles temporarily to the real visible element
+    element.classList.add('pdf-export-mode');
 
-    // Place clone off-screen but still "in the document" so it renders fully
-    clone.style.cssText = [
-        "position: fixed",
-        "top: 0",
-        "left: 0",
-        "width: 794px",
-        "height: 1123px",
-        "padding: 28px 36px",
-        "margin: 0",
-        "border: none",
-        "box-shadow: none",
-        "overflow: hidden",
-        "box-sizing: border-box",
-        "background: #ffffff",
-        "font-size: 10px",
-        "line-height: 1.35",
-        "color: #374151",
-        "z-index: -9999",
-        "opacity: 1",
-        "visibility: visible",
-        "pointer-events: none"
-    ].join(" !important; ") + " !important";
-
-    // Copy the current theme class to clone
-    clone.className = element.className;
-    
-    document.body.appendChild(clone);
-    
     const nameVal = document.getElementById('res-name').value || 'Resume';
     const opt = {
         margin:    0,
@@ -1487,27 +1460,30 @@ function downloadResumePDF() {
             useCORS: true,
             letterRendering: true,
             scrollX: 0,
-            scrollY: 0
+            scrollY: -window.scrollY // offset window scrolling!
         },
-        jsPDF:     { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: 'avoid-all' }
+        jsPDF:     { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
-    html2pdf().set(opt).from(clone).save().then(() => {
-        clone.remove();
+    html2pdf().set(opt).from(element).save().then(() => {
+        element.classList.remove('pdf-export-mode');
         if (btn) {
             btn.disabled = false;
             btn.innerHTML = originalHtml;
         }
     }).catch(err => {
         console.error(err);
-        clone.remove();
+        element.classList.remove('pdf-export-mode');
         if (btn) {
             btn.disabled = false;
             btn.innerHTML = originalHtml;
         }
         alert("Failed to export PDF: " + err.message);
     });
+}
+
+function printResume() {
+    window.print();
 }
 </script>
 <style>
@@ -1734,6 +1710,29 @@ function downloadResumePDF() {
 }
 .hover-scale:hover {
     transform: scale(1.05);
+}
+
+@media print {
+    /* Hide everything except the A4 resume preview sheet */
+    body * {
+        visibility: hidden;
+    }
+    #resume-sheet-paper, #resume-sheet-paper * {
+        visibility: visible;
+    }
+    #resume-sheet-paper {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 210mm !important;
+        height: 297mm !important;
+        padding: 18mm !important;
+        margin: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+    }
 }
 </style>
 {% endblock %}

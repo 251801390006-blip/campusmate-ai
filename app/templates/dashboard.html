@@ -2,22 +2,43 @@
 
 {% block title %}Dashboard - CampusMate AI{% endblock %}
 
-{% block header_title %}Student Overview Dashboard{% endblock %}
+{% block header_title %}Student Operating Control Panel{% endblock %}
 
 {% block content %}
+<!-- Page-level check for dismissed card preferences -->
+<script>
+    (function() {
+        const dismissedCards = ['card-welcome', 'card-profile', 'card-learning', 'card-roadmap', 'card-ats-score', 'card-readiness', 'card-projects', 'card-certs', 'card-timeline'];
+        dismissedCards.forEach(cardId => {
+            if (localStorage.getItem('dismissed_' + cardId) === 'permanent') {
+                document.write(`<style>#${cardId} { display: none !important; }</style>`);
+            }
+        });
+    })();
+</script>
+
 <!-- Welcome Banner -->
-<div class="flat-card mb-4" id="dashboard-welcome-banner" style="display: none; background: linear-gradient(135deg, var(--neon-blue-dim), rgba(124, 58, 237, 0.08)); border-left: 4px solid var(--neon-blue); padding: 1.8rem 2rem; position: relative;">
-    <button type="button" class="btn-close position-absolute" onclick="dismissWelcomeBanner()" style="top: 15px; right: 15px; font-size: 1.1rem; background:none; border:none; cursor:pointer; color: var(--text-muted);"><i class="fa-solid fa-xmark"></i></button>
+<div class="flat-card mb-4" id="card-welcome" style="background: linear-gradient(135deg, var(--neon-blue-dim), rgba(124, 58, 237, 0.08)); border-left: 4px solid var(--neon-blue); padding: 1.8rem 2rem; position: relative;">
+    <div class="position-absolute d-flex align-items-center gap-2" style="top: 15px; right: 15px;">
+        <div class="dropdown card-dismiss-dropdown" style="position: relative;">
+            <button class="btn btn-xs btn-link p-0 text-muted border-0 bg-transparent" onclick="toggleCardDropdown(event, 'card-welcome')" style="font-size: 0.85rem; cursor: pointer; color: var(--text-muted) !important;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+            <ul id="card-dropdown-card-welcome" class="dropdown-menu dropdown-menu-end shadow hidden" style="position: absolute; right: 0; top: 20px; z-index: 110; min-width: 130px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; list-style: none; padding: 4px 0; margin: 0;">
+                <li><a class="dropdown-item" href="javascript:void(0)" onclick="dismissCard('card-welcome', 'session')" style="display: block; padding: 4px 12px; font-size: 0.72rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-eye-slash me-2"></i> Hide temporarily</a></li>
+                <li><a class="dropdown-item" href="javascript:void(0)" onclick="dismissCard('card-welcome', 'permanent')" style="display: block; padding: 4px 12px; font-size: 0.72rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-trash me-2 text-danger"></i> Never show again</a></li>
+            </ul>
+        </div>
+        <button type="button" class="btn-close" onclick="dismissCard('card-welcome', 'session')" style="font-size: 1.1rem; background:none; border:none; cursor:pointer; color: var(--text-muted);"><i class="fa-solid fa-xmark"></i></button>
+    </div>
     <div class="row align-items-center">
         <div class="col-md-8">
             <span class="badge badge-info mb-2 text-uppercase" style="font-size:0.68rem; letter-spacing:1px; background: rgba(124, 58, 237, 0.1); color: var(--neon-blue); font-weight:700;">Student Workspace</span>
-            <h2 style="font-size: 1.5rem; font-weight:800; letter-spacing:-0.02em;" class="mb-2">Welcome Back, {{ current_user.username }}!</h2>
+            <h2 style="font-size: 1.5rem; font-weight:800; letter-spacing:-0.02em;" class="mb-2">Welcome Back, {{ current_user.name or current_user.username }}!</h2>
             <p class="text-secondary mb-0" style="font-size: 0.88rem; max-width: 620px; line-height: 1.5;">
                 Track your career milestones, build ATS-optimized resumes, practice code interviews, and monitor your placement eligibility from your student operating control panel.
             </p>
         </div>
         <div class="col-md-4 text-md-end mt-3 mt-md-0">
-            <div class="d-inline-flex align-items-center gap-3 p-2 px-3 border rounded bg-white shadow-sm" style="border-color: var(--border-color) !important;">
+            <div class="d-inline-flex align-items-center gap-3 p-2 px-3 border rounded bg-white shadow-sm" style="border-color: var(--border-color) !important; background: var(--bg-secondary) !important;">
                 <div class="text-center">
                     <span class="text-muted d-block" style="font-size:0.65rem; font-weight:700; text-transform:uppercase;">XP Balance</span>
                     <strong class="text-secondary" style="font-size:1.15rem; color: var(--neon-blue) !important;"><i class="fa-solid fa-bolt me-1"></i> {{ current_user.xp }} XP</strong>
@@ -37,11 +58,11 @@
 <div class="flat-card mb-4" id="dashboard-notifications-card" style="border-left: 4px solid var(--neon-blue);">
     <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
         <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-bell text-muted me-2"></i> Active Notifications</h3>
-        <button class="btn btn-sm btn-outline text-danger border-0" onclick="clearAllNotifications()" style="font-size: 0.75rem;"><i class="fa-solid fa-trash me-1"></i> Clear All</button>
+        <button class="btn btn-sm btn-outline text-danger border-0" onclick="clearAllNotifications()" style="font-size: 0.75rem; cursor: pointer; background: transparent;"><i class="fa-solid fa-trash me-1"></i> Clear All</button>
     </div>
     <div class="d-flex flex-column gap-2" id="dashboard-notifications-list">
         {% for notif in unread_notifications %}
-        <div class="p-3 border rounded bg-white d-flex justify-content-between align-items-start position-relative animate-fade-in" id="db-notif-{{ notif.id }}" style="border-color: var(--border-color) !important; padding-right: 2.5rem !important;">
+        <div class="p-3 border rounded bg-white d-flex justify-content-between align-items-start position-relative animate-fade-in" id="db-notif-{{ notif.id }}" style="border-color: var(--border-color) !important; background: var(--bg-secondary) !important; padding-right: 2.5rem !important;">
             <button class="btn-close position-absolute" onclick="dismissDbNotification({{ notif.id }})" style="top: 10px; right: 10px; font-size: 0.85rem; background:none; border:none; cursor:pointer; color: var(--text-muted);" title="Dismiss"><i class="fa-solid fa-xmark"></i></button>
             <div class="d-flex gap-2.5">
                 <div class="notif-icon-circle {{ notif.category }} d-flex align-items-center justify-content-center" style="width: 30px; height: 30px; border-radius: 50%; background: var(--bg-tertiary); color: var(--neon-blue); flex-shrink:0;">
@@ -52,9 +73,8 @@
                     <p class="text-muted mb-0" style="font-size: 0.78rem; line-height: 1.35;">{{ notif.content }}</p>
                     <span class="text-muted d-block mt-1" style="font-size: 0.65rem;">{{ notif.created_at.strftime('%m-%d %H:%M') }}</span>
                     <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-xs btn-light py-1 px-2" style="font-size: 0.65rem; background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); cursor: pointer;" onclick="dismissDbNotification({{ notif.id }})"><i class="fa-solid fa-check me-1 text-success"></i> Mark Read</button>
-                        <button class="btn btn-xs btn-light py-1 px-2" style="font-size: 0.65rem; background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); cursor: pointer;" onclick="dismissDbNotification({{ notif.id }})"><i class="fa-solid fa-eye-slash me-1"></i> Dismiss</button>
-                        <button class="btn btn-xs btn-light py-1 px-2 text-danger" style="font-size: 0.65rem; background: var(--bg-secondary); border: 1px solid var(--border-color); cursor: pointer;" onclick="deleteDbNotification({{ notif.id }})"><i class="fa-solid fa-trash me-1"></i> Delete</button>
+                        <button class="btn btn-xs btn-light py-1 px-2" style="font-size: 0.65rem; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); cursor: pointer;" onclick="dismissDbNotification({{ notif.id }})"><i class="fa-solid fa-check me-1 text-success"></i> Mark Read</button>
+                        <button class="btn btn-xs btn-light py-1 px-2 text-danger" style="font-size: 0.65rem; background: var(--bg-primary); border: 1px solid var(--border-color); cursor: pointer;" onclick="deleteDbNotification({{ notif.id }})"><i class="fa-solid fa-trash me-1"></i> Delete</button>
                     </div>
                 </div>
             </div>
@@ -64,105 +84,118 @@
 </div>
 {% endif %}
 
-
-<!-- Primary control grid -->
-<div class="row g-4 mb-4">
-    <!-- Placement Readiness Gauge -->
-    <div class="col-lg-7">
+<!-- Primary Grid Layout -->
+<div class="row g-4">
+    <!-- Row 1 Left: Profile Details Card -->
+    <div class="col-md-6 col-lg-4" id="card-profile">
         <div class="flat-card h-100 bg-white border">
-            <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom" style="border-color: var(--border-color);">
-                <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-gauge-high text-muted me-2"></i> Placement Readiness Score</h3>
-                <span class="badge badge-success" style="font-size:0.7rem;">Live Metrics</span>
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
+                <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-circle-user text-muted me-2"></i> Student Profile</h3>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="dropdown card-dismiss-dropdown" style="position: relative;">
+                        <button class="btn btn-xs btn-link p-0 text-muted border-0 bg-transparent" onclick="toggleCardDropdown(event, 'card-profile')" style="font-size: 0.85rem; cursor: pointer;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                        <ul id="card-dropdown-card-profile" class="dropdown-menu dropdown-menu-end shadow hidden" style="position: absolute; right: 0; top: 20px; z-index: 110; min-width: 130px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; list-style: none; padding: 4px 0; margin: 0;">
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="dismissCard('card-profile', 'session')" style="display: block; padding: 4px 12px; font-size: 0.72rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-eye-slash me-2"></i> Hide temporarily</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="dismissCard('card-profile', 'permanent')" style="display: block; padding: 4px 12px; font-size: 0.72rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-trash me-2 text-danger"></i> Never show again</a></li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-xs btn-link p-0 text-muted border-0 bg-transparent" onclick="dismissCard('card-profile', 'session')" style="font-size: 0.9rem; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+                </div>
             </div>
             
-            <div class="row align-items-center g-4">
-                <!-- Circular Indicator -->
-                <div class="col-sm-5 text-center">
-                    <div class="d-inline-block position-relative mb-2" style="width: 140px; height: 140px;">
-                        <!-- SVG Circular Progress -->
-                        <svg class="progress-ring" width="140" height="140">
-                            <circle class="progress-ring__background" stroke="var(--bg-tertiary)" stroke-width="12" fill="transparent" r="58" cx="70" cy="70" />
-                            <circle class="progress-ring__circle" stroke="var(--neon-blue)" stroke-width="12" fill="transparent" r="58" cx="70" cy="70" 
-                                    stroke-dasharray="364.4" stroke-dashoffset="{{ 364.4 - (364.4 * placement_score / 100) }}" style="transition: stroke-dashoffset 0.5s ease; stroke-linecap: round;" />
-                        </svg>
-                        <div class="position-absolute top-50 start-50 translate-middle text-center">
-                            <span class="fw-extrabold text-secondary" style="font-size: 1.8rem; letter-spacing:-0.03em;">{{ placement_score }}</span>
-                            <span class="text-muted d-block" style="font-size: 0.65rem; font-weight: 700; text-transform:uppercase; margin-top:-4px;">Rating</span>
-                        </div>
-                    </div>
-                    <span class="text-secondary fw-bold d-block" style="font-size: 0.85rem;">
-                        {% if placement_score >= 80 %}Excellent Readiness
-                        {% elif placement_score >= 60 %}Placement Capable
-                        {% else %}Needs Optimization{% endif %}
-                    </span>
+            <div class="d-flex flex-column align-items-center text-center mb-3">
+                <div class="profile-photo-preview mb-2">
+                    {% if current_user.profile_photo %}
+                        <img src="{{ url_for('static', filename=current_user.profile_photo) }}" alt="Avatar" class="rounded-circle border shadow-sm" style="width: 70px; height: 70px; object-fit: cover;">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='images/avatars/' ~ current_user.avatar) }}" alt="Avatar" class="rounded-circle border shadow-sm" style="width: 70px; height: 70px; object-fit: cover;">
+                    {% endif %}
                 </div>
+                <h4 class="fw-bold mb-0 text-secondary" style="font-size: 1.05rem;">{{ current_user.name or current_user.username }}</h4>
+                <span class="badge badge-info mt-1" style="font-size:0.68rem; background: var(--bg-tertiary); color: var(--neon-blue) !important; border: 1px solid var(--border-color);">{{ current_user.career_goal or 'Not Configured' }}</span>
+            </div>
 
-                <!-- Subscores list -->
-                <div class="col-sm-7">
-                    <div class="d-flex flex-column gap-3">
-                        <div>
-                            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.78rem;">
-                                <span class="text-secondary fw-semibold"><i class="fa-solid fa-route me-1 text-muted"></i> Technical Skills</span>
-                                <span class="fw-bold text-secondary">{{ tech_ready }}%</span>
-                            </div>
-                            <div class="progress-bar-container" style="background: var(--bg-tertiary); height: 6px; border-radius: 3px;">
-                                <div class="progress-bar-fill" style="background: var(--neon-blue); height: 100%; width: {{ tech_ready }}%;"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.78rem;">
-                                <span class="text-secondary fw-semibold"><i class="fa-solid fa-file-invoice me-1 text-muted"></i> Resume ATS Score</span>
-                                <span class="fw-bold text-secondary">{{ resume_ready }}%</span>
-                            </div>
-                            <div class="progress-bar-container" style="background: var(--bg-tertiary); height: 6px; border-radius: 3px;">
-                                <div class="progress-bar-fill" style="background: var(--info); height: 100%; width: {{ resume_ready }}%;"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.78rem;">
-                                <span class="text-secondary fw-semibold"><i class="fa-solid fa-microphone me-1 text-muted"></i> Interview Readiness</span>
-                                <span class="fw-bold text-secondary">{{ interview_ready }}%</span>
-                            </div>
-                            <div class="progress-bar-container" style="background: var(--bg-tertiary); height: 6px; border-radius: 3px;">
-                                <div class="progress-bar-fill" style="background: var(--warning); height: 100%; width: {{ interview_ready }}%;"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.78rem;">
-                                <span class="text-secondary fw-semibold"><i class="fa-solid fa-laptop-code me-1 text-muted"></i> Project Showcase</span>
-                                <span class="fw-bold text-secondary">{{ project_ready }}%</span>
-                            </div>
-                            <div class="progress-bar-container" style="background: var(--bg-tertiary); height: 6px; border-radius: 3px;">
-                                <div class="progress-bar-fill" style="background: var(--success); height: 100%; width: {{ project_ready }}%;"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.78rem;">
-                                <span class="text-secondary fw-semibold"><i class="fa-solid fa-award me-1 text-muted"></i> Certifications</span>
-                                <span class="fw-bold text-secondary">{{ cert_ready }}%</span>
-                            </div>
-                            <div class="progress-bar-container" style="background: var(--bg-tertiary); height: 6px; border-radius: 3px;">
-                                <div class="progress-bar-fill" style="background: var(--cyan); height: 100%; width: {{ cert_ready }}%;"></div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="d-flex flex-column gap-2" style="font-size:0.82rem;">
+                <div class="d-flex justify-content-between"><span class="text-muted">Academic Branch:</span> <strong class="text-secondary">{{ current_user.branch or 'General' }}</strong></div>
+                <div class="d-flex justify-content-between"><span class="text-muted">Academic Year:</span> <strong class="text-secondary">{{ current_user.year or 'Not set' }}</strong></div>
+                <div class="d-flex justify-content-between"><span class="text-muted">Primary Email:</span> <strong class="text-secondary">{{ current_user.email }}</strong></div>
+                {% if current_user.bio %}
+                <div class="border-top pt-2 mt-1">
+                    <span class="text-muted d-block mb-1" style="font-size:0.75rem; text-transform:uppercase; font-weight:700;">Bio Summary</span>
+                    <p class="text-muted mb-0" style="line-height:1.4; font-size:0.78rem;">{{ current_user.bio }}</p>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>
 
-    <!-- Active Learning & Next Steps -->
-    <div class="col-lg-5">
+    <!-- Row 1 Middle: Learning Progress & Study Plan Card -->
+    <div class="col-md-6 col-lg-4" id="card-learning">
         <div class="flat-card h-100 bg-white border d-flex flex-column justify-content-between">
-            <div class="mb-3">
+            <div>
                 <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
-                    <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-circle-nodes text-muted me-2"></i> Current Track Milestones</h3>
-                    <span class="badge badge-info text-uppercase" style="font-size:0.62rem; font-weight:700;">{{ target_role }}</span>
+                    <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-graduation-cap text-muted me-2"></i> Learning Progress</h3>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="dropdown card-dismiss-dropdown" style="position: relative;">
+                            <button class="btn btn-xs btn-link p-0 text-muted border-0 bg-transparent" onclick="toggleCardDropdown(event, 'card-learning')" style="font-size: 0.85rem; cursor: pointer;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                            <ul id="card-dropdown-card-learning" class="dropdown-menu dropdown-menu-end shadow hidden" style="position: absolute; right: 0; top: 20px; z-index: 110; min-width: 130px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; list-style: none; padding: 4px 0; margin: 0;">
+                                <li><a class="dropdown-item" href="javascript:void(0)" onclick="dismissCard('card-learning', 'session')" style="display: block; padding: 4px 12px; font-size: 0.72rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-eye-slash me-2"></i> Hide temporarily</a></li>
+                                <li><a class="dropdown-item" href="javascript:void(0)" onclick="dismissCard('card-learning', 'permanent')" style="display: block; padding: 4px 12px; font-size: 0.72rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-trash me-2 text-danger"></i> Never show again</a></li>
+                            </ul>
+                        </div>
+                        <button class="btn btn-xs btn-link p-0 text-muted border-0 bg-transparent" onclick="dismissCard('card-learning', 'session')" style="font-size: 0.9rem; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
                 </div>
-                
+
+                <div class="row g-2 text-center mb-3" style="font-size: 0.8rem;">
+                    <div class="col-6">
+                        <div class="p-2 border rounded bg-light" style="border-color:var(--border-color) !important;">
+                            <span class="text-muted d-block" style="font-size:0.65rem; text-transform:uppercase;">XP earned</span>
+                            <strong class="text-secondary" style="font-size:1rem; color: var(--neon-blue) !important;">{{ current_user.xp }} XP</strong>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-2 border rounded bg-light" style="border-color:var(--border-color) !important;">
+                            <span class="text-muted d-block" style="font-size:0.65rem; text-transform:uppercase;">Streak</span>
+                            <strong class="text-warning" style="font-size:1rem;">{{ current_user.learning_streak }} Days</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-3" style="font-size:0.82rem;">
+                    <span class="text-muted">Daily Time Budget:</span>
+                    <span class="fw-bold text-secondary"><i class="fa-regular fa-clock me-1 text-muted"></i> {{ current_user.daily_study_time or '2 hours/day' }}</span>
+                </div>
+            </div>
+
+            <div>
+                <button id="btn-generate-study-plan" onclick="triggerGenerateStudyPlan()" class="btn btn-primary w-100 py-2 d-flex align-items-center justify-content-center gap-2" style="font-size:0.8rem; background: linear-gradient(135deg, #0078d4, #00bcf2); border: none;"><i class="fa-solid fa-brain"></i> Generate AI Study Plan</button>
+                <div id="study-plan-display-box" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 1 Right: Roadmap Progress Card -->
+    <div class="col-md-12 col-lg-4" id="card-roadmap">
+        <div class="flat-card h-100 bg-white border d-flex flex-column justify-content-between">
+            <div>
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
+                    <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-route text-muted me-2"></i> Roadmap Progress</h3>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="dropdown card-dismiss-dropdown" style="position: relative;">
+                            <button class="btn btn-xs btn-link p-0 text-muted border-0 bg-transparent" onclick="toggleCardDropdown(event, 'card-roadmap')" style="font-size: 0.85rem; cursor: pointer;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                            <ul id="card-dropdown-card-roadmap" class="dropdown-menu dropdown-menu-end shadow hidden" style="position: absolute; right: 0; top: 20px; z-index: 110; min-width: 130px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; list-style: none; padding: 4px 0; margin: 0;">
+                                <li><a class="dropdown-item" href="javascript:void(0)" onclick="dismissCard('card-roadmap', 'session')" style="display: block; padding: 4px 12px; font-size: 0.72rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-eye-slash me-2"></i> Hide temporarily</a></li>
+                                <li><a class="dropdown-item" href="javascript:void(0)" onclick="dismissCard('card-roadmap', 'permanent')" style="display: block; padding: 4px 12px; font-size: 0.72rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-trash me-2 text-danger"></i> Never show again</a></li>
+                            </ul>
+                        </div>
+                        <button class="btn btn-xs btn-link p-0 text-muted border-0 bg-transparent" onclick="dismissCard('card-roadmap', 'session')" style="font-size: 0.9rem; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                </div>
+
                 <div class="mb-3">
                     <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.8rem;">
-                        <span class="text-secondary fw-semibold">Roadmap Progress</span>
+                        <span class="text-secondary fw-semibold">Roadmap Tree Ratio</span>
                         <span class="text-secondary fw-semibold">{{ roadmap_percent }}% Complete</span>
                     </div>
                     <div class="progress-bar-container" style="background: var(--bg-tertiary); height: 8px; border-radius: 4px; overflow: hidden;">
@@ -170,174 +203,423 @@
                     </div>
                 </div>
 
-                <div class="p-3 border rounded mb-0" style="background-color: var(--bg-primary); border-color: var(--border-color);">
-                    <span class="text-muted d-block text-uppercase mb-1" style="font-size:0.62rem; font-weight:700; letter-spacing:0.5px;"><i class="fa-solid fa-circle-play text-cyan me-1"></i> Next Node to Master</span>
-                    <h4 style="font-size: 0.88rem; font-weight:700;" class="mb-2 text-secondary">{{ next_node_title }}</h4>
-                    <p class="text-muted mb-0" style="font-size: 0.78rem; line-height: 1.4;">
-                        Complete this checkpoint to unlock your next sequential lesson, projects list, and earn additional XP points.
-                    </p>
+                <div class="p-2.5 border rounded mb-3" style="background-color: var(--bg-primary); border-color: var(--border-color); font-size: 0.8rem;">
+                    <span class="text-muted d-block text-uppercase mb-1" style="font-size:0.62rem; font-weight:700; letter-spacing:0.5px;"><i class="fa-solid fa-circle-play text-cyan me-1"></i> Current Checkpoint</span>
+                    <strong class="text-secondary">{{ next_node_title }}</strong>
                 </div>
             </div>
             
-            <a href="{{ url_for('features.list_roadmaps') }}" class="btn btn-primary btn-block py-2" style="font-size:0.85rem;"><i class="fa-solid fa-route me-1"></i> Open Learning Tree</a>
+            <a href="{{ url_for('features.list_roadmaps') }}" class="btn btn-outline w-100 py-2 text-center" style="font-size:0.8rem; border-color: var(--border-color); color: var(--text-primary); background: transparent;"><i class="fa-solid fa-route me-1"></i> Open Learning Tree</a>
         </div>
     </div>
 </div>
 
-<!-- Career Digital Twin & Timeline -->
-<div class="flat-card mb-4 bg-white border">
-    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom" style="border-color: var(--border-color);">
-        <div>
-            <h3 class="fw-bold mb-1" style="font-size:1.05rem;"><i class="fa-solid fa-timeline text-muted me-2"></i> AI Career Digital Twin Timeline</h3>
-            <p class="text-secondary mb-0" style="font-size:0.75rem;">Interactive projection showing career paths and salary growth based on your track</p>
+<div class="row g-4 mt-1">
+    <!-- Row 2 Left: Resume & ATS Score Card -->
+    <div class="col-md-6 col-lg-6" id="card-ats-score">
+        <div class="flat-card h-100 bg-white border d-flex flex-column justify-content-between">
+            <div>
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
+                    <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-file-circle-check text-muted me-2"></i> ATS Resume Score</h3>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="dropdown card-dismiss-dropdown" style="position: relative;">
+                            <button class="btn btn-xs btn-link p-0 text-muted border-0 bg-transparent" onclick="toggleCardDropdown(event, 'card-ats-score')" style="font-size: 0.85rem; cursor: pointer;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                            <ul id="card-dropdown-card-ats-score" class="dropdown-menu dropdown-menu-end shadow hidden" style="position: absolute; right: 0; top: 20px; z-index: 110; min-width: 130px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; list-style: none; padding: 4px 0; margin: 0;">
+                                <li><a class="dropdown-item" href="javascript:void(0)" onclick="dismissCard('card-ats-score', 'session')" style="display: block; padding: 4px 12px; font-size: 0.72rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-eye-slash me-2"></i> Hide temporarily</a></li>
+                                <li><a class="dropdown-item" href="javascript:void(0)" onclick="dismissCard('card-ats-score', 'permanent')" style="display: block; padding: 4px 12px; font-size: 0.72rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-trash me-2 text-danger"></i> Never show again</a></li>
+                            </ul>
+                        </div>
+                        <button class="btn btn-xs btn-link p-0 text-muted border-0 bg-transparent" onclick="dismissCard('card-ats-score', 'session')" style="font-size: 0.9rem; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                </div>
+
+                {% if resume_score > 0 %}
+                    <div class="row g-2 text-center mb-3">
+                        <div class="col-4">
+                            <div class="p-2 border rounded bg-light" style="border-color: var(--border-color) !important;">
+                                <span class="text-muted d-block" style="font-size:0.65rem; text-transform:uppercase;">ATS score</span>
+                                <strong class="text-secondary" style="font-size:1.05rem; color: var(--neon-blue) !important;">{{ resume_score }}/100</strong>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-2 border rounded bg-light" style="border-color: var(--border-color) !important;">
+                                <span class="text-muted d-block" style="font-size:0.65rem; text-transform:uppercase;">Readability</span>
+                                <strong class="text-secondary" style="font-size:1.05rem;">{{ readability_score }}%</strong>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-2 border rounded bg-light" style="border-color: var(--border-color) !important;">
+                                <span class="text-muted d-block" style="font-size:0.65rem; text-transform:uppercase;">Keywords</span>
+                                <strong class="text-secondary" style="font-size:1.05rem;">{{ industry_match_score }}%</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-2.5 border rounded bg-light-subtle" style="font-size: 0.78rem; line-height: 1.45;">
+                        <strong>Optimization Hint:</strong> Reword experience lines using action verbs (e.g. <em>Architected</em>, <em>Hardened</em>) and include key tech stacks (Docker, CI/CD).
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fa-solid fa-file-invoice text-muted mb-2" style="font-size: 1.8rem;"></i>
+                        <h4 style="font-size: 0.88rem;" class="fw-bold mb-1">No Resume Profile Scanned</h4>
+                        <p class="text-secondary mb-0" style="font-size: 0.75rem; max-width: 320px; margin: 0 auto;">
+                            Upload your resume or build one to calculate your real-time applicant score metrics.
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <a href="{{ url_for('features.resume_analyzer') }}" class="btn btn-outline w-100 py-2 mt-3" style="font-size:0.8rem; border-color: var(--border-color); color: var(--text-primary); background: transparent;"><i class="fa-solid fa-file-signature me-1"></i> Open Resume Builder</a>
         </div>
-        <span class="badge badge-warning text-uppercase" style="font-size:0.62rem; font-weight:700;">Class of {{ current_user.year }}</span>
     </div>
 
-    <!-- Timeline Steps -->
-    <div class="row g-4 timeline-wrapper" style="position:relative;">
-        <div class="col-sm-6 col-xl-3 text-center timeline-node-twin">
-            <div class="p-3 border rounded bg-light-blue-gradient h-100" style="border-color: var(--border-color); background: rgba(59, 130, 246, 0.02);">
-                <div class="twin-year mb-2"><span class="badge" style="background: var(--bg-tertiary); color: var(--text-secondary); font-weight:700;">2026</span></div>
-                <h4 style="font-size:0.85rem;" class="fw-bold mb-1">Foundational Layer</h4>
-                <p class="text-muted mb-2" style="font-size:0.75rem;">Build basics, master Git, CLI, and database basics.</p>
-                <div class="p-2 border rounded bg-white text-secondary" style="font-size: 0.72rem; border-color: var(--border-color) !important;">
-                    <div>Est. Salary: <strong>$65,000/yr</strong></div>
-                    <div style="font-size:0.68rem; color: var(--neon-blue); margin-top:2px;">Goal: Azure Fundamentals</div>
+    <!-- Row 2 Right: Internship Readiness Card -->
+    <div class="col-md-6 col-lg-6" id="card-readiness">
+        <div class="flat-card h-100 bg-white border d-flex flex-column justify-content-between">
+            <div>
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
+                    <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-briefcase text-muted me-2"></i> Internship Readiness</h3>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="dropdown card-dismiss-dropdown" style="position: relative;">
+                            <button class="btn btn-xs btn-link p-0 text-muted border-0 bg-transparent" onclick="toggleCardDropdown(event, 'card-readiness')" style="font-size: 0.85rem; cursor: pointer;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                            <ul id="card-dropdown-card-readiness" class="dropdown-menu dropdown-menu-end shadow hidden" style="position: absolute; right: 0; top: 20px; z-index: 110; min-width: 130px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; list-style: none; padding: 4px 0; margin: 0;">
+                                <li><a class="dropdown-item" href="javascript:void(0)" onclick="dismissCard('card-readiness', 'session')" style="display: block; padding: 4px 12px; font-size: 0.72rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-eye-slash me-2"></i> Hide temporarily</a></li>
+                                <li><a class="dropdown-item" href="javascript:void(0)" onclick="dismissCard('card-readiness', 'permanent')" style="display: block; padding: 4px 12px; font-size: 0.72rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-trash me-2 text-danger"></i> Never show again</a></li>
+                            </ul>
+                        </div>
+                        <button class="btn btn-xs btn-link p-0 text-muted border-0 bg-transparent" onclick="dismissCard('card-readiness', 'session')" style="font-size: 0.9rem; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center justify-content-between mb-3" style="font-size:0.85rem;">
+                    <span class="text-secondary fw-semibold">Algorithmic Readiness Score</span>
+                    <strong style="font-size: 1.1rem; color: {% if placement_score >= 80 %}#10b981{% elif placement_score >= 60 %}#f59e0b{% else %}#ef4444{% endif %};">{{ placement_score }}%</strong>
                 </div>
             </div>
-        </div>
-        <div class="col-sm-6 col-xl-3 text-center timeline-node-twin">
-            <div class="p-3 border rounded h-100" style="border-color: var(--border-color); background: rgba(59, 130, 246, 0.02);">
-                <div class="twin-year mb-2"><span class="badge" style="background: var(--bg-tertiary); color: var(--text-secondary); font-weight:700;">2027</span></div>
-                <h4 style="font-size:0.85rem;" class="fw-bold mb-1">Intermediate Architect</h4>
-                <p class="text-muted mb-2" style="font-size:0.75rem;">Deploy full-stack REST APIs, configure containerization.</p>
-                <div class="p-2 border rounded bg-white text-secondary" style="font-size: 0.72rem; border-color: var(--border-color) !important;">
-                    <div>Est. Salary: <strong>$85,000/yr</strong></div>
-                    <div style="font-size:0.68rem; color: var(--neon-blue); margin-top:2px;">Goal: Terraform Associate</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-xl-3 text-center timeline-node-twin">
-            <div class="p-3 border rounded h-100" style="border-color: var(--border-color); background: rgba(59, 130, 246, 0.02);">
-                <div class="twin-year mb-2"><span class="badge" style="background: var(--bg-tertiary); color: var(--text-secondary); font-weight:700;">2028</span></div>
-                <h4 style="font-size:0.85rem;" class="fw-bold mb-1">Advanced Engineer</h4>
-                <p class="text-muted mb-2" style="font-size:0.75rem;">Implement CI/CD networks, system monitoring pipelines.</p>
-                <div class="p-2 border rounded bg-white text-secondary" style="font-size: 0.72rem; border-color: var(--border-color) !important;">
-                    <div>Est. Salary: <strong>$105,000/yr</strong></div>
-                    <div style="font-size:0.68rem; color: var(--neon-blue); margin-top:2px;">Goal: AWS Solutions Arch</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-xl-3 text-center timeline-node-twin">
-            <div class="p-3 border rounded h-100" style="border-color: var(--border-color); background: rgba(124, 58, 237, 0.02);">
-                <div class="twin-year mb-2"><span class="badge badge-warning" style="font-weight:700;">2029 (Career Ready)</span></div>
-                <h4 style="font-size:0.85rem;" class="fw-bold mb-1">Senior Specialist</h4>
-                <p class="text-muted mb-2" style="font-size:0.75rem;">Build capstone microservices, scale system security.</p>
-                <div class="p-2 border rounded bg-white text-secondary" style="font-size: 0.72rem; border-color: var(--border-color) !important;">
-                    <div>Est. Salary: <strong>$135,000/yr</strong></div>
-                    <div style="font-size:0.68rem; color: var(--success); margin-top:2px;">Goal: Security+ / OSCP</div>
-                </div>
+
+            <div>
+                <button id="btn-generate-readiness" onclick="triggerInternshipReadiness()" class="btn btn-primary w-100 py-2 d-flex align-items-center justify-content-center gap-2" style="font-size:0.8rem; background: linear-gradient(135deg, #0078d4, #00bcf2); border: none;"><i class="fa-solid fa-wand-magic-sparkles"></i> Calculate AI Readiness</button>
+                <div id="internship-readiness-results" style="display: none;"></div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row g-4">
-    <!-- ATS Resume Scan Breakdown -->
-    <div class="col-lg-8">
-        <div class="flat-card bg-white border h-100">
-            <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom" style="border-color: var(--border-color);">
-                <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-file-circle-check text-muted me-2"></i> ATS Resume Scoring</h3>
-                <a href="{{ url_for('features.resume_analyzer') }}" class="btn btn-sm btn-outline" style="font-size:0.75rem;">Open Builder <i class="fa-solid fa-arrow-up-right-from-square ms-1"></i></a>
-            </div>
-            
-            {% if resume_score > 0 %}
-                <div class="row g-3 mb-4">
-                    <div class="col-sm-4 text-center">
-                        <div class="p-3 border rounded bg-light" style="border-color: var(--border-color) !important;">
-                            <span class="text-muted d-block mb-1" style="font-size:0.72rem; font-weight:700; text-transform:uppercase;">ATS score</span>
-                            <span class="fw-extrabold text-secondary" style="font-size:1.6rem; color: var(--neon-blue) !important;">{{ resume_score }}/100</span>
+<div class="row g-4 mt-1">
+    <!-- Row 3 Left: Featured Projects Card -->
+    <div class="col-md-6 col-lg-4" id="card-projects">
+        <div class="flat-card h-100 bg-white border d-flex flex-column justify-content-between">
+            <div>
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
+                    <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-laptop-code text-muted me-2"></i> Showcase Projects</h3>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="dropdown card-dismiss-dropdown" style="position: relative;">
+                            <button class="btn btn-xs btn-link p-0 text-muted border-0 bg-transparent" onclick="toggleCardDropdown(event, 'card-projects')" style="font-size: 0.85rem; cursor: pointer;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                            <ul id="card-dropdown-card-projects" class="dropdown-menu dropdown-menu-end shadow hidden" style="position: absolute; right: 0; top: 20px; z-index: 110; min-width: 130px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; list-style: none; padding: 4px 0; margin: 0;">
+                                <li><a class="dropdown-item" href="javascript:void(0)" onclick="dismissCard('card-projects', 'session')" style="display: block; padding: 4px 12px; font-size: 0.72rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-eye-slash me-2"></i> Hide temporarily</a></li>
+                                <li><a class="dropdown-item" href="javascript:void(0)" onclick="dismissCard('card-projects', 'permanent')" style="display: block; padding: 4px 12px; font-size: 0.72rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-trash me-2 text-danger"></i> Never show again</a></li>
+                            </ul>
                         </div>
-                    </div>
-                    <div class="col-sm-4 text-center">
-                        <div class="p-3 border rounded bg-light" style="border-color: var(--border-color) !important;">
-                            <span class="text-muted d-block mb-1" style="font-size:0.72rem; font-weight:700; text-transform:uppercase;">Readability Index</span>
-                            <span class="fw-bold text-secondary" style="font-size:1.4rem;">{{ readability_score }}%</span>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 text-center">
-                        <div class="p-3 border rounded bg-light" style="border-color: var(--border-color) !important;">
-                            <span class="text-muted d-block mb-1" style="font-size:0.72rem; font-weight:700; text-transform:uppercase;">Keyword Alignment</span>
-                            <span class="fw-bold text-secondary" style="font-size:1.4rem;">{{ industry_match_score }}%</span>
-                        </div>
+                        <button class="btn btn-xs btn-link p-0 text-muted border-0 bg-transparent" onclick="dismissCard('card-projects', 'session')" style="font-size: 0.9rem; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
                     </div>
                 </div>
 
-                <div>
-                    <h4 class="fw-bold mb-2 text-secondary" style="font-size:0.8rem; text-transform:uppercase;"><i class="fa-solid fa-circle-info me-1 text-muted"></i> Optimization Recommendation</h4>
-                    <p class="text-muted mb-0" style="font-size:0.8rem; line-height:1.5;">
-                        Your resume has moderate compatibility with technical scanning engines. To maximize impact, add missing keywords (such as Docker, Linux, and Wireshark) and rewrite experience bullets using leadership action verbs like <strong>Architected</strong>, <strong>Hardened</strong>, and <strong>Automated</strong>.
-                    </p>
+                <div class="d-flex flex-column gap-2 mb-3" style="font-size:0.78rem;">
+                    <div class="p-2 border rounded bg-light" style="border-color:var(--border-color) !important; background: var(--bg-primary) !important;">
+                        <strong class="text-dark">1. CampusMate OS Dashboard</strong>
+                        <p class="text-muted mb-0 mt-0.5">Full-stack student tracking dashboard built with Flask and SQLite database schema structures.</p>
+                    </div>
+                    <div class="p-2 border rounded bg-light" style="border-color:var(--border-color) !important; background: var(--bg-primary) !important;">
+                        <strong class="text-dark">2. Custom Shell Script Scheduler</strong>
+                        <p class="text-muted mb-0 mt-0.5">Automated script pipeline that checks server configs and uploads backups to S3 storage buckets.</p>
+                    </div>
                 </div>
-            {% else %}
-                <div class="text-center py-5">
-                    <i class="fa-solid fa-file-invoice-dollar text-muted mb-3" style="font-size: 2.2rem;"></i>
-                    <h4 style="font-size: 0.95rem;" class="fw-bold mb-2">No Resume File Scanned Yet</h4>
-                    <p class="text-secondary mb-3" style="font-size: 0.8rem; max-width: 400px; margin: 0 auto;">
-                        Upload your existing resume file or create a curriculum vitae from scratch inside the split-screen resume builder workspace to check your ATS compatibility.
-                    </p>
-                    <a href="{{ url_for('features.resume_analyzer') }}" class="btn btn-sm btn-primary">Open Resume Workspace <i class="fa-solid fa-plus"></i></a>
-                </div>
-            {% endif %}
+            </div>
+
+            <a href="{{ url_for('features.project_architect') }}" class="btn btn-outline w-100 py-2" style="font-size:0.8rem; border-color: var(--border-color); color: var(--text-primary); background: transparent;"><i class="fa-solid fa-cubes me-1"></i> AI Project Architect</a>
         </div>
     </div>
 
-    <!-- Student profile details -->
-    <div class="col-lg-4">
-        <div class="flat-card bg-white border h-100">
-            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
-                <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-address-card text-muted me-2"></i> Student Profile</h3>
+    <!-- Row 3 Middle: Certifications Plan Card -->
+    <div class="col-md-6 col-lg-4" id="card-certs">
+        <div class="flat-card h-100 bg-white border d-flex flex-column justify-content-between">
+            <div>
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
+                    <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-award text-muted me-2"></i> Recommended Certs</h3>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="dropdown card-dismiss-dropdown" style="position: relative;">
+                            <button class="btn btn-xs btn-link p-0 text-muted border-0 bg-transparent" onclick="toggleCardDropdown(event, 'card-certs')" style="font-size: 0.85rem; cursor: pointer;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                            <ul id="card-dropdown-card-certs" class="dropdown-menu dropdown-menu-end shadow hidden" style="position: absolute; right: 0; top: 20px; z-index: 110; min-width: 130px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; list-style: none; padding: 4px 0; margin: 0;">
+                                <li><a class="dropdown-item" href="javascript:void(0)" onclick="dismissCard('card-certs', 'session')" style="display: block; padding: 4px 12px; font-size: 0.72rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-eye-slash me-2"></i> Hide temporarily</a></li>
+                                <li><a class="dropdown-item" href="javascript:void(0)" onclick="dismissCard('card-certs', 'permanent')" style="display: block; padding: 4px 12px; font-size: 0.72rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-trash me-2 text-danger"></i> Never show again</a></li>
+                            </ul>
+                        </div>
+                        <button class="btn btn-xs btn-link p-0 text-muted border-0 bg-transparent" onclick="dismissCard('card-certs', 'session')" style="font-size: 0.9rem; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column gap-2 mb-3" style="font-size: 0.78rem;">
+                    <div class="d-flex justify-content-between text-secondary">
+                        <span>Active Target:</span> <strong>GCP / AWS / CompTIA</strong>
+                    </div>
+                </div>
             </div>
-            
-            <div class="d-flex flex-column gap-3" style="font-size:0.85rem;">
-                <div>
-                    <span class="text-muted d-block" style="font-size:0.7rem; font-weight:700; text-transform:uppercase;">Target Role Path</span>
-                    <span class="fw-semibold text-secondary" style="font-size:0.9rem; color: var(--neon-blue);"><i class="fa-solid fa-bullseye me-1 text-muted" style="font-size:0.8rem;"></i> {{ target_role }}</span>
-                </div>
-                <div>
-                    <span class="text-muted d-block" style="font-size:0.7rem; font-weight:700; text-transform:uppercase;">Academic Department</span>
-                    <span class="fw-semibold text-secondary">{{ current_user.branch or 'Computer Science Department' }}</span>
-                </div>
-                <div>
-                    <span class="text-muted d-block" style="font-size:0.7rem; font-weight:700; text-transform:uppercase;">Primary Email</span>
-                    <span class="fw-semibold text-secondary">{{ current_user.email }}</span>
-                </div>
-                <div>
-                    <span class="text-muted d-block" style="font-size:0.7rem; font-weight:700; text-transform:uppercase;">Account Role</span>
-                    <span class="fw-semibold text-secondary text-uppercase">{{ current_user.role }}</span>
-                </div>
+
+            <div>
+                <button id="btn-generate-certs" onclick="triggerCertificationPlan()" class="btn btn-primary w-100 py-2 d-flex align-items-center justify-content-center gap-2" style="font-size:0.8rem; background: linear-gradient(135deg, #0078d4, #00bcf2); border: none;"><i class="fa-solid fa-award"></i> Generate Certifications Plan</button>
+                <div id="certs-plan-results" style="display: none;"></div>
             </div>
         </div>
     </div>
+
+    <!-- Row 3 Right: AI Career Digital Twin Card -->
+    <div class="col-md-12 col-lg-4" id="card-timeline">
+        <div class="flat-card h-100 bg-white border d-flex flex-column justify-content-between">
+            <div>
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
+                    <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-timeline text-muted me-2"></i> Career Projection</h3>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="dropdown card-dismiss-dropdown" style="position: relative;">
+                            <button class="btn btn-xs btn-link p-0 text-muted border-0 bg-transparent" onclick="toggleCardDropdown(event, 'card-timeline')" style="font-size: 0.85rem; cursor: pointer;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                            <ul id="card-dropdown-card-timeline" class="dropdown-menu dropdown-menu-end shadow hidden" style="position: absolute; right: 0; top: 20px; z-index: 110; min-width: 130px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; list-style: none; padding: 4px 0; margin: 0;">
+                                <li><a class="dropdown-item" href="javascript:void(0)" onclick="dismissCard('card-timeline', 'session')" style="display: block; padding: 4px 12px; font-size: 0.72rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-eye-slash me-2"></i> Hide temporarily</a></li>
+                                <li><a class="dropdown-item" href="javascript:void(0)" onclick="dismissCard('card-timeline', 'permanent')" style="display: block; padding: 4px 12px; font-size: 0.72rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-trash me-2 text-danger"></i> Never show again</a></li>
+                            </ul>
+                        </div>
+                        <button class="btn btn-xs btn-link p-0 text-muted border-0 bg-transparent" onclick="dismissCard('card-timeline', 'session')" style="font-size: 0.9rem; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column gap-2" style="font-size: 0.8rem;">
+                    <div class="p-2 border rounded" style="background: rgba(59, 130, 246, 0.02); border-color: var(--border-color) !important;">
+                        <span class="badge bg-secondary-subtle text-secondary" style="font-size:0.65rem;">Class of {{ current_user.year or '2028' }} Target</span>
+                        <div class="d-flex justify-content-between mt-1 text-secondary">
+                            <span>Entry Salary:</span> <strong>$75,000 - $95,000/yr</strong>
+                        </div>
+                        <div class="d-flex justify-content-between text-secondary">
+                            <span>Target Role:</span> <strong>Junior {{ current_user.career_goal or 'Engineer' }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <span class="text-muted text-center d-block mt-3" style="font-size: 0.7rem;">Interactive Projection synced to learning path</span>
+        </div>
+    </div>
+</div>
+
+<!-- Footer layout reset button -->
+<div class="text-center mt-5 mb-2">
+    <button class="btn btn-xs btn-outline-secondary" onclick="resetHiddenCards()" style="font-size: 0.72rem; padding: 4px 10px; border-color: var(--border-color); color: var(--text-muted); background: transparent; cursor: pointer;"><i class="fa-solid fa-rotate-left me-1"></i> Restore Hidden Dashboard Layout Cards</button>
 </div>
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        if (localStorage.getItem("dismissed_welcome_banner") !== "true") {
-            const banner = document.getElementById("dashboard-welcome-banner");
-            if (banner) banner.style.display = "block";
-        }
-    });
-
-    function dismissWelcomeBanner() {
-        const banner = document.getElementById("dashboard-welcome-banner");
-        if (banner) banner.style.display = "none";
-        localStorage.setItem("dismissed_welcome_banner", "true");
+    // Toggle three-dots menu dropdown on individual cards
+    function toggleCardDropdown(event, cardId) {
+        event.stopPropagation();
+        const dropdownMenu = document.getElementById(`card-dropdown-${cardId}`);
+        if (!dropdownMenu) return;
+        
+        // Close all other dropdown menus
+        document.querySelectorAll(".card-dismiss-dropdown ul").forEach(el => {
+            if (el.id !== `card-dropdown-${cardId}`) {
+                el.classList.add("hidden");
+            }
+        });
+        
+        dropdownMenu.classList.toggle("hidden");
     }
 
+    // Dismiss dashboard cards (temporarily or permanently)
+    function dismissCard(cardId, type) {
+        const card = document.getElementById(cardId);
+        if (card) {
+            card.style.display = "none";
+        }
+        if (type === 'permanent') {
+            localStorage.setItem(`dismissed_${cardId}`, 'permanent');
+        }
+    }
+
+    // Restore hidden cards configuration
+    function resetHiddenCards() {
+        const dismissedCards = ['card-welcome', 'card-profile', 'card-learning', 'card-roadmap', 'card-ats-score', 'card-readiness', 'card-projects', 'card-certs', 'card-timeline'];
+        dismissedCards.forEach(cardId => {
+            localStorage.removeItem(`dismissed_${cardId}`);
+            const el = document.getElementById(cardId);
+            if (el) {
+                el.style.display = "block";
+                el.style.setProperty("display", "block", "important");
+            }
+        });
+    }
+
+    // Hide dropdowns when clicking outside
+    document.addEventListener("click", () => {
+        document.querySelectorAll(".card-dismiss-dropdown ul").forEach(el => el.classList.add("hidden"));
+    });
+
+    // ── Smart AI Actions Ajax Triggers ───────────────────────────
+
+    function formatMarkdownToHtml(md) {
+        let html = md || "";
+        html = html.replace(/\n/g, "<br>");
+        html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        html = html.replace(/^- (.*?)(?:<br>|$)/gm, '<li>$1</li>');
+        html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+        return html;
+    }
+
+    async function triggerGenerateStudyPlan() {
+        const btn = document.getElementById("btn-generate-study-plan");
+        const planBox = document.getElementById("study-plan-display-box");
+        if (!btn || !planBox) return;
+        
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Designing Plan...`;
+        planBox.style.display = "block";
+        planBox.innerHTML = `<div class="text-center py-3 text-muted" style="font-size: 0.78rem;"><i class="fa-solid fa-spinner fa-spin me-2"></i> Analyzing track milestones...</div>`;
+        
+        try {
+            const key = localStorage.getItem("campusmate_gemini_key") || "";
+            const response = await fetch("/smart-ai/study-plan", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({ custom_key: key })
+            });
+            const data = await response.json();
+            if (response.ok && data.success) {
+                planBox.innerHTML = `<div class="p-3 border rounded bg-light mt-2 text-secondary" style="font-size: 0.8rem; line-height: 1.5; max-height: 250px; overflow-y: auto; text-align: left;">${formatMarkdownToHtml(data.study_plan)}</div>`;
+            } else {
+                planBox.innerHTML = `<div class="text-danger mt-2" style="font-size: 0.78rem;">Error: ${data.error || "Failed to generate"}</div>`;
+            }
+        } catch(e) {
+            console.error(e);
+            planBox.innerHTML = `<div class="text-danger mt-2" style="font-size: 0.78rem;">Connection error.</div>`;
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fa-solid fa-brain me-1"></i> Generate AI Study Plan`;
+        }
+    }
+
+    async function triggerInternshipReadiness() {
+        const btn = document.getElementById("btn-generate-readiness");
+        const resultsBox = document.getElementById("internship-readiness-results");
+        if (!btn || !resultsBox) return;
+        
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Running Diagnostics...`;
+        resultsBox.style.display = "block";
+        resultsBox.innerHTML = `<div class="text-center py-3 text-muted" style="font-size: 0.78rem;"><i class="fa-solid fa-spinner fa-spin me-2"></i> Fetching ATS match data...</div>`;
+        
+        try {
+            const key = localStorage.getItem("campusmate_gemini_key") || "";
+            const response = await fetch("/smart-ai/internship-readiness", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({ custom_key: key })
+            });
+            const data = await response.json();
+            if (response.ok && data.success) {
+                resultsBox.innerHTML = `
+                    <div class="mt-3 p-3 border rounded bg-light text-secondary" style="text-align: left;">
+                        <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom" style="border-color: var(--border-color);">
+                            <strong style="font-size:0.82rem;"><i class="fa-solid fa-circle-check text-success me-1"></i> AI Match Analysis</strong>
+                            <span class="badge bg-success" style="font-size:0.7rem; font-weight:700;">${data.score}% Match</span>
+                        </div>
+                        <div class="mb-2" style="font-size:0.78rem;">
+                            <strong>Missing Skills / Keywords:</strong>
+                            <div class="d-flex flex-wrap gap-1 mt-1">
+                                ${data.missing_skills.map(s => `<span class="badge bg-danger-subtle text-danger" style="font-size:0.68rem; padding: 2px 6px; border: 1px solid rgba(239,68,68,0.15);">${s}</span>`).join("")}
+                             </div>
+                        </div>
+                        <div class="mb-2" style="font-size:0.78rem;">
+                            <strong>Recommended Certs:</strong>
+                            <div class="d-flex flex-wrap gap-1 mt-1">
+                                ${data.missing_certs.map(c => `<span class="badge bg-warning-subtle text-warning" style="font-size:0.68rem; padding: 2px 6px; border: 1px solid rgba(245,158,11,0.15);">${c}</span>`).join("")}
+                             </div>
+                        </div>
+                        <div class="mb-2" style="font-size:0.78rem;">
+                            <strong>Suggested Projects to Build:</strong>
+                            <ul class="ps-3 mb-2" style="font-size:0.75rem;">
+                                ${data.missing_projects.map(p => `<li>${p}</li>`).join("")}
+                            </ul>
+                        </div>
+                        <div style="font-size:0.75rem; border-top: 1px solid var(--border-color); padding-top: 6px;">
+                            <strong>Immediate Action Plan:</strong>
+                            <div class="mt-1" style="line-height:1.4;">${formatMarkdownToHtml(data.action_plan)}</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                resultsBox.innerHTML = `<div class="text-danger mt-2" style="font-size: 0.78rem;">Error: ${data.error || "Failed to calculate"}</div>`;
+            }
+        } catch(e) {
+            console.error(e);
+            resultsBox.innerHTML = `<div class="text-danger mt-2" style="font-size: 0.78rem;">Connection error.</div>`;
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles me-1"></i> Calculate AI Readiness`;
+        }
+    }
+
+    async function triggerCertificationPlan() {
+        const btn = document.getElementById("btn-generate-certs");
+        const resultsBox = document.getElementById("certs-plan-results");
+        if (!btn || !resultsBox) return;
+        
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Matching Certs...`;
+        resultsBox.style.display = "block";
+        resultsBox.innerHTML = `<div class="text-center py-3 text-muted" style="font-size: 0.78rem;"><i class="fa-solid fa-spinner fa-spin me-2"></i> Analyzing industry requirements...</div>`;
+        
+        try {
+            const key = localStorage.getItem("campusmate_gemini_key") || "";
+            const response = await fetch("/smart-ai/certification-plan", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({ custom_key: key })
+            });
+            const data = await response.json();
+            if (response.ok && data.success) {
+                resultsBox.innerHTML = `
+                    <div class="mt-3 d-flex flex-column gap-2 text-start">
+                        ${data.certifications.map(c => `
+                            <div class="p-2.5 border rounded bg-light text-secondary" style="font-size:0.78rem;">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <strong class="text-dark" style="font-size:0.8rem;"><i class="fa-solid fa-certificate text-primary me-1"></i> ${c.name}</strong>
+                                    <span class="badge bg-secondary-subtle text-secondary" style="font-size:0.65rem; font-weight:700;">${c.difficulty}</span>
+                                </div>
+                                <div class="text-muted mb-1" style="font-size:0.72rem;">Provider: ${c.provider} &bull; Cost: ${c.cost} &bull; Prep Time: ${c.hours}</div>
+                                <div class="text-secondary" style="font-size:0.72rem; line-height:1.35;"><strong>Value:</strong> ${c.value}</div>
+                            </div>
+                        `).join("")}
+                    </div>
+                `;
+            } else {
+                resultsBox.innerHTML = `<div class="text-danger mt-2" style="font-size: 0.78rem;">Error: ${data.error || "Failed to generate"}</div>`;
+            }
+        } catch(e) {
+            console.error(e);
+            resultsBox.innerHTML = `<div class="text-danger mt-2" style="font-size: 0.78rem;">Connection error.</div>`;
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fa-solid fa-award me-1"></i> Generate Certifications Plan`;
+        }
+    }
+
+    // Notifications handlers
     async function dismissDbNotification(notifId) {
         try {
             const response = await fetch(`/notifications/read/${notifId}`, {
