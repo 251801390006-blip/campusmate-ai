@@ -1,70 +1,412 @@
 {% extends "base.html" %}
 
-{% block title %}Welcome to CampusMate AI{% endblock %}
+{% block title %}Welcome to CampusMate AI - Student Growth OS{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Premium Landing Styles */
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--neon-blue-dim);
+        color: var(--neon-blue);
+        padding: 6px 14px;
+        border-radius: 30px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        border: 1px solid rgba(0, 120, 212, 0.15);
+        margin-bottom: 20px;
+    }
+    
+    .hero-title {
+        font-size: 3.2rem;
+        font-weight: 800;
+        line-height: 1.15;
+        letter-spacing: -0.04em;
+        color: var(--text-primary);
+        margin-bottom: 18px;
+    }
+    
+    @media (max-width: 991.98px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+    }
+    
+    .hero-desc {
+        font-size: 1.05rem;
+        line-height: 1.6;
+        color: var(--text-secondary);
+        max-width: 540px;
+        margin-bottom: 30px;
+    }
+    
+    .hero-image-container {
+        position: relative;
+        background: rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        border-radius: 24px;
+        padding: 12px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.06);
+        transition: transform 0.5s ease, box-shadow 0.5s ease;
+        transform: perspective(1000px) rotateY(-8deg) rotateX(6deg) scale(0.98);
+    }
+    
+    body.dark .hero-image-container {
+        background: rgba(30, 41, 59, 0.4);
+        border-color: rgba(51, 65, 85, 0.6);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+    }
+    
+    .hero-image-container:hover {
+        transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1);
+        box-shadow: 0 35px 60px -10px rgba(0, 120, 212, 0.12);
+    }
+    
+    body.dark .hero-image-container:hover {
+        box-shadow: 0 35px 60px -10px rgba(59, 130, 246, 0.25);
+    }
+    
+    .hero-illustration {
+        border-radius: 16px;
+        width: 100%;
+        display: block;
+        transition: transform 0.5s ease;
+    }
+    
+    /* Stats Bar */
+    .stats-bar {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 30px 20px;
+        box-shadow: 0 10px 30px -10px rgba(0,0,0,0.02);
+        margin: 40px 0 60px;
+    }
+    
+    .stat-item {
+        text-align: center;
+        border-right: 1px solid var(--border-color);
+    }
+    
+    .stat-item:last-child {
+        border-right: none;
+    }
+    
+    @media (max-width: 767.98px) {
+        .stat-item {
+            border-right: none;
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 0;
+        }
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+    }
+    
+    .stat-num {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--neon-blue);
+        line-height: 1;
+        margin-bottom: 6px;
+        letter-spacing: -0.02em;
+    }
+    
+    .stat-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    /* Feature Cards */
+    .section-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        text-align: center;
+        margin-bottom: 12px;
+    }
+    
+    .section-desc {
+        text-align: center;
+        color: var(--text-secondary);
+        max-width: 600px;
+        margin: 0 auto 50px;
+        font-size: 1rem;
+    }
+    
+    .feature-grid-card {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 18px;
+        padding: 30px;
+        height: 100%;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .feature-grid-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: transparent;
+        transition: background 0.3s ease;
+    }
+    
+    .feature-grid-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+        border-color: rgba(0, 120, 212, 0.3);
+    }
+    
+    body.dark .feature-grid-card:hover {
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        border-color: rgba(59, 130, 246, 0.3);
+    }
+    
+    .feature-grid-card.blue-accent:hover::before { background: #3b82f6; }
+    .feature-grid-card.green-accent:hover::before { background: #10b981; }
+    .feature-grid-card.purple-accent:hover::before { background: #8b5cf6; }
+    .feature-grid-card.orange-accent:hover::before { background: #f59e0b; }
+    .feature-grid-card.pink-accent:hover::before { background: #ec4899; }
+    .feature-grid-card.teal-accent:hover::before { background: #14b8a6; }
+    
+    .feature-icon-wrapper {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        margin-bottom: 22px;
+        border: 1px solid transparent;
+    }
+    
+    .feature-badge {
+        display: inline-block;
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 6px;
+        margin-top: 15px;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+    }
+    
+    /* CTA Block */
+    .cta-banner {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        border-radius: 24px;
+        padding: 60px 40px;
+        text-align: center;
+        color: #ffffff;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        margin-top: 60px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    
+    body.dark .cta-banner {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    }
+    
+    .cta-banner::after {
+        content: '';
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+        top: -150px;
+        right: -150px;
+        pointer-events: none;
+    }
+    
+    .cta-banner::before {
+        content: '';
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(139, 92, 246, 0.12) 0%, transparent 70%);
+        bottom: -150px;
+        left: -150px;
+        pointer-events: none;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container py-5">
+<div class="container py-4">
     <!-- Hero Block -->
     <div class="row align-items-center py-5 g-5">
         <!-- Left Details -->
         <div class="col-lg-6">
-            <h1 class="fw-extrabold mb-3" style="font-size: 2.6rem; line-height: 1.2; letter-spacing: -0.03em;">The Complete <span style="background: linear-gradient(135deg, var(--neon-blue), #4f46e5); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Growth Operating System</span> for Students</h1>
+            <div class="hero-badge">
+                <span>🚀</span> Next-Gen Academic & Career Operating System
+            </div>
+            
+            <h1 class="hero-title">
+                The Ultimate <span style="background: linear-gradient(135deg, var(--neon-blue), #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Growth OS</span> for College Students
+            </h1>
 
-            <p class="text-secondary mb-4" style="font-size: 1.02rem; line-height: 1.6; max-width: 520px;">
-                Accelerate your academic projects, follow structured career learning paths, analyze your resume dynamically, and resolve ticket issues directly with the student advisor staff.
+            <p class="hero-desc">
+                CampusMate AI is a unified suite designed by developers for developers. Seamlessly map 50+ career paths, analyze resumes instantly, architect custom project tech stacks, mock-interview with AI simulators, and secure top-tier tech internships.
             </p>
+            
             <div class="d-flex flex-wrap gap-3">
-                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">Create Free Account <i class="fa-solid fa-user-plus"></i></a>
-                <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-lg">Sign In <i class="fa-solid fa-right-to-bracket"></i></a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg px-4" style="background: linear-gradient(135deg, var(--neon-blue), #8b5cf6); border: none; box-shadow: 0 4px 14px rgba(0, 120, 212, 0.35);">
+                    Create Free Account <i class="fa-solid fa-user-plus ms-1"></i>
+                </a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-lg px-4">
+                    Sign In <i class="fa-solid fa-right-to-bracket ms-1"></i>
+                </a>
             </div>
         </div>
-        <!-- Right Image -->
-        <div class="col-lg-6 text-center">
-            <div class="hero-image-wrapper">
-                <img src="{{ url_for('static', filename='img/landing_hero.png') }}" alt="CampusMate Growth Dashboard Illustration" class="img-fluid hero-illustration">
+        
+        <!-- Right Image (Next-Level Generated Graphic) -->
+        <div class="col-lg-6">
+            <div class="hero-image-container">
+                <img src="{{ url_for('static', filename='img/landing_hero.png') }}" alt="CampusMate AI Student Growth Dashboard" class="hero-illustration">
             </div>
         </div>
     </div>
 
-    <!-- Features Section -->
-    <div class="row g-4 py-5 mt-2">
-        <h2 class="text-center mb-4">Interconnected Student Growth Modules</h2>
-        <div class="col-md-6 col-lg-3">
-            <div class="flat-card h-100">
-                <div class="stat-card icon-box mb-3" style="width: 40px; height: 40px; border-radius: 6px; background: var(--neon-blue-dim); color: var(--neon-blue); display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
-                    <i class="fa-solid fa-route"></i>
-                </div>
-                <h3 style="font-size: 1.05rem;" class="mb-2">Learning Roadmaps</h3>
-                <p class="text-secondary" style="font-size: 0.85rem; line-height: 1.4;">Follow structured milestones containing duration trackers, Mini-Projects, and certifications.</p>
+    <!-- Stats Showcase Bar -->
+    <div class="stats-bar">
+        <div class="row g-4">
+            <div class="col-6 col-md-3 stat-item">
+                <div class="stat-num">50+</div>
+                <div class="stat-label">Career Tracks</div>
+            </div>
+            <div class="col-6 col-md-3 stat-item">
+                <div class="stat-num">200</div>
+                <div class="stat-label">Milestones / Path</div>
+            </div>
+            <div class="col-6 col-md-3 stat-item">
+                <div class="stat-num">100+</div>
+                <div class="stat-label">Top Internships</div>
+            </div>
+            <div class="col-6 col-md-3 stat-item">
+                <div class="stat-num">11</div>
+                <div class="stat-label">Q&As per Step</div>
             </div>
         </div>
-        <div class="col-md-6 col-lg-3">
-            <div class="flat-card h-100">
-                <div class="stat-card icon-box mb-3" style="width: 40px; height: 40px; border-radius: 6px; background: rgba(16, 185, 129, 0.08); color: var(--success); display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
-                    <i class="fa-solid fa-file-invoice"></i>
+    </div>
+
+    <!-- Core Features Grid -->
+    <div class="py-4">
+        <h2 class="section-title">Actual Student Growth Modules</h2>
+        <p class="section-desc">
+            An interconnected environment designed to empower your engineering journey from your freshman year through graduation and corporate recruiting.
+        </p>
+        
+        <div class="row g-4">
+            <!-- 1. Roadmaps -->
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-grid-card blue-accent">
+                    <div class="feature-icon-wrapper" style="background: rgba(59, 130, 246, 0.08); color: #3b82f6; border-color: rgba(59, 130, 246, 0.2);">
+                        <i class="fa-solid fa-route"></i>
+                    </div>
+                    <h3 style="font-size: 1.15rem;" class="mb-2">AI Career Roadmaps</h3>
+                    <p class="text-secondary" style="font-size: 0.86rem; line-height: 1.5;">
+                        Navigate 200-step curriculum trees mapping specialized tracks (like VLSI, ECE, CSBS, and Quantum). Access resources, assignments, and certificates instantly without rigid locks.
+                    </p>
+                    <span class="feature-badge" style="background: rgba(59, 130, 246, 0.08); color: #3b82f6;">50+ Pathways</span>
                 </div>
-                <h3 style="font-size: 1.05rem;" class="mb-2">ATS Resume Analyzer</h3>
-                <p class="text-secondary" style="font-size: 0.85rem; line-height: 1.4;">Extract document text and verify metrics matching recruiters readability guidelines.</p>
+            </div>
+            
+            <!-- 2. ATS Resume Scanner -->
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-grid-card green-accent">
+                    <div class="feature-icon-wrapper" style="background: rgba(16, 185, 129, 0.08); color: #10b981; border-color: rgba(16, 185, 129, 0.2);">
+                        <i class="fa-solid fa-file-invoice"></i>
+                    </div>
+                    <h3 style="font-size: 1.15rem;" class="mb-2">ATS Resume Analyzer</h3>
+                    <p class="text-secondary" style="font-size: 0.86rem; line-height: 1.5;">
+                        Extract PDF text and measure readiness scores against recruiter guidelines. Receive direct feedback on phrasing improvements and formatting corrections.
+                    </p>
+                    <span class="feature-badge" style="background: rgba(16, 185, 129, 0.08); color: #10b981;">ATS Scanner</span>
+                </div>
+            </div>
+            
+            <!-- 3. Interview Prep -->
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-grid-card purple-accent">
+                    <div class="feature-icon-wrapper" style="background: rgba(139, 92, 246, 0.08); color: #8b5cf6; border-color: rgba(139, 92, 246, 0.2);">
+                        <i class="fa-solid fa-comments"></i>
+                    </div>
+                    <h3 style="font-size: 1.15rem;" class="mb-2">Mock Interview Simulator</h3>
+                    <p class="text-secondary" style="font-size: 0.86rem; line-height: 1.5;">
+                        Select your exact roadmap specialization from the unified dropdown. Tackle high-quality technical or behavioral questions with real-time AI response grading.
+                    </p>
+                    <span class="feature-badge" style="background: rgba(139, 92, 246, 0.08); color: #8b5cf6;">AI Assessment</span>
+                </div>
+            </div>
+            
+            <!-- 4. Project Architect -->
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-grid-card orange-accent">
+                    <div class="feature-icon-wrapper" style="background: rgba(245, 158, 11, 0.08); color: #f59e0b; border-color: rgba(245, 158, 11, 0.2);">
+                        <i class="fa-solid fa-drafting-compass"></i>
+                    </div>
+                    <h3 style="font-size: 1.15rem;" class="mb-2">Tech Stack Architect</h3>
+                    <p class="text-secondary" style="font-size: 0.86rem; line-height: 1.5;">
+                        Define target scopes and technologies to automatically decompose ideas into modular tasks, system architectures, and helper git branch commands.
+                    </p>
+                    <span class="feature-badge" style="background: rgba(245, 158, 11, 0.08); color: #f59e0b;">Workflow Builder</span>
+                </div>
+            </div>
+            
+            <!-- 5. Portfolio Builder -->
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-grid-card teal-accent">
+                    <div class="feature-icon-wrapper" style="background: rgba(20, 184, 166, 0.08); color: #14b8a6; border-color: rgba(20, 184, 166, 0.2);">
+                        <i class="fa-solid fa-laptop-code"></i>
+                    </div>
+                    <h3 style="font-size: 1.15rem;" class="mb-2">1-Click Portfolio Builder</h3>
+                    <p class="text-secondary" style="font-size: 0.86rem; line-height: 1.5;">
+                        Assemble projects, certifications, work history, and academic scores directly from your account profile into a beautifully styled, mobile-responsive web resume.
+                    </p>
+                    <span class="feature-badge" style="background: rgba(20, 184, 166, 0.08); color: #14b8a6;">Portfolio Gen</span>
+                </div>
+            </div>
+            
+            <!-- 6. Feedback & Tickets -->
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-grid-card pink-accent">
+                    <div class="feature-icon-wrapper" style="background: rgba(236, 72, 153, 0.08); color: #ec4899; border-color: rgba(236, 72, 153, 0.2);">
+                        <i class="fa-solid fa-ticket"></i>
+                    </div>
+                    <h3 style="font-size: 1.15rem;" class="mb-2">Dual Support Center</h3>
+                    <p class="text-secondary" style="font-size: 0.86rem; line-height: 1.5;">
+                        Propose features on the public community suggestions board, and get direct assistance from student advisors through private, secure help-desk ticket threads.
+                    </p>
+                    <span class="feature-badge" style="background: rgba(236, 72, 153, 0.08); color: #ec4899;">Advisor Ready</span>
+                </div>
             </div>
         </div>
-        <div class="col-md-6 col-lg-3">
-            <div class="flat-card h-100">
-                <div class="stat-card icon-box mb-3" style="width: 40px; height: 40px; border-radius: 6px; background: rgba(245, 158, 11, 0.08); color: var(--warning); display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
-                    <i class="fa-solid fa-comments"></i>
-                </div>
-                <h3 style="font-size: 1.05rem;" class="mb-2">Feedback & Tickets</h3>
-                <p class="text-secondary" style="font-size: 0.85rem; line-height: 1.4;">Dual-track system for public suggestion discussions and private help desk support tickets.</p>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-3">
-            <div class="flat-card h-100">
-                <div class="stat-card icon-box mb-3" style="width: 40px; height: 40px; border-radius: 6px; background: rgba(239, 68, 68, 0.08); color: var(--danger); display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
-                    <i class="fa-solid fa-shield-halved"></i>
-                </div>
-                <h3 style="font-size: 1.05rem;" class="mb-2">Admin Console</h3>
-                <p class="text-secondary" style="font-size: 0.85rem; line-height: 1.4;">Fully secured control console containing threat logs, user lists, and DB control panels.</p>
-            </div>
-        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="cta-banner">
+        <h2 class="fw-bold mb-3" style="font-size: 2.2rem; color: #ffffff;">Launch Your Engineering Career</h2>
+        <p class="mb-4" style="max-width: 580px; margin: 0 auto; opacity: 0.85; font-size: 1rem; line-height: 1.6;">
+            Join thousands of student developers mapping roadmaps, preparing for interviews, and applying for internships. Create your growth account today.
+        </p>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg px-5 py-3 fw-bold" style="color: #0f172a; border-radius: 10px; font-size: 0.95rem; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            Get Started For Free <i class="fa-solid fa-arrow-right ms-2"></i>
+        </a>
     </div>
 </div>
 {% endblock %}
