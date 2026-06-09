@@ -22,7 +22,7 @@
     <div class="landing-layout">
         <!-- Landing Header -->
         <header class="landing-header">
-            <div class="logo"><i class="fa-solid fa-graduation-cap"></i> CampusMate AI</div>
+            <div class="logo">🎓 CampusMate AI</div>
             <nav class="landing-nav">
                 <a href="{{ url_for('dashboard.landing') }}">Home</a>
                 {% if current_user.is_authenticated %}
@@ -43,7 +43,13 @@
                     {% if messages %}
                         {% for category, message in messages %}
                             <div class="flash-alert alert-{{ category }}">
-                                <i class="fa-solid {% if category == 'success' %}fa-circle-check{% elif category == 'danger' %}fa-triangle-exclamation{% else %}fa-circle-info{% endif %}"></i>
+                                {% if category == 'success' %}
+                                    <span style="margin-right: 8px;">✅</span>
+                                {% elif category == 'danger' %}
+                                    <span style="margin-right: 8px;">❌</span>
+                                {% else %}
+                                    <span style="margin-right: 8px;">ℹ️</span>
+                                {% endif %}
                                 <span>{{ message }}</span>
                             </div>
                         {% endfor %}
@@ -57,7 +63,7 @@
         <!-- Footer -->
         <footer class="landing-footer py-4">
             <div class="container text-center">
-                <div class="logo mb-2"><i class="fa-solid fa-graduation-cap"></i> CampusMate AI</div>
+                <div class="logo mb-2">🎓 CampusMate AI</div>
                 <div style="margin-bottom: 8px; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.8;">
                     <span style="font-weight: 600; color: var(--text-primary);">Founder:</span> Vanjith Kumar
                     <span style="margin: 0 12px; color: var(--border-color);">|</span>

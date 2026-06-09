@@ -499,9 +499,16 @@ a:hover {
     background-color: var(--neon-blue-dim);
     border-right: 3px solid var(--neon-blue);
 }
-.sidebar-link i {
+.sidebar-link i,
+.sidebar-link .sidebar-icon {
     font-size: 0.95rem;
     width: 20px;
+    display: inline-block;
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+.sidebar-link:hover .sidebar-icon {
+    transform: scale(1.15);
 }
 .sidebar-footer {
     padding: 1rem 1.5rem;
@@ -2402,11 +2409,18 @@ animation: fadeIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     color: var(--text-secondary);
     font-size: 0.65rem;
     font-weight: 500;
-    width: 20%;
+    flex: 1;
+    min-width: 0;
     transition: all 0.15s ease;
 }
-.mobile-bottom-link i {
+.mobile-bottom-link i,
+.mobile-bottom-link .mobile-bottom-icon {
     font-size: 1.15rem;
+    display: inline-block;
+    transition: transform 0.15s ease;
+}
+.mobile-bottom-link:hover .mobile-bottom-icon {
+    transform: scale(1.15);
 }
 .mobile-bottom-link:hover {
     color: var(--text-primary);
@@ -2757,19 +2771,25 @@ body.dark .notification-dropdown-card {
 
 /* Specific styling polish for the mobile bottom nav bar */
 .mobile-bottom-nav {
-    background: rgba(255, 255, 255, 0.96) !important;
+    background: var(--bg-secondary) !important;
     border-top: 1px solid var(--border-color) !important;
     box-shadow: 0 -3px 20px rgba(0, 0, 0, 0.08) !important;
     height: 68px !important; /* Slightly taller for more breathing room */
 }
 .mobile-bottom-link {
-    padding: 8px 0;
+    padding: 6px 2px !important;
 }
-.mobile-bottom-link i {
-    font-size: 1.3rem !important; /* Slightly larger for easier touch */
+.mobile-bottom-link i,
+.mobile-bottom-link .mobile-bottom-icon {
+    font-size: 1.25rem !important; /* Slightly larger for easier touch */
 }
 .mobile-bottom-link span {
-    font-size: 0.68rem !important;
+    font-size: 0.58rem !important;
     font-weight: 600 !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: block;
 }
 
