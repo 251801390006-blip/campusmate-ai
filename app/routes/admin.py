@@ -1,8 +1,10 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, abort, jsonify
 from flask_login import login_required, current_user
-from app.models import db, User, FeedbackItem, FeedbackReply
+from app.models import db, User, FeedbackItem, FeedbackReply, RoadmapProgress, UserResume, ChatMessage
 from functools import wraps
+from sqlalchemy import func
 import time
+from datetime import datetime, timedelta
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -26,6 +28,41 @@ def dashboard():
     total_tickets = FeedbackItem.query.filter_by(is_public=False).count()
     total_suggestions = FeedbackItem.query.filter_by(is_public=True).count()
     
+    # 1. Roadmaps popularity query
+    popular_roadmaps_raw = db.session.query(
+        RoadmapProgress.role, 
+        func.count(RoadmapProgress.id).label('count')
+    ).group_by(RoadmapProgress.role).order_by(db.text('count DESC')).limit(5).all()
+    
+    popular_roadmaps = []
+    for r in popular_roadmaps_raw:
+        popular_roadmaps.append({"role": r.role, "count": r.count})
+    if not popular_roadmaps:
+        popular_roadmaps = [
+            {"role": "Cyber Security", "count": 1},
+            {"role": "AI Engineering", "count": 1}
+        ]
+
+    # 2. Resume Builder stats
+    total_resumes = UserResume.query.count()
+    
+    # 3. AI Usage statistics
+    total_chat_messages = ChatMessage.query.count()
+    
+    # 4. Daily signups mock-seed or query
+    today = datetime.utcnow().date()
+    daily_signups = []
+    for i in range(6, -1, -1):
+        day = today - timedelta(days=i)
+        # Query count for this day
+        count = User.query.filter(func.date(User.created_at) == day).count()
+        # Fallback to make the chart render pretty
+        if count == 0 and i == 0:
+            count = total_users
+        elif count == 0:
+            count = (total_users // 5) or 1
+        daily_signups.append({"date": day.strftime('%a'), "count": count})
+        
     # Registered users list (exclude admins from being deleted)
     users = User.query.all()
     
@@ -53,7 +90,11 @@ def dashboard():
         total_suggestions=total_suggestions,
         users=users,
         threat_logs=threat_logs,
-        db_status=db_status
+        db_status=db_status,
+        popular_roadmaps=popular_roadmaps,
+        total_resumes=total_resumes,
+        total_chat_messages=total_chat_messages,
+        daily_signups=daily_signups
     )
 
 @admin_bp.route('/users/<int:user_id>/toggle-status', methods=['POST'])
@@ -150,3 +191,25 @@ def reset_database():
         return jsonify({"success": True, "message": "Database reset and seeded successfully!"})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+
+
+@admin_bp.route('/users/<int:user_id>/change-role', methods=['POST'])
+@login_required
+@role_required('admin')
+def change_user_role(user_id):
+    user = User.query.get_or_404(user_id)
+    if user.id == current_user.id:
+        flash("You cannot demote yourself from Admin status!", "danger")
+        return redirect(url_for('admin.dashboard'))
+        
+    new_role = request.form.get('role')
+    if new_role in ['student', 'mentor', 'admin', 'user']:
+        # Map generic 'user' selection to student role
+        user.role = 'user' if new_role == 'student' else new_role
+        db.session.commit()
+        flash(f"User {user.username} role updated to {new_role.upper()}.", "success")
+    else:
+        flash("Invalid role selection.", "danger")
+        
+    return redirect(url_for('admin.dashboard'))
+

@@ -1,0 +1,136 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}My Profile - CampusMate AI{% endblock %}
+
+{% block header_title %}Student Profile{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Left Panel: Avatar & Badges -->
+    <div class="col-lg-4">
+        <!-- Avatar card -->
+        <div class="flat-card shadow-sm border-light text-center mb-4">
+            <div class="position-relative d-inline-block mb-3">
+                <div style="background:#e9ecef; width:100px; height:100px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:3rem; color:#0078d4; margin:0 auto; border:2.5px solid #0078d4;">
+                    <!-- Dynamically choosing avatar icon -->
+                    {% if current_user.avatar == 'avatar-2.png' %}
+                        <i class="fa-solid fa-user-astronaut"></i>
+                    {% elif current_user.avatar == 'avatar-3.png' %}
+                        <i class="fa-solid fa-user-shield"></i>
+                    {% elif current_user.avatar == 'avatar-4.png' %}
+                        <i class="fa-solid fa-user-ninja"></i>
+                    {% elif current_user.avatar == 'avatar-5.png' %}
+                        <i class="fa-solid fa-user-graduate"></i>
+                    {% elif current_user.avatar == 'avatar-6.png' %}
+                        <i class="fa-solid fa-user-tie"></i>
+                    {% else %}
+                        <i class="fa-solid fa-user-gear"></i>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <h3 class="fw-bold text-dark mb-1" style="font-size:1.15rem;">{{ current_user.name or current_user.username.title() }}</h3>
+            <span class="badge bg-light text-primary border border-primary px-3 mb-2" style="font-size:0.75rem; font-weight:600;">{{ current_user.career_goal or "Student Partner" }}</span>
+            <p class="text-secondary mb-0" style="font-size:0.8rem; line-height:1.5;">{{ current_user.bio or "This student has not written a bio yet." }}</p>
+        </div>
+
+        <!-- Badges Card -->
+        <div class="flat-card shadow-sm border-light">
+            <h3 class="fw-bold text-dark mb-3" style="font-size:1.02rem;"><i class="fa-solid fa-medal text-primary me-2"></i> Unlocked Achievements</h3>
+            
+            <div class="d-flex flex-wrap gap-3 justify-content-center">
+                {% for badge in badges %}
+                    <div class="badge-item text-center p-2 border rounded bg-white shadow-sm" style="width: 80px;" title="Unlocked achievement">
+                        <div style="background:#fff3cd; color:#ffc107; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 6px; font-size:1.15rem; border:1px solid #ffeeba;">
+                            <i class="fa-solid {{ badge.badge_icon }}"></i>
+                        </div>
+                        <span class="d-block text-dark fw-bold" style="font-size:0.65rem;">{{ badge.badge_name }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Panel: Profile Editor Form -->
+    <div class="col-lg-8">
+        <div class="flat-card shadow-sm border-light">
+            <!-- Tabs Navigation -->
+            <div class="d-flex border-bottom mb-4 pb-2 flex-wrap gap-2" style="border-color:#dee2e6;">
+                <h3 class="fw-bold text-dark mb-0" style="font-size:1.1rem;"><i class="fa-solid fa-user-pen text-primary me-2"></i> Edit Student Profile</h3>
+            </div>
+
+            <form method="POST" action="{{ url_for('dashboard.profile') }}" class="d-flex flex-column gap-3">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <div class="input-group d-flex flex-column gap-1">
+                            <label for="name-field" class="fw-semibold text-secondary" style="font-size:0.8rem;">Display Name</label>
+                            <input type="text" id="name-field" name="name" class="form-control shadow-sm" value="{{ current_user.name or '' }}" placeholder="Enter display name">
+                        </div>
+                    </div>
+                    
+                    <div class="col-sm-6">
+                        <div class="input-group d-flex flex-column gap-1">
+                            <label for="avatar-field" class="fw-semibold text-secondary" style="font-size:0.8rem;">Select Profile Avatar</label>
+                            <select id="avatar-field" name="avatar" class="form-select shadow-sm" style="font-size:0.85rem;">
+                                <option value="avatar-1.png" {% if current_user.avatar == 'avatar-1.png' %}selected{% endif %}>Gear Engineer</option>
+                                <option value="avatar-2.png" {% if current_user.avatar == 'avatar-2.png' %}selected{% endif %}>Astronaut Scientist</option>
+                                <option value="avatar-3.png" {% if current_user.avatar == 'avatar-3.png' %}selected{% endif %}>Shield Defender</option>
+                                <option value="avatar-4.png" {% if current_user.avatar == 'avatar-4.png' %}selected{% endif %}>Ninja Coder</option>
+                                <option value="avatar-5.png" {% if current_user.avatar == 'avatar-5.png' %}selected{% endif %}>Graduated Scholar</option>
+                                <option value="avatar-6.png" {% if current_user.avatar == 'avatar-6.png' %}selected{% endif %}>Executive Lead</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group d-flex flex-column gap-1">
+                    <label for="bio-field" class="fw-semibold text-secondary" style="font-size:0.8rem;">Profile Biography (Bio)</label>
+                    <textarea id="bio-field" name="bio" class="form-control shadow-sm" rows="3" placeholder="Tell recruiters about yourself...">{{ current_user.bio or '' }}</textarea>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <div class="input-group d-flex flex-column gap-1">
+                            <label for="skills-field" class="fw-semibold text-secondary" style="font-size:0.8rem;">Tech Skills Checklist</label>
+                            <input type="text" id="skills-field" name="skills" class="form-control shadow-sm" value="{{ current_user.skills or '' }}" placeholder="e.g. Python, Docker, Git">
+                        </div>
+                    </div>
+                    
+                    <div class="col-sm-6">
+                        <div class="input-group d-flex flex-column gap-1">
+                            <label for="interests-field" class="fw-semibold text-secondary" style="font-size:0.8rem;">Aspirations / Interests</label>
+                            <input type="text" id="interests-field" name="interests" class="form-control shadow-sm" value="{{ current_user.interests or '' }}" placeholder="e.g. Web Development, AI Engineering">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary shadow-sm py-2 mt-3" style="background: linear-gradient(135deg, #0078d4, #00bcf2); border: none; font-size:0.9rem;">
+                    Save Profile Settings <i class="fa-solid fa-save ms-1"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- Saved Resume Drafts / Versions -->
+        <div class="flat-card shadow-sm border-light mt-4">
+            <h3 class="fw-bold text-dark mb-3" style="font-size:1.05rem;"><i class="fa-solid fa-file-invoice text-primary me-2"></i> Saved Resume Versions</h3>
+            {% if resumes %}
+                <div class="list-group d-flex flex-column gap-2">
+                    {% for res in resumes %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center p-3 border rounded bg-white shadow-sm">
+                            <div>
+                                <strong class="text-dark d-block" style="font-size:0.85rem;">{{ res.title }}</strong>
+                                <span class="text-secondary" style="font-size:0.72rem;">ATS Grade: <strong>{{ res.ats_score }}/100</strong> • Saved on: {{ res.created_at.strftime('%Y-%m-%d') }}</span>
+                            </div>
+                            <a href="{{ url_for('features.resume_analyzer') }}" class="btn btn-sm btn-outline-primary" style="font-size:0.72rem;">Launch Editor <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-secondary mb-0" style="font-size:0.85rem;">No resume versions saved yet. Navigate to the Resume Builder to save drafts.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

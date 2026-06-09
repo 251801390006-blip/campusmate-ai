@@ -2,164 +2,287 @@
 
 {% block title %}Dashboard - CampusMate AI{% endblock %}
 
-{% block header_title %}Student Overview{% endblock %}
+{% block header_title %}Student Overview Dashboard{% endblock %}
 
 {% block content %}
-<!-- Welcome Card -->
-<div class="flat-card mb-4" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.02), rgba(124, 58, 237, 0.05)); border-left: 4px solid var(--neon-blue);">
-    <h2 style="font-size: 1.35rem;" class="mb-2">Hello, {{ current_user.username }}!</h2>
-    <p class="text-secondary mb-3" style="font-size: 0.88rem; max-width: 600px;">
-        Welcome to your growth workspace. You are currently logged in as a <strong>{{ current_user.role | upper }}</strong>. Track your progress, follow your career roadmaps, check your resume metrics, or open support tickets.
-    </p>
-    <div class="d-flex gap-2">
-        <a href="{{ url_for('features.list_roadmaps') }}" class="btn btn-sm btn-primary">Resume Learning <i class="fa-solid fa-route"></i></a>
-        <a href="{{ url_for('features.resume_analyzer') }}" class="btn btn-sm btn-outline">Analyze Resume <i class="fa-solid fa-file-invoice"></i></a>
-        {% if current_user.role == 'admin' %}
-            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-sm btn-outline">Admin Console <i class="fa-solid fa-shield-halved"></i></a>
-        {% endif %}
-    </div>
-</div>
-
-<!-- Stats Grid -->
-<div class="stats-grid">
-    <!-- Stat 1: Target Career Track -->
-    <div class="stat-card">
-        <div class="info">
-            <span class="label">Career Track</span>
-            <span class="value" style="font-size:1.05rem; margin-top:8px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:160px;" title="{{ target_role }}">
-                {{ target_role }}
-            </span>
+<!-- Welcome Banner -->
+<div class="flat-card mb-4" style="background: linear-gradient(135deg, var(--neon-blue-dim), rgba(124, 58, 237, 0.08)); border-left: 4px solid var(--neon-blue); padding: 1.8rem 2rem;">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <span class="badge badge-info mb-2 text-uppercase" style="font-size:0.68rem; letter-spacing:1px; background: rgba(124, 58, 237, 0.1); color: var(--neon-blue); font-weight:700;">Student Workspace</span>
+            <h2 style="font-size: 1.5rem; font-weight:800; letter-spacing:-0.02em;" class="mb-2">Welcome Back, {{ current_user.username }}!</h2>
+            <p class="text-secondary mb-0" style="font-size: 0.88rem; max-width: 620px; line-height: 1.5;">
+                Track your career milestones, build ATS-optimized resumes, practice code interviews, and monitor your placement eligibility from your student operating control panel.
+            </p>
         </div>
-        <div class="icon-box" style="background-color: var(--info-bg); color: var(--info);">
-            <i class="fa-solid fa-route"></i>
-        </div>
-    </div>
-    <!-- Stat 2: Roadmap Progress -->
-    <div class="stat-card">
-        <div class="info">
-            <span class="label">Roadmap Progress</span>
-            <span class="value">{{ roadmap_percent }}%</span>
-        </div>
-        <div class="icon-box" style="background-color: rgba(124, 58, 237, 0.08); color: var(--neon-blue);">
-            <i class="fa-solid fa-circle-check"></i>
-        </div>
-    </div>
-    <!-- Stat 3: ATS Resume Score -->
-    <div class="stat-card">
-        <div class="info">
-            <span class="label">ATS Resume Score</span>
-            <span class="value">{% if resume_score > 0 %}{{ resume_score }}{% else %}N/A{% endif %}</span>
-        </div>
-        <div class="icon-box" style="background-color: var(--success-bg); color: var(--success);">
-            <i class="fa-solid fa-file-circle-check"></i>
-        </div>
-    </div>
-    <!-- Stat 4: Learning Streak -->
-    <div class="stat-card">
-        <div class="info">
-            <span class="label">Learning Streak</span>
-            <span class="value">5 Days</span>
-        </div>
-        <div class="icon-box" style="background-color: var(--warning-bg); color: var(--warning);">
-            <i class="fa-solid fa-fire text-orange"></i>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <div class="d-inline-flex align-items-center gap-3 p-2 px-3 border rounded bg-white shadow-sm" style="border-color: var(--border-color) !important;">
+                <div class="text-center">
+                    <span class="text-muted d-block" style="font-size:0.65rem; font-weight:700; text-transform:uppercase;">XP Balance</span>
+                    <strong class="text-secondary" style="font-size:1.15rem; color: var(--neon-blue) !important;"><i class="fa-solid fa-bolt me-1"></i> {{ current_user.xp }} XP</strong>
+                </div>
+                <div class="vr" style="background: var(--border-color); width:1px; height:28px;"></div>
+                <div class="text-center">
+                    <span class="text-muted d-block" style="font-size:0.65rem; font-weight:700; text-transform:uppercase;">Daily Streak</span>
+                    <strong class="text-warning" style="font-size:1.15rem;"><i class="fa-solid fa-fire me-1"></i> {{ current_user.learning_streak }} Days</strong>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Grid Details Row -->
-<div class="row g-4">
-    <!-- Left Column: Detailed Progress and Tasks -->
-    <div class="col-lg-8">
-        <div class="flat-card mb-4">
-            <h3 style="font-size:1.05rem;" class="mb-3"><i class="fa-solid fa-circle-nodes text-muted me-2"></i> Current Milestones & Progress</h3>
+<!-- Primary control grid -->
+<div class="row g-4 mb-4">
+    <!-- Placement Readiness Gauge -->
+    <div class="col-lg-7">
+        <div class="flat-card h-100 bg-white border">
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom" style="border-color: var(--border-color);">
+                <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-gauge-high text-muted me-2"></i> Placement Readiness Score</h3>
+                <span class="badge badge-success" style="font-size:0.7rem;">Live Metrics</span>
+            </div>
             
-            {% if target_role != 'Not Configured' %}
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.82rem;">
-                        <span class="text-secondary fw-semibold">Overall Pathway Progress</span>
-                        <span class="text-secondary fw-semibold">{{ roadmap_percent }}% Completed</span>
+            <div class="row align-items-center g-4">
+                <!-- Circular Indicator -->
+                <div class="col-sm-5 text-center">
+                    <div class="d-inline-block position-relative mb-2" style="width: 140px; height: 140px;">
+                        <!-- SVG Circular Progress -->
+                        <svg class="progress-ring" width="140" height="140">
+                            <circle class="progress-ring__background" stroke="var(--bg-tertiary)" stroke-width="12" fill="transparent" r="58" cx="70" cy="70" />
+                            <circle class="progress-ring__circle" stroke="var(--neon-blue)" stroke-width="12" fill="transparent" r="58" cx="70" cy="70" 
+                                    stroke-dasharray="364.4" stroke-dashoffset="{{ 364.4 - (364.4 * placement_score / 100) }}" style="transition: stroke-dashoffset 0.5s ease; stroke-linecap: round;" />
+                        </svg>
+                        <div class="position-absolute top-50 start-50 translate-middle text-center">
+                            <span class="fw-extrabold text-secondary" style="font-size: 1.8rem; letter-spacing:-0.03em;">{{ placement_score }}</span>
+                            <span class="text-muted d-block" style="font-size: 0.65rem; font-weight: 700; text-transform:uppercase; margin-top:-4px;">Rating</span>
+                        </div>
                     </div>
-                    <div class="progress-bar-container" style="background: var(--border-color); height: 10px; border-radius: 5px; overflow: hidden;">
-                        <div class="progress-bar-fill" style="background: var(--neon-blue); height: 100%; width: {{ roadmap_percent }}%; transition: width 0.3s ease;"></div>
+                    <span class="text-secondary fw-bold d-block" style="font-size: 0.85rem;">
+                        {% if placement_score >= 80 %}Excellent Readiness
+                        {% elif placement_score >= 60 %}Placement Capable
+                        {% else %}Needs Optimization{% endif %}
+                    </span>
+                </div>
+
+                <!-- Subscores list -->
+                <div class="col-sm-7">
+                    <div class="d-flex flex-column gap-3">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.78rem;">
+                                <span class="text-secondary fw-semibold"><i class="fa-solid fa-route me-1 text-muted"></i> Technical Skills</span>
+                                <span class="fw-bold text-secondary">{{ tech_ready }}%</span>
+                            </div>
+                            <div class="progress-bar-container" style="background: var(--bg-tertiary); height: 6px; border-radius: 3px;">
+                                <div class="progress-bar-fill" style="background: var(--neon-blue); height: 100%; width: {{ tech_ready }}%;"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.78rem;">
+                                <span class="text-secondary fw-semibold"><i class="fa-solid fa-file-invoice me-1 text-muted"></i> Resume ATS Score</span>
+                                <span class="fw-bold text-secondary">{{ resume_ready }}%</span>
+                            </div>
+                            <div class="progress-bar-container" style="background: var(--bg-tertiary); height: 6px; border-radius: 3px;">
+                                <div class="progress-bar-fill" style="background: var(--info); height: 100%; width: {{ resume_ready }}%;"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.78rem;">
+                                <span class="text-secondary fw-semibold"><i class="fa-solid fa-microphone me-1 text-muted"></i> Interview Readiness</span>
+                                <span class="fw-bold text-secondary">{{ interview_ready }}%</span>
+                            </div>
+                            <div class="progress-bar-container" style="background: var(--bg-tertiary); height: 6px; border-radius: 3px;">
+                                <div class="progress-bar-fill" style="background: var(--warning); height: 100%; width: {{ interview_ready }}%;"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.78rem;">
+                                <span class="text-secondary fw-semibold"><i class="fa-solid fa-laptop-code me-1 text-muted"></i> Project Showcase</span>
+                                <span class="fw-bold text-secondary">{{ project_ready }}%</span>
+                            </div>
+                            <div class="progress-bar-container" style="background: var(--bg-tertiary); height: 6px; border-radius: 3px;">
+                                <div class="progress-bar-fill" style="background: var(--success); height: 100%; width: {{ project_ready }}%;"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.78rem;">
+                                <span class="text-secondary fw-semibold"><i class="fa-solid fa-award me-1 text-muted"></i> Certifications</span>
+                                <span class="fw-bold text-secondary">{{ cert_ready }}%</span>
+                            </div>
+                            <div class="progress-bar-container" style="background: var(--bg-tertiary); height: 6px; border-radius: 3px;">
+                                <div class="progress-bar-fill" style="background: var(--cyan); height: 100%; width: {{ cert_ready }}%;"></div>
+                            </div>
+                        </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Learning & Next Steps -->
+    <div class="col-lg-5">
+        <div class="flat-card h-100 bg-white border d-flex flex-column justify-content-between">
+            <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
+                    <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-circle-nodes text-muted me-2"></i> Current Track Milestones</h3>
+                    <span class="badge badge-info text-uppercase" style="font-size:0.62rem; font-weight:700;">{{ target_role }}</span>
                 </div>
                 
-                <div class="next-task-box p-3 border rounded" style="background-color: var(--bg-primary); border-color: var(--border-color);">
-                    <span class="badge badge-info mb-2">Next Milestone Action</span>
-                    <h4 style="font-size: 0.95rem;" class="mb-1 fw-bold text-secondary">{{ next_node_title }}</h4>
-                    <p class="text-muted mb-3" style="font-size: 0.8rem;">
-                        This is the next upcoming step in your career roadmap path. Complete it to unlock advanced learning projects and earn XP credits!
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.8rem;">
+                        <span class="text-secondary fw-semibold">Roadmap Progress</span>
+                        <span class="text-secondary fw-semibold">{{ roadmap_percent }}% Complete</span>
+                    </div>
+                    <div class="progress-bar-container" style="background: var(--bg-tertiary); height: 8px; border-radius: 4px; overflow: hidden;">
+                        <div class="progress-bar-fill" style="background: var(--neon-blue); height: 100%; width: {{ roadmap_percent }}%;"></div>
+                    </div>
+                </div>
+
+                <div class="p-3 border rounded mb-0" style="background-color: var(--bg-primary); border-color: var(--border-color);">
+                    <span class="text-muted d-block text-uppercase mb-1" style="font-size:0.62rem; font-weight:700; letter-spacing:0.5px;"><i class="fa-solid fa-circle-play text-cyan me-1"></i> Next Node to Master</span>
+                    <h4 style="font-size: 0.88rem; font-weight:700;" class="mb-2 text-secondary">{{ next_node_title }}</h4>
+                    <p class="text-muted mb-0" style="font-size: 0.78rem; line-height: 1.4;">
+                        Complete this checkpoint to unlock your next sequential lesson, projects list, and earn additional XP points.
                     </p>
-                    <a href="{{ url_for('features.list_roadmaps') }}" class="btn btn-sm btn-primary">Open Roadmap Engine <i class="fa-solid fa-arrow-right-long"></i></a>
+                </div>
+            </div>
+            
+            <a href="{{ url_for('features.list_roadmaps') }}" class="btn btn-primary btn-block py-2" style="font-size:0.85rem;"><i class="fa-solid fa-route me-1"></i> Open Learning Tree</a>
+        </div>
+    </div>
+</div>
+
+<!-- Career Digital Twin & Timeline -->
+<div class="flat-card mb-4 bg-white border">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom" style="border-color: var(--border-color);">
+        <div>
+            <h3 class="fw-bold mb-1" style="font-size:1.05rem;"><i class="fa-solid fa-timeline text-muted me-2"></i> AI Career Digital Twin Timeline</h3>
+            <p class="text-secondary mb-0" style="font-size:0.75rem;">Interactive projection showing career paths and salary growth based on your track</p>
+        </div>
+        <span class="badge badge-warning text-uppercase" style="font-size:0.62rem; font-weight:700;">Class of {{ current_user.year }}</span>
+    </div>
+
+    <!-- Timeline Steps -->
+    <div class="row g-4 timeline-wrapper" style="position:relative;">
+        <div class="col-sm-6 col-xl-3 text-center timeline-node-twin">
+            <div class="p-3 border rounded bg-light-blue-gradient h-100" style="border-color: var(--border-color); background: rgba(59, 130, 246, 0.02);">
+                <div class="twin-year mb-2"><span class="badge" style="background: var(--bg-tertiary); color: var(--text-secondary); font-weight:700;">2026</span></div>
+                <h4 style="font-size:0.85rem;" class="fw-bold mb-1">Foundational Layer</h4>
+                <p class="text-muted mb-2" style="font-size:0.75rem;">Build basics, master Git, CLI, and database basics.</p>
+                <div class="p-2 border rounded bg-white text-secondary" style="font-size: 0.72rem; border-color: var(--border-color) !important;">
+                    <div>Est. Salary: <strong>$65,000/yr</strong></div>
+                    <div style="font-size:0.68rem; color: var(--neon-blue); margin-top:2px;">Goal: Azure Fundamentals</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3 text-center timeline-node-twin">
+            <div class="p-3 border rounded h-100" style="border-color: var(--border-color); background: rgba(59, 130, 246, 0.02);">
+                <div class="twin-year mb-2"><span class="badge" style="background: var(--bg-tertiary); color: var(--text-secondary); font-weight:700;">2027</span></div>
+                <h4 style="font-size:0.85rem;" class="fw-bold mb-1">Intermediate Architect</h4>
+                <p class="text-muted mb-2" style="font-size:0.75rem;">Deploy full-stack REST APIs, configure containerization.</p>
+                <div class="p-2 border rounded bg-white text-secondary" style="font-size: 0.72rem; border-color: var(--border-color) !important;">
+                    <div>Est. Salary: <strong>$85,000/yr</strong></div>
+                    <div style="font-size:0.68rem; color: var(--neon-blue); margin-top:2px;">Goal: Terraform Associate</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3 text-center timeline-node-twin">
+            <div class="p-3 border rounded h-100" style="border-color: var(--border-color); background: rgba(59, 130, 246, 0.02);">
+                <div class="twin-year mb-2"><span class="badge" style="background: var(--bg-tertiary); color: var(--text-secondary); font-weight:700;">2028</span></div>
+                <h4 style="font-size:0.85rem;" class="fw-bold mb-1">Advanced Engineer</h4>
+                <p class="text-muted mb-2" style="font-size:0.75rem;">Implement CI/CD networks, system monitoring pipelines.</p>
+                <div class="p-2 border rounded bg-white text-secondary" style="font-size: 0.72rem; border-color: var(--border-color) !important;">
+                    <div>Est. Salary: <strong>$105,000/yr</strong></div>
+                    <div style="font-size:0.68rem; color: var(--neon-blue); margin-top:2px;">Goal: AWS Solutions Arch</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3 text-center timeline-node-twin">
+            <div class="p-3 border rounded h-100" style="border-color: var(--border-color); background: rgba(124, 58, 237, 0.02);">
+                <div class="twin-year mb-2"><span class="badge badge-warning" style="font-weight:700;">2029 (Career Ready)</span></div>
+                <h4 style="font-size:0.85rem;" class="fw-bold mb-1">Senior Specialist</h4>
+                <p class="text-muted mb-2" style="font-size:0.75rem;">Build capstone microservices, scale system security.</p>
+                <div class="p-2 border rounded bg-white text-secondary" style="font-size: 0.72rem; border-color: var(--border-color) !important;">
+                    <div>Est. Salary: <strong>$135,000/yr</strong></div>
+                    <div style="font-size:0.68rem; color: var(--success); margin-top:2px;">Goal: Security+ / OSCP</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- ATS Resume Scan Breakdown -->
+    <div class="col-lg-8">
+        <div class="flat-card bg-white border h-100">
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom" style="border-color: var(--border-color);">
+                <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-file-circle-check text-muted me-2"></i> ATS Resume Scoring</h3>
+                <a href="{{ url_for('features.resume_analyzer') }}" class="btn btn-sm btn-outline" style="font-size:0.75rem;">Open Builder <i class="fa-solid fa-arrow-up-right-from-square ms-1"></i></a>
+            </div>
+            
+            {% if resume_score > 0 %}
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-4 text-center">
+                        <div class="p-3 border rounded bg-light" style="border-color: var(--border-color) !important;">
+                            <span class="text-muted d-block mb-1" style="font-size:0.72rem; font-weight:700; text-transform:uppercase;">ATS score</span>
+                            <span class="fw-extrabold text-secondary" style="font-size:1.6rem; color: var(--neon-blue) !important;">{{ resume_score }}/100</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 text-center">
+                        <div class="p-3 border rounded bg-light" style="border-color: var(--border-color) !important;">
+                            <span class="text-muted d-block mb-1" style="font-size:0.72rem; font-weight:700; text-transform:uppercase;">Readability Index</span>
+                            <span class="fw-bold text-secondary" style="font-size:1.4rem;">{{ readability_score }}%</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 text-center">
+                        <div class="p-3 border rounded bg-light" style="border-color: var(--border-color) !important;">
+                            <span class="text-muted d-block mb-1" style="font-size:0.72rem; font-weight:700; text-transform:uppercase;">Keyword Alignment</span>
+                            <span class="fw-bold text-secondary" style="font-size:1.4rem;">{{ industry_match_score }}%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="fw-bold mb-2 text-secondary" style="font-size:0.8rem; text-transform:uppercase;"><i class="fa-solid fa-circle-info me-1 text-muted"></i> Optimization Recommendation</h4>
+                    <p class="text-muted mb-0" style="font-size:0.8rem; line-height:1.5;">
+                        Your resume has moderate compatibility with technical scanning engines. To maximize impact, add missing keywords (such as Docker, Linux, and Wireshark) and rewrite experience bullets using leadership action verbs like <strong>Architected</strong>, <strong>Hardened</strong>, and <strong>Automated</strong>.
+                    </p>
                 </div>
             {% else %}
-                <div class="text-center py-4">
-                    <i class="fa-solid fa-route text-muted mb-3" style="font-size: 2.2rem;"></i>
-                    <h4 style="font-size: 0.95rem;" class="fw-bold mb-2">No Active Roadmap Track Selected</h4>
+                <div class="text-center py-5">
+                    <i class="fa-solid fa-file-invoice-dollar text-muted mb-3" style="font-size: 2.2rem;"></i>
+                    <h4 style="font-size: 0.95rem;" class="fw-bold mb-2">No Resume File Scanned Yet</h4>
                     <p class="text-secondary mb-3" style="font-size: 0.8rem; max-width: 400px; margin: 0 auto;">
-                        Choose one of the 8 career pathways in the Roadmap Engine to get a personalized timeline and track your learning achievements.
+                        Upload your existing resume file or create a curriculum vitae from scratch inside the split-screen resume builder workspace to check your ATS compatibility.
                     </p>
-                    <a href="{{ url_for('features.list_roadmaps') }}" class="btn btn-sm btn-primary">Select Career Track <i class="fa-solid fa-plus"></i></a>
+                    <a href="{{ url_for('features.resume_analyzer') }}" class="btn btn-sm btn-primary">Open Resume Workspace <i class="fa-solid fa-plus"></i></a>
                 </div>
             {% endif %}
         </div>
-
-        {% if resume_score > 0 %}
-            <div class="flat-card">
-                <h3 style="font-size:1.05rem;" class="mb-3"><i class="fa-solid fa-chart-pie text-muted me-2"></i> Latest Resume Scan Breakdown</h3>
-                <div class="row g-3">
-                    <div class="col-sm-4">
-                        <div class="p-3 border rounded text-center" style="background-color: var(--bg-primary); border-color: var(--border-color);">
-                            <span class="text-muted d-block mb-1" style="font-size:0.75rem;">ATS Optimization</span>
-                            <span class="fw-bold text-secondary" style="font-size: 1.25rem;">{{ resume_score }}/100</span>
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="p-3 border rounded text-center" style="background-color: var(--bg-primary); border-color: var(--border-color);">
-                            <span class="text-muted d-block mb-1" style="font-size:0.75rem;">Readability Index</span>
-                            <span class="fw-bold text-secondary" style="font-size: 1.25rem;">{{ readability_score }}%</span>
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="p-3 border rounded text-center" style="background-color: var(--bg-primary); border-color: var(--border-color);">
-                            <span class="text-muted d-block mb-1" style="font-size:0.75rem;">Industry Keyword Match</span>
-                            <span class="fw-bold text-secondary" style="font-size: 1.25rem;">{{ industry_match_score }}%</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="text-end mt-3">
-                    <a href="{{ url_for('features.resume_analyzer') }}" style="font-size: 0.8rem; font-weight: 600;">View detailed improvements <i class="fa-solid fa-angles-right"></i></a>
-                </div>
-            </div>
-        {% endif %}
     </div>
-    
-    <!-- Right Column: User Profile Info -->
+
+    <!-- Student profile details -->
     <div class="col-lg-4">
-        <div class="flat-card h-100">
-            <h3 style="font-size:1.05rem;" class="mb-3"><i class="fa-solid fa-user-gear text-muted me-2"></i> Account Details</h3>
+        <div class="flat-card bg-white border h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
+                <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-address-card text-muted me-2"></i> Student Profile</h3>
+            </div>
+            
             <div class="d-flex flex-column gap-3" style="font-size:0.85rem;">
                 <div>
-                    <span class="text-muted d-block">Username</span>
-                    <span class="fw-semibold text-secondary">{{ current_user.username }}</span>
+                    <span class="text-muted d-block" style="font-size:0.7rem; font-weight:700; text-transform:uppercase;">Target Role Path</span>
+                    <span class="fw-semibold text-secondary" style="font-size:0.9rem; color: var(--neon-blue);"><i class="fa-solid fa-bullseye me-1 text-muted" style="font-size:0.8rem;"></i> {{ target_role }}</span>
                 </div>
                 <div>
-                    <span class="text-muted d-block">Email Address</span>
+                    <span class="text-muted d-block" style="font-size:0.7rem; font-weight:700; text-transform:uppercase;">Academic Department</span>
+                    <span class="fw-semibold text-secondary">{{ current_user.branch or 'Computer Science Department' }}</span>
+                </div>
+                <div>
+                    <span class="text-muted d-block" style="font-size:0.7rem; font-weight:700; text-transform:uppercase;">Primary Email</span>
                     <span class="fw-semibold text-secondary">{{ current_user.email }}</span>
                 </div>
                 <div>
-                    <span class="text-muted d-block">Account Status</span>
-                    <span class="fw-semibold text-success"><i class="fa-solid fa-circle-check"></i> Active</span>
+                    <span class="text-muted d-block" style="font-size:0.7rem; font-weight:700; text-transform:uppercase;">Account Role</span>
+                    <span class="fw-semibold text-secondary text-uppercase">{{ current_user.role }}</span>
                 </div>
-                <div>
-                    <span class="text-muted d-block">Academic Class Status</span>
-                    <span class="fw-semibold text-secondary">Class of 2027</span>
-                </div>
-                {% if current_user.role == 'admin' %}
-                    <div class="mt-2 pt-2 border-top" style="border-color: var(--border-color);">
-                        <span class="badge badge-warning"><i class="fa-solid fa-user-shield"></i> System Administrator</span>
-                    </div>
-                {% endif %}
             </div>
         </div>
     </div>

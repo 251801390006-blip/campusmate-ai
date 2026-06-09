@@ -3,92 +3,182 @@
 {% block title %}Sign Up - CampusMate AI{% endblock %}
 
 {% block content %}
-<div class="container py-5 d-flex justify-content-center">
-    <div class="flat-card auth-card" style="width: 100%; max-width: 440px; padding: 2.5rem 2rem 2rem;">
-        <div class="text-center mb-4">
-            <div class="auth-logo-icon">
-                <i class="fa-solid fa-user-plus"></i>
+<div class="container py-4">
+    <div class="row g-5 align-items-center">
+        <!-- Left Side: Product Hero, Benefits & Testimonials -->
+        <div class="col-lg-6 d-none d-lg-block">
+            <div class="pe-xl-5">
+                <!-- Hero Panel -->
+                <div class="hero-showcase mb-5 p-4 rounded shadow-sm" style="background: linear-gradient(135deg, rgba(0, 120, 212, 0.08), rgba(0, 188, 242, 0.08)); border: 1.5px solid rgba(0, 120, 212, 0.15);">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div style="background:#0078d4; color:white; width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">
+                            <i class="fa-solid fa-user-plus"></i>
+                        </div>
+                        <div>
+                            <h3 class="fw-bold text-dark mb-0" style="font-size:1.35rem;">Start Your Growth Journey</h3>
+                            <span class="text-secondary" style="font-size:0.8rem;">Join over 15,000+ students nationwide</span>
+                        </div>
+                    </div>
+                    
+                    <p class="text-secondary" style="font-size:0.88rem; line-height:1.5;">
+                        Create your account today to unlock personalized roadmaps, gamified milestones learning, mock interview simulator cards, and ATS resume analyzers.
+                    </p>
+                </div>
+
+                <!-- Product Benefits -->
+                <h3 class="fw-bold text-dark mb-3" style="font-size: 1.15rem;">What you unlock:</h3>
+                <ul class="d-flex flex-column gap-3 ps-0 mb-5" style="list-style: none;">
+                    <li class="d-flex align-items-start gap-3">
+                        <div style="background:#f0f9ff; color:#0078d4; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                            <i class="fa-solid fa-trophy" style="font-size:0.85rem;"></i>
+                        </div>
+                        <div>
+                            <strong class="text-dark d-block" style="font-size:0.9rem;">Gamified Milestones Tracking</strong>
+                            <p class="text-secondary mb-0" style="font-size:0.8rem;">Earn XP rewards, unlock badges, and maintain study streaks.</p>
+                        </div>
+                    </li>
+                    <li class="d-flex align-items-start gap-3">
+                        <div style="background:#f0fdf4; color:#10b981; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                            <i class="fa-solid fa-briefcase" style="font-size:0.85rem;"></i>
+                        </div>
+                        <div>
+                            <strong class="text-dark d-block" style="font-size:0.9rem;">Kanban Internship Management</strong>
+                            <p class="text-secondary mb-0" style="font-size:0.8rem;">Browse matching openings and simulate applications pipelines.</p>
+                        </div>
+                    </li>
+                    <li class="d-flex align-items-start gap-3">
+                        <div style="background:#fdf2f8; color:#db2777; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                            <i class="fa-solid fa-compass-drafting" style="font-size:0.85rem;"></i>
+                        </div>
+                        <div>
+                            <strong class="text-dark d-block" style="font-size:0.9rem;">AI Project Architect blueprints</strong>
+                            <p class="text-secondary mb-0" style="font-size:0.8rem;">Instantly compile configurations and Mermaid flowchart schemas.</p>
+                        </div>
+                    </li>
+                </ul>
             </div>
-            <h2 class="h4 mb-1" style="font-weight: 700; letter-spacing: -0.02em;">Create Account</h2>
-            <p class="text-secondary" style="font-size: 0.82rem;">Sign up using your university or personal email</p>
         </div>
 
-        <form method="POST" action="{{ url_for('auth.register') }}">
-            {{ form.csrf_token }}
-            
-            <!-- Username Input -->
-            <div class="input-group">
-                {{ form.username.label }}
-                {{ form.username(placeholder="alex_smith") }}
-                {% if form.username.errors %}
-                    {% for error in form.username.errors %}
-                        <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
-                    {% endfor %}
-                {% endif %}
-            </div>
-
-            <!-- Email Input -->
-            <div class="input-group">
-                {{ form.email.label }}
-                {{ form.email(placeholder="student@nit.ac.in") }}
-                <span class="input-helper mt-1">Academic domains supported (e.g. .edu.in, .ac.in)</span>
-                {% if form.email.errors %}
-                    {% for error in form.email.errors %}
-                        <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
-                    {% endfor %}
-                {% endif %}
-            </div>
-
-            <!-- Password Input -->
-            <div class="input-group">
-                {{ form.password.label }}
-                <div class="password-container">
-                    {{ form.password(placeholder="At least 8 characters", id="reg-password") }}
-                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('reg-password', this)" aria-label="Toggle password visibility">
-                        <i class="fa-solid fa-eye"></i>
-                    </button>
+        <!-- Right Side: Register Form -->
+        <div class="col-lg-6">
+            <div class="flat-card auth-card shadow-lg mx-auto" style="width: 100%; max-width: 450px; padding: 2.5rem 2rem 2rem;">
+                <div class="text-center mb-4">
+                    <div class="auth-logo-icon" style="background: rgba(0, 120, 212, 0.08); color: #0078d4; border: 1px solid rgba(0, 120, 212, 0.15);">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </div>
+                    <h2 class="h4 mb-1 text-dark" style="font-weight: 700; letter-spacing: -0.02em;">Create Account</h2>
+                    <p class="text-secondary" style="font-size: 0.82rem;">Sign up using your university credentials</p>
                 </div>
-                {% if form.password.errors %}
-                    {% for error in form.password.errors %}
-                        <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
-                    {% endfor %}
-                {% endif %}
-            </div>
 
-            <!-- Confirm Password Input -->
-            <div class="input-group">
-                {{ form.confirm_password.label }}
-                <div class="password-container">
-                    {{ form.confirm_password(placeholder="Re-enter password", id="reg-confirm-password") }}
-                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('reg-confirm-password', this)" aria-label="Toggle password visibility">
-                        <i class="fa-solid fa-eye"></i>
-                    </button>
+                <!-- Social Logins -->
+                <div class="d-flex gap-2 mb-4">
+                    <a href="{{ url_for('auth.oauth_login', provider='google') }}" class="btn btn-outline border w-100 py-2 d-flex align-items-center justify-content-center gap-2 shadow-sm" style="font-size: 0.8rem; font-weight:600; color:var(--text-primary);">
+                        <i class="fa-brands fa-google text-danger"></i> Google
+                    </a>
+                    <a href="{{ url_for('auth.oauth_login', provider='github') }}" class="btn btn-outline border w-100 py-2 d-flex align-items-center justify-content-center gap-2 shadow-sm" style="font-size: 0.8rem; font-weight:600; color:var(--text-primary);">
+                        <i class="fa-brands fa-github text-dark"></i> GitHub
+                    </a>
                 </div>
-                {% if form.confirm_password.errors %}
-                    {% for error in form.confirm_password.errors %}
-                        <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
-                    {% endfor %}
-                {% endif %}
-            </div>
 
-            <!-- Academic Level Select -->
-            <div class="input-group">
-                {{ form.academic_level.label }}
-                {{ form.academic_level }}
-                {% if form.academic_level.errors %}
-                    {% for error in form.academic_level.errors %}
-                        <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
-                    {% endfor %}
-                {% endif %}
-            </div>
+                <div class="d-flex align-items-center gap-2 mb-4">
+                    <hr class="flex-grow-1" style="border-color:#dee2e6;">
+                    <span class="text-muted" style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Or Register via Email</span>
+                    <hr class="flex-grow-1" style="border-color:#dee2e6;">
+                </div>
 
-            <button type="submit" class="btn btn-primary btn-block mt-4">Create Account <i class="fa-solid fa-user-plus"></i></button>
-        </form>
-        
-        <div class="text-center mt-4 pt-2 border-top" style="font-size:0.82rem; border-color: var(--border-color);">
-            <span class="text-secondary">Already have an account?</span> 
-            <a href="{{ url_for('auth.login') }}" class="fw-semibold">Sign In</a>
+                <form method="POST" action="{{ url_for('auth.register') }}">
+                    {{ form.csrf_token }}
+                    
+                    <!-- Username Input -->
+                    <div class="input-group mb-3 d-flex flex-column gap-1">
+                        {{ form.username.label(class="fw-semibold text-secondary", style="font-size: 0.82rem;") }}
+                        {{ form.username(class="form-control shadow-sm", placeholder="alex_smith") }}
+                        {% if form.username.errors %}
+                            {% for error in form.username.errors %}
+                                <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Email Input -->
+                    <div class="input-group mb-3 d-flex flex-column gap-1">
+                        {{ form.email.label(class="fw-semibold text-secondary", style="font-size: 0.82rem;") }}
+                        {{ form.email(class="form-control shadow-sm", placeholder="student@nit.ac.in") }}
+                        <span class="text-muted" style="font-size: 0.65rem;">Academic domains preferred (.edu.in, .ac.in)</span>
+                        {% if form.email.errors %}
+                            {% for error in form.email.errors %}
+                                <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Password Input -->
+                    <div class="input-group mb-3 d-flex flex-column gap-1">
+                        {{ form.password.label(class="fw-semibold text-secondary", style="font-size: 0.82rem;") }}
+                        <div class="password-container position-relative">
+                            {{ form.password(class="form-control shadow-sm", placeholder="At least 8 characters", id="reg-password") }}
+                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('reg-password', this)" style="border:none; background:none; position:absolute; right:12px; top:50%; transform:translateY(-50%); color:#64748b;">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                        {% if form.password.errors %}
+                            {% for error in form.password.errors %}
+                                <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Confirm Password Input -->
+                    <div class="input-group mb-3 d-flex flex-column gap-1">
+                        {{ form.confirm_password.label(class="fw-semibold text-secondary", style="font-size: 0.82rem;") }}
+                        <div class="password-container position-relative">
+                            {{ form.confirm_password(class="form-control shadow-sm", placeholder="Re-enter password", id="reg-confirm-password") }}
+                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('reg-confirm-password', this)" style="border:none; background:none; position:absolute; right:12px; top:50%; transform:translateY(-50%); color:#64748b;">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                        {% if form.confirm_password.errors %}
+                            {% for error in form.confirm_password.errors %}
+                                <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Academic Level Select -->
+                    <div class="input-group mb-4 d-flex flex-column gap-1">
+                        {{ form.academic_level.label(class="fw-semibold text-secondary", style="font-size: 0.82rem;") }}
+                        {{ form.academic_level(class="form-select shadow-sm") }}
+                        {% if form.academic_level.errors %}
+                            {% for error in form.academic_level.errors %}
+                                <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block py-2.5 fw-bold shadow-sm" style="background: linear-gradient(135deg, #0078d4, #00bcf2); border: none; font-size: 0.95rem;">Create Account <i class="fa-solid fa-user-plus ms-1"></i></button>
+                </form>
+                
+                <div class="text-center mt-4 pt-3 border-top" style="font-size:0.82rem; border-color: #dee2e6;">
+                    <span class="text-secondary">Already have an account?</span> 
+                    <a href="{{ url_for('auth.login') }}" class="fw-bold text-primary">Sign In</a>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+function togglePasswordVisibility(fieldId, btn) {
+    const field = document.getElementById(fieldId);
+    if (!field) return;
+    const icon = btn.querySelector("i");
+    if (field.type === "password") {
+        field.type = "text";
+        icon.className = "fa-solid fa-eye-slash";
+    } else {
+        field.type = "password";
+        icon.className = "fa-solid fa-eye";
+    }
+}
+</script>
 {% endblock %}

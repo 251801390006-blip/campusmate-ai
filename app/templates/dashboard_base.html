@@ -38,10 +38,19 @@
                 <i class="fa-solid fa-route"></i> Learning Roadmaps
             </a>
             <a href="{{ url_for('features.resume_analyzer') }}" class="sidebar-link {% if request.endpoint == 'features.resume_analyzer' %}active{% endif %}">
-                <i class="fa-solid fa-file-invoice"></i> Resume Builder
+                <i class="fa-solid fa-file-invoice"></i> Resume Builder 3.0
             </a>
             <a href="{{ url_for('features.interview_prep') }}" class="sidebar-link {% if request.endpoint == 'features.interview_prep' %}active{% endif %}">
-                <i class="fa-solid fa-microphone"></i> Interview Prep
+                <i class="fa-solid fa-microphone"></i> Interview Simulator
+            </a>
+            <a href="{{ url_for('features.internship_center') }}" class="sidebar-link {% if request.endpoint == 'features.internship_center' %}active{% endif %}">
+                <i class="fa-solid fa-briefcase"></i> Internship Center
+            </a>
+            <a href="{{ url_for('features.portfolio_builder') }}" class="sidebar-link {% if request.endpoint == 'features.portfolio_builder' %}active{% endif %}">
+                <i class="fa-solid fa-window-restore"></i> Portfolio Builder
+            </a>
+            <a href="{{ url_for('features.project_architect') }}" class="sidebar-link {% if request.endpoint == 'features.project_architect' %}active{% endif %}">
+                <i class="fa-solid fa-cubes"></i> Project Architect
             </a>
             <a href="{{ url_for('features.hackathon_assistant') }}" class="sidebar-link {% if request.endpoint == 'features.hackathon_assistant' %}active{% endif %}">
                 <i class="fa-solid fa-laptop-code"></i> Hackathon Assistant
@@ -96,13 +105,73 @@
                 </button>
                 <h1 class="header-title">{% block header_title %}Dashboard{% endblock %}</h1>
             </div>
+
+            <!-- Global Search Input in Header -->
+            <div class="header-search-container d-none d-md-flex align-items-center position-relative">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="global-search-input" placeholder="Search roadmaps, projects, certs..." autocomplete="off">
+                <div id="global-search-results" class="search-results-dropdown hidden"></div>
+            </div>
             
-            <div class="header-right d-flex align-items-center gap-2">
+            <div class="header-right d-flex align-items-center gap-3">
+                <!-- Notification Bell Dropdown -->
+                <div class="notification-bell-wrapper position-relative">
+                    <button id="notification-bell-btn" class="header-icon-btn" onclick="toggleNotificationDropdown(event)">
+                        <i class="fa-solid fa-bell"></i>
+                        {% if unread_notifications_count > 0 %}
+                            <span class="notification-badge" id="notif-badge-count">{{ unread_notifications_count }}</span>
+                        {% endif %}
+                    </button>
+                    <div id="notification-dropdown" class="notification-dropdown-card hidden">
+                        <div class="notif-header d-flex justify-content-between align-items-center p-3 border-bottom">
+                            <span class="fw-bold" style="font-size: 0.85rem;">Notifications</span>
+                            {% if unread_notifications_count > 0 %}
+                                <a href="javascript:void(0)" class="mark-all-read-btn text-decoration-none" onclick="markAllNotificationsRead(event)" style="font-size: 0.72rem; font-weight: 600; color: var(--neon-blue);">Mark all read</a>
+                            {% endif %}
+                        </div>
+                        <div class="notif-body" id="notif-dropdown-body" style="max-height: 300px; overflow-y: auto;">
+                            {% if unread_notifications and unread_notifications|length > 0 %}
+                                {% for notif in unread_notifications %}
+                                    <div class="notif-item d-flex gap-2 p-3 border-bottom position-relative" id="notif-item-{{ notif.id }}">
+                                        <div class="notif-icon-circle {{ notif.category }} d-flex align-items-center justify-content-center" style="width: 28px; height: 28px; border-radius: 50%; font-size: 0.75rem; background: var(--bg-tertiary); color: var(--neon-blue);">
+                                            <i class="fa-solid {% if notif.category == 'streak' %}fa-fire{% elif notif.category == 'milestone' %}fa-route{% else %}fa-star{% endif %}"></i>
+                                        </div>
+                                        <div class="notif-content-wrapper flex-grow-1" style="font-size: 0.75rem; padding-right: 15px;">
+                                            <strong class="notif-title d-block text-dark">{{ notif.title }}</strong>
+                                            <span class="notif-desc d-block text-secondary mt-0.5" style="line-height: 1.3;">{{ notif.content }}</span>
+                                            <span class="notif-time d-block text-muted mt-1" style="font-size: 0.65rem;">{{ notif.created_at.strftime('%m-%d %H:%M') }}</span>
+                                        </div>
+                                        <button class="notif-dismiss-btn border-0 bg-transparent text-secondary position-absolute" onclick="dismissNotification(event, {{ notif.id }})" style="top: 8px; right: 8px; cursor: pointer; padding: 2px; font-size: 0.8rem;">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="notif-empty text-center py-4 text-muted">
+                                    <i class="fa-regular fa-bell-slash mb-2 d-block" style="font-size: 1.5rem;"></i>
+                                    <p style="font-size: 0.75rem; margin-bottom: 0;">All caught up! No new notifications.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Avatar Link -->
+                <a href="{{ url_for('dashboard.profile') }}" class="header-profile-avatar d-flex align-items-center justify-content-center border" title="View Profile" style="width: 32px; height: 32px; border-radius: 50%; overflow: hidden; background: var(--bg-tertiary);">
+                    {% if current_user.avatar %}
+                        <img src="{{ url_for('static', filename='images/avatars/' + current_user.avatar) }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                        <i class="fa-solid fa-user text-secondary" style="display: none; font-size: 0.85rem;"></i>
+                    {% else %}
+                        <i class="fa-solid fa-user text-secondary" style="font-size: 0.85rem;"></i>
+                    {% endif %}
+                </a>
+
                 <span class="role-badge badge {% if current_user.role == 'admin' %}badge-warning{% else %}badge-info{% endif %}">
                     {{ current_user.role | upper }}
                 </span>
             </div>
         </header>
+
 
         <!-- Main Inner Dashboard Content -->
         <div class="dashboard-inner-container p-4">
@@ -155,7 +224,32 @@
         </div>
     </div>
 
+    <!-- Mobile Bottom Navigation Bar -->
+    <nav class="mobile-bottom-nav d-lg-none">
+        <a href="{{ url_for('dashboard.home') }}" class="mobile-bottom-link {% if request.endpoint == 'dashboard.home' %}active{% endif %}">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="{{ url_for('features.list_roadmaps') }}" class="mobile-bottom-link {% if request.endpoint == 'features.list_roadmaps' %}active{% endif %}">
+            <i class="fa-solid fa-route"></i>
+            <span>Roadmaps</span>
+        </a>
+        <a href="{{ url_for('features.resume_analyzer') }}" class="mobile-bottom-link {% if request.endpoint == 'features.resume_analyzer' %}active{% endif %}">
+            <i class="fa-solid fa-file-invoice"></i>
+            <span>Resumes</span>
+        </a>
+        <a href="{{ url_for('features.ai_mentor') }}" class="mobile-bottom-link {% if request.endpoint == 'features.ai_mentor' %}active{% endif %}">
+            <i class="fa-solid fa-robot"></i>
+            <span>AI Coach</span>
+        </a>
+        <a href="{{ url_for('dashboard.profile') }}" class="mobile-bottom-link {% if request.endpoint == 'dashboard.profile' %}active{% endif %}">
+            <i class="fa-solid fa-user-circle"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+
     <!-- Core Scripts -->
+
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/mentor.js') }}"></script>
     <script>

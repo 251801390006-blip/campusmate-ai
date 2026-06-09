@@ -1,0 +1,50 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Activity History - CampusMate AI{% endblock %}
+
+{% block header_title %}Activity Logs & History{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="flat-card shadow-sm border-light">
+            <h3 class="fw-bold text-dark mb-4" style="font-size:1.1rem;"><i class="fa-solid fa-clock-rotate-left text-primary me-2"></i> Chronological Activity Registry</h3>
+            
+            {% if logs %}
+                <div class="activity-timeline position-relative ps-4" style="border-left: 2px solid #e2e8f0; margin-left: 15px;">
+                    {% for log in logs %}
+                        <div class="activity-item position-relative mb-4">
+                            <!-- Timeline node indicator dot -->
+                            <div class="timeline-dot position-absolute" style="left: -24px; top: 2px; width: 14px; height: 14px; border-radius: 50%; border: 2.5px solid #ffffff; background: #0078d4; box-shadow: 0 0 6px rgba(0, 120, 212, 0.3);"></div>
+                            
+                            <div class="p-3 border rounded bg-white shadow-sm" style="transition:all 0.15s ease;">
+                                <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-1">
+                                    <span class="badge bg-light text-primary border border-primary px-2" style="font-size: 0.68rem; text-transform: uppercase; font-weight: 700;">
+                                        {% if log.activity_type == 'resume' %}
+                                            <i class="fa-solid fa-file-lines me-1"></i> Resume
+                                        {% elif log.activity_type == 'roadmap' %}
+                                            <i class="fa-solid fa-route me-1"></i> Roadmap
+                                        {% elif log.activity_type == 'chat' %}
+                                            <i class="fa-solid fa-comments me-1"></i> Advisor Chat
+                                        {% else %}
+                                            <i class="fa-solid fa-compass me-1"></i> Activity
+                                        {% endif %}
+                                    </span>
+                                    <span class="text-secondary" style="font-size: 0.72rem;">{{ log.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                                </div>
+                                <p class="text-dark mb-0 fw-semibold" style="font-size: 0.88rem; line-height: 1.5;">{{ log.description }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fa-solid fa-timeline text-muted mb-3" style="font-size: 2.5rem; opacity: 0.3;"></i>
+                    <h4 class="fw-bold text-dark mb-1">No activities logged yet</h4>
+                    <p class="text-secondary mb-0" style="font-size:0.82rem;">Your activity timeline will populate automatically as you navigate the platform.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

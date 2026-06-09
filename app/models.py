@@ -18,6 +18,22 @@ class User(db.Model, UserMixin):
     last_login = db.Column(db.DateTime, nullable=True)
     plain_password = db.Column(db.String(255), nullable=True)
     
+    # Onboarding and gamification properties
+    branch = db.Column(db.String(100), nullable=True)
+    year = db.Column(db.String(20), nullable=True)
+    career_goal = db.Column(db.String(100), nullable=True)
+    interests = db.Column(db.Text, nullable=True)
+    daily_study_time = db.Column(db.String(50), nullable=True)
+    xp = db.Column(db.Integer, default=0, nullable=False)
+    learning_streak = db.Column(db.Integer, default=0, nullable=False)
+    skills = db.Column(db.Text, nullable=True)
+    onboarded = db.Column(db.Boolean, default=False, nullable=False)
+    
+    # Profile Extensions
+    name = db.Column(db.String(100), nullable=True)
+    avatar = db.Column(db.String(200), nullable=True, default='avatar-1.png')
+    bio = db.Column(db.Text, nullable=True)
+    
     # Relationships
     feedback_items = db.relationship('FeedbackItem', backref='author', lazy=True, cascade="all, delete-orphan")
     replies = db.relationship('FeedbackReply', backref='author', lazy=True, cascade="all, delete-orphan")
@@ -83,4 +99,76 @@ class RoadmapProgress(db.Model):
     role = db.Column(db.String(100), nullable=False) # e.g. 'Cyber Security'
     completed_nodes = db.Column(db.Text, default="") # Comma-separated node indices, e.g. "1,2,5"
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+class UserResume(db.Model):
+    __tablename__ = 'user_resumes'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    title = db.Column(db.String(150), nullable=False)
+    theme = db.Column(db.String(50), default='classic', nullable=False)
+    content_json = db.Column(db.Text, nullable=False) # holds serialized dict
+    ats_score = db.Column(db.Integer, default=0, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    
+    # Relationship
+    user = db.relationship('User', backref=db.backref('resumes', lazy=True, cascade="all, delete-orphan"))
+
+
+class Notification(db.Model):
+    __tablename__ = 'notifications'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    category = db.Column(db.String(50), default='general', nullable=False) # 'milestone', 'cert', 'interview', 'streak', 'achievement'
+    is_read = db.Column(db.Boolean, default=False, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    
+    # Relationship
+    user = db.relationship('User', backref=db.backref('notifications', lazy=True, cascade="all, delete-orphan"))
+
+
+class SavedItem(db.Model):
+    __tablename__ = 'saved_items'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    item_type = db.Column(db.String(50), nullable=False) # 'roadmap', 'cert', 'project', 'resource', 'note'
+    item_id = db.Column(db.String(100), nullable=True)
+    title = db.Column(db.String(200), nullable=False)
+    metadata_json = db.Column(db.Text, nullable=True) # JSON config
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    
+    # Relationship
+    user = db.relationship('User', backref=db.backref('saved_items', lazy=True, cascade="all, delete-orphan"))
+
+
+class ActivityHistory(db.Model):
+    __tablename__ = 'activity_history'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    activity_type = db.Column(db.String(50), nullable=False) # 'chat', 'roadmap', 'resume', 'cert', 'project'
+    description = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    
+    # Relationship
+    user = db.relationship('User', backref=db.backref('activities', lazy=True, cascade="all, delete-orphan"))
+
+
+class UserBadge(db.Model):
+    __tablename__ = 'user_badges'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    badge_name = db.Column(db.String(100), nullable=False)
+    badge_icon = db.Column(db.String(100), nullable=False) # e.g. 'fa-star', 'fa-fire'
+    unlocked_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    
+    # Relationship
+    user = db.relationship('User', backref=db.backref('badges', lazy=True, cascade="all, delete-orphan"))
+
 

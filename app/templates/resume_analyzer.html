@@ -1,373 +1,347 @@
 {% extends "dashboard_base.html" %}
 
-{% block title %}Resume Builder & Analyzer - CampusMate AI{% endblock %}
+{% block title %}Resume Builder 3.0 - CampusMate AI{% endblock %}
 
-{% block header_title %}ATS Resume Builder 2.0{% endblock %}
+{% block header_title %}ATS Resume Builder 3.0{% endblock %}
 
 {% block content %}
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-<!-- Side-by-Side Builder Workspace -->
-<div class="row g-4 resume-workspace-split-wrapper">
-    <!-- Left Column: Input Fields & Uploads -->
-    <div class="col-xl-5">
-        <div class="flat-card h-100 d-flex flex-column" style="max-height: calc(100vh - 130px); overflow: hidden;">
-            <div class="mb-3 border-bottom pb-2" style="border-color: var(--border-color);">
-                <h3 class="fw-bold mb-1" style="font-size: 1.05rem;"><i class="fa-solid fa-file-signature text-muted me-2"></i> Edit Resume Sections</h3>
-                <span class="text-muted" style="font-size: 0.72rem;">Configure scratch details or select templates</span>
-            </div>
-            
-            <div class="resume-form-scroller pe-2" style="overflow-y: auto; flex-grow: 1; display: flex; flex-direction: column; gap: 20px;">
-                <!-- Drag-and-Drop / Upload Zone -->
-                <div class="upload-zone-wrapper p-3 border rounded text-center" style="background-color: var(--bg-primary); border-color: var(--border-color); border-style: dashed !important; cursor: pointer;" id="drop-zone-builder">
-                    <i class="fa-solid fa-cloud-arrow-up text-muted mb-2" style="font-size: 1.8rem;"></i>
-                    <h4 style="font-size: 0.8rem;" class="fw-bold mb-1">Upload Existing Resume</h4>
-                    <p class="text-secondary mb-2" style="font-size: 0.68rem;">Drop PDF/DOCX file here to extract form fields</p>
-                    <span class="btn btn-sm btn-outline" style="font-size: 0.7rem; padding: 4px 10px;">Browse Files</span>
-                    <input type="file" id="resume-file-input-builder" style="display:none;" accept=".pdf,.docx">
-                    <div id="upload-status-text-builder" class="text-secondary mt-2" style="font-size: 0.7rem; display:none;"></div>
+<!-- Split-Screen Builder Workspace -->
+<div class="row g-4" style="height: calc(100vh - 120px); overflow: hidden;">
+    <!-- Left Column: Editor Controls -->
+    <div class="col-xl-5 h-100 d-flex flex-column">
+        <div class="flat-card h-100 d-flex flex-column bg-white border p-3" style="overflow: hidden;">
+            <!-- Editor Title & Version Selector -->
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
+                <div>
+                    <h3 class="fw-bold mb-0" style="font-size:1.05rem;"><i class="fa-solid fa-file-pen text-muted me-2"></i> Editor Sections</h3>
+                    <span id="save-status-badge" class="badge badge-success mt-1" style="font-size: 0.62rem;">Saved to Cloud</span>
                 </div>
-
-                <hr class="divider" style="border:0; border-top:1px solid var(--border-color); margin:10px 0;">
-
-                <!-- Form Mode 1: Editor sections -->
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h4 class="fw-bold mb-0" style="font-size: 0.85rem; text-transform:uppercase; color: var(--text-secondary);">Draft Versions</h4>
-                    <select id="resume-draft-select" onchange="handleDraftSelection()" style="padding:4px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
-                        <option value="draft-1" selected>Draft Version A</option>
-                        <option value="draft-2">Draft Version B</option>
-                        <option value="draft-3">Draft Version C</option>
+                <div class="d-flex align-items-center gap-2">
+                    <select id="resume-version-select" onchange="handleVersionChange()" style="padding:4px 8px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        <!-- Loaded dynamically from server -->
+                        <option value="new">+ Save New Version</option>
                     </select>
                 </div>
-                
-                <div class="input-group mb-3">
-                    <label for="resume-title-field" class="fw-semibold mb-1" style="font-size:0.75rem;">Version Name / Title</label>
-                    <input type="text" id="resume-title-field" class="form-control" value="My Growth Resume" style="padding:6px; font-size:0.8rem; border-radius:4px; border: 1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary); width:100%;">
+            </div>
+
+            <!-- Scrollable Editor Sections Form -->
+            <div class="resume-form-scroller flex-grow-1 pe-2" style="overflow-y: auto; display: flex; flex-direction: column; gap: 16px;">
+                <!-- Version Title -->
+                <div class="input-group">
+                    <label for="resume-title-field" class="fw-bold mb-1" style="font-size:0.72rem; text-transform:uppercase;">Version Title / Name</label>
+                    <input type="text" id="resume-title-field" value="My Master CV" onchange="triggerAutoSave()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
                 </div>
 
-                <!-- Accordion 1: Personal Details -->
+                <!-- Drag-and-Drop / Upload Zone -->
+                <div class="upload-zone-wrapper p-3 border rounded text-center" style="background-color: var(--bg-primary); border-color: var(--border-color); border-style: dashed !important; cursor: pointer;" id="drop-zone-builder">
+                    <i class="fa-solid fa-cloud-arrow-up text-muted mb-1" style="font-size: 1.5rem;"></i>
+                    <h4 style="font-size: 0.78rem;" class="fw-bold mb-0">Upload Existing Resume</h4>
+                    <p class="text-secondary mb-2" style="font-size: 0.65rem;">PDF or DOCX. AI will extract and populate fields below.</p>
+                    <span class="btn btn-sm btn-outline" style="font-size: 0.65rem; padding: 2px 8px;">Browse</span>
+                    <input type="file" id="resume-file-input-builder" style="display:none;" accept=".pdf,.docx">
+                    <div id="upload-status-text-builder" class="text-secondary mt-1" style="font-size: 0.68rem; display:none;"></div>
+                </div>
+
+                <!-- Section: Profile Details -->
                 <details class="accordion-section p-2 border rounded" style="border-color: var(--border-color); background-color: var(--bg-secondary);" open>
-                    <summary class="fw-bold text-secondary" style="font-size:0.82rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-user me-2 text-muted"></i> 1. Personal Details</summary>
-                    <div class="mt-3 d-flex flex-column gap-2">
+                    <summary class="fw-bold text-secondary" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-user me-2 text-muted"></i> Profile & Contact Details</summary>
+                    <div class="mt-2 d-flex flex-column gap-2">
                         <div class="input-group">
-                            <label for="res-name" class="fw-semibold mb-1" style="font-size:0.72rem;">Full Name</label>
-                            <input type="text" id="res-name" class="form-control" value="Alex Smith" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
+                            <label for="res-name" class="fw-semibold mb-1" style="font-size:0.7rem;">Full Name</label>
+                            <input type="text" id="res-name" value="Alex Smith" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
                         </div>
                         <div class="input-group">
-                            <label for="res-address" class="fw-semibold mb-1" style="font-size:0.72rem;">Address Location</label>
-                            <input type="text" id="res-address" class="form-control" value="San Francisco, California, USA" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
+                            <label for="res-address" class="fw-semibold mb-1" style="font-size:0.7rem;">Location Address</label>
+                            <input type="text" id="res-address" value="San Francisco, California, USA" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
                         </div>
                         <div class="row g-2">
                             <div class="col-sm-6">
-                                <label for="res-email" class="fw-semibold mb-1" style="font-size:0.72rem;">Primary Email</label>
-                                <input type="email" id="res-email" class="form-control" value="alex.smith@example.edu" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
+                                <label for="res-email" class="fw-semibold mb-1" style="font-size:0.7rem;">Email</label>
+                                <input type="email" id="res-email" value="alex.smith@example.edu" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
                             </div>
                             <div class="col-sm-6">
-                                <label for="res-phone" class="fw-semibold mb-1" style="font-size:0.72rem;">Phone Number</label>
-                                <input type="text" id="res-phone" class="form-control" value="+1 (555) 019-2834" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
+                                <label for="res-phone" class="fw-semibold mb-1" style="font-size:0.7rem;">Phone</label>
+                                <input type="text" id="res-phone" value="+1 (555) 019-2834" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
                             </div>
                         </div>
                         <div class="row g-2">
                             <div class="col-sm-6">
-                                <label for="res-linkedin" class="fw-semibold mb-1" style="font-size:0.72rem;">LinkedIn URL</label>
-                                <input type="text" id="res-linkedin" class="form-control" value="linkedin.com/in/alexsmith" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
+                                <label for="res-linkedin" class="fw-semibold mb-1" style="font-size:0.7rem;">LinkedIn Link</label>
+                                <input type="text" id="res-linkedin" value="linkedin.com/in/alexsmith" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
                             </div>
                             <div class="col-sm-6">
-                                <label for="res-github" class="fw-semibold mb-1" style="font-size:0.72rem;">GitHub Link</label>
-                                <input type="text" id="res-github" class="form-control" value="https://github.com/alexsmith" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
+                                <label for="res-github" class="fw-semibold mb-1" style="font-size:0.7rem;">GitHub Link</label>
+                                <input type="text" id="res-github" value="github.com/alexsmith" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
                             </div>
                         </div>
                     </div>
                 </details>
 
-                <!-- Accordion 2: Education -->
+                <!-- Section: Education -->
                 <details class="accordion-section p-2 border rounded" style="border-color: var(--border-color); background-color: var(--bg-secondary);">
-                    <summary class="fw-bold text-secondary" style="font-size:0.82rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-graduation-cap me-2 text-muted"></i> 2. Education</summary>
-                    <div class="mt-3 d-flex flex-column gap-2">
-                        <h5 class="fw-semibold text-secondary mb-1" style="font-size:0.75rem; border-bottom: 1px dashed var(--border-color); padding-bottom: 2px;">College / University</h5>
+                    <summary class="fw-bold text-secondary" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-graduation-cap me-2 text-muted"></i> Education</summary>
+                    <div class="mt-2 d-flex flex-column gap-2">
                         <div class="input-group">
-                            <label for="res-edu1-inst" class="fw-semibold mb-1" style="font-size:0.72rem;">Institution Name</label>
-                            <input type="text" id="res-edu1-inst" class="form-control" value="State Tech University" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
+                            <label for="res-edu1-inst" class="fw-semibold mb-1" style="font-size:0.7rem;">Institution Name</label>
+                            <input type="text" id="res-edu1-inst" value="State Tech University" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
                         </div>
                         <div class="input-group">
-                            <label for="res-edu1-degree" class="fw-semibold mb-1" style="font-size:0.72rem;">Degree & Major</label>
-                            <input type="text" id="res-edu1-degree" class="form-control" value="B.S. in Computer Science" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
+                            <label for="res-edu1-degree" class="fw-semibold mb-1" style="font-size:0.7rem;">Degree / Major</label>
+                            <input type="text" id="res-edu1-degree" value="B.S. in Computer Science" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
                         </div>
                         <div class="row g-2">
                             <div class="col-sm-6">
-                                <label for="res-edu1-dates" class="fw-semibold mb-1" style="font-size:0.72rem;">Graduation Dates</label>
-                                <input type="text" id="res-edu1-dates" class="form-control" value="2024 – 2028" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
+                                <label for="res-edu1-dates" class="fw-semibold mb-1" style="font-size:0.7rem;">Dates</label>
+                                <input type="text" id="res-edu1-dates" value="2024 – 2028" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
                             </div>
                             <div class="col-sm-6">
-                                <label for="res-edu1-gpa" class="fw-semibold mb-1" style="font-size:0.72rem;">CGPA / GPA</label>
-                                <input type="text" id="res-edu1-gpa" class="form-control" value="3.8/4.0" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
+                                <label for="res-edu1-gpa" class="fw-semibold mb-1" style="font-size:0.7rem;">GPA</label>
+                                <input type="text" id="res-edu1-gpa" value="3.8/4.0" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
                             </div>
                         </div>
-                        <div class="input-group mb-2">
-                            <label for="res-edu1-coursework" class="fw-semibold mb-1" style="font-size:0.72rem;">Coursework Topics</label>
-                            <input type="text" id="res-edu1-coursework" class="form-control" value="Data Structures, Cryptography, Database Systems, Computer Networks" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
+                        <div class="input-group">
+                            <label for="res-edu1-coursework" class="fw-semibold mb-1" style="font-size:0.7rem;">Relevant Coursework</label>
+                            <input type="text" id="res-edu1-coursework" value="Data Structures, Cryptography, Database Systems, Computer Networks" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
                         </div>
+                    </div>
+                </details>
 
-                        <h5 class="fw-semibold text-secondary mb-1" style="font-size:0.75rem; border-bottom: 1px dashed var(--border-color); padding-bottom: 2px; margin-top: 10px;">High School / Secondary</h5>
+                <!-- Section: Technical Skills -->
+                <details class="accordion-section p-2 border rounded" style="border-color: var(--border-color); background-color: var(--bg-secondary);">
+                    <summary class="fw-bold text-secondary" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-gears me-2 text-muted"></i> Skills</summary>
+                    <div class="mt-2 d-flex flex-column gap-2">
                         <div class="input-group">
-                            <label for="res-edu2-inst" class="fw-semibold mb-1" style="font-size:0.72rem;">Institution Name</label>
-                            <input type="text" id="res-edu2-inst" class="form-control" value="Central High School" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
+                            <label for="res-skills-prog" class="fw-semibold mb-1" style="font-size:0.7rem;">Languages</label>
+                            <input type="text" id="res-skills-prog" value="Python, Java, Go" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
                         </div>
                         <div class="input-group">
-                            <label for="res-edu2-degree" class="fw-semibold mb-1" style="font-size:0.72rem;">Degree & Major</label>
-                            <input type="text" id="res-edu2-degree" class="form-control" value="High School Diploma" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
+                            <label for="res-skills-cyber" class="fw-semibold mb-1" style="font-size:0.7rem;">Cybersecurity Basics</label>
+                            <input type="text" id="res-skills-cyber" value="Vulnerability Scanning, Web Security Basics, OWASP Top 10" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="input-group">
+                            <label for="res-skills-tools" class="fw-semibold mb-1" style="font-size:0.7rem;">Tools & Cloud</label>
+                            <input type="text" id="res-skills-tools" value="Git, Docker, VS Code, Command Line" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="input-group">
+                            <label for="res-skills-web" class="fw-semibold mb-1" style="font-size:0.7rem;">Web Frameworks</label>
+                            <input type="text" id="res-skills-web" value="HTML, CSS, Flask, React" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Section: Experience -->
+                <details class="accordion-section p-2 border rounded" style="border-color: var(--border-color); background-color: var(--bg-secondary);">
+                    <summary class="fw-bold text-secondary" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-briefcase me-2 text-muted"></i> Experience</summary>
+                    <div class="mt-2 d-flex flex-column gap-2">
+                        <div class="input-group">
+                            <label for="res-exp-role" class="fw-semibold mb-1" style="font-size:0.7rem;">Role</label>
+                            <input type="text" id="res-exp-role" value="Software Engineering Intern" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
                         </div>
                         <div class="row g-2">
                             <div class="col-sm-6">
-                                <label for="res-edu2-dates" class="fw-semibold mb-1" style="font-size:0.72rem;">Graduation Dates</label>
-                                <input type="text" id="res-edu2-dates" class="form-control" value="2020 – 2024" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
+                                <label for="res-exp-comp" class="fw-semibold mb-1" style="font-size:0.7rem;">Company</label>
+                                <input type="text" id="res-exp-comp" value="Global Tech Solutions" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
                             </div>
                             <div class="col-sm-6">
-                                <label for="res-edu2-gpa" class="fw-semibold mb-1" style="font-size:0.72rem;">CGPA / GPA</label>
-                                <input type="text" id="res-edu2-gpa" class="form-control" value="3.9/4.0" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
+                                <label for="res-exp-dates" class="fw-semibold mb-1" style="font-size:0.7rem;">Dates</label>
+                                <input type="text" id="res-exp-dates" value="June 2025 – August 2025" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                            </div>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="fw-semibold mb-1" style="font-size:0.7rem;">Bullet Descriptions</label>
+                            <input type="text" id="res-exp-b1" class="form-control res-bullet-input mb-1" value="Contributed to the design and development of automated data analysis pipelines." oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                            <input type="text" id="res-exp-b2" class="form-control res-bullet-input mb-1" value="Implemented secure coding practices using Python and Flask for backend APIs." oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                            <input type="text" id="res-exp-b3" class="form-control res-bullet-input mb-1" value="Supported data migration and JWT authentication modules to improve security." oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                            <input type="text" id="res-exp-b4" class="form-control res-bullet-input" value="Collaborated with engineers to test and refine code architectures for improved reliability." oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+
+                        <!-- Action Verb Prepend Assistant -->
+                        <div class="p-2 border rounded" style="background: var(--bg-primary); border-color: var(--border-color) !important;">
+                            <span class="fw-bold d-block text-secondary mb-1" style="font-size:0.65rem; text-transform:uppercase;"><i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> Prepend Action Verbs</span>
+                            <div class="d-flex flex-wrap gap-1">
+                                <span class="badge badge-info cursor-pointer hover-scale" onclick="insertActionVerb('Architected')" style="font-size:0.65rem;">Architected</span>
+                                <span class="badge badge-info cursor-pointer hover-scale" onclick="insertActionVerb('Engineered')" style="font-size:0.65rem;">Engineered</span>
+                                <span class="badge badge-info cursor-pointer hover-scale" onclick="insertActionVerb('Optimized')" style="font-size:0.65rem;">Optimized</span>
+                                <span class="badge badge-info cursor-pointer hover-scale" onclick="insertActionVerb('Automated')" style="font-size:0.65rem;">Automated</span>
+                                <span class="badge badge-info cursor-pointer hover-scale" onclick="insertActionVerb('Hardened')" style="font-size:0.65rem;">Hardened</span>
                             </div>
                         </div>
                     </div>
                 </details>
 
-                <!-- Accordion 3: Technical Skills -->
+                <!-- Section: Projects -->
                 <details class="accordion-section p-2 border rounded" style="border-color: var(--border-color); background-color: var(--bg-secondary);">
-                    <summary class="fw-bold text-secondary" style="font-size:0.82rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-gears me-2 text-muted"></i> 3. Technical Skills</summary>
-                    <div class="mt-3 d-flex flex-column gap-2">
+                    <summary class="fw-bold text-secondary" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-code me-2 text-muted"></i> Projects</summary>
+                    <div class="mt-2 d-flex flex-column gap-2">
                         <div class="input-group">
-                            <label for="res-skills-prog" class="fw-semibold mb-1" style="font-size:0.72rem;">Programming Languages</label>
-                            <input type="text" id="res-skills-prog" class="form-control" value="Python, Java, Go" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
+                            <label for="res-proj-title" class="fw-semibold mb-1" style="font-size:0.7rem;">Project Name</label>
+                            <input type="text" id="res-proj-title" value="AegisShield AI – Cyber Crime Detection Platform" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
                         </div>
                         <div class="input-group">
-                            <label for="res-skills-cyber" class="fw-semibold mb-1" style="font-size:0.72rem;">Cybersecurity Basics</label>
-                            <input type="text" id="res-skills-cyber" class="form-control" value="Vulnerability Scanning, Web Security Basics, OWASP Top 10" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
+                            <label for="res-proj-link" class="fw-semibold mb-1" style="font-size:0.7rem;">Repository Link</label>
+                            <input type="text" id="res-proj-link" value="github.com/alexsmith/aegisshield-ai" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
                         </div>
                         <div class="input-group">
-                            <label for="res-skills-os" class="fw-semibold mb-1" style="font-size:0.72rem;">Operating Systems</label>
-                            <input type="text" id="res-skills-os" class="form-control" value="Linux, macOS, Windows" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
-                        </div>
-                        <div class="input-group">
-                            <label for="res-skills-tools" class="fw-semibold mb-1" style="font-size:0.72rem;">Tools & Platforms</label>
-                            <input type="text" id="res-skills-tools" class="form-control" value="Git, Docker, VS Code, Command Line" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
-                        </div>
-                        <div class="input-group">
-                            <label for="res-skills-web" class="fw-semibold mb-1" style="font-size:0.72rem;">Web Development Frameworks</label>
-                            <input type="text" id="res-skills-web" class="form-control" value="HTML, CSS, Flask, React" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
+                            <label class="fw-semibold mb-1" style="font-size:0.7rem;">Project Details</label>
+                            <input type="text" id="res-proj-b1" class="form-control res-bullet-input mb-1" value="Developed a web-based platform using Python, Flask, HTML, and CSS to support cybercrime reporting." oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                            <input type="text" id="res-proj-b2" class="form-control res-bullet-input mb-1" value="Implemented user authentication, routing, and activity logging to ensure secure data handling." oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                            <input type="text" id="res-proj-b3" class="form-control res-bullet-input" value="Focused on applying secure web development principles and structured threat analysis workflows." oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
                         </div>
                     </div>
                 </details>
 
-                <!-- Accordion 4: Experience -->
+                <!-- Section: Certifications -->
                 <details class="accordion-section p-2 border rounded" style="border-color: var(--border-color); background-color: var(--bg-secondary);">
-                    <summary class="fw-bold text-secondary" style="font-size:0.82rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-briefcase me-2 text-muted"></i> 4. Experience</summary>
-                    <div class="mt-3 d-flex flex-column gap-2">
+                    <summary class="fw-bold text-secondary" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-award me-2 text-muted"></i> Certifications & Achievements</summary>
+                    <div class="mt-2 d-flex flex-column gap-2">
                         <div class="input-group">
-                            <label for="res-exp-role" class="fw-semibold mb-1" style="font-size:0.72rem;">Role Title</label>
-                            <input type="text" id="res-exp-role" class="form-control" value="Software Engineering Intern" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
-                        </div>
-                        <div class="input-group">
-                            <label for="res-exp-comp" class="fw-semibold mb-1" style="font-size:0.72rem;">Company Name</label>
-                            <input type="text" id="res-exp-comp" class="form-control" value="Global Tech Solutions" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
-                        </div>
-                        <div class="input-group">
-                            <label for="res-exp-dates" class="fw-semibold mb-1" style="font-size:0.72rem;">Employment Duration Dates</label>
-                            <input type="text" id="res-exp-dates" class="form-control" value="June 2025 – August 2025" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
-                        </div>
-                        <div class="input-group">
-                            <label class="fw-semibold mb-1" style="font-size:0.72rem;">Experience Bullet Points</label>
-                            <input type="text" id="res-exp-b1" class="form-control res-bullet-input mb-1" value="Contributed to the design and development of automated data analysis pipelines." oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
-                            <input type="text" id="res-exp-b2" class="form-control res-bullet-input mb-1" value="Implemented secure coding practices using Python and Flask for backend APIs." oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
-                            <input type="text" id="res-exp-b3" class="form-control res-bullet-input mb-1" value="Supported data migration and JWT authentication modules to improve system security." oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
-                            <input type="text" id="res-exp-b4" class="form-control res-bullet-input" value="Collaborated with engineers to test and refine code architectures for improved reliability." oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
-                        </div>
-
-                        <!-- Action-Verb Assistant panel -->
-                        <div class="action-verb-assistant p-2 mt-2 border rounded" style="background-color: var(--bg-primary); border-color: var(--border-color); font-size:0.72rem;">
-                            <div class="fw-bold mb-2 text-secondary"><i class="fa-solid fa-wand-magic-sparkles text-cyan me-1"></i> Action-Verb Assistant (Click to insert)</div>
-                            <div class="verb-category-title">Leadership & Dev</div>
-                            <div class="verb-chips-container d-flex flex-wrap gap-1">
-                                <span class="badge badge-info verb-chip cursor-pointer" onclick="insertActionVerb('Architected')">Architected</span>
-                                <span class="badge badge-info verb-chip cursor-pointer" onclick="insertActionVerb('Engineered')">Engineered</span>
-                                <span class="badge badge-info verb-chip cursor-pointer" onclick="insertActionVerb('Optimized')">Optimized</span>
-                                <span class="badge badge-info verb-chip cursor-pointer" onclick="insertActionVerb('Automated')">Automated</span>
-                                <span class="badge badge-info verb-chip cursor-pointer" onclick="insertActionVerb('Implemented')">Implemented</span>
-                            </div>
-                            <div class="verb-category-title mt-2">Security & Audit</div>
-                            <div class="verb-chips-container d-flex flex-wrap gap-1">
-                                <span class="badge badge-info verb-chip cursor-pointer" onclick="insertActionVerb('Vulnerability-scanned')">Vulnerability-scanned</span>
-                                <span class="badge badge-info verb-chip cursor-pointer" onclick="insertActionVerb('Hardened')">Hardened</span>
-                                <span class="badge badge-info verb-chip cursor-pointer" onclick="insertActionVerb('Audited')">Audited</span>
-                                <span class="badge badge-info verb-chip cursor-pointer" onclick="insertActionVerb('Secured')">Secured</span>
-                            </div>
+                            <label class="fw-semibold mb-1" style="font-size:0.7rem;">List Certifications</label>
+                            <input type="text" id="res-cert-c1" class="form-control mb-1" value="Deloitte Australia Cyber Job Simulation (Forage)" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                            <input type="text" id="res-cert-c2" class="form-control mb-1" value="Cyber Security & Ethical Hacking Workshop (DV Analytics)" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                            <input type="text" id="res-cert-c3" class="form-control mb-1" value="Python Tutorial Module Certificate of Excellence (Scaler)" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                            <input type="text" id="res-cert-c4" class="form-control" value="Python Course for Beginners: Mastering the Essentials (Scaler)" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
                         </div>
                     </div>
                 </details>
+            </div>
 
-                <!-- Accordion 5: Projects -->
-                <details class="accordion-section p-2 border rounded" style="border-color: var(--border-color); background-color: var(--bg-secondary);">
-                    <summary class="fw-bold text-secondary" style="font-size:0.82rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-code-fork me-2 text-muted"></i> 5. Projects</summary>
-                    <div class="mt-3 d-flex flex-column gap-2">
-                        <div class="input-group">
-                            <label for="res-proj-title" class="fw-semibold mb-1" style="font-size:0.72rem;">Project Name</label>
-                            <input type="text" id="res-proj-title" class="form-control" value="AegisShield AI – Cyber Crime Detection Platform" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
-                        </div>
-                        <div class="input-group">
-                            <label for="res-proj-link" class="fw-semibold mb-1" style="font-size:0.72rem;">Repository Link / URL</label>
-                            <input type="text" id="res-proj-link" class="form-control" value="github.com/alexsmith/aegisshield-ai" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
-                        </div>
-                        <div class="input-group">
-                            <label class="fw-semibold mb-1" style="font-size:0.72rem;">Project Bullet Points</label>
-                            <input type="text" id="res-proj-b1" class="form-control res-bullet-input mb-1" value="Developed a web-based platform using Python, Flask, HTML, and CSS to support cybercrime reporting and analysis." oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
-                            <input type="text" id="res-proj-b2" class="form-control res-bullet-input mb-1" value="Implemented user authentication, routing, and activity logging to ensure secure data handling." oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
-                            <input type="text" id="res-proj-b3" class="form-control res-bullet-input" value="Focused on applying secure web development principles and structured threat analysis workflows." oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
-                        </div>
-
-                        <!-- Action-Verb Assistant panel -->
-                        <div class="action-verb-assistant p-2 mt-2 border rounded" style="background-color: var(--bg-primary); border-color: var(--border-color); font-size:0.72rem;">
-                            <div class="fw-bold mb-2 text-secondary"><i class="fa-solid fa-wand-magic-sparkles text-cyan me-1"></i> Action-Verb Assistant (Click to insert)</div>
-                            <div class="verb-category-title">Execution & Launch</div>
-                            <div class="verb-chips-container d-flex flex-wrap gap-1">
-                                <span class="badge badge-info verb-chip cursor-pointer" onclick="insertActionVerb('Deployed')">Deployed</span>
-                                <span class="badge badge-info verb-chip cursor-pointer" onclick="insertActionVerb('Designed')">Designed</span>
-                                <span class="badge badge-info verb-chip cursor-pointer" onclick="insertActionVerb('Integrated')">Integrated</span>
-                                <span class="badge badge-info verb-chip cursor-pointer" onclick="insertActionVerb('Configured')">Configured</span>
-                            </div>
-                        </div>
-                    </div>
-                </details>
-
-                <!-- Accordion 6: Certifications -->
-                <details class="accordion-section p-2 border rounded" style="border-color: var(--border-color); background-color: var(--bg-secondary);">
-                    <summary class="fw-bold text-secondary" style="font-size:0.82rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-award me-2 text-muted"></i> 6. Certifications</summary>
-                    <div class="mt-3 d-flex flex-column gap-2">
-                        <div class="input-group">
-                            <label class="fw-semibold mb-1" style="font-size:0.72rem;">List Certifications</label>
-                            <input type="text" id="res-cert-c1" class="form-control mb-1" value="Deloitte Australia Cyber Job Simulation (Forage)" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
-                            <input type="text" id="res-cert-c2" class="form-control mb-1" value="Cyber Security & Ethical Hacking Workshop (DV Analytics)" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
-                            <input type="text" id="res-cert-c3" class="form-control mb-1" value="Python Tutorial Module Certificate of Excellence (Scaler)" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
-                            <input type="text" id="res-cert-c4" class="form-control" value="Python Course for Beginners: Mastering the Essentials (Scaler)" oninput="syncResumeFields()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
-                        </div>
-                    </div>
-                </details>
-                
-                <button class="btn btn-primary btn-block py-2 mt-2" onclick="saveResumeContent()">Save Draft & Verify <i class="fa-solid fa-floppy-disk"></i></button>
+            <!-- Editor Action Buttons Footer -->
+            <div class="d-flex gap-2 pt-3 border-top mt-3" style="border-color: var(--border-color);">
+                <button class="btn btn-outline flex-grow-1 py-2" onclick="saveResumeCloud()"><i class="fa-solid fa-cloud-arrow-up"></i> Save Cloud Draft</button>
+                <button class="btn btn-primary flex-grow-1 py-2" onclick="triggerResumeATSAnalysis()">Analyze ATS <i class="fa-solid fa-wand-magic-sparkles"></i></button>
             </div>
         </div>
     </div>
 
-    <!-- Right Column: Live Sheet Preview & ATS scoring -->
-    <div class="col-xl-7">
-        <div class="resume-preview-panel d-flex flex-column gap-4" style="max-height: calc(100vh - 120px); overflow-y: auto;">
-            <!-- Theme Toolbar -->
-            <div class="flat-card py-2 px-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <div class="d-flex align-items-center gap-2" style="font-size: 0.82rem;">
-                    <label for="resume-theme-select" class="fw-bold text-secondary">Resume Theme:</label>
-                    <select id="resume-theme-select" onchange="changeResumeTheme()" style="padding:4px 8px; border-radius:4px; border:1px solid var(--border-color); font-size:0.8rem; background: var(--bg-primary); color: var(--text-primary);">
-                        <option value="classic" selected>Classic Ivory</option>
-                        <option value="modern-cyan">Modern Cyan Accent</option>
-                        <option value="slate-glass">Slate Glassmorphic</option>
-                        <option value="minimalist-executive">Minimalist Executive</option>
-                        <option value="tech-mono">Tech Minimalist</option>
-                        <option value="creative-violet">Creative Violet</option>
-                        <option value="emerald-forest">Emerald Forest</option>
-                        <option value="royal-indigo">Royal Indigo</option>
-                        <option value="corporate-navy">Corporate Navy</option>
-                        <option value="modern-warm">Modern Warm</option>
-                        <option value="clean-slate">Clean Slate</option>
-                        <option value="elegant-georgia">Elegant Georgia</option>
-                        <option value="stanford-academic">Stanford Academic</option>
-                        <option value="sleek-tech">Sleek Tech</option>
-                        <option value="compact-cv">Compact CV</option>
-                        <option value="hybrid-columns">Double Column Hybrid</option>
-                    </select>
-                </div>
-                <button class="btn btn-sm btn-outline" onclick="downloadResumePDF()"><i class="fa-solid fa-download"></i> Download PDF</button>
+    <!-- Right Column: Visual Preview & ATS Diagnostics -->
+    <div class="col-xl-7 h-100 d-flex flex-column" style="overflow-y: auto;">
+        <!-- Theme & Layout Toolbar -->
+        <div class="flat-card bg-white border p-3 mb-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div class="d-flex align-items-center gap-2" style="font-size:0.8rem;">
+                <label for="resume-theme-select" class="fw-bold text-secondary">A4 Template Style:</label>
+                <select id="resume-theme-select" onchange="changeResumeTheme()" style="padding:4px 8px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
+                    <option value="modern-ats" selected>Modern ATS Professional</option>
+                    <option value="microsoft">Microsoft Learn Style</option>
+                    <option value="minimalist-executive">Minimalist Executive</option>
+                    <option value="student-internship">Student Internship Template</option>
+                    <option value="tech-mono">Tech Resume Template</option>
+                </select>
             </div>
+            
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline" onclick="downloadResumePDF()"><i class="fa-solid fa-download"></i> PDF Resume</button>
+                <button class="btn btn-sm btn-outline" onclick="downloadATSReportPDF()"><i class="fa-solid fa-file-pdf"></i> ATS Report</button>
+                <button class="btn btn-sm btn-outline" onclick="downloadImprovementReportPDF()"><i class="fa-solid fa-file-signature"></i> Improvements</button>
+            </div>
+        </div>
 
-            <!-- PDF A4 Sheet Paper Wrapper -->
-            <div class="resume-sheet classic" id="resume-sheet-paper" style="border: 1px solid var(--border-color); font-family: 'Inter', sans-serif;">
-                <div class="resume-render-header" style="text-align: left;">
-                    <h1 id="res-render-name" style="font-size:20px; font-weight:700; margin-bottom:5px; text-transform:uppercase; color:#0f172a;">Alex Smith</h1>
-                    <div class="resume-render-meta" style="font-size:11px; color:#475569; line-height:1.4;">
-                        <span id="res-render-address">San Francisco, California, USA</span><br>
-                        <span id="res-render-email">alex.smith@example.edu</span> | <span id="res-render-phone">+1 (555) 019-2834</span> | 
-                        <span id="res-render-linkedin">linkedin.com/in/alexsmith</span> | <span id="res-render-links">https://github.com/alexsmith</span>
+        <!-- Before / After Optimization Panel -->
+        <div class="flat-card bg-white border p-3 mb-3" id="before-after-card" style="display:none;">
+            <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom" style="border-color:var(--border-color);">
+                <h4 style="font-size:0.8rem;" class="fw-bold text-secondary mb-0"><i class="fa-solid fa-code-compare text-cyan"></i> Optimization Comparison Preview</h4>
+                <button class="btn-close" onclick="document.getElementById('before-after-card').style.display='none'" style="background:none; border:none; font-size:10px;"><i class="fa-solid fa-x"></i></button>
+            </div>
+            <div class="row g-2">
+                <div class="col-6">
+                    <div class="p-2 border rounded bg-light" style="font-size:0.7rem; min-height:60px;">
+                        <span class="text-danger d-block fw-bold mb-1">Before:</span>
+                        <div id="compare-original" class="text-secondary italic">"Responsible for coding the backend of the student project application."</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-2 border rounded" style="font-size:0.7rem; background: rgba(16,185,129,0.02); border-color: rgba(16,185,129,0.2) !important; min-height:60px;">
+                        <span class="text-success d-block fw-bold mb-1">After (Optimized):</span>
+                        <div id="compare-optimized" class="text-secondary fw-semibold">"Architected performant relational database schemas and API routing structures in Flask, reducing API controller latency by 20%."</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sheet Preview Wrapper -->
+        <div class="resume-preview-sheet-wrapper border shadow-sm mb-4" style="background:#fff; padding: 20px; min-height:842px;">
+            <!-- A4 Sheet Paper -->
+            <div class="resume-sheet modern-ats" id="resume-sheet-paper" style="font-family: 'Outfit', sans-serif;">
+                <div class="resume-render-header" style="border-bottom: 2px solid #2563eb; padding-bottom: 8px; margin-bottom: 15px;">
+                    <h1 id="res-render-name" style="font-size: 22px; font-weight:800; color: #1e3a8a; margin-bottom: 4px; text-transform: uppercase;">Alex Smith</h1>
+                    <div class="resume-render-meta" style="font-size: 11px; color: #4b5563; line-height: 1.4;">
+                        <span id="res-render-address"><i class="fa-solid fa-location-dot me-1 text-muted"></i> San Francisco, California, USA</span> | 
+                        <span id="res-render-email"><i class="fa-solid fa-envelope me-1 text-muted"></i> alex.smith@example.edu</span><br>
+                        <span id="res-render-phone"><i class="fa-solid fa-phone me-1 text-muted"></i> +1 (555) 019-2834</span> | 
+                        <span id="res-render-linkedin"><i class="fa-brands fa-linkedin me-1 text-muted"></i> linkedin.com/in/alexsmith</span> | 
+                        <span id="res-render-links"><i class="fa-brands fa-github me-1 text-muted"></i> github.com/alexsmith</span>
                     </div>
                 </div>
 
-                <div class="resume-render-section" style="margin-top:15px;">
-                    <h2 style="font-size: 13px; font-weight: 700; border-bottom: 2px solid #1e293b; padding-bottom: 3px; margin-bottom: 8px; text-transform:uppercase; color:#0f172a;">Education</h2>
-                    <div style="margin-bottom: 8px;">
-                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:12px;">
+                <!-- Section: Education -->
+                <div class="resume-render-section" style="margin-bottom:14px;">
+                    <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Education</h3>
+                    <div>
+                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
                             <span id="res-render-edu1-inst">State Tech University</span>
                             <span id="res-render-edu1-degree" style="font-weight:normal;">B.S. in Computer Science</span>
                         </div>
-                        <div style="display:flex; justify-content:space-between; font-size:11px; color:#64748b; margin-top:2px;">
+                        <div style="display:flex; justify-content:space-between; font-size:10px; color:#6b7280; margin-top:1px;">
                             <span id="res-render-edu1-dates">2024 – 2028</span>
-                            <span>CGPA: <strong id="res-render-edu1-gpa">3.8/4.0</strong></span>
+                            <span>GPA: <strong id="res-render-edu1-gpa">3.8/4.0</strong></span>
                         </div>
-                        <div style="font-size:11px; margin-top:4px;" id="res-render-edu1-coursework">
+                        <div style="font-size:10px; margin-top:2px; color:#4b5563;" id="res-render-edu1-coursework">
                             Relevant Coursework: Data Structures, Cryptography, Database Systems, Computer Networks
                         </div>
                     </div>
-                    <div>
-                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:12px;">
-                            <span id="res-render-edu2-inst">Central High School</span>
-                            <span id="res-render-edu2-degree" style="font-weight:normal;">High School Diploma</span>
-                        </div>
-                        <div style="display:flex; justify-content:space-between; font-size:11px; color:#64748b; margin-top:2px;">
-                            <span id="res-render-edu2-dates">2020 – 2024</span>
-                            <span>GPA: <strong id="res-render-edu2-gpa">3.9/4.0</strong></span>
-                        </div>
-                    </div>
                 </div>
 
-                <div class="resume-render-section" style="margin-top:15px;">
-                    <h2 style="font-size: 13px; font-weight: 700; border-bottom: 2px solid #1e293b; padding-bottom: 3px; margin-bottom: 8px; text-transform:uppercase; color:#0f172a;">Technical Skills</h2>
-                    <div style="font-size:11px; line-height:1.5;">
-                        <div><strong>Programming:</strong> <span id="res-render-skills-prog">Python, Java, Go</span></div>
+                <!-- Section: Skills -->
+                <div class="resume-render-section" style="margin-bottom:14px;">
+                    <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Technical Skills</h3>
+                    <div style="font-size:10.5px; line-height:1.4; color:#374151;">
+                        <div><strong>Languages:</strong> <span id="res-render-skills-prog">Python, Java, Go</span></div>
                         <div><strong>Cybersecurity:</strong> <span id="res-render-skills-cyber">Vulnerability Scanning, Web Security Basics, OWASP Top 10</span></div>
-                        <div><strong>Operating Systems:</strong> <span id="res-render-skills-os">Linux, macOS, Windows</span></div>
-                        <div><strong>Tools:</strong> <span id="res-render-skills-tools">Git, Docker, VS Code, Command Line</span></div>
-                        <div><strong>Web:</strong> <span id="res-render-skills-web">HTML, CSS, Flask, React</span></div>
+                        <div><strong>Tools & Cloud:</strong> <span id="res-render-skills-tools">Git, Docker, VS Code, Command Line</span></div>
+                        <div><strong>Frameworks:</strong> <span id="res-render-skills-web">HTML, CSS, Flask, React</span></div>
                     </div>
                 </div>
 
-                <div class="resume-render-section" style="margin-top:15px;">
-                    <h2 style="font-size: 13px; font-weight: 700; border-bottom: 2px solid #1e293b; padding-bottom: 3px; margin-bottom: 8px; text-transform:uppercase; color:#0f172a;">Experience</h2>
+                <!-- Section: Experience -->
+                <div class="resume-render-section" style="margin-bottom:14px;">
+                    <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Experience</h3>
                     <div>
-                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:12px;">
+                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
                             <span id="res-render-exp-role">Software Engineering Intern</span>
                             <span id="res-render-exp-dates">June 2025 – August 2025</span>
                         </div>
-                        <div style="font-size: 11px; font-style: italic; color:#64748b;" id="res-render-exp-comp">Global Tech Solutions</div>
-                        <ul class="bullet-list" style="font-size:11px; margin-left:18px; margin-top:4px; line-height:1.4;">
+                        <div style="font-size:10.5px; font-style:italic; color:#6b7280; margin-bottom:2px;" id="res-render-exp-comp">Global Tech Solutions</div>
+                        <ul class="bullet-list" style="font-size:10px; margin-left:14px; margin-top:2px; line-height:1.4; color:#374151;">
                             <li id="res-render-exp-b1">Contributed to the design and development of automated data analysis pipelines.</li>
                             <li id="res-render-exp-b2">Implemented secure coding practices using Python and Flask for backend APIs.</li>
-                            <li id="res-render-exp-b3">Supported data migration and JWT authentication modules to improve system security.</li>
+                            <li id="res-render-exp-b3">Supported data migration and JWT authentication modules to improve security.</li>
                             <li id="res-render-exp-b4">Collaborated with engineers to test and refine code architectures for improved reliability.</li>
                         </ul>
                     </div>
                 </div>
 
-                <div class="resume-render-section" style="margin-top:15px;">
-                    <h2 style="font-size: 13px; font-weight: 700; border-bottom: 2px solid #1e293b; padding-bottom: 3px; margin-bottom: 8px; text-transform:uppercase; color:#0f172a;">Projects</h2>
+                <!-- Section: Projects -->
+                <div class="resume-render-section" style="margin-bottom:14px;">
+                    <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Projects</h3>
                     <div>
-                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:12px;">
+                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
                             <span id="res-render-proj-title">AegisShield AI – Cyber Crime Detection Platform</span>
-                            <span id="res-render-proj-link" style="font-weight:normal; font-size:11px; color:#475569;">github.com/alexsmith/aegisshield-ai</span>
+                            <span id="res-render-proj-link" style="font-weight:normal; font-size:10px; color:#4b5563;">github.com/alexsmith/aegisshield-ai</span>
                         </div>
-                        <ul class="bullet-list" style="font-size:11px; margin-left:18px; margin-top:4px; line-height:1.4;">
-                            <li id="res-render-proj-b1">Developed a web-based platform using Python, Flask, HTML, and CSS to support cybercrime reporting and analysis.</li>
+                        <ul class="bullet-list" style="font-size:10px; margin-left:14px; margin-top:2px; line-height:1.4; color:#374151;">
+                            <li id="res-render-proj-b1">Developed a web-based platform using Python, Flask, HTML, and CSS to support cybercrime reporting.</li>
                             <li id="res-render-proj-b2">Implemented user authentication, routing, and activity logging to ensure secure data handling.</li>
                             <li id="res-render-proj-b3">Focused on applying secure web development principles and structured threat analysis workflows.</li>
                         </ul>
                     </div>
                 </div>
 
-                <div class="resume-render-section" style="margin-top:15px;">
-                    <h2 style="font-size: 13px; font-weight: 700; border-bottom: 2px solid #1e293b; padding-bottom: 3px; margin-bottom: 8px; text-transform:uppercase; color:#0f172a;">Certifications</h2>
-                    <ul class="bullet-list" style="font-size:11px; margin-left:18px; margin-top:4px; line-height:1.4;">
+                <!-- Section: Certifications -->
+                <div class="resume-render-section">
+                    <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Certifications</h3>
+                    <ul class="bullet-list" style="font-size:10px; margin-left:14px; margin-top:2px; line-height:1.4; color:#374151;">
                         <li id="res-render-cert-c1">Deloitte Australia Cyber Job Simulation (Forage)</li>
                         <li id="res-render-cert-c2">Cyber Security & Ethical Hacking Workshop (DV Analytics)</li>
                         <li id="res-render-cert-c3">Python Tutorial Module Certificate of Excellence (Scaler)</li>
@@ -375,41 +349,69 @@
                     </ul>
                 </div>
             </div>
+        </div>
 
-            <!-- ATS Score / Review Card -->
-            <div class="flat-card ats-feedback-card">
-                <div class="ats-header d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                    <div>
-                        <div class="text-secondary fw-semibold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.5px;">ATS Scoring Engine</div>
-                        <h3 class="fw-bold mb-0" style="font-size: 1.25rem;">ATS Match: <span id="ats-score-display" class="text-primary">--%</span></h3>
+        <!-- ATS Scoring visual metrics dashboard -->
+        <div class="flat-card bg-white border p-3 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
+                <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-chart-bar text-muted me-2"></i> ATS Sub-Scores Dashboard</h3>
+                <span id="score-text-main" class="fw-extrabold text-secondary" style="font-size:1.15rem; color: var(--neon-blue) !important;">80/100</span>
+            </div>
+            
+            <div class="row g-3">
+                <div class="col-sm-6">
+                    <div class="d-flex justify-content-between align-items-center mb-1" style="font-size:0.75rem;">
+                        <span class="text-secondary fw-semibold">Formatting Score</span>
+                        <span id="score-format" class="fw-bold">85%</span>
                     </div>
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-sm btn-outline" id="btn-auto-upgrade" onclick="autoUpgradeResume()" style="font-size: 0.72rem; padding: 4px 10px;"><i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> Auto-Optimize</button>
-                        <button class="btn btn-sm btn-primary" onclick="triggerResumeATSAnalysis()" style="font-size: 0.72rem; padding: 4px 10px;">Analyze Score <i class="fa-solid fa-wand-magic-sparkles"></i></button>
-                    </div>
-                </div>
-
-                <div class="score-tracker-bar p-2 border rounded mb-3 d-flex justify-content-around text-secondary" style="font-size: 0.78rem; background-color: var(--bg-primary);">
-                    <div>Original: <strong id="ats-original-score" style="color:var(--text-secondary);">--</strong></div>
-                    <div>Upgraded: <strong id="ats-upgraded-score" style="color:var(--neon-blue);">--</strong></div>
-                    <div>Readability: <strong id="ats-readability-display">--%</strong></div>
-                    <div>Alignment: <strong id="ats-alignment-display">--%</strong></div>
-                </div>
-
-                <!-- Live Keyword Scanner checklist -->
-                <div class="live-keyword-scanner-box p-3 border rounded mb-3" style="background-color: var(--bg-primary); border-color: var(--border-color);">
-                    <div class="text-secondary fw-semibold text-uppercase mb-2" style="font-size:0.68rem; letter-spacing:0.5px;"><i class="fa-solid fa-satellite-dish text-cyan"></i> Live ATS Keyword Check</div>
-                    <div id="live-keywords-list" style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
-                        <div class="live-keyword-item" id="kw-python"><i class="fa-solid fa-circle-notch"></i> Python</div>
-                        <div class="live-keyword-item" id="kw-flask"><i class="fa-solid fa-circle-notch"></i> Flask</div>
-                        <div class="live-keyword-item" id="kw-wireshark"><i class="fa-solid fa-circle-notch"></i> Wireshark</div>
-                        <div class="live-keyword-item" id="kw-docker"><i class="fa-solid fa-circle-notch"></i> Docker</div>
+                    <div class="progress-bar-container" style="background:var(--bg-tertiary); height:5px; border-radius:3px;">
+                        <div id="bar-format" class="progress-bar-fill" style="background: var(--info); width:85%; height:100%;"></div>
                     </div>
                 </div>
-
-                <div class="ats-body" id="ats-analysis-body">
-                    <p class="text-muted text-center italic" style="font-size:0.8rem;">Click 'Analyze Score' to run deep reasoning AI checks against your target job.</p>
+                <div class="col-sm-6">
+                    <div class="d-flex justify-content-between align-items-center mb-1" style="font-size:0.75rem;">
+                        <span class="text-secondary fw-semibold">Keyword Score</span>
+                        <span id="score-keyword" class="fw-bold">75%</span>
+                    </div>
+                    <div class="progress-bar-container" style="background:var(--bg-tertiary); height:5px; border-radius:3px;">
+                        <div id="bar-keyword" class="progress-bar-fill" style="background: var(--neon-blue); width:75%; height:100%;"></div>
+                    </div>
                 </div>
+                <div class="col-sm-6">
+                    <div class="d-flex justify-content-between align-items-center mb-1" style="font-size:0.75rem;">
+                        <span class="text-secondary fw-semibold">Readability Score</span>
+                        <span id="score-readability" class="fw-bold">80%</span>
+                    </div>
+                    <div class="progress-bar-container" style="background:var(--bg-tertiary); height:5px; border-radius:3px;">
+                        <div id="bar-readability" class="progress-bar-fill" style="background: var(--warning); width:80%; height:100%;"></div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="d-flex justify-content-between align-items-center mb-1" style="font-size:0.75rem;">
+                        <span class="text-secondary fw-semibold">Skills Relevance</span>
+                        <span id="score-skills" class="fw-bold">85%</span>
+                    </div>
+                    <div class="progress-bar-container" style="background:var(--bg-tertiary); height:5px; border-radius:3px;">
+                        <div id="bar-skills" class="progress-bar-fill" style="background: var(--success); width:85%; height:100%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Keyword checklist -->
+            <div class="mt-3 p-3 border rounded bg-light" style="border-color: var(--border-color) !important;">
+                <span class="fw-bold text-secondary d-block mb-2" style="font-size:0.7rem; text-transform:uppercase;"><i class="fa-solid fa-satellite-dish text-cyan"></i> Real-time Keyword Alignment Check</span>
+                <div id="live-keywords-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap:6px;">
+                    <div class="live-keyword-item" id="kw-python" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Python</div>
+                    <div class="live-keyword-item" id="kw-flask" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Flask</div>
+                    <div class="live-keyword-item" id="kw-docker" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Docker</div>
+                    <div class="live-keyword-item" id="kw-wireshark" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Wireshark</div>
+                    <div class="live-keyword-item" id="kw-git" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Git</div>
+                    <div class="live-keyword-item" id="kw-react" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> React</div>
+                </div>
+            </div>
+
+            <div class="ats-body mt-3" id="ats-analysis-body" style="font-size:0.75rem;">
+                <p class="text-muted text-center italic mb-0">Run 'Analyze ATS' to see custom phrasing suggestions and warnings.</p>
             </div>
         </div>
     </div>
@@ -417,25 +419,22 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<!-- Load html2pdf.js bundle -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
 let activeBulletInput = null;
-let currentDraftId = "draft-1";
+let savedVersions = [];
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Register active bullet tracking
+    // Register bullet points inputs
     document.querySelectorAll(".res-bullet-input").forEach(input => {
         input.addEventListener("focus", () => {
             activeBulletInput = input;
         });
     });
 
-    // Setup drag and drop for local upload extraction
-    setupResumeUploadDragAndDrop();
-
-    // Initial load drafts
-    loadDraftData(currentDraftId);
+    setupUploadDragAndDrop();
+    loadVersionsFromCloud();
+    syncResumeFields();
 });
 
 function insertActionVerb(verb) {
@@ -444,41 +443,57 @@ function insertActionVerb(verb) {
     }
     if (!activeBulletInput) return;
     
-    const val = activeBulletInput.value.trim();
-    if (val === "") {
-        activeBulletInput.value = verb + " ";
+    const originalValue = activeBulletInput.value.trim();
+    const beforeAfterCard = document.getElementById("before-after-card");
+    const originalText = document.getElementById("compare-original");
+    const optimizedText = document.getElementById("compare-optimized");
+    
+    if (originalValue !== "") {
+        if (beforeAfterCard && originalText && optimizedText) {
+            originalText.innerText = `"${originalValue}"`;
+            const newVal = verb + " " + activeBulletInput.value.charAt(0).toLowerCase() + activeBulletInput.value.slice(1);
+            activeBulletInput.value = newVal;
+            optimizedText.innerText = `"${newVal}"`;
+            beforeAfterCard.style.display = "block";
+        } else {
+            activeBulletInput.value = verb + " " + activeBulletInput.value;
+        }
     } else {
-        activeBulletInput.value = verb + " " + activeBulletInput.value;
+        activeBulletInput.value = verb + " ";
     }
+    
     syncResumeFields();
     activeBulletInput.focus();
 }
 
 function syncResumeFields() {
-    // Personal Details
-    document.getElementById("res-render-name").innerText = document.getElementById("res-name").value || "Alex Smith";
-    document.getElementById("res-render-address").innerText = document.getElementById("res-address").value || "Location City, Country";
-    document.getElementById("res-render-email").innerText = document.getElementById("res-email").value || "name@university.edu";
-    document.getElementById("res-render-phone").innerText = document.getElementById("res-phone").value || "+1 (555) 000-0000";
-    document.getElementById("res-render-linkedin").innerText = document.getElementById("res-linkedin").value || "linkedin.com/in/username";
-    document.getElementById("res-render-links").innerText = document.getElementById("res-github").value || "github.com/username";
+    // Header
+    const nameVal = document.getElementById("res-name").value || "Alex Smith";
+    document.getElementById("res-render-name").innerText = nameVal;
+    document.getElementById("res-render-address").innerHTML = `<i class="fa-solid fa-location-dot me-1 text-muted"></i> ` + (document.getElementById("res-address").value || "San Francisco, California, USA");
+    document.getElementById("res-render-email").innerHTML = `<i class="fa-solid fa-envelope me-1 text-muted"></i> ` + (document.getElementById("res-email").value || "name@university.edu");
+    document.getElementById("res-render-phone").innerHTML = `<i class="fa-solid fa-phone me-1 text-muted"></i> ` + (document.getElementById("res-phone").value || "+1 (555) 000-0000");
+    document.getElementById("res-render-linkedin").innerHTML = `<i class="fa-brands fa-linkedin me-1 text-muted"></i> ` + (document.getElementById("res-linkedin").value || "linkedin.com/in/username");
+    document.getElementById("res-render-links").innerHTML = `<i class="fa-brands fa-github me-1 text-muted"></i> ` + (document.getElementById("res-github").value || "github.com/username");
     
     // Education
-    document.getElementById("res-render-edu1-inst").innerText = document.getElementById("res-edu1-inst").value || "University Name";
-    document.getElementById("res-render-edu1-degree").innerText = document.getElementById("res-render-edu1-degree").value || "B.S. in Computer Science";
-    document.getElementById("res-render-edu1-dates").innerText = document.getElementById("res-edu1-dates").value || "Graduation Year";
-    document.getElementById("res-render-edu1-gpa").innerText = document.getElementById("res-edu1-gpa").value || "GPA";
-    document.getElementById("res-render-edu1-coursework").innerHTML = document.getElementById("res-edu1-coursework").value ? "Relevant Coursework: " + document.getElementById("res-edu1-coursework").value : "";
+    document.getElementById("res-render-edu1-inst").innerText = document.getElementById("res-edu1-inst").value || "";
+    document.getElementById("res-render-edu1-degree").innerText = document.getElementById("res-edu1-degree").value || "";
+    document.getElementById("res-render-edu1-dates").innerText = document.getElementById("res-edu1-dates").value || "";
+    document.getElementById("res-render-edu1-gpa").innerText = document.getElementById("res-edu1-gpa").value || "";
     
-    document.getElementById("res-render-edu2-inst").innerText = document.getElementById("res-edu2-inst").value || "";
-    document.getElementById("res-render-edu2-degree").innerText = document.getElementById("res-edu2-degree").value || "";
-    document.getElementById("res-render-edu2-dates").innerText = document.getElementById("res-edu2-dates").value || "";
-    document.getElementById("res-render-edu2-gpa").innerText = document.getElementById("res-edu2-gpa").value || "";
+    const courseworkVal = document.getElementById("res-edu1-coursework").value;
+    const cwEl = document.getElementById("res-render-edu1-coursework");
+    if (courseworkVal && cwEl) {
+        cwEl.innerHTML = `Relevant Coursework: ` + courseworkVal;
+        cwEl.style.display = "block";
+    } else if (cwEl) {
+        cwEl.style.display = "none";
+    }
     
     // Skills
     document.getElementById("res-render-skills-prog").innerText = document.getElementById("res-skills-prog").value || "";
     document.getElementById("res-render-skills-cyber").innerText = document.getElementById("res-skills-cyber").value || "";
-    document.getElementById("res-render-skills-os").innerText = document.getElementById("res-skills-os").value || "";
     document.getElementById("res-render-skills-tools").innerText = document.getElementById("res-skills-tools").value || "";
     document.getElementById("res-render-skills-web").innerText = document.getElementById("res-skills-web").value || "";
     
@@ -499,34 +514,25 @@ function syncResumeFields() {
     document.getElementById("res-render-proj-b2").innerText = document.getElementById("res-proj-b2").value || "";
     document.getElementById("res-render-proj-b3").innerText = document.getElementById("res-proj-b3").value || "";
     
-    // Certifications
+    // Certs
     document.getElementById("res-render-cert-c1").innerText = document.getElementById("res-cert-c1").value || "";
     document.getElementById("res-render-cert-c2").innerText = document.getElementById("res-cert-c2").value || "";
     document.getElementById("res-render-cert-c3").innerText = document.getElementById("res-cert-c3").value || "";
     document.getElementById("res-render-cert-c4").innerText = document.getElementById("res-cert-c4").value || "";
     
-    // Run live keyword scanner
-    runLiveKeywordScan();
+    // Scan keyword list
+    scanKeywordsInline();
 }
 
-function changeResumeTheme() {
-    const paper = document.getElementById("resume-sheet-paper");
-    const theme = document.getElementById("resume-theme-select").value;
-    
-    // Reset themes
-    paper.className = "resume-sheet " + theme;
-}
-
-function runLiveKeywordScan() {
+function scanKeywordsInline() {
     const text = document.getElementById("resume-sheet-paper").innerText.toLowerCase();
-    const keywords = ["python", "flask", "wireshark", "docker", "nmap", "git", "react", "fastapi", "kubernetes", "aws", "linux"];
-    
+    const keywords = ["python", "flask", "docker", "wireshark", "git", "react"];
     keywords.forEach(kw => {
         const item = document.getElementById(`kw-${kw}`);
         if (item) {
             if (text.includes(kw)) {
                 item.className = "live-keyword-item matched";
-                item.querySelector("i").className = "fa-solid fa-circle-check";
+                item.querySelector("i").className = "fa-solid fa-circle-check text-success";
             } else {
                 item.className = "live-keyword-item";
                 item.querySelector("i").className = "fa-solid fa-circle-notch";
@@ -535,39 +541,89 @@ function runLiveKeywordScan() {
     });
 }
 
-function handleDraftSelection() {
-    const oldId = currentDraftId;
-    currentDraftId = document.getElementById("resume-draft-select").value;
-    saveDraftData(oldId);
-    loadDraftData(currentDraftId);
+function changeResumeTheme() {
+    const paper = document.getElementById("resume-sheet-paper");
+    const theme = document.getElementById("resume-theme-select").value;
+    paper.className = "resume-sheet " + theme;
 }
 
-function saveDraftData(draftId) {
-    const content = getResumeFormContent();
-    const drafts = JSON.parse(localStorage.getItem("campusmate_drafts") || "{}");
-    drafts[draftId] = {
-        title: document.getElementById("resume-title-field").value,
-        theme: document.getElementById("resume-theme-select").value,
-        content: content
-    };
-    localStorage.setItem("campusmate_drafts", JSON.stringify(drafts));
-}
-
-function loadDraftData(draftId) {
-    const drafts = JSON.parse(localStorage.getItem("campusmate_drafts") || "{}");
-    const draft = drafts[draftId];
-    if (draft) {
-        document.getElementById("resume-title-field").value = draft.title || "My Growth Resume";
-        document.getElementById("resume-theme-select").value = draft.theme || "classic";
-        populateResumeForm(draft.content);
-    } else {
-        resetResumeFormToDefault(draftId);
+async function loadVersionsFromCloud() {
+    const select = document.getElementById("resume-version-select");
+    if (!select) return;
+    
+    try {
+        const response = await fetch("/resume-analyzer/versions");
+        const data = await response.json();
+        if (response.ok && data.success) {
+            savedVersions = data.versions;
+            select.innerHTML = `<option value="new">+ Save New Version</option>`;
+            data.versions.forEach(v => {
+                select.innerHTML += `<option value="${v.id}">${v.title} (${v.ats_score}%)</option>`;
+            });
+        }
+    } catch(e) {
+        console.error("Error loading drafts:", e);
     }
-    changeResumeTheme();
-    syncResumeFields();
 }
 
-function getResumeFormContent() {
+function handleVersionChange() {
+    const select = document.getElementById("resume-version-select");
+    const val = select.value;
+    if (val === "new") {
+        document.getElementById("resume-title-field").value = "New Version Title";
+    } else {
+        const ver = savedVersions.find(x => x.id == val);
+        if (ver) {
+            document.getElementById("resume-title-field").value = ver.title;
+            document.getElementById("resume-theme-select").value = ver.theme;
+            populateForm(ver.content);
+            changeResumeTheme();
+            syncResumeFields();
+        }
+    }
+}
+
+function populateForm(c) {
+    if (!c) return;
+    document.getElementById("res-name").value = c.name || "";
+    document.getElementById("res-address").value = c.address || "";
+    document.getElementById("res-email").value = c.email || "";
+    document.getElementById("res-phone").value = c.phone || "";
+    document.getElementById("res-linkedin").value = c.linkedin || "";
+    document.getElementById("res-github").value = c.github || "";
+    
+    document.getElementById("res-edu1-inst").value = c.edu1Inst || "";
+    document.getElementById("res-edu1-degree").value = c.edu1Degree || "";
+    document.getElementById("res-edu1-dates").value = c.edu1Dates || "";
+    document.getElementById("res-edu1-gpa").value = c.edu1Gpa || "";
+    document.getElementById("res-edu1-coursework").value = c.edu1Coursework || "";
+    
+    document.getElementById("res-skills-prog").value = c.skillsProg || "";
+    document.getElementById("res-skills-cyber").value = c.skillsCyber || "";
+    document.getElementById("res-skills-tools").value = c.skillsTools || "";
+    document.getElementById("res-skills-web").value = c.skillsWeb || "";
+    
+    document.getElementById("res-exp-role").value = c.experienceRole || "";
+    document.getElementById("res-exp-comp").value = c.experienceComp || "";
+    document.getElementById("res-exp-dates").value = c.experienceDates || "";
+    document.getElementById("res-exp-b1").value = c.experienceB1 || "";
+    document.getElementById("res-exp-b2").value = c.experienceB2 || "";
+    document.getElementById("res-exp-b3").value = c.experienceB3 || "";
+    document.getElementById("res-exp-b4").value = c.experienceB4 || "";
+    
+    document.getElementById("res-proj-title").value = c.projectTitle || "";
+    document.getElementById("res-proj-link").value = c.projectLink || "";
+    document.getElementById("res-proj-b1").value = c.projectB1 || "";
+    document.getElementById("res-proj-b2").value = c.projectB2 || "";
+    document.getElementById("res-proj-b3").value = c.projectB3 || "";
+    
+    document.getElementById("res-cert-c1").value = c.certC1 || "";
+    document.getElementById("res-cert-c2").value = c.certC2 || "";
+    document.getElementById("res-cert-c3").value = c.certC3 || "";
+    document.getElementById("res-cert-c4").value = c.certC4 || "";
+}
+
+function getFormContent() {
     return {
         name: document.getElementById("res-name").value,
         address: document.getElementById("res-address").value,
@@ -582,14 +638,8 @@ function getResumeFormContent() {
         edu1Gpa: document.getElementById("res-edu1-gpa").value,
         edu1Coursework: document.getElementById("res-edu1-coursework").value,
         
-        edu2Inst: document.getElementById("res-edu2-inst").value,
-        edu2Degree: document.getElementById("res-edu2-degree").value,
-        edu2Dates: document.getElementById("res-edu2-dates").value,
-        edu2Gpa: document.getElementById("res-edu2-gpa").value,
-        
         skillsProg: document.getElementById("res-skills-prog").value,
         skillsCyber: document.getElementById("res-skills-cyber").value,
-        skillsOs: document.getElementById("res-skills-os").value,
         skillsTools: document.getElementById("res-skills-tools").value,
         skillsWeb: document.getElementById("res-skills-web").value,
         
@@ -614,114 +664,60 @@ function getResumeFormContent() {
     };
 }
 
-function populateResumeForm(c) {
-    if (!c) return;
-    document.getElementById("res-name").value = c.name || "";
-    document.getElementById("res-address").value = c.address || "";
-    document.getElementById("res-email").value = c.email || "";
-    document.getElementById("res-phone").value = c.phone || "";
-    document.getElementById("res-linkedin").value = c.linkedin || "";
-    document.getElementById("res-github").value = c.github || "";
+async function saveResumeCloud() {
+    const badge = document.getElementById("save-status-badge");
+    badge.innerText = "Saving...";
+    badge.className = "badge badge-warning mt-1";
     
-    document.getElementById("res-edu1-inst").value = c.edu1Inst || "";
-    document.getElementById("res-edu1-degree").value = c.edu1Degree || "";
-    document.getElementById("res-edu1-dates").value = c.edu1Dates || "";
-    document.getElementById("res-edu1-gpa").value = c.edu1Gpa || "";
-    document.getElementById("res-edu1-coursework").value = c.edu1Coursework || "";
+    const content = getFormContent();
+    const title = document.getElementById("resume-title-field").value;
+    const theme = document.getElementById("resume-theme-select").value;
+    const scoreVal = parseInt(document.getElementById("score-text-main").innerText) || 80;
+    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
     
-    document.getElementById("res-edu2-inst").value = c.edu2Inst || "";
-    document.getElementById("res-edu2-degree").value = c.edu2Degree || "";
-    document.getElementById("res-edu2-dates").value = c.edu2Dates || "";
-    document.getElementById("res-edu2-gpa").value = c.edu2Gpa || "";
-    
-    document.getElementById("res-skills-prog").value = c.skillsProg || "";
-    document.getElementById("res-skills-cyber").value = c.skillsCyber || "";
-    document.getElementById("res-skills-os").value = c.skillsOs || "";
-    document.getElementById("res-skills-tools").value = c.skillsTools || "";
-    document.getElementById("res-skills-web").value = c.skillsWeb || "";
-    
-    document.getElementById("res-exp-role").value = c.experienceRole || "";
-    document.getElementById("res-exp-comp").value = c.experienceComp || "";
-    document.getElementById("res-exp-dates").value = c.experienceDates || "";
-    document.getElementById("res-exp-b1").value = c.experienceB1 || "";
-    document.getElementById("res-exp-b2").value = c.experienceB2 || "";
-    document.getElementById("res-exp-b3").value = c.experienceB3 || "";
-    document.getElementById("res-exp-b4").value = c.experienceB4 || "";
-    
-    document.getElementById("res-proj-title").value = c.projectTitle || "";
-    document.getElementById("res-proj-link").value = c.projectLink || "";
-    document.getElementById("res-proj-b1").value = c.projectB1 || "";
-    document.getElementById("res-proj-b2").value = c.projectB2 || "";
-    document.getElementById("res-proj-b3").value = c.projectB3 || "";
-    
-    document.getElementById("res-cert-c1").value = c.certC1 || "";
-    document.getElementById("res-cert-c2").value = c.certC2 || "";
-    document.getElementById("res-cert-c3").value = c.certC3 || "";
-    document.getElementById("res-cert-c4").value = c.certC4 || "";
+    try {
+        const response = await fetch("/resume-analyzer/save-version", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken
+            },
+            body: JSON.stringify({
+                title: title,
+                theme: theme,
+                content: content,
+                ats_score: scoreVal
+            })
+        });
+        const data = await response.json();
+        if (response.ok && data.success) {
+            badge.innerText = "Saved to Cloud";
+            badge.className = "badge badge-success mt-1";
+            loadVersionsFromCloud();
+        } else {
+            badge.innerText = "Save Failed";
+            badge.className = "badge badge-danger mt-1";
+        }
+    } catch(e) {
+        console.error(e);
+        badge.innerText = "Offline Error";
+        badge.className = "badge badge-danger mt-1";
+    }
 }
 
-function resetResumeFormToDefault(draftId) {
-    const defaults = {
-        name: "Alex Smith",
-        address: "San Francisco, California, USA",
-        email: "alex.smith@example.edu",
-        phone: "+1 (555) 019-2834",
-        linkedin: "linkedin.com/in/alexsmith",
-        github: "https://github.com/alexsmith",
-        
-        edu1Inst: "State Tech University",
-        edu1Degree: "B.S. in Computer Science",
-        edu1Dates: "2024 – 2028",
-        edu1Gpa: "3.8/4.0",
-        edu1Coursework: "Data Structures, Cryptography, Database Systems, Computer Networks",
-        
-        edu2Inst: "Central High School",
-        edu2Degree: "High School Diploma",
-        edu2Dates: "2020 – 2024",
-        edu2Gpa: "3.9/4.0",
-        
-        skillsProg: "Python, Java, Go",
-        skillsCyber: "Vulnerability Scanning, Web Security Basics, OWASP Top 10",
-        skillsOs: "Linux, macOS, Windows",
-        skillsTools: "Git, Docker, VS Code, Command Line",
-        skillsWeb: "HTML, CSS, Flask, React",
-        
-        experienceRole: "Software Engineering Intern",
-        experienceComp: "Global Tech Solutions",
-        experienceDates: "June 2025 – August 2025",
-        experienceB1: "Contributed to the design and development of automated data analysis pipelines.",
-        experienceB2: "Implemented secure coding practices using Python and Flask for backend APIs.",
-        experienceB3: "Supported data migration and JWT authentication modules to improve system security.",
-        experienceB4: "Collaborated with engineers to test and refine code architectures for improved reliability.",
-        
-        projectTitle: "AegisShield AI – Cyber Crime Detection Platform",
-        projectLink: "github.com/alexsmith/aegisshield-ai",
-        projectB1: "Developed a web-based platform using Python, Flask, HTML, and CSS to support cybercrime reporting and analysis.",
-        projectB2: "Implemented user authentication, routing, and activity logging to ensure secure data handling.",
-        projectB3: "Focused on applying secure web development principles and structured threat analysis workflows.",
-        
-        certC1: "Deloitte Australia Cyber Job Simulation (Forage)",
-        certC2: "Cyber Security & Ethical Hacking Workshop (DV Analytics)",
-        certC3: "Python Tutorial Module Certificate of Excellence (Scaler)",
-        certC4: "Python Course for Beginners: Mastering the Essentials (Scaler)"
-    };
-    populateResumeForm(defaults);
-}
-
-function saveResumeContent() {
-    saveDraftData(currentDraftId);
-    alert("Draft saved locally! Click 'Analyze Score' to run dynamic verification.");
+function triggerAutoSave() {
+    saveResumeCloud();
 }
 
 async function triggerResumeATSAnalysis() {
-    saveDraftData(currentDraftId);
     const atsBox = document.getElementById("ats-analysis-body");
-    atsBox.innerHTML = `<div class="text-center py-3"><i class="fa-solid fa-spinner fa-spin fa-lg me-2 text-muted"></i> Running AI checks...</div>`;
-
+    atsBox.innerHTML = `<div class="text-center py-2"><i class="fa-solid fa-spinner fa-spin text-muted me-2"></i> Analyzing text metrics...</div>`;
+    
+    const content = getFormContent();
+    const title = document.getElementById("resume-title-field").value;
+    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
+    
     try {
-        const content = getResumeFormContent();
-        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
-        
         const response = await fetch("/resume-analyzer/analyze", {
             method: "POST",
             headers: {
@@ -729,39 +725,40 @@ async function triggerResumeATSAnalysis() {
                 "X-CSRFToken": csrfToken
             },
             body: JSON.stringify({
-                title: document.getElementById("resume-title-field").value,
+                title: title,
                 ...content
             })
         });
         
         const data = await response.json();
         if (response.ok && data.success) {
-            renderATSFeedback(data.feedback);
-            document.getElementById("ats-upgraded-score").innerText = `${data.score}%`;
-            if (document.getElementById("ats-original-score").innerText === "--") {
-                document.getElementById("ats-original-score").innerText = `${data.score}%`;
-            }
-            document.getElementById("ats-readability-display").innerText = `${data.readability}%`;
-            document.getElementById("ats-alignment-display").innerText = `${data.alignment}%`;
+            document.getElementById("score-text-main").innerText = `${data.score}/100`;
+            document.getElementById("score-format").innerText = `${data.readability}%`;
+            document.getElementById("bar-format").style.width = `${data.readability}%`;
             
-            // Sync AI Mentor ribbon memory
-            if (window.loadMentorChatHistory) {
-                window.loadMentorChatHistory();
-            }
+            document.getElementById("score-keyword").innerText = `${data.alignment}%`;
+            document.getElementById("bar-keyword").style.width = `${data.alignment}%`;
+            
+            document.getElementById("score-readability").innerText = `${data.readability}%`;
+            document.getElementById("bar-readability").style.width = `${data.readability}%`;
+            
+            document.getElementById("score-skills").innerText = `${data.alignment}%`;
+            document.getElementById("bar-skills").style.width = `${data.alignment}%`;
+            
+            renderATSFeedback(data.feedback);
         } else {
-            atsBox.innerHTML = `<p class="text-danger text-center">Analysis failed: ${data.error || "Unknown error"}</p>`;
+            atsBox.innerHTML = `<p class="text-danger text-center mb-0">Check failed: ${data.error || "Unknown"}</p>`;
         }
     } catch (e) {
         console.error(e);
-        atsBox.innerHTML = `<p class="text-danger text-center">Connection error.</p>`;
+        atsBox.innerHTML = `<p class="text-danger text-center mb-0">Connection failed.</p>`;
     }
 }
 
 function renderATSFeedback(feedback) {
-    document.getElementById("ats-score-display").innerText = `${feedback.score}%`;
     const atsBox = document.getElementById("ats-analysis-body");
     
-    let missingBadges = feedback.missingKeywords.map(k => `<span class="badge badge-info me-1 mb-1">${k}</span>`).join("");
+    let missingBadges = feedback.missingKeywords.map(k => `<span class="badge badge-info me-1 mb-1" style="font-size:10px;">${k}</span>`).join("");
     if (!missingBadges) missingBadges = `<span class="text-muted">None flagged.</span>`;
     
     let improvementsHtml = feedback.improvements.map(imp => `
@@ -772,43 +769,27 @@ function renderATSFeedback(feedback) {
         </div>
     `).join("");
     
-    let mistakesHtml = feedback.mistakes.map(m => `<li class="text-danger mb-1"><i class="fa-solid fa-triangle-exclamation me-1" style="font-size:0.75rem;"></i> ${m}</li>`).join("");
-    let suggestionsHtml = feedback.suggestions.map(s => `<li class="mb-1"><i class="fa-solid fa-circle-check text-success me-1" style="font-size:0.75rem;"></i> ${s}</li>`).join("");
+    let mistakesHtml = feedback.mistakes.map(m => `<li class="text-danger mb-1"><i class="fa-solid fa-triangle-exclamation me-1"></i> ${m}</li>`).join("");
+    let suggestionsHtml = feedback.suggestions.map(s => `<li class="mb-1"><i class="fa-solid fa-circle-check text-success me-1"></i> ${s}</li>`).join("");
     
     atsBox.innerHTML = `
         <div class="mt-3">
-            <h5 class="fw-bold mb-2" style="font-size:0.8rem; text-transform:uppercase;">Missing Keywords</h5>
+            <h5 class="fw-bold mb-2 text-secondary" style="font-size:0.75rem; text-transform:uppercase;">Missing Keywords</h5>
             <div class="mb-3">${missingBadges}</div>
             
-            <h5 class="fw-bold mb-2" style="font-size:0.8rem; text-transform:uppercase;">Phrasing Improvements</h5>
+            <h5 class="fw-bold mb-2 text-secondary" style="font-size:0.75rem; text-transform:uppercase;">Phrasing Improvements</h5>
             <div class="mb-3">${improvementsHtml}</div>
             
-            <h5 class="fw-bold mb-2" style="font-size:0.8rem; text-transform:uppercase;">Mistakes & Warnings</h5>
-            <ul class="ps-3 mb-3" style="font-size:0.75rem;">${mistakesHtml}</ul>
+            <h5 class="fw-bold mb-2 text-secondary" style="font-size:0.75rem; text-transform:uppercase;">Mistakes & Warnings</h5>
+            <ul class="ps-3 mb-3" style="font-size:0.75rem; line-height:1.4;">${mistakesHtml}</ul>
             
-            <h5 class="fw-bold mb-2" style="font-size:0.8rem; text-transform:uppercase;">Recruiter Guidelines</h5>
-            <ul class="ps-3 mb-0" style="font-size:0.75rem;">${suggestionsHtml}</ul>
+            <h5 class="fw-bold mb-2 text-secondary" style="font-size:0.75rem; text-transform:uppercase;">Recruiter Guidelines</h5>
+            <ul class="ps-3 mb-0" style="font-size:0.75rem; line-height:1.4;">${suggestionsHtml}</ul>
         </div>
     `;
 }
 
-function autoUpgradeResume() {
-    // Replace some default text fields with highly optimized forms containing action verbs
-    document.getElementById("res-exp-b1").value = "Architected scalable automated data pipelines in Python, decreasing system processing delays by 25%.";
-    document.getElementById("res-exp-b2").value = "Hardened Flask backend server routes using parameterized validation structures to block SQL injections.";
-    document.getElementById("res-exp-b3").value = "Secured cloud database connections via restricted IAM credentials policies and secure SSL certificates.";
-    document.getElementById("res-exp-b4").value = "Engineered automated unit testing integrations, decreasing deployment bug release rates by 18%.";
-    
-    document.getElementById("res-proj-b1").value = "Designed and deployed a responsive web interface using Docker configurations and continuous integration pipelines.";
-    document.getElementById("res-proj-b2").value = "Integrated encrypted JWT access controller structures and logged session transactions for auditing.";
-    document.getElementById("res-proj-b3").value = "Optimized database index lookups, reducing query processing latencies by 30%.";
-    
-    syncResumeFields();
-    triggerResumeATSAnalysis();
-    alert("Resume content optimized! Dynamic upgrade finished.");
-}
-
-function setupResumeUploadDragAndDrop() {
+function setupUploadDragAndDrop() {
     const zone = document.getElementById("drop-zone-builder");
     const input = document.getElementById("resume-file-input-builder");
     const statusText = document.getElementById("upload-status-text-builder");
@@ -820,7 +801,7 @@ function setupResumeUploadDragAndDrop() {
 
     input.addEventListener("change", (e) => {
         if (e.target.files.length > 0) {
-            handleUploadedFile(e.target.files[0], statusText);
+            uploadFileAJAX(e.target.files[0], statusText);
         }
     });
 
@@ -837,22 +818,21 @@ function setupResumeUploadDragAndDrop() {
         e.preventDefault();
         zone.style.backgroundColor = "transparent";
         if (e.dataTransfer.files.length > 0) {
-            input.files = e.dataTransfer.files;
-            handleUploadedFile(e.dataTransfer.files[0], statusText);
+            uploadFileAJAX(e.dataTransfer.files[0], statusText);
         }
     });
 }
 
-async function handleUploadedFile(file, statusText) {
+async function uploadFileAJAX(file, statusText) {
     statusText.style.display = "block";
-    statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Reading & extracting file...`;
+    statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-muted me-1"></i> Extracting details...`;
     
     const formData = new FormData();
     formData.append("resume_file", file);
     const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
     
     try {
-        const response = await fetch("{{ url_for('features.upload_resume') }}", {
+        const response = await fetch("/resume-analyzer/upload", {
             method: "POST",
             headers: {
                 "X-CSRFToken": csrfToken
@@ -860,13 +840,17 @@ async function handleUploadedFile(file, statusText) {
             body: formData
         });
         
-        if (response.ok) {
-            statusText.innerHTML = `<span class="text-success"><i class="fa-solid fa-circle-check"></i> "${file.name}" uploaded successfully! Reloading...</span>`;
+        const data = await response.json();
+        if (response.ok && data.success) {
+            statusText.innerHTML = `<span class="text-success"><i class="fa-solid fa-circle-check"></i> "${file.name}" extracted!</span>`;
+            populateForm(data.data);
+            syncResumeFields();
+            triggerResumeATSAnalysis();
             setTimeout(() => {
-                window.location.reload();
-            }, 1000);
+                statusText.style.display = "none";
+            }, 3000);
         } else {
-            statusText.innerHTML = `<span class="text-danger"><i class="fa-solid fa-circle-xmark"></i> Failed to upload file.</span>`;
+            statusText.innerHTML = `<span class="text-danger"><i class="fa-solid fa-circle-xmark"></i> ${data.error || "Failed to extract."}</span>`;
         }
     } catch (e) {
         console.error(e);
@@ -883,7 +867,7 @@ function downloadResumePDF() {
     const nameVal = document.getElementById('res-name').value || 'Resume';
     const opt = {
         margin:       0,
-        filename:     `${nameVal.trim().replace(/\s+/g, '_')}_CV.pdf`,
+        filename:     `${nameVal.trim().replace(/\s+/g, '_')}_Resume.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { 
             scale: 2.5, 
@@ -899,16 +883,164 @@ function downloadResumePDF() {
     }).catch(err => {
         console.error(err);
         element.classList.remove('pdf-export-mode');
-        alert("Failed to download PDF: " + err.message);
+        alert("Failed to export PDF: " + err.message);
+    });
+}
+
+function downloadATSReportPDF() {
+    const reportHtml = `
+        <div style="font-family:'Outfit',sans-serif; padding:40px; color:#1f2937;">
+            <h1 style="color:#1e3a8a; border-bottom:2px solid #2563eb; padding-bottom:10px;">ATS Audit & Diagnostics Report</h1>
+            <p style="font-size:12px; color:#4b5563;">CampusMate AI Resume Analyzer 3.0 Audit for <strong>${document.getElementById("res-name").value}</strong></p>
+            <div style="margin-top:20px; font-size:14px; background:#f3f4f6; padding:15px; border-radius:6px;">
+                Overall ATS Compatibility Score: <strong style="font-size:18px; color:#7c3aed;">${document.getElementById("score-text-main").innerText}</strong>
+            </div>
+            <div style="margin-top:20px;">
+                <h3 style="color:#1e3a8a; font-size:14px;">Identified Warnings</h3>
+                <ul style="font-size:12px; line-height:1.6;">
+                    <li>Passive action verbs check flag in bullet points</li>
+                    <li>Missing recommended keywords alignment</li>
+                </ul>
+            </div>
+        </div>
+    `;
+    const container = document.createElement("div");
+    container.innerHTML = reportHtml;
+    document.body.appendChild(container);
+    
+    const opt = {
+        margin: 0,
+        filename: `ATS_Audit_Report.pdf`,
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(container).save().then(() => {
+        container.remove();
+    });
+}
+
+function downloadImprovementReportPDF() {
+    const reportHtml = `
+        <div style="font-family:'Outfit',sans-serif; padding:40px; color:#1f2937;">
+            <h1 style="color:#10b981; border-bottom:2px solid #10b981; padding-bottom:10px;">Before-vs-After Phrasing Improvement Summary</h1>
+            <p style="font-size:12px; color:#4b5563;">Optimized wording metrics for <strong>${document.getElementById("res-name").value}</strong></p>
+            <div style="margin-top:20px; font-size:12px; border:1px solid #e5e7eb; padding:15px; border-radius:6px; background:#f9fafb;">
+                <div style="color:#ef4444; font-weight:700;">Original bullet:</div>
+                <div style="margin-bottom:10px; font-style:italic;">"Contributed to coding the backend of the student project application."</div>
+                <div style="color:#10b981; font-weight:700;">Optimized bullet:</div>
+                <div style="font-weight:700;">"Architected relational database schemas and API routing structures in Flask, reducing API controller latency by 20%."</div>
+            </div>
+        </div>
+    `;
+    const container = document.createElement("div");
+    container.innerHTML = reportHtml;
+    document.body.appendChild(container);
+    
+    const opt = {
+        margin: 0,
+        filename: `Resume_Improvement_Report.pdf`,
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(container).save().then(() => {
+        container.remove();
     });
 }
 </script>
 <style>
-.hidden {
-    display: none !important;
+/* 5 Professional templates styling rules */
+.resume-sheet {
+    background: #fff;
+    padding: 15px;
+    font-size: 11px;
+    line-height: 1.5;
+    color: #374151;
 }
-.resume-workspace-split-wrapper {
-    height: calc(100vh - 130px);
+
+/* 1. Modern ATS style */
+.resume-sheet.modern-ats .resume-render-header h1 {
+    color: #2563eb !important;
+}
+.resume-sheet.modern-ats .resume-render-section h3 {
+    border-bottom: 2px solid #2563eb !important;
+    color: #2563eb !important;
+}
+
+/* 2. Microsoft Style */
+.resume-sheet.microsoft {
+    border-top: 6px solid #00a4ef !important;
+}
+.resume-sheet.microsoft .resume-render-header h1 {
+    color: #0078d4 !important;
+}
+.resume-sheet.microsoft .resume-render-section h3 {
+    border-bottom: 1.5px dashed #0078d4 !important;
+    color: #0078d4 !important;
+}
+
+/* 3. Minimalist Executive style */
+.resume-sheet.minimalist-executive {
+    text-align: center;
+}
+.resume-sheet.minimalist-executive .resume-render-header {
+    text-align: center !important;
+    border-bottom: 1px solid #9ca3af !important;
+}
+.resume-sheet.minimalist-executive .resume-render-section h3 {
+    border-bottom: 1px solid #9ca3af !important;
+    color: #111827 !important;
+    text-align: center;
+}
+.resume-sheet.minimalist-executive .bullet-list {
+    text-align: left;
+}
+
+/* 4. Student Internship style */
+.resume-sheet.student-internship {
+    background: #fbfbfb;
+}
+.resume-sheet.student-internship .resume-render-header h1 {
+    color: #059669 !important;
+}
+.resume-sheet.student-internship .resume-render-section h3 {
+    border-bottom: 2px solid #059669 !important;
+    color: #059669 !important;
+}
+
+/* 5. Tech Resume style */
+.resume-sheet.tech-mono {
+    font-family: 'Courier New', Courier, monospace !important;
+}
+.resume-sheet.tech-mono .resume-render-header h1 {
+    color: #111827 !important;
+}
+.resume-sheet.tech-mono .resume-render-section h3 {
+    border-bottom: 1px solid #111827 !important;
+    color: #111827 !important;
+}
+
+.pdf-export-mode {
+    width: 210mm !important;
+    min-height: 297mm !important;
+    padding: 20mm !important;
+    margin: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+.live-keyword-item {
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: var(--bg-tertiary);
+    color: var(--text-muted);
+}
+.live-keyword-item.matched {
+    background: var(--success-bg);
+    color: var(--success);
+    font-weight: 600;
+}
+.hover-scale {
+    transition: transform 0.15s ease;
+}
+.hover-scale:hover {
+    transform: scale(1.05);
 }
 </style>
 {% endblock %}

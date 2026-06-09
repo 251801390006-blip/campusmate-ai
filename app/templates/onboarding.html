@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Career Onboarding - CampusMate AI{% endblock %}
+
+{% block content %}
+<div class="container py-5 d-flex justify-content-center">
+    <div class="flat-card auth-card" style="width: 100%; max-width: 580px; padding: 2.5rem 2rem 2rem;">
+        <div class="text-center mb-4">
+            <div class="auth-logo-icon" style="background: var(--neon-blue-dim); color: var(--neon-blue);">
+                <i class="fa-solid fa-compass"></i>
+            </div>
+            <h2 class="h3 mb-2 fw-bold" style="letter-spacing: -0.02em;">Welcome to CampusMate AI</h2>
+            <p class="text-secondary" style="font-size: 0.85rem;">Let's customize your Student Operating System and career path.</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('dashboard.onboarding') }}" class="d-flex flex-column gap-3">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <div class="input-group">
+                <label for="name-field" class="fw-semibold mb-1">Full Name</label>
+                <input type="text" id="name-field" name="name" placeholder="e.g. Alex Smith" required style="width:100%; padding:8px; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary);">
+            </div>
+            
+            <div class="row g-3">
+                <!-- Branch / Major -->
+                <div class="col-sm-6">
+                    <div class="input-group">
+                        <label for="branch-field" class="fw-semibold mb-1">Academic Branch</label>
+                        <input type="text" id="branch-field" name="branch" placeholder="e.g. Computer Science" required style="width:100%; padding:8px; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary);">
+                    </div>
+                </div>
+                <!-- Year -->
+                <div class="col-sm-6">
+                    <div class="input-group">
+                        <label for="year-field" class="fw-semibold mb-1">Current Year</label>
+                        <select id="year-field" name="year" required>
+                            <option value="1st Year">1st Year</option>
+                            <option value="2nd Year">2nd Year</option>
+                            <option value="3rd Year">3rd Year</option>
+                            <option value="4th Year">4th Year</option>
+                            <option value="Postgraduate">Postgraduate</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Target Career Goal (50 technology tracks) -->
+            <div class="input-group">
+                <label for="career-field" class="fw-semibold mb-1">Target Technology Path</label>
+                <select id="career-field" name="career_goal" required style="max-height: 200px;">
+                    {% for track in tracks %}
+                        <option value="{{ track }}">{{ track }}</option>
+                    {% endfor %}
+                </select>
+                <span class="input-helper">Select from 50 standard engineering and management roadmaps.</span>
+            </div>
+
+            <div class="row g-3">
+                <!-- Daily Study Time -->
+                <div class="col-sm-6">
+                    <div class="input-group">
+                        <label for="study-field" class="fw-semibold mb-1">Daily Study Budget</label>
+                        <select id="study-field" name="daily_study_time" required>
+                            <option value="1 hour/day">1 hour / day</option>
+                            <option value="2 hours/day" selected>2 hours / day</option>
+                            <option value="3 hours/day">3 hours / day</option>
+                            <option value="4+ hours/day">4+ hours / day</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Current Skills -->
+                <div class="col-sm-6">
+                    <div class="input-group">
+                        <label for="skills-field" class="fw-semibold mb-1">Known Skills (Comma separated)</label>
+                        <input type="text" id="skills-field" name="skills" placeholder="e.g. Python, Git, HTML" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interests -->
+            <div class="input-group">
+                <label for="interests-field" class="fw-semibold mb-1">Technical Interests & Aspirations</label>
+                <textarea id="interests-field" name="interests" rows="3" placeholder="Describe what you want to build or work on..." required style="resize:none;"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block py-2 mt-3" style="font-size:0.95rem;">
+                Generate Profile Workspace <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

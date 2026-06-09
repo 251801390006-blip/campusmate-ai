@@ -1,53 +1,119 @@
 {% extends "dashboard_base.html" %}
 
-{% block title %}Interview Prep - CampusMate AI{% endblock %}
+{% block title %}AI Interview Simulator - CampusMate AI{% endblock %}
 
-{% block header_title %}AI Technical Interview Prep{% endblock %}
+{% block header_title %}AI Interview Simulator{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <!-- Setup Window -->
-        <div class="flat-card text-center py-5" id="mock-setup-window">
-            <div class="setup-icon mb-3"><i class="fa-solid fa-microphone-slash text-muted" style="font-size: 3rem;"></i></div>
-            <h2 class="fw-bold mb-2">AI Technical Interview Prep</h2>
-            <p class="text-secondary mb-4" style="max-width: 480px; margin: 0 auto; font-size: 0.88rem;">
-                Test your competencies with our conversational mock interviewer. Receive structured analysis, scores, and corrective solutions.
+<div class="row justify-content-center g-4">
+    <div class="col-lg-9">
+        <!-- Setup / Launch Panel -->
+        <div class="flat-card shadow-sm border-light text-center py-5" id="mock-setup-window">
+            <div class="setup-icon mb-4" style="background: rgba(0, 120, 212, 0.08); color: #0078d4; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; border: 1.5px solid rgba(0, 120, 212, 0.2);">
+                <i class="fa-solid fa-microphone-lines" style="font-size: 2.2rem;"></i>
+            </div>
+            <h2 class="fw-bold text-dark mb-2" style="font-size: 1.5rem;">AI Interview Simulator 3.0</h2>
+            <p class="text-secondary mb-4" style="max-width: 520px; margin: 0 auto; font-size: 0.9rem; line-height: 1.6;">
+                Simulate a real-time technical or HR screening panel. Practice speaking or typing your responses, get vocal feedback, and receive detailed score assessments.
             </p>
-            <div class="setup-form text-start" style="max-width: 400px; margin: 0 auto;">
+            
+            <div class="setup-form text-start border p-4 rounded bg-white shadow-sm" style="max-width: 460px; margin: 0 auto;">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <div class="input-group mb-3">
-                    <label for="mock-role-input" class="fw-semibold mb-1" style="font-size: 0.82rem;">Interview Target Role</label>
-                    <input type="text" id="mock-role-input" class="form-control" placeholder="e.g. Backend Engineer, Systems Security" value="Software Engineer" style="width:100%; padding:8px; border-radius:4px; border: 1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary);">
+                
+                <div class="mb-3">
+                    <label for="mock-role-input" class="fw-semibold text-secondary d-block mb-1" style="font-size: 0.82rem;">Target Career Role</label>
+                    <input type="text" id="mock-role-input" class="form-control shadow-sm" placeholder="e.g. Backend Engineer, SOC Analyst" value="{{ user_track }}" style="font-size:0.9rem;">
                 </div>
-                <button class="btn btn-primary w-100" onclick="startMockInterview()">Launch Interview <i class="fa-solid fa-microphone"></i></button>
+
+                <div class="mb-4">
+                    <label class="fw-semibold text-secondary d-block mb-2" style="font-size: 0.82rem;">Voice Assistance Settings</label>
+                    <div class="d-flex flex-column gap-2">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="voice-synthesis-toggle" checked>
+                            <label class="form-check-label text-dark" for="voice-synthesis-toggle" style="font-size: 0.85rem;">Read out questions (Text-To-Speech)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary w-100 py-2.5 fw-bold shadow-sm" onclick="startMockInterview()" style="background: linear-gradient(135deg, #0078d4, #00bcf2); border: none; font-size: 0.95rem;">
+                    Launch Interactive Panel <i class="fa-solid fa-circle-play ms-1"></i>
+                </button>
             </div>
         </div>
 
         <!-- Active Interview Window -->
-        <div class="flat-card hidden" id="mock-active-window">
-            <div class="mock-header d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom" style="border-color: var(--border-color);">
-                <span class="badge badge-danger"><i class="fa-solid fa-circle-dot text-red animate-pulse me-1"></i> Live Mock Session</span>
-                <span id="mock-question-counter" class="fw-semibold text-secondary" style="font-size: 0.85rem;">Question 1 of 3</span>
+        <div class="flat-card shadow-sm border-light hidden" id="mock-active-window">
+            <div class="mock-header d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom flex-wrap gap-2" style="border-color: #dee2e6;">
+                <div>
+                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2.5 py-1" style="font-size:0.75rem; font-weight:700;"><i class="fa-solid fa-circle-dot text-danger animate-pulse me-1"></i> Active Simulation</span>
+                    <span class="badge bg-light text-primary border border-primary ms-2 px-2.5 py-1" style="font-size:0.75rem; font-weight:600;" id="mock-role-badge">Software Engineer</span>
+                </div>
+                <span id="mock-question-counter" class="fw-bold text-secondary" style="font-size: 0.85rem;">Question 1 of 3</span>
             </div>
-            <div class="mock-question-display p-3 border rounded mb-4" style="background-color: var(--bg-primary); border-color: var(--border-color);">
-                <p class="question-label fw-bold text-uppercase text-info mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Interviewer Question:</p>
-                <p id="mock-question-text" class="question-text mb-0 fw-semibold text-secondary" style="font-size: 1rem; line-height: 1.5;">Retrieving question...</p>
+
+            <div class="mock-question-display p-3.5 border rounded mb-4 shadow-sm" style="background-color: #fafbfc; border-color: #dee2e6;">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="question-label fw-bold text-uppercase text-primary" style="font-size: 0.72rem; letter-spacing: 0.5px;"><i class="fa-solid fa-circle-question me-1"></i> Interviewer Question:</span>
+                    <button class="btn btn-sm btn-link p-0 text-primary" onclick="speakQuestionText()" title="Repeat question out loud"><i class="fa-solid fa-volume-high"></i> Replay Audio</button>
+                </div>
+                <p id="mock-question-text" class="question-text mb-0 fw-semibold text-dark" style="font-size: 1.05rem; line-height: 1.55;">Retrieving question...</p>
             </div>
+
             <div class="mock-response-area mb-4">
-                <label for="mock-answer-input" class="fw-semibold mb-2 d-block" style="font-size: 0.85rem;">Your Answer</label>
-                <textarea id="mock-answer-input" class="form-control" rows="5" placeholder="Type your response here... (or speak)" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-size: 0.88rem;"></textarea>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <label for="mock-answer-input" class="fw-semibold text-dark mb-0" style="font-size: 0.88rem;">Your Engineering Answer</label>
+                    
+                    <!-- Speech to Text control button -->
+                    <button id="mic-btn" class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1.5 px-2.5 py-1" onclick="toggleSpeechRecognition()" style="font-size: 0.78rem; font-weight:600; border-radius: 20px;">
+                        <i id="mic-icon" class="fa-solid fa-microphone"></i> <span id="mic-text">Speak Answer</span>
+                    </button>
+                </div>
+                <div class="position-relative">
+                    <textarea id="mock-answer-input" class="form-control shadow-sm" rows="6" placeholder="Type your response, or click 'Speak Answer' to speak using your microphone..." style="font-size: 0.9rem; padding: 12px;"></textarea>
+                    <div id="mic-pulse-overlay" class="mic-pulse-overlay hidden">
+                        <div class="pulse-ring"></div>
+                        <span style="font-size:0.8rem; font-weight:600; color:#dc3545;"><i class="fa-solid fa-microphone animate-pulse me-1"></i> Recording voice... Speak clearly.</span>
+                    </div>
+                </div>
             </div>
+
             <div class="mock-controls d-flex justify-content-between align-items-center">
-                <button class="btn btn-outline" id="mock-skip-btn" onclick="abortMockInterview()">Cancel Session</button>
-                <button class="btn btn-primary" id="mock-submit-btn" onclick="submitMockAnswer()">Submit Answer <i class="fa-solid fa-paper-plane"></i></button>
+                <button class="btn btn-light shadow-sm border" id="mock-skip-btn" onclick="abortMockInterview()">Cancel Session</button>
+                <button class="btn btn-primary px-4 shadow-sm" id="mock-submit-btn" onclick="submitMockAnswer()" style="background: linear-gradient(135deg, #0078d4, #00bcf2); border: none;">Submit Answer <i class="fa-solid fa-paper-plane ms-1"></i></button>
             </div>
-            <!-- Feedback Card -->
-            <div class="mock-feedback-box mt-4 p-3 border rounded hidden" id="mock-feedback-box" style="background-color: rgba(59, 130, 246, 0.02); border-color: rgba(59, 130, 246, 0.2);">
-                <h4 class="fw-bold mb-2" style="font-size: 0.92rem;"><i class="fa-solid fa-graduation-cap text-primary me-1"></i> AI Evaluation:</h4>
-                <div class="score-line mb-2" style="font-size: 0.88rem;">Score: <strong id="mock-item-score" class="text-primary">0/100</strong></div>
-                <p class="feedback-desc text-secondary mb-0" id="mock-item-desc" style="font-size: 0.85rem; line-height: 1.5;">Feedback details...</p>
+
+            <!-- Grade & Feedback Scorecard -->
+            <div class="mock-feedback-box mt-4 p-4 border rounded hidden" id="mock-feedback-box" style="background-color: #fafbfc; border-color: #dee2e6;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="fw-bold mb-0 text-dark" style="font-size: 1rem;"><i class="fa-solid fa-square-poll-vertical text-primary me-2"></i> Recruiter Evaluation Scorecard</h4>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="text-secondary" style="font-size:0.85rem;">Score:</span>
+                        <strong id="mock-item-score" class="text-primary" style="font-size: 1.25rem;">0/100</strong>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="progress-bar-container" style="background: #e9ecef; height: 8px; border-radius: 4px; overflow: hidden; border: 1px solid #dee2e6;">
+                        <div id="feedback-score-bar" class="progress-bar-fill" style="background: #0078d4; height: 100%; width: 0%; transition: width 0.4s ease;"></div>
+                    </div>
+                </div>
+
+                <div class="feedback-text-area rounded p-3 bg-white border" style="border-color:#dee2e6;">
+                    <p class="fw-semibold text-secondary mb-1" style="font-size: 0.75rem; text-transform: uppercase;">Constructive Assessment</p>
+                    <p class="feedback-desc text-dark mb-0" id="mock-item-desc" style="font-size: 0.88rem; line-height: 1.5;"></p>
+                </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gamification Success Floating Notification -->
+<div id="gamification-toast" class="gamification-toast hidden">
+    <div class="toast-content d-flex align-items-center gap-3">
+        <div class="toast-icon"><i class="fa-solid fa-trophy text-warning"></i></div>
+        <div>
+            <strong class="d-block text-dark" style="font-size:0.9rem;">Interview Series Passed!</strong>
+            <span class="text-secondary" style="font-size:0.8rem;">+150 XP Awarded</span>
         </div>
     </div>
 </div>
@@ -59,13 +125,133 @@ let mockInterviewState = {
     active: false,
     role: "",
     questionIndex: 0,
-    questions: [
-        "What is the difference between TCP and UDP, and in what scenarios would you choose one over the other?",
-        "Explain how a SQL Injection occurs and detail two distinct prevention strategies on the application layer.",
-        "How do index tables optimize search latency, and what is the trade-off of maintaining too many indices?"
-    ],
-    answers: []
+    questions: [],
+    answers: [],
+    // Category mappings based on track queries
+    trackDatabase: {
+        "security": [
+            "How does WPA3 protect wireless connections differently from WPA2, and what are the main security benefits?",
+            "Explain the difference between Symmetric and Asymmetric encryption, and how TLS uses both to secure connections.",
+            "What is an SQL injection, and how do parameterized queries prevent it on an database architecture level?"
+        ],
+        "data_ai": [
+            "Explain the difference between L1 and L2 regularization, and how they impact model weights during optimization.",
+            "What is the vanishing gradient problem in deep neural networks, and how do ResNets or LSTMs mitigate it?",
+            "Describe the core architecture of a Transformer model, and how Self-Attention differs from standard recurrence."
+        ],
+        "cloud_ops": [
+            "What is the difference between virtualization and containerization, and when would you choose VMs over containers?",
+            "Explain how Kubernetes handles service discovery and load balancing between isolated pods.",
+            "Describe a standard CI/CD deployment pipeline for a production application utilizing GitOps workflows."
+        ],
+        "general": [
+            "How does Event Delegation work in JavaScript, and what are its memory optimization benefits?",
+            "What are React Hooks, and how does the Virtual DOM optimize rendering cycles in web pages?",
+            "Explain JWT-based authentication, where to store tokens securely, and how to mitigate XSS risks."
+        ]
+    }
 };
+
+// Speech Recognition setup
+let recognition = null;
+let isListening = false;
+
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+
+    recognition.onresult = function(event) {
+        let interimTranscript = '';
+        let finalTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+                finalTranscript += event.results[i][0].transcript;
+            } else {
+                interimTranscript += event.results[i][0].transcript;
+            }
+        }
+        
+        const ansInput = document.getElementById("mock-answer-input");
+        if (ansInput && finalTranscript) {
+            ansInput.value += (ansInput.value ? ' ' : '') + finalTranscript;
+        }
+    };
+
+    recognition.onerror = function(event) {
+        console.error("Speech Recognition Error:", event.error);
+        stopListening();
+    };
+
+    recognition.onend = function() {
+        stopListening();
+    };
+}
+
+function toggleSpeechRecognition() {
+    if (!recognition) {
+        alert("Web Speech recognition is not supported in this browser. Please try Chrome or Edge.");
+        return;
+    }
+    
+    if (isListening) {
+        stopListening();
+    } else {
+        startListening();
+    }
+}
+
+function startListening() {
+    try {
+        recognition.start();
+        isListening = true;
+        
+        document.getElementById("mic-pulse-overlay").classList.remove("hidden");
+        document.getElementById("mic-icon").className = "fa-solid fa-microphone-slash animate-pulse";
+        document.getElementById("mic-text").innerText = "Stop Listening";
+        document.getElementById("mic-btn").classList.replace("btn-outline-danger", "btn-danger");
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+function stopListening() {
+    try {
+        recognition.stop();
+    } catch(e) {}
+    isListening = false;
+    
+    const pulseOverlay = document.getElementById("mic-pulse-overlay");
+    if (pulseOverlay) pulseOverlay.classList.add("hidden");
+    
+    const micIcon = document.getElementById("mic-icon");
+    if (micIcon) micIcon.className = "fa-solid fa-microphone";
+    
+    const micText = document.getElementById("mic-text");
+    if (micText) micText.innerText = "Speak Answer";
+    
+    const micBtn = document.getElementById("mic-btn");
+    if (micBtn) micBtn.classList.replace("btn-danger", "btn-outline-danger");
+}
+
+// Speak text using Speech Synthesis API
+function speakQuestionText() {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel(); // cancel current speak
+    
+    const questionText = document.getElementById("mock-question-text").innerText;
+    const utterance = new SpeechSynthesisUtterance(questionText);
+    
+    // Choose a standard English voice if available
+    const voices = window.speechSynthesis.getVoices();
+    const englishVoice = voices.find(v => v.lang.startsWith('en'));
+    if (englishVoice) utterance.voice = englishVoice;
+    
+    window.speechSynthesis.speak(utterance);
+}
 
 function startMockInterview() {
     const role = document.getElementById("mock-role-input").value.trim();
@@ -79,8 +265,21 @@ function startMockInterview() {
     mockInterviewState.questionIndex = 0;
     mockInterviewState.answers = [];
 
+    // Map role keywords to categories
+    const roleLower = role.toLowerCase();
+    if (roleLower.includes("security") || roleLower.includes("cyber") || roleLower.includes("hacking") || roleLower.includes("soc") || roleLower.includes("network")) {
+        mockInterviewState.questions = mockInterviewState.trackDatabase["security"];
+    } else if (roleLower.includes("ai") || roleLower.includes("machine") || roleLower.includes("deep") || roleLower.includes("learning") || roleLower.includes("data")) {
+        mockInterviewState.questions = mockInterviewState.trackDatabase["data_ai"];
+    } else if (roleLower.includes("cloud") || roleLower.includes("ops") || roleLower.includes("devops") || roleLower.includes("sre") || roleLower.includes("kubernetes")) {
+        mockInterviewState.questions = mockInterviewState.trackDatabase["cloud_ops"];
+    } else {
+        mockInterviewState.questions = mockInterviewState.trackDatabase["general"];
+    }
+
     document.getElementById("mock-setup-window").classList.add("hidden");
     document.getElementById("mock-active-window").classList.remove("hidden");
+    document.getElementById("mock-role-badge").innerText = role;
     
     loadNextMockQuestion();
 }
@@ -92,24 +291,34 @@ function loadNextMockQuestion() {
     
     ansInput.value = "";
     document.getElementById("mock-feedback-box").classList.add("hidden");
+    stopListening();
     
     countText.innerText = `Question ${mockInterviewState.questionIndex + 1} of ${mockInterviewState.questions.length}`;
     questionText.innerText = mockInterviewState.questions[mockInterviewState.questionIndex];
     
+    // Play voice synthesis if active
+    const synthesisToggle = document.getElementById("voice-synthesis-toggle");
+    if (synthesisToggle && synthesisToggle.checked) {
+        setTimeout(speakQuestionText, 250);
+    }
+    
     const submitBtn = document.getElementById("mock-submit-btn");
-    submitBtn.innerHTML = `Submit Answer <i class="fa-solid fa-paper-plane"></i>`;
+    submitBtn.innerHTML = `Submit Answer <i class="fa-solid fa-paper-plane ms-1"></i>`;
     submitBtn.onclick = () => submitMockAnswer();
 }
 
 async function submitMockAnswer() {
     const answer = document.getElementById("mock-answer-input").value.trim();
     if (!answer) {
-        alert("Please type a response before submitting.");
+        alert("Please type or speak a response before submitting.");
         return;
     }
+    
+    stopListening();
+    window.speechSynthesis.cancel();
 
     const submitBtn = document.getElementById("mock-submit-btn");
-    submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Grading...`;
+    submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Evaluating response...`;
     
     try {
         const customKey = localStorage.getItem("campusmate_gemini_key") || "";
@@ -130,22 +339,40 @@ async function submitMockAnswer() {
         
         const data = await response.json();
         if (response.ok && data.success) {
+            // Render scorecard visual
+            const scoreBar = document.getElementById("feedback-score-bar");
+            const scoreText = document.getElementById("mock-item-score");
+            const descText = document.getElementById("mock-item-desc");
             const feedbackBox = document.getElementById("mock-feedback-box");
-            document.getElementById("mock-item-score").innerText = `${data.score}/100`;
-            document.getElementById("mock-item-desc").innerText = data.feedback;
+            
+            scoreText.innerText = `${data.score}/100`;
+            scoreBar.style.width = `${data.score}%`;
+            descText.innerText = data.feedback;
             feedbackBox.classList.remove("hidden");
 
-            submitBtn.innerHTML = `Next Question <i class="fa-solid fa-arrow-right"></i>`;
+            submitBtn.innerHTML = `Next Question <i class="fa-solid fa-arrow-right ms-1"></i>`;
             submitBtn.onclick = () => moveToNextQuestion();
         } else {
-            alert("Grading failed: " + (data.error || "Unknown error"));
-            submitBtn.innerHTML = `Submit Answer <i class="fa-solid fa-paper-plane"></i>`;
+            alert("Grading failed: " + (data.error || "Unknown response error"));
+            submitBtn.innerHTML = `Submit Answer <i class="fa-solid fa-paper-plane ms-1"></i>`;
         }
     } catch (e) {
         console.error(e);
         alert("Failed to grade answer.");
-        submitBtn.innerHTML = `Submit Answer <i class="fa-solid fa-paper-plane"></i>`;
+        submitBtn.innerHTML = `Submit Answer <i class="fa-solid fa-paper-plane ms-1"></i>`;
     }
+}
+
+function showCompletionToast() {
+    const toast = document.getElementById("gamification-toast");
+    if (!toast) return;
+    
+    toast.classList.remove("hidden");
+    toast.style.animation = "slide-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards";
+    
+    setTimeout(() => {
+        toast.classList.add("hidden");
+    }, 4500);
 }
 
 function moveToNextQuestion() {
@@ -153,20 +380,93 @@ function moveToNextQuestion() {
     if (mockInterviewState.questionIndex < mockInterviewState.questions.length) {
         loadNextMockQuestion();
     } else {
-        alert("Mock Interview Complete! Excellent work. You've earned 150 XP.");
-        window.location.reload();
+        // Mock interview complete gamification trigger
+        showCompletionToast();
+        setTimeout(() => {
+            alert("Mock Interview Complete! Excellent work. You've earned 150 XP.");
+            window.location.reload();
+        }, 2000);
     }
 }
 
 function abortMockInterview() {
+    window.speechSynthesis.cancel();
+    stopListening();
     if (confirm("Are you sure you want to end this interview session? Your progress will not be saved.")) {
         window.location.reload();
     }
 }
+
+// Trigger initial cancel speaker in case they refresh
+window.addEventListener("beforeunload", () => {
+    window.speechSynthesis.cancel();
+});
 </script>
+
 <style>
 .hidden {
     display: none !important;
+}
+.mic-pulse-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    z-index: 10;
+}
+.pulse-ring {
+    border: 3px solid #dc3545;
+    background-color: transparent;
+    border-radius: 50%;
+    height: 40px;
+    width: 40px;
+    position: absolute;
+    animation: pulse 1.5s ease-out infinite;
+    opacity: 0;
+}
+@keyframes pulse {
+    0% { transform: scale(0.6); opacity: 0; }
+    50% { opacity: 0.5; }
+    100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* Gamification Success Toast styling */
+.gamification-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 11000;
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 16px 20px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+.toast-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #fffbeb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+@keyframes slide-in {
+    from {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 </style>
 {% endblock %}

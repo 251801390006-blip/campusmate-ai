@@ -76,9 +76,65 @@ def create_app():
     # Create tables and seed default accounts
     with app.app_context():
         db.create_all()
+        # Safe SQLite migrations for User table expansion
+        for col, col_type in [
+            ("branch", "VARCHAR(100)"),
+            ("year", "VARCHAR(20)"),
+            ("career_goal", "VARCHAR(100)"),
+            ("interests", "TEXT"),
+            ("daily_study_time", "VARCHAR(50)"),
+            ("xp", "INTEGER DEFAULT 0"),
+            ("learning_streak", "INTEGER DEFAULT 0"),
+            ("skills", "TEXT"),
+            ("onboarded", "BOOLEAN DEFAULT 0"),
+            ("name", "VARCHAR(100)"),
+            ("avatar", "VARCHAR(200) DEFAULT 'avatar-1.png'"),
+            ("bio", "TEXT")
+        ]:
+            try:
+                db.session.execute(db.text(f"ALTER TABLE users ADD COLUMN {col} {col_type}"))
+                db.session.commit()
+            except Exception:
+                db.session.rollback()
         seed_default_users(db, User)
         
+    # Global context processor for notifications
+    @app.context_processor
+    def inject_notifications():
+        from flask_login import current_user
+        if current_user and current_user.is_authenticated:
+            from app.models import Notification
+            unread_notifs = Notification.query.filter_by(user_id=current_user.id, is_read=False).order_by(Notification.created_at.desc()).all()
+            if not Notification.query.filter_by(user_id=current_user.id).first():
+                try:
+                    notif1 = Notification(
+                        user_id=current_user.id, 
+                        title="Welcome to CampusMate AI 🚀", 
+                        content="Get started by configuring your onboarding profile to calculate your placement readiness score.", 
+                        category="milestone"
+                    )
+                    notif2 = Notification(
+                        user_id=current_user.id, 
+                        title="Roadmap Seeding Enabled 🎯", 
+                        content="Choose a track in the Roadmap Engine to generate a visual career path with 200 checkpoints.", 
+                        category="milestone"
+                    )
+                    db.session.add_all([notif1, notif2])
+                    db.session.commit()
+                    unread_notifs = [notif1, notif2]
+                except Exception:
+                    db.session.rollback()
+            return {
+                'unread_notifications': unread_notifs,
+                'unread_notifications_count': len(unread_notifs)
+            }
+        return {
+            'unread_notifications': [],
+            'unread_notifications_count': 0
+        }
+
     return app
+
 
 def seed_default_users(db, User):
     # Seed default admin user if not exists
@@ -92,6 +148,9 @@ def seed_default_users(db, User):
         )
         admin_user.set_password('Vanjith@2008')
         db.session.add(admin_user)
+    else:
+        admin.role = 'admin'
+        admin.set_password('Vanjith@2008')
         
     # Seed default demo user if not exists
     demo = User.query.filter_by(email='demo@university.edu').first()
@@ -104,5 +163,7 @@ def seed_default_users(db, User):
         )
         demo_user.set_password('demo1234')
         db.session.add(demo_user)
+    else:
+        demo.set_password('demo1234')
         
     db.session.commit()

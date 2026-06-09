@@ -1,0 +1,53 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Bookmarks Dashboard - CampusMate AI{% endblock %}
+
+{% block header_title %}Saved Items & Bookmarks{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="flat-card shadow-sm border-light">
+            <h3 class="fw-bold text-dark mb-4" style="font-size:1.1rem;"><i class="fa-solid fa-bookmark text-primary me-2"></i> Bookmarked Workspace Resources</h3>
+            
+            {% if items %}
+                <div class="row g-3">
+                    {% for item in items %}
+                        <div class="col-md-6">
+                            <div class="p-3 border rounded bg-white shadow-sm d-flex justify-content-between align-items-center" style="transition:all 0.2s ease;">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div style="background:{% if item.item_type == 'roadmap' %}#e0f2fe{% elif item.item_type == 'project' %}#f0fdf4{% else %}#f8fafc{% endif %}; color:{% if item.item_type == 'roadmap' %}#0078d4{% elif item.item_type == 'project' %}#10b981{% else %}#64748b{% endif %}; width:38px; height:38px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1.1rem;">
+                                        {% if item.item_type == 'roadmap' %}
+                                            <i class="fa-solid fa-route"></i>
+                                        {% elif item.item_type == 'project' %}
+                                            <i class="fa-solid fa-flask"></i>
+                                        {% else %}
+                                            <i class="fa-solid fa-file-invoice"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <strong class="text-dark d-block" style="font-size:0.85rem;">{{ item.title }}</strong>
+                                        <span class="text-secondary" style="font-size:0.7rem;">Saved on: {{ item.created_at.strftime('%Y-%m-%d') }}</span>
+                                    </div>
+                                </div>
+                                <form method="POST" action="{{ url_for('dashboard.delete_bookmark', item_id=item.id) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm text-danger" style="background:none; border:none; padding:4px;" title="Remove Bookmark">
+                                        <i class="fa-solid fa-trash-can" style="font-size: 0.9rem;"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fa-solid fa-bookmark text-muted mb-3" style="font-size: 2.5rem; opacity: 0.3;"></i>
+                    <h4 class="fw-bold text-dark mb-1">No bookmarked items</h4>
+                    <p class="text-secondary mb-0" style="font-size:0.82rem;">Bookmarks will show here as you save milestones, certs, and projects.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

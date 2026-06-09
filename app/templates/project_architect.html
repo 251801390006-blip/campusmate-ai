@@ -1,0 +1,213 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Project Architect - CampusMate AI{% endblock %}
+
+{% block extra_head %}
+<!-- Mermaid JS for rendering visual architecture flowcharts locally -->
+<script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ 
+        startOnLoad: false,
+        theme: 'default',
+        securityLevel: 'loose'
+    });
+    window.mermaid = mermaid;
+</script>
+{% endblock %}
+
+{% block header_title %}AI Project Architect{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Left Panel: Input Project Idea -->
+    <div class="col-lg-4">
+        <div class="flat-card shadow-sm border-light mb-4">
+            <h3 class="fw-bold text-dark mb-3" style="font-size:1.05rem;"><i class="fa-solid fa-cubes text-primary me-2"></i> Design Architecture</h3>
+            
+            <div class="d-flex flex-column gap-3">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div>
+                    <label for="project-idea-input" class="fw-semibold text-secondary d-block mb-1.5" style="font-size:0.82rem;">Core MVP Concept Idea</label>
+                    <textarea id="project-idea-input" class="form-control shadow-sm" rows="5" placeholder="e.g. A real-time chat application using WebSockets and Redis database caching, containerized with Docker." style="font-size:0.85rem; padding: 10px;"></textarea>
+                </div>
+
+                <div>
+                    <label for="project-stack-select" class="fw-semibold text-secondary d-block mb-1.5" style="font-size:0.82rem;">Primary Target Stack</label>
+                    <select id="project-stack-select" class="form-select shadow-sm" style="font-size:0.85rem;">
+                        <option value="flask">Python / Flask app</option>
+                        <option value="nodejs">Node.js / Express server</option>
+                        <option value="go">Go / Gin microservice</option>
+                        <option value="react">React / Next.js app</option>
+                    </select>
+                </div>
+
+                <button class="btn btn-primary w-100 py-2.5 fw-bold shadow-sm" onclick="generateArchitectBlueprint()" style="background: linear-gradient(135deg, #0078d4, #00bcf2); border: none; font-size:0.9rem;">
+                    Generate System Blueprint <i class="fa-solid fa-compass-drafting ms-1"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="flat-card shadow-sm border-light">
+            <h3 class="fw-bold text-dark mb-2" style="font-size:1.05rem;"><i class="fa-solid fa-sitemap text-primary me-2"></i> Blueprint Artifacts</h3>
+            <p class="text-secondary mb-0" style="font-size:0.82rem; line-height:1.5;">
+                Generates a clean directory hierarchy map, production docker files, schema creation queries, and a live rendered database connection flowchart matching industry software design guidelines.
+            </p>
+        </div>
+    </div>
+
+    <!-- Right Panel: Architecture Artifact View Tabs -->
+    <div class="col-lg-8" id="architect-output-panel">
+        <div class="flat-card shadow-sm border-light" style="padding: 0; overflow: hidden;">
+            <!-- Tabs Navigation -->
+            <div class="d-flex bg-light border-bottom flex-wrap" style="border-color:#dee2e6;" id="tabs-navigation">
+                <button class="tab-nav-btn active" onclick="switchArchitectTab('tree')"><i class="fa-solid fa-folder-tree me-1.5"></i> Directory Tree</button>
+                <button class="tab-nav-btn" onclick="switchArchitectTab('config')"><i class="fa-solid fa-gears me-1.5"></i> Configurations</button>
+                <button class="tab-nav-btn" onclick="switchArchitectTab('schema')"><i class="fa-solid fa-database me-1.5"></i> Schema SQL</button>
+                <button class="tab-nav-btn" onclick="switchArchitectTab('mermaid')"><i class="fa-solid fa-chart-simple me-1.5"></i> Flow Diagram</button>
+            </div>
+
+            <!-- Tab Contents -->
+            <div style="height: 520px; position: relative; background: #1e293b; color: #f8fafc; overflow: auto; padding: 20px;">
+                <!-- 1. Folder Tree -->
+                <div id="architect-tab-tree" class="tab-content-panel">
+                    <h5 class="fw-bold text-info mb-3" style="font-size: 0.82rem; text-transform: uppercase;"><i class="fa-solid fa-folder-open me-1"></i> Folder Hierarchy Map</h5>
+                    <pre style="margin: 0; font-family: monospace; font-size: 0.8rem; line-height: 1.6; white-space: pre-wrap;"><code id="blueprint-tree-display">Blueprint folders will appear here after generation...</code></pre>
+                </div>
+
+                <!-- 2. Configurations Boilerplate -->
+                <div id="architect-tab-config" class="tab-content-panel hidden">
+                    <h5 class="fw-bold text-info mb-3" style="font-size: 0.82rem; text-transform: uppercase;"><i class="fa-solid fa-file-code me-1"></i> Deployment Boilerplate (Dockerfile/package.json)</h5>
+                    <pre style="margin: 0; font-family: monospace; font-size: 0.8rem; line-height: 1.6; white-space: pre-wrap;"><code id="blueprint-config-display">Configuration scripts will appear here after generation...</code></pre>
+                </div>
+
+                <!-- 3. Database Schema -->
+                <div id="architect-tab-schema" class="tab-content-panel hidden">
+                    <h5 class="fw-bold text-info mb-3" style="font-size: 0.82rem; text-transform: uppercase;"><i class="fa-solid fa-database me-1"></i> Relational Database Tables Config</h5>
+                    <pre style="margin: 0; font-family: monospace; font-size: 0.8rem; line-height: 1.6; white-space: pre-wrap;"><code id="blueprint-schema-display">SQL tables will appear here after generation...</code></pre>
+                </div>
+
+                <!-- 4. Visual Diagram Rendering -->
+                <div id="architect-tab-mermaid" class="tab-content-panel hidden" style="background:#ffffff; color:#1e293b; border-radius: 6px; padding: 15px; min-height: 100%;">
+                    <h5 class="fw-bold text-primary mb-3" style="font-size: 0.82rem; text-transform: uppercase;"><i class="fa-solid fa-circle-nodes me-1"></i> Live Rendered Dataflow Diagram</h5>
+                    <div id="mermaid-render-container" style="display: flex; justify-content: center; align-items: center; min-height: 350px;">
+                        <span class="text-secondary" style="font-size: 0.88rem;">Diagram flow chart will render here after generation...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+let activeTab = "tree";
+let currentMermaidCode = "";
+
+function switchArchitectTab(tab) {
+    activeTab = tab;
+    
+    // Toggle navigation button styles
+    const navButtons = document.querySelectorAll("#tabs-navigation button");
+    navButtons.forEach(btn => btn.classList.remove("active"));
+    
+    const targetIdx = ["tree", "config", "schema", "mermaid"].indexOf(tab);
+    if (targetIdx >= 0) navButtons[targetIdx].classList.add("active");
+
+    // Toggle panels visibility
+    document.getElementById("architect-tab-tree").classList.add("hidden");
+    document.getElementById("architect-tab-config").classList.add("hidden");
+    document.getElementById("architect-tab-schema").classList.add("hidden");
+    document.getElementById("architect-tab-mermaid").classList.add("hidden");
+
+    document.getElementById(`architect-tab-${tab}`).classList.remove("hidden");
+}
+
+async function generateArchitectBlueprint() {
+    const idea = document.getElementById("project-idea-input").value.trim();
+    if (!idea) {
+        alert("Please describe your project concept idea first.");
+        return;
+    }
+
+    const generateBtn = document.querySelector('button[onclick="generateArchitectBlueprint()"]');
+    generateBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Architecture Blueprints...`;
+    generateBtn.disabled = true;
+
+    try {
+        const customKey = localStorage.getItem("campusmate_gemini_key") || "";
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
+        const response = await fetch("/project-architect/generate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken
+            },
+            body: JSON.stringify({ idea: idea, custom_key: customKey })
+        });
+
+        const data = await response.json();
+        if (response.ok && data.success) {
+            document.getElementById("blueprint-tree-display").innerText = data.folder_tree;
+            document.getElementById("blueprint-config-display").innerText = data.config_file;
+            document.getElementById("blueprint-schema-display").innerText = data.schema;
+            
+            currentMermaidCode = data.mermaid;
+
+            // Render Mermaid flowchart dynamically using Mermaid.js API
+            const container = document.getElementById("mermaid-render-container");
+            container.innerHTML = `<pre class="mermaid" id="mermaid-canvas-element">${currentMermaidCode}</pre>`;
+            
+            if (window.mermaid) {
+                try {
+                    window.mermaid.run({
+                        nodes: [document.getElementById("mermaid-canvas-element")]
+                    });
+                } catch(err) {
+                    console.error("Mermaid Render Error:", err);
+                    container.innerHTML = `<div class="alert alert-warning" style="font-size:0.8rem;">Diagram compilation error. Displaying raw diagram markup:<br><pre style="margin-top:6px; color:#c2410c;">${currentMermaidCode}</pre></div>`;
+                }
+            }
+
+            // Switch back to folder tree default tab view
+            switchArchitectTab('tree');
+        } else {
+            alert("Blueprint generation failed: " + (data.error || "Unknown error"));
+        }
+    } catch(e) {
+        console.error(e);
+        alert("Failed to build architecture configurations.");
+    } finally {
+        generateBtn.innerHTML = `Generate System Blueprint <i class="fa-solid fa-compass-drafting ms-1"></i>`;
+        generateBtn.disabled = false;
+    }
+}
+</script>
+
+<style>
+.hidden {
+    display: none !important;
+}
+.tab-nav-btn {
+    background: transparent;
+    border: none;
+    border-bottom: 2.5px solid transparent;
+    padding: 12px 18px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.tab-nav-btn:hover {
+    color: #0078d4;
+    background: rgba(0, 120, 212, 0.02);
+}
+.tab-nav-btn.active {
+    color: #0078d4;
+    border-bottom-color: #0078d4;
+    font-weight: 700;
+}
+</style>
+{% endblock %}

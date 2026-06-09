@@ -1,0 +1,83 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Settings Panel - CampusMate AI{% endblock %}
+
+{% block header_title %}Platform Settings{% endblock %}
+
+{% block content %}
+<div class="row g-4 justify-content-center">
+    <div class="col-lg-8">
+        <!-- Password Settings Card -->
+        <div class="flat-card shadow-sm border-light mb-4">
+            <h3 class="fw-bold text-dark mb-3" style="font-size:1.05rem;"><i class="fa-solid fa-key text-primary me-2"></i> Update Security Credentials</h3>
+            
+            <form method="POST" action="{{ url_for('dashboard.settings') }}" class="d-flex flex-column gap-3">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="action" value="password">
+                
+                <div class="input-group d-flex flex-column gap-1">
+                    <label for="old-pass-field" class="fw-semibold text-secondary" style="font-size:0.8rem;">Current Password</label>
+                    <input type="password" id="old-pass-field" name="old_password" class="form-control shadow-sm" required placeholder="Enter current password">
+                </div>
+
+                <div class="input-group d-flex flex-column gap-1">
+                    <label for="new-pass-field" class="fw-semibold text-secondary" style="font-size:0.8rem;">New Password</label>
+                    <input type="password" id="new-pass-field" name="new_password" class="form-control shadow-sm" required placeholder="Minimum 8 characters">
+                </div>
+
+                <button type="submit" class="btn btn-primary shadow-sm py-2 mt-2" style="background: linear-gradient(135deg, #0078d4, #00bcf2); border: none; font-size:0.9rem;">
+                    Confirm Password Change <i class="fa-solid fa-shield-check ms-1"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- Preferences Settings Card -->
+        <div class="flat-card shadow-sm border-light">
+            <h3 class="fw-bold text-dark mb-3" style="font-size:1.05rem;"><i class="fa-solid fa-sliders text-primary me-2"></i> Platform Preferences</h3>
+            
+            <form method="POST" action="{{ url_for('dashboard.settings') }}" class="d-flex flex-column gap-3">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="action" value="preferences">
+                
+                <!-- Notification Settings -->
+                <div class="mb-3">
+                    <h4 class="fw-bold text-dark mb-2.5" style="font-size:0.9rem;">Notification Center Toggles</h4>
+                    <div class="d-flex flex-column gap-2">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="notify-milestones" name="notify_milestones" checked>
+                            <label class="form-check-label text-dark" for="notify-milestones" style="font-size: 0.85rem;">Milestone check-offs & roadmap alerts</label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="notify-streaks" name="notify_streaks" checked>
+                            <label class="form-check-label text-dark" for="notify-streaks" style="font-size: 0.85rem;">Study streaks and gamification badges</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Privacy Settings -->
+                <div class="mb-4 border-top pt-3" style="border-color:#dee2e6;">
+                    <h4 class="fw-bold text-dark mb-2.5" style="font-size:0.9rem;">Recruiter Profile Visibility</h4>
+                    <div class="d-flex flex-column gap-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="privacy_level" id="privacy-public" value="public" checked>
+                            <label class="form-check-label text-dark" for="privacy-public" style="font-size: 0.85rem;">
+                                <strong>Public Registry</strong> (Show my profile compatibility to recruiters in the Internship Center)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="privacy_level" id="privacy-private" value="private">
+                            <label class="form-check-label text-dark" for="privacy-private" style="font-size: 0.85rem;">
+                                <strong>Private/Hidden</strong> (Only visible to myself and platform mentors)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-outline-primary shadow-sm py-2" style="font-size:0.9rem; font-weight:600;">
+                    Save Preferences <i class="fa-solid fa-save ms-1"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

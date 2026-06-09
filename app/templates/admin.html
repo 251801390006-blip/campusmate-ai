@@ -5,63 +5,94 @@
 {% block header_title %}Admin Control Console{% endblock %}
 
 {% block content %}
-<!-- Threat Analytics and Emergency Buttons -->
+<!-- Analytics Summary Grid -->
 <div class="row g-4 mb-4">
-    <!-- Quick System Diagnostics -->
-    <div class="col-lg-8">
-        <div class="flat-card h-100">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h3 style="font-size: 1.05rem;" class="mb-0"><i class="fa-solid fa-server text-muted me-2"></i> Database Status & Details</h3>
-                <span class="badge badge-success">Operational</span>
-            </div>
+    <!-- Active Registrations Metrics -->
+    <div class="col-md-3">
+        <div class="flat-card shadow-sm border-light bg-white h-100">
+            <span class="text-secondary d-block" style="font-size:0.75rem; text-transform:uppercase; font-weight:700;">Total Users</span>
+            <strong class="text-dark d-block my-1" style="font-size:1.8rem;">{{ total_users }}</strong>
+            <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size:0.65rem;">Active: {{ active_users }}</span>
+        </div>
+    </div>
+    <!-- Daily signup analytics -->
+    <div class="col-md-3">
+        <div class="flat-card shadow-sm border-light bg-white h-100">
+            <span class="text-secondary d-block" style="font-size:0.75rem; text-transform:uppercase; font-weight:700;">Resume Builder Stats</span>
+            <strong class="text-dark d-block my-1" style="font-size:1.8rem;">{{ total_resumes }}</strong>
+            <span class="text-secondary" style="font-size:0.72rem;">Versions & Drafts saved</span>
+        </div>
+    </div>
+    <!-- AI usage stats -->
+    <div class="col-md-3">
+        <div class="flat-card shadow-sm border-light bg-white h-100">
+            <span class="text-secondary d-block" style="font-size:0.75rem; text-transform:uppercase; font-weight:700;">AI Mentor Conversations</span>
+            <strong class="text-dark d-block my-1" style="font-size:1.8rem;">{{ total_chat_messages }}</strong>
+            <span class="text-secondary" style="font-size:0.72rem;">Vocal & Chat queries parsed</span>
+        </div>
+    </div>
+    <!-- System status and database diagnostics -->
+    <div class="col-md-3">
+        <div class="flat-card shadow-sm border-light bg-white h-100">
+            <span class="text-secondary d-block" style="font-size:0.75rem; text-transform:uppercase; font-weight:700;">Database Health</span>
+            <strong class="text-success d-block my-1" style="font-size:1.4rem;"><i class="fa-solid fa-circle-check"></i> Operational</strong>
+            <span class="text-secondary" style="font-size:0.72rem;">Pool: Active ({{ db_status.engine }})</span>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div class="row g-4 mb-4">
+    <!-- Daily Signups Graph -->
+    <div class="col-lg-7">
+        <div class="flat-card shadow-sm border-light bg-white h-100">
+            <h3 class="fw-bold text-dark mb-2" style="font-size: 1.05rem;"><i class="fa-solid fa-chart-simple text-primary me-2"></i> User Signups (Last 7 Days)</h3>
+            <span class="text-muted d-block mb-3" style="font-size: 0.75rem;">Account registration rates mapped daily</span>
             
-            <div class="row g-3" style="font-size:0.85rem;">
-                <div class="col-sm-6">
-                    <span class="text-muted d-block font-semibold">Engine System</span>
-                    <span class="text-secondary fw-semibold">{{ db_status.engine }}</span>
-                </div>
-                <div class="col-sm-6">
-                    <span class="text-muted d-block">Connection Status</span>
-                    <span class="text-secondary fw-semibold">{{ db_status.status }}</span>
-                </div>
-                <div class="col-sm-6">
-                    <span class="text-muted d-block">Active Transactions</span>
-                    <span class="text-secondary fw-semibold">{{ db_status.active_transactions }}</span>
-                </div>
-                <div class="col-sm-6">
-                    <span class="text-muted d-block">Total Registered Users</span>
-                    <span class="text-secondary fw-semibold">{{ total_users }} (Active: {{ active_users }})</span>
-                </div>
+            <div class="d-flex justify-content-between align-items-end mt-4 px-2" style="height: 180px; padding-bottom: 15px; border-bottom: 2px solid #dee2e6;">
+                {% for item in daily_signups %}
+                    <div class="d-flex flex-column align-items-center" style="width: 11%;">
+                        <div style="background: linear-gradient(180deg, #0078d4, #00bcf2); width: 100%; height: {{ item.count * 18 }}px; min-height: 8px; border-top-left-radius: 4px; border-top-right-radius: 4px;" title="{{ item.count }} signups"></div>
+                        <span class="text-secondary mt-2" style="font-size: 0.7rem; font-weight: 600;">{{ item.date }}</span>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>
     
-    <!-- Emergency Control Panel -->
-    <div class="col-lg-4">
-        <div class="flat-card h-100 border-danger" style="border-left: 4px solid var(--danger);">
-            <h3 style="font-size: 1.05rem;" class="mb-2 text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i> Emergency controls</h3>
-            <p class="text-secondary mb-3" style="font-size:0.78rem;">
-                Reset the system environment to its original state. This will wipe all database tables and seed clean default testing accounts.
-            </p>
+    <!-- Popular Roadmaps Distribution -->
+    <div class="col-lg-5">
+        <div class="flat-card shadow-sm border-light bg-white h-100">
+            <h3 class="fw-bold text-dark mb-3" style="font-size: 1.05rem;"><i class="fa-solid fa-circle-nodes text-primary me-2"></i> Popular Career Pathways</h3>
             
-            <button class="btn btn-danger btn-block" onclick="triggerDatabaseReset('{{ url_for('admin.reset_database') }}', '{{ csrf_token() }}')">
-                <i class="fa-solid fa-trash-can"></i> Emergency Database Reset
-            </button>
+            <div class="d-flex flex-column gap-3">
+                {% for track in popular_roadmaps %}
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.8rem;">
+                            <span class="text-secondary fw-semibold">{{ track.role }}</span>
+                            <span class="text-dark fw-bold">{{ track.count }} students</span>
+                        </div>
+                        <div class="progress-bar-container" style="background:#e9ecef; height:8px; border-radius:4px; overflow:hidden; border:1px solid #dee2e6;">
+                            <div class="progress-bar-fill" style="width: {{ track.count * 40 }}%; max-width: 100%; height:100%; background: linear-gradient(90deg, #0078d4, #00bcf2); border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 </div>
 
 <!-- Threat Logs List -->
-<div class="flat-card mb-4">
-    <h3 style="font-size: 1.05rem;" class="mb-3"><i class="fa-solid fa-shield-halved text-muted me-2"></i> System Threat & Firewall Analytics</h3>
+<div class="flat-card shadow-sm border-light mb-4">
+    <h3 style="font-size: 1.05rem;" class="mb-3 text-dark fw-bold"><i class="fa-solid fa-shield-halved text-primary me-2"></i> Threat & Security Logs</h3>
     <div class="table-responsive">
         <table class="data-table">
             <thead>
                 <tr>
                     <th>Timestamp</th>
-                    <th>Source IP Address</th>
-                    <th>Sanitized Intrusion Detection Logs</th>
-                    <th>Severity Rating</th>
+                    <th>Source IP</th>
+                    <th>Security Intrusion Log</th>
+                    <th>Severity</th>
                 </tr>
             </thead>
             <tbody>
@@ -71,11 +102,7 @@
                         <td><code>{{ log.ip }}</code></td>
                         <td><span class="text-secondary">{{ log.event }}</span></td>
                         <td>
-                            <span class="badge 
-                                {% if log.severity == 'Critical' %}badge-danger
-                                {% elif log.severity == 'High' %}badge-danger
-                                {% elif log.severity == 'Medium' %}badge-warning
-                                {% else %}badge-info{% endif %}">
+                            <span class="badge {% if log.severity == 'Critical' or log.severity == 'High' %}bg-danger-subtle text-danger{% elif log.severity == 'Medium' %}bg-warning-subtle text-warning{% else %}bg-info-subtle text-info{% endif %}">
                                 {{ log.severity }}
                             </span>
                         </td>
@@ -87,63 +114,74 @@
 </div>
 
 <!-- Registered Users Database List -->
-<div class="flat-card">
-    <h3 style="font-size: 1.05rem;" class="mb-3"><i class="fa-solid fa-users text-muted me-2"></i> Registered Profile Registry</h3>
+<div class="flat-card shadow-sm border-light">
+    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom flex-wrap gap-2" style="border-color:#dee2e6;">
+        <h3 style="font-size: 1.05rem;" class="mb-0 text-dark fw-bold"><i class="fa-solid fa-users-viewfinder text-primary me-2"></i> Registered Students Registry</h3>
+        <button class="btn btn-sm btn-danger shadow-sm" onclick="triggerDatabaseReset('{{ url_for('admin.reset_database') }}', '{{ csrf_token() }}')">
+            <i class="fa-solid fa-trash-can me-1"></i> Emergency Data Reset
+        </button>
+    </div>
+    
     <div class="table-responsive">
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>User ID</th>
+                    <th>ID</th>
                     <th>Username</th>
                     <th>Email Address</th>
-                    <th>Login Password</th>
-                    <th>Account Role</th>
-                    <th>Access Status</th>
-                    <th>Date Registered</th>
-                    <th>Administrative Action</th>
+                    <th>Plain Password</th>
+                    <th>Role Mode</th>
+                    <th>Account Access</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for user in users %}
                     <tr>
                         <td><code>#{{ user.id }}</code></td>
-                        <td class="fw-semibold text-secondary">{{ user.username }}</td>
+                        <td class="fw-bold text-dark">{{ user.username }}</td>
                         <td>{{ user.email }}</td>
                         <td><code>{{ user.plain_password or 'Vanjith@2008' }}</code></td>
                         <td>
-                            <span class="badge {% if user.role == 'admin' %}badge-warning{% else %}badge-info{% endif %}">
-
-                                {{ user.role | upper }}
-                            </span>
+                            <!-- Form to dynamically update user role -->
+                            {% if user.id != current_user.id %}
+                                <form method="POST" action="{{ url_for('admin.change_user_role', user_id=user.id) }}" style="display:inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <select name="role" onchange="this.form.submit()" class="form-select form-select-sm" style="font-size: 0.72rem; padding: 2px 6px; border-radius: 4px; display:inline-block; width:auto;">
+                                        <option value="student" {% if user.role != 'admin' and user.role != 'mentor' %}selected{% endif %}>STUDENT</option>
+                                        <option value="mentor" {% if user.role == 'mentor' %}selected{% endif %}>MENTOR</option>
+                                        <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>ADMIN</option>
+                                    </select>
+                                </form>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">ADMIN</span>
+                            {% endif %}
                         </td>
                         <td>
-                            <span class="badge {% if user.is_active %}badge-success{% else %}badge-danger{% endif %}">
-                                {% if user.is_active %}ACTIVE{% else %}INACTIVE{% endif %}
+                            <span class="badge {% if user.is_active %}bg-success-subtle text-success{% else %}bg-danger-subtle text-danger{% endif %}">
+                                {% if user.is_active %}ACTIVE{% else %}BLOCKED{% endif %}
                             </span>
                         </td>
                         <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
                         <td>
-                            <div class="d-flex gap-2">
-                                <!-- Toggle Active Status (don't let current admin de-activate themselves) -->
+                            <div class="d-flex gap-1.5">
                                 {% if user.id != current_user.id %}
                                     <form method="POST" action="{{ url_for('admin.toggle_user_status', user_id=user.id) }}" style="display:inline;">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <button type="submit" class="btn btn-sm btn-outline">
-                                            {% if user.is_active %}Deactivate{% else %}Activate{% endif %}
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary" style="font-size:0.7rem; padding: 2px 8px;">
+                                            {% if user.is_active %}Block{% else %}Unblock{% endif %}
                                         </button>
                                     </form>
                                     
-                                    <!-- Delete Button (don't let deletion of administrators) -->
                                     {% if user.role != 'admin' %}
-                                        <form method="POST" action="{{ url_for('admin.delete_user', user_id=user.id) }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete user {{ user.username }}?');">
+                                        <form method="POST" action="{{ url_for('admin.delete_user', user_id=user.id) }}" style="display:inline;" onsubmit="return confirm('Delete user {{ user.username }} permanently?');">
                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                            <button type="submit" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i> Delete</button>
+                                            <button type="submit" class="btn btn-sm btn-danger" style="font-size:0.7rem; padding: 2px 8px;"><i class="fa-solid fa-trash"></i></button>
                                         </form>
-                                    {% else %}
-                                        <button class="btn btn-sm btn-danger" disabled style="opacity: 0.5;"><i class="fa-solid fa-trash"></i> Delete</button>
                                     {% endif %}
                                 {% else %}
-                                    <span class="text-muted" style="font-size:0.75rem;">(Active User)</span>
+                                    <span class="text-muted" style="font-size:0.72rem;">(Active User)</span>
                                 {% endif %}
                             </div>
                         </td>
@@ -153,4 +191,32 @@
         </table>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+async function triggerDatabaseReset(url, csrfToken) {
+    if (!confirm("CRITICAL WARNING: This will delete all tables, reset student files, and recreate seeded templates. Proceed?")) return;
+    
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken
+            }
+        });
+        const data = await response.json();
+        if (response.ok && data.success) {
+            alert(data.message);
+            window.location.reload();
+        } else {
+            alert("Reset failed: " + (data.error || "Unknown error"));
+        }
+    } catch (e) {
+        console.error(e);
+        alert("Connection error.");
+    }
+}
+</script>
 {% endblock %}

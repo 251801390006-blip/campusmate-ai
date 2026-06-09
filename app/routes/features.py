@@ -8,7 +8,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, current_app
 from flask_login import login_required, current_user
-from app.models import db, User, ChatMessage, ResumeAnalysis, RoadmapProgress
+from app.models import db, User, ChatMessage, ResumeAnalysis, RoadmapProgress, UserResume
 from pypdf import PdfReader
 
 features_bp = Blueprint('features', __name__)
@@ -222,6 +222,116 @@ def heuristic_parse_resume(text: str) -> dict:
         "suggestions": suggestions
     }
 
+def parse_text_to_resume_fields(text: str) -> dict:
+    parsed = heuristic_parse_resume(text)
+    
+    # Base defaults
+    fields = {
+        "name": parsed.get("name", "Alex Smith"),
+        "address": "San Francisco, California, USA",
+        "email": parsed.get("email", ""),
+        "phone": parsed.get("phone", ""),
+        "linkedin": parsed.get("linkedin", ""),
+        "github": parsed.get("github", ""),
+        
+        "edu1Inst": "State Tech University",
+        "edu1Degree": "B.S. in Computer Science",
+        "edu1Dates": "2024 – 2028",
+        "edu1Gpa": "3.8/4.0",
+        "edu1Coursework": "Data Structures, Cryptography, Database Systems, Computer Networks",
+        
+        "edu2Inst": "",
+        "edu2Degree": "",
+        "edu2Dates": "",
+        "edu2Gpa": "",
+        
+        "skillsProg": parsed.get("skillsProg", ""),
+        "skillsCyber": parsed.get("skillsCyber", ""),
+        "skillsOs": parsed.get("skillsOs", ""),
+        "skillsTools": parsed.get("skillsTools", ""),
+        "skillsWeb": parsed.get("skillsWeb", ""),
+        
+        "experienceRole": "Software Engineering Intern",
+        "experienceComp": "Global Tech Solutions",
+        "experienceDates": "June 2025 – August 2025",
+        "experienceB1": "",
+        "experienceB2": "",
+        "experienceB3": "",
+        "experienceB4": "",
+        
+        "projectTitle": "AegisShield AI – Cyber Crime Detection Platform",
+        "projectLink": "github.com/alexsmith/aegisshield-ai",
+        "projectB1": "",
+        "projectB2": "",
+        "projectB3": "",
+        
+        "certC1": "",
+        "certC2": "",
+        "certC3": "",
+        "certC4": ""
+    }
+    
+    # Try to extract sections dynamically from text
+    lines = [l.strip() for l in text.split("\n") if l.strip()]
+    
+    # Split text by sections
+    section_map = {}
+    current_sec = None
+    for l in lines:
+        l_lower = l.lower()
+        if any(x in l_lower for x in ["education", "academic", "university", "college"]):
+            current_sec = "edu"
+        elif any(x in l_lower for x in ["experience", "employment", "work", "career"]):
+            current_sec = "exp"
+        elif any(x in l_lower for x in ["projects", "personal projects", "portfolio"]):
+            current_sec = "proj"
+        elif any(x in l_lower for x in ["skills", "technical skills", "languages", "technologies"]):
+            current_sec = "skills"
+        elif any(x in l_lower for x in ["certifications", "certs", "credentials", "achievements"]):
+            current_sec = "cert"
+        elif current_sec:
+            section_map.setdefault(current_sec, []).append(l)
+            
+    # Assign education
+    edu_lines = section_map.get("edu", [])
+    if edu_lines:
+        fields["edu1Inst"] = edu_lines[0]
+        if len(edu_lines) > 1:
+            fields["edu1Degree"] = edu_lines[1]
+        if len(edu_lines) > 2:
+            fields["edu1Dates"] = edu_lines[2]
+            
+    # Assign experience
+    exp_lines = section_map.get("exp", [])
+    if exp_lines:
+        fields["experienceRole"] = exp_lines[0]
+        if len(exp_lines) > 1 and not exp_lines[1].startswith(("-", "*", "•")):
+            fields["experienceComp"] = exp_lines[1]
+        bullets = [l for l in exp_lines[1:] if l.startswith(("-", "*", "•")) or len(l) > 30]
+        if len(bullets) > 0: fields["experienceB1"] = bullets[0].lstrip("-*• ")
+        if len(bullets) > 1: fields["experienceB2"] = bullets[1].lstrip("-*• ")
+        if len(bullets) > 2: fields["experienceB3"] = bullets[2].lstrip("-*• ")
+        if len(bullets) > 3: fields["experienceB4"] = bullets[3].lstrip("-*• ")
+        
+    # Assign projects
+    proj_lines = section_map.get("proj", [])
+    if proj_lines:
+        fields["projectTitle"] = proj_lines[0]
+        bullets = [l for l in proj_lines[1:] if l.startswith(("-", "*", "•")) or len(l) > 30]
+        if len(bullets) > 0: fields["projectB1"] = bullets[0].lstrip("-*• ")
+        if len(bullets) > 1: fields["projectB2"] = bullets[1].lstrip("-*• ")
+        if len(bullets) > 2: fields["projectB3"] = bullets[2].lstrip("-*• ")
+        
+    # Assign certifications
+    cert_lines = section_map.get("cert", [])
+    if cert_lines:
+        if len(cert_lines) > 0: fields["certC1"] = cert_lines[0]
+        if len(cert_lines) > 1: fields["certC2"] = cert_lines[1]
+        if len(cert_lines) > 2: fields["certC3"] = cert_lines[2]
+        if len(cert_lines) > 3: fields["certC4"] = cert_lines[3]
+        
+    return fields
+
 # --- ROADMAP DETAIL CONTEXTS ---
 def get_predefined_roadmap(role: str) -> list:
     role_lower = role.lower()
@@ -360,142 +470,236 @@ def get_predefined_roadmap(role: str) -> list:
             ("Cloud Computing Fundamentals", "Learn IaaS, PaaS, SaaS, and public vs private structures."),
             ("Virtual Machines & OS Provisioning", "Spin up VMs, configure SSH access, and update repositories."),
             ("Virtual Networking & Subnetting", "Deploy virtual networks, design subnets, and configure routes."),
-            ("Firewalls & Network Access Control", "Configure ingress/egress rules and block open SSH ports."),
-            ("Cloud Object Storage Essentials", "Create storage buckets, configure access controls, and files."),
-            ("IAM: Users, Groups & Policy JSON", "Write strict access policies and delegate privileges safely."),
-            ("SQL Databases in the Cloud", "Provision relational instances and audit connectivity links."),
-            ("NoSQL Cloud Database Engines", "Setup key-value engines and configure primary partition keys."),
-            ("Load Balancers & High Availability", "Distribute HTTP requests across target server pools."),
-            ("Auto-Scaling & Elastic Operations", "Configure rules to automatically scale node counts on load."),
-            ("Serverless Functions (FaaS)", "Deploy event-driven functions and configure trigger endpoints."),
-            ("DNS Routing & Domain Registries", "Configure target routes, health checks, and domain maps."),
-            ("Content Delivery Networks (CDN)", "Cache static images and CSS stylesheets at edge locations."),
-            ("Monitoring, Metrics & Logs Tracker", "Setup metric graphs and track CPU/memory alerts."),
-            ("Backup, Restore & Disaster Recovery", "Schedule snapshot policies and test database recovery loops."),
-            ("Terraform: Infrastructure as Code (IaC)", "Define VMs, networks, and firewalls using YAML/HCL configurations."),
-            ("Terraform: State Files & Variables", "Manage state configs, output parameters, and modules."),
-            ("Cloud Container Registry setups", "Build Docker images and push to cloud registry stores."),
-            ("Kubernetes Cloud Clusters (EKS/AKS)", "Provision managed Kubernetes clusters and connect kubectl."),
-            ("Hybrid Cloud & VPN Tunnel Gateway", "Bridge local data networks to cloud nodes using secure VPNs."),
-            ("Cloud Billing & Cost Controls", "Set spending limits, configure alarms, and clean unused disks."),
-            ("Shared Responsibility Security Audits", "Evaluate vulnerability logs, WAF alerts, and security groups."),
-            ("Automated VM Configuration (Ansible)", "Write playbooks to deploy web servers on fresh cloud VMs."),
-            ("Server Migration Strategies", "Learn how to lift and shift database nodes to cloud instances."),
-            ("Capstone: Deploy Secure Cloud Cluster", "Deploy a complete SaaS network behind load balancers with WAF."),
-            ("Capstone High-Availability Architecture", "Present solutions blueprint achieving 99.99% multi-region uptime.")
+            ("Firewalls & Network Access Control", "Configure ingress/egress rules and block open SSH ports.")
         ]
-        provider = "Amazon AWS / Microsoft"
-        cert = "AWS Certified Solutions Architect – Associate"
-    # 6. DevOps
-    elif "devops" in role_lower:
-        milestones = [
-            ("DevOps Culture & Linux Shell Power", "Learn standard commands, file management, and terminal tools."),
-            ("Git Foundations & Branching Models", "Master merging, rebasing, pull requests, and git-flow patterns."),
-            ("Bash Scripting & Automation Loops", "Write automation scripts to clean temp files and parse logs."),
-            ("Docker: Building Custom Containers", "Write Dockerfiles, configure layers, and run entrypoints."),
-            ("Docker Compose: Multi-Container Setup", "Run backend APIs and database nodes side-by-side using YAML."),
-            ("Docker Volumes & Persistent Storage", "Configure mount volumes and preserve data across restarts."),
-            ("CI/CD: GitHub Actions Workflows", "Create YAML workflows to compile code on push events."),
-            ("CI/CD: Automated Linter & Unit Tests", "Integrate automated check steps and block broken pull builds."),
-            ("Infrastructure as Code (IaC) Basics", "Learn declarative config models and write simple YAML plans."),
-            ("Terraform: Provisioning Local Dev Host", "Write terraform configs to deploy Docker containers."),
-            ("Terraform: State Management & Backends", "Configure remote state locking to avoid resource conflicts."),
-            ("Configuration Management: Ansible", "Write playbooks to configure packages on server networks."),
-            ("Continuous Deployment: SSH Web Deploy", "Auto-deploy code directly to remote servers using SSH scripts."),
-            ("Monitoring Systems: Prometheus Basics", "Expose metrics endpoints and monitor CPU/RAM utilization."),
-            ("Log Aggregation: ELK Stack / Grafana", "Collect application logs, construct dashboards, and monitor errors."),
-            ("Kubernetes: Pods, Services & Deployments", "Write YAML manifests to deploy container sets locally."),
-            ("Kubernetes: ConfigMaps & Secrets", "Inject environment variables and secret tokens securely."),
-            ("Kubernetes: Ingress & Domain Routing", "Deploy ingress controllers to route HTTP traffic to services."),
-            ("Helm: Packaging Kubernetes Apps", "Use Helm charts to install persistent database clusters."),
-            ("GitOps: Intro to ArgoCD pipelines", "Sync Kubernetes clusters directly with git repository state."),
-            ("SaaS Logging & Alerting Triggers", "Setup Slack/email alert webhooks for down server nodes."),
-            ("CI/CD: Artifact Registries & Packages", "Publish compiled images to secure image registries."),
-            ("Security: Scanning Docker Images (Trivy)", "Integrate CVE vulnerability scans inside build jobs."),
-            ("DevSecOps: Secret Key Scanning", "Audit repository histories and block commit keys from git."),
-            ("Capstone: Zero-Downtime CD Pipeline", "Deliver an automated pipeline that builds, tests, and rolls updates."),
-            ("Capstone System Resilience Verification", "Conduct chaos experiments testing server pool auto-recovery.")
-        ]
-        provider = "HashiCorp / RedHat"
-        cert = "HashiCorp Certified: Terraform Associate"
-    # 7. Full Stack Web Development
-    elif "full" in role_lower or "web" in role_lower or "developer" in role_lower or "engineering" in role_lower or "software" in role_lower:
-        milestones = [
-            ("Internet Basics & Web Architectures", "Understand HTTP protocols, DNS servers, and request lifecycles."),
-            ("Semantic HTML5 Document Design", "Learn layout structures, inputs, buttons, and document trees."),
-            ("CSS3 Styling: Flexbox & Page Grids", "Align interface cards, configure grid spans, and margins."),
-            ("Responsive CSS Variables & Queries", "Build responsive layouts using variables and media queries."),
-            ("Modern Styling: Brutalist & Glassmorphism", "Apply neo-brutalist solid black borders and glass cards."),
-            ("JavaScript Variables, Arrays & loops", "Master basic data handling, loops, and conditions."),
-            ("DOM Manipulation & Page Events", "Write event listeners to dynamically modify page elements."),
-            ("JavaScript Promises & Async/Await", "Fetch JSON payloads from backend endpoints asynchronously."),
-            ("React: Creating Functional Components", "Learn components, props, and render layouts in React."),
-            ("React: Hooks, State & Input Binding", "Use useState and useEffect to bind input variables."),
-            ("React: Context API & Routing", "Configure app navigation tabs and global user states."),
-            ("Node.js Runtime & Package Systems", "Write terminal scripts and load external modules."),
-            ("Express.js REST APIs & Routing", "Configure GET/POST routes and handle JSON body payloads."),
-            ("Relational Database Schema Design", "Design PostgreSQL tables, keys, and relational maps."),
-            ("SQL Queries, Indexing & Joins", "Write query commands, join tables, and index query fields."),
-            ("ORM integration: SQLModel / Prisma", "Map database tables to programming models."),
-            ("Authentication: JWT Tokens & Hash", "Hash passwords with bcrypt and sign JWT session tokens."),
-            ("API Gateways, CORS & Rate Limiting", "Secure endpoints from unauthorized cross-origin requests."),
-            ("Unit Testing Backend Controllers", "Write test suites, run assertions, and mock databases."),
-            ("Frontend Integration & Fetch Client", "Call authentication and data endpoints from frontend pages."),
-            ("Dockerizing Full Stack Applications", "Containerize frontend and backend layers into single images."),
-            ("CI/CD Pipelines: Automated Release", "Configure GitHub Actions to compile and deploy to cloud hosts."),
-            ("Performance: Query Caching with Redis", "Cache slow database outputs and speed up response cycles."),
-            ("Real-Time Communication: WebSockets", "Build live interactive chat hubs using WebSocket listeners."),
-            ("Capstone: Deploy E-Commerce Platform", "Deploy a complete app containing user auth, items, and billing."),
-            ("Capstone Deployment Validation", "Execute cypress visual validation tests verifying dynamic cart state.")
-        ]
-        provider = "FreeCodeCamp / OpenJS"
-        cert = "Meta Front-End Developer Certificate"
-    # 8. Mobile Development
+        provider = "Amazon Web Services"
+        cert = "AWS Certified Solutions Architect"
     else:
         milestones = [
-            ("Mobile Ecosystems: iOS & Android", "Learn native app files, lifecycle stages, and app store rules."),
-            ("Command Line Tools & Mobile SDKs", "Configure Android Studio, Xcode, simulator systems, and paths."),
-            ("Dart / Kotlin Language Foundations", "Master variables, loops, classes, and types of native languages."),
-            ("Functions & Modular File Imports", "Create reusable files, helper scripts, and async modules."),
-            ("UI Layout: Widgets & Layout Grids", "Deploy layout cards, flex lists, columns, and margins."),
-            ("Mobile Styling, Themes & Colors", "Apply light/dark mode support, responsive fonts, and buttons."),
-            ("State Management: Local Page States", "Track text inputs, form selections, and local toggle variables."),
-            ("Handling User Events: Gestures & Inputs", "Capture taps, swipes, long presses, and input focus changes."),
-            ("HTTP API Integration: Networking", "Fetch data from REST APIs, decode JSON, and handle connection errors."),
-            ("Local Database Storage (SQLite/Hive)", "Persist user settings and catalog local records offline."),
-            ("Mobile Authentication: JWT & OAuth", "Securely store login tokens and manage user sessions."),
-            ("Navigation Architectures: Tab Routers", "Configure stack navigation, tab bars, and back buttons."),
-            ("Camera, Files & Device Permissions", "Request access to camera features and load local photos."),
-            ("Location Services & Map Rendering", "Fetch GPS coordinates and render locations on map widgets."),
-            ("Push Notifications & Background Jobs", "Setup notification triggers and sync data in the background."),
-            ("Responsive UI for Mobile & Tablets", "Scale padding, layouts, and image assets dynamically."),
-            ("Global State Management (Bloc/Redux)", "Share user profiles and roadmaps across different screens."),
-            ("Unit & Widget UI Testing", "Write assertions for widget render states and test logic blocks."),
-            ("CI/CD: Building Release Bundles", "Auto-compile APK/IPA builds and run checks using CLI tools."),
-            ("App Optimizations: Caching & Loading", "Optimize image download sizes and cache local JSON records."),
-            ("Google Play & Apple Store Deployment", "Publish production builds to developer testing tracks."),
-            ("Error Logging & Crashlytics", "Integrate crash detectors and monitor runtime stack traces."),
-            ("Animations: Transitions & Micro-actions", "Add page transitions and micro-interactions for items."),
-            ("Securing App Files & Keystore Storage", "Encrypt API key tokens and secure password files in keychains."),
-            ("Capstone Mobile App Deployment", "Deploy a fully functional React Native/Flutter app containing auth and maps.")
+            ("Web Architecture & HTTP Protocols", "Learn how web requests travel over TCP and DNS infrastructure."),
+            ("HTML5 & CSS Grid Layouts", "Build responsive layouts using semantic grids and CSS variables."),
+            ("JavaScript Core & DOM Operations", "Write asynchronous promises and event handlers."),
+            ("REST APIs with Flask or Express", "Configure HTTP routing, controllers, and JSON responses.")
         ]
-        provider = "Google / Apple"
-        cert = "Google Associate Android Developer"
-        
+        provider = "Meta"
+        cert = "Meta Front-End Developer Certificate"
+
+    # Map tracks to distinct stages
+    if "cyber" in role_lower or "security" in role_lower or "hacking" in role_lower or "soc" in role_lower or "forensics" in role_lower or "network" in role_lower or "linux" in role_lower:
+        track_type = "security"
+    elif "ai" in role_lower or "intelligence" in role_lower or "machine" in role_lower or "deep" in role_lower or "learning" in role_lower or "prompt" in role_lower or "agentic" in role_lower or "analytics" in role_lower or "data" in role_lower:
+        track_type = "data_ai"
+    elif "cloud" in role_lower or "aws" in role_lower or "azure" in role_lower or "google" in role_lower or "devops" in role_lower or "kubernetes" in role_lower or "docker" in role_lower or "reliability" in role_lower:
+        track_type = "cloud_ops"
+    elif "blockchain" in role_lower or "web3" in role_lower:
+        track_type = "web3"
+    elif "design" in role_lower or "product" in role_lower or "testing" in role_lower or "qa" in role_lower or "business" in role_lower or "sap" in role_lower or "salesforce" in role_lower:
+        track_type = "product_qa"
+    else:
+        track_type = "dev" # standard programming and full-stack development
+
+    # Stage themes
+    if track_type == "security":
+        beginner_themes = [
+            "Networking Foundations & OSI Model", "IP Routing & Local Subnets",
+            "Command Line Interfaces & Linux Bash", "Basic Cryptography & Hashing Keys",
+            "Port Scanning & Reconnaissance Tools", "Wireshark Packet Analysis Techniques"
+        ]
+        inter_themes = [
+            "Firewall Policy Controls & VPNs", "OWASP Top 10 Web Vulnerabilities",
+            "Access Control Lists & IAM Policies", "Intrusion Detection Systems (IDS/IPS)",
+            "System Log Auditing & Splunk Basics", "Cloud Security Configuration Hardening"
+        ]
+        adv_themes = [
+            "Active Directory Intrusion Testing", "Reverse Engineering & Assembly Basics",
+            "Malware Signature Recognition", "Buffer Overflow Vulnerability Exploitations",
+            "Advanced Penetration Testing Frameworks"
+        ]
+        prof_themes = [
+            "Threat Hunting & Incident Response", "SaaS DevSecOps Compliance Rules",
+            "Zero-Downtime Incident Failovers", "OSCP Capstone Laboratory Preparation"
+        ]
+        cert_name = "CompTIA Security+"
+        cert_provider = "CompTIA"
+    elif track_type == "data_ai":
+        beginner_themes = [
+            "Linear Algebra & Statistical Basics", "Python Foundations & Numpy Arrays",
+            "Pandas Data Wrangling & Cleaning", "SQL Queries & Databases Operations",
+            "Scikit-Learn Machine Learning Models", "Regression & Classification Metrics"
+        ]
+        inter_themes = [
+            "Neural Network Architecture Basics", "PyTorch Framework & Deep Learning",
+            "Computer Vision & Convolutional Nets", "Recurrent Neural Networks & NLP",
+            "Model Fine-Tuning Hyperparameters", "Vector Databases & Semantic Embeddings"
+        ]
+        adv_themes = [
+            "Transformer Models & Attention Layers", "Generative AI & LLMs Architecture",
+            "Retrieval Augmented Generation (RAG)", "Agentic AI Autopilot Multi-Agent Frameworks",
+            "Model Optimizations & Quantization"
+        ]
+        prof_themes = [
+            "AI Deployment Pipelines & Kubernetes", "Model Monitoring & Drift Detection",
+            "Bias Mitigation & AI Ethics Guidelines", "Production Capstone LLM Deployment"
+        ]
+        cert_name = "Microsoft Certified: Azure AI Engineer"
+        cert_provider = "Microsoft"
+    elif track_type == "cloud_ops":
+        beginner_themes = [
+            "Networking Essentials & IP Subnets", "Virtual Machines & Hypervisors",
+            "Linux Commands & File Hardening", "Cloud Storage Buckets & Permissions",
+            "Docker Containers Foundations", "Git Version Control Operations"
+        ]
+        inter_themes = [
+            "YAML Manifests & Shell Scripting", "Infrastructure as Code (IaC) Basics",
+            "Terraform Deployments & States", "Ansible Configuration Playbooks",
+            "Continuous Integration (CI) Actions", "Kubernetes Pods & Services"
+        ]
+        adv_themes = [
+            "Kubernetes ConfigMaps & Secret Variables", "Ingress Controllers & Domain Routing",
+            "SRE SLOs/SLIs System Health Metrics", "Prometheus & Grafana Dashboards",
+            "Jenkins Deployment Pipeline Scripts"
+        ]
+        prof_themes = [
+            "GitOps ArgoCD Automatic Sync", "Vulnerability Scanning inside Pipelines",
+            "Multi-Region Cloud Deployments", "DevOps Production Pipeline Capstone"
+        ]
+        cert_name = "AWS Certified Solutions Architect"
+        cert_provider = "Amazon Web Services"
+    elif track_type == "web3":
+        beginner_themes = [
+            "Cryptography & Hash Functions", "Decentralized Ledger Architecture",
+            "Bitcoin Protocol & Transactions", "Ethereum Virtual Machine Foundations",
+            "Solidity Language Syntax Variables", "Smart Contracts Basic Topics"
+        ]
+        inter_themes = [
+            "Web3.js & Ethers.js Interfaces", "MetaMask Wallet API Binding",
+            "ERC-20 & ERC-721 Token Standard", "IPFS Decentralized File Hosting",
+            "Truffle & Hardhat Local Dev Test", "Smart Contract Security Vulnerabilities"
+        ]
+        adv_themes = [
+            "Defi Pools & Automated Market Makers", "Decentralized Autonomous Organizations (DAOs)",
+            "Layer-2 Rollups & Scaling Pipelines", "Smart Contract Gas Fee Optimizations",
+            "Oracles & ChainLink API Integration"
+        ]
+        prof_themes = [
+            "Smart Contract Security Audits", "ZK-Rollups & Zero-Knowledge Proofs",
+            "Web3 DApp Complete Deployment", "Web3 Capstone Production Auditor"
+        ]
+        cert_name = "Certified Blockchain Developer"
+        cert_provider = "Blockchain Council"
+    elif track_type == "product_qa":
+        beginner_themes = [
+            "Product Lifecycle & Agile Scrum", "User Research & Persona Mappings",
+            "Figma Wireframes & Page Layouts", "Software Quality Assurance Basics",
+            "Manual Test Cases & Bug Trackers", "Database Indexing & Queries"
+        ]
+        inter_themes = [
+            "QA Automation Selenium Scripts", "Playwright Visual Test Suites",
+            "SaaS Product Metrics & LTV/CAC", "Business Process Mapping (BPMN)",
+            "SAP Module Layouts & ERP Basics", "Salesforce Apex Scripting Triggers"
+        ]
+        adv_themes = [
+            "Load Testing & JMeter Performance", "API Mocking & Postman Automation",
+            "Product Roadmap Backlog Pruning", "ERP Database Integration Pipelines",
+            "Salesforce CRM Flow Configurations"
+        ]
+        prof_themes = [
+            "SaaS Launch Strategy & Analytics", "ERP Deployment Compliance Audit",
+            "CI/CD QA Verification Gateways", "QA Capstone System Deliverable"
+        ]
+        cert_name = "Professional Scrum Product Owner"
+        cert_provider = "Scrum.org"
+    else: # dev / Full Stack
+        beginner_themes = [
+            "HTTP Protocols & Web Architectures", "Semantic HTML5 Page Layouts",
+            "CSS Flexbox & Page Grids Layout", "Responsive CSS Variables & MQ",
+            "JavaScript Arrays & Page Events", "Promises & Async Fetch Calls"
+        ]
+        inter_themes = [
+            "React Functional Page Components", "React hooks state management",
+            "Node.js & Express REST APIs Routing", "Database Relational Schemas",
+            "SQL Queries and indexing optimizations", "JWT Authentication and session security"
+        ]
+        adv_themes = [
+            "Redux Global State Management", "WebSockets Real-Time Communications",
+            "Dockerizing Full Stack Server Layers", "Continuous Integration pipelines",
+            "Redis Output Query Memory Caching"
+        ]
+        prof_themes = [
+            "Microservices Cloud Deployment Plans", "Automated Visual Test Frameworks",
+            "Zero-Downtime Release CD Scripts", "Capstone Web SaaS Deployment"
+        ]
+        cert_name = "Meta Full-End Certificate"
+        cert_provider = "Meta"
+
+    # Assemble 200 nodes!
     nodes = []
-    for i, (title, desc) in enumerate(milestones):
-        diff = "BEGINNER" if i < 8 else ("INTERMEDIATE" if i < 17 else "ADVANCED")
-        dur = f"{8 + (i % 5)*2} hours"
+    for i in range(1, 201):
+        if i <= 50:
+            diff = "BEGINNER"
+            theme = beginner_themes[(i - 1) % len(beginner_themes)]
+            subtopic = f"Topic {i}: foundational exploration of {theme} tools."
+            why = f"Essential for setting up baseline developer skills in {role}."
+            dur = "4 hours"
+            reward = 25
+            proj = "Foundational Task Checkpoint"
+            tasks = ["Set up dev environment", "Write code syntax tests", "Verify log output"]
+        elif i <= 120:
+            diff = "INTERMEDIATE"
+            theme = inter_themes[(i - 51) % len(inter_themes)]
+            subtopic = f"Topic {i}: intermediate implementation of {theme} frameworks."
+            why = f"Required to build functional mid-tier applications and configure {role} systems."
+            dur = "8 hours"
+            reward = 50
+            proj = "Intermediate Level Mock Application"
+            tasks = ["Configure database models", "Write integration tests", "Deploy mock container"]
+        elif i <= 170:
+            diff = "ADVANCED"
+            theme = adv_themes[(i - 121) % len(adv_themes)]
+            subtopic = f"Topic {i}: advanced optimizations of {theme} design patterns."
+            why = f"Equips you to optimize scale, concurrency, and security in {role} deployments."
+            dur = "12 hours"
+            reward = 75
+            proj = "Advanced Optimizations Project"
+            tasks = ["Configure load balancer", "Write benchmark assertions", "Perform load tests"]
+        else:
+            diff = "PROFESSIONAL"
+            theme = prof_themes[(i - 171) % len(prof_themes)]
+            subtopic = f"Topic {i}: production launch and audits of {theme} systems."
+            why = f"Prepares you for real-world enterprise architectures and certifications matching {role} roles."
+            dur = "16 hours"
+            reward = 100
+            proj = "Production Capstone Deployment"
+            tasks = ["Configure ArgoCD GitOps sync", "Run Trivy container scan", "Execute chaos testing"]
+            
         nodes.append({
-            "id": f"node-{i+1}",
-            "title": f"Step {i+1}: {title}",
-            "description": desc,
+            "id": f"node-{i}",
+            "title": f"Step {i}: {theme} Checkpoint",
+            "description": subtopic,
             "difficulty": diff,
             "estimated_duration": dur,
-            "resources": [{"title": f"Official documentation for {title}", "url": "https://docs.microsoft.com"}],
-            "projects": [{"title": f"Implementation Project - Step {i+1}", "description": f"Build a practical system that demonstrates deep knowledge of {title}.", "tasks": ["Configure the framework settings", "Write code files implementation", "Verify local test suits passes"]}],
-            "certifications": [{"name": cert, "provider": provider}]
+            "why_learn_it": why,
+            "prerequisites": f"Step {i-1}" if i > 1 else "None",
+            "xp_reward": reward,
+            "resources": [
+                {"title": f"Microsoft Learn: {theme} Introduction", "url": "https://learn.microsoft.com"},
+                {"title": f"GitHub Repository Template for {theme}", "url": "https://github.com"}
+            ],
+            "projects": [{
+                "title": f"Step {i} Practice Project: {proj}",
+                "description": f"Design and implement a structured module targeting {theme}.",
+                "tasks": tasks
+            }],
+            "certifications": [{
+                "name": cert_name,
+                "provider": cert_provider,
+                "cost": "$99-$165",
+                "duration": "2 hours exam",
+                "difficulty": diff,
+                "career_impact": "High demand, unlocks recruiter screening filters."
+            }]
         })
+        
     return nodes
 
 # --- ROUTES CONTROLLERS ---
@@ -508,14 +712,17 @@ def list_roadmaps():
     progress = RoadmapProgress.query.filter_by(user_id=current_user.id).first()
     
     tracks = [
-        "Cyber Security", 
-        "AI Engineering", 
-        "Machine Learning", 
-        "Data Science", 
-        "Cloud Computing", 
-        "DevOps", 
-        "Full Stack Web Development", 
-        "Mobile Development"
+        "Cyber Security", "Ethical Hacking", "SOC Analyst", "Digital Forensics",
+        "AI Engineering", "Machine Learning", "Deep Learning", "Generative AI", "Prompt Engineering", "Agentic AI",
+        "Data Science", "Data Analytics", "Python Developer", "Java Developer", "C++ Developer",
+        "Full Stack Development", "Frontend Development", "Backend Development", "React Developer", "Node.js Developer",
+        "Mobile App Development", "Android Development", "Flutter Development",
+        "Cloud Computing", "AWS", "Azure", "Google Cloud",
+        "DevOps", "Kubernetes", "Docker", "Linux Engineering", "Network Engineering",
+        "Blockchain", "Web3", "UI/UX Design", "Product Design", "Product Management",
+        "Software Testing", "QA Automation", "Game Development", "AR/VR Development",
+        "Robotics", "IoT", "Embedded Systems", "Database Engineering",
+        "Site Reliability Engineering", "Business Analysis", "SAP", "Salesforce", "Competitive Programming"
     ]
     
     selected_role = None
@@ -583,6 +790,24 @@ def toggle_step():
         status = "added"
         
     progress.completed_nodes = ",".join(str(x) for x in sorted(completed_list))
+    
+    # Calculate XP reward
+    if step_num <= 50:
+        reward = 25
+    elif step_num <= 120:
+        reward = 50
+    elif step_num <= 170:
+        reward = 75
+    else:
+        reward = 100
+        
+    if status == "added":
+        current_user.xp += reward
+        current_user.learning_streak = (current_user.learning_streak or 0) + 1
+    else:
+        current_user.xp = max(0, current_user.xp - reward)
+        current_user.learning_streak = max(0, (current_user.learning_streak or 1) - 1)
+        
     db.session.commit()
     
     # Calculate new percentage
@@ -595,8 +820,11 @@ def toggle_step():
         "status": status, 
         "percent": percent,
         "completed_count": completed_count,
-        "total_count": len(nodes)
+        "total_count": len(nodes),
+        "xp": current_user.xp,
+        "streak": current_user.learning_streak
     })
+
 
 # 2. ATS Resume Analyzer
 @features_bp.route('/resume-analyzer', methods=['GET'])
@@ -618,34 +846,28 @@ def resume_analyzer():
 @login_required
 def upload_resume():
     file = request.files.get('resume_file')
-    text_paste = request.form.get('resume_text', '').strip()
-    target_role = request.form.get('target_role', 'Software Engineer')
-    
+    if not file or file.filename == '':
+        return jsonify({"success": False, "error": "No file uploaded"}), 400
+        
+    filename = file.filename
+    file_bytes = file.read()
     extracted_text = ""
-    filename = "Pasted_Resume_Text"
     
-    if file and file.filename != '':
-        filename = file.filename
-        file_bytes = file.read()
+    try:
         if filename.lower().endswith('.pdf'):
             extracted_text = extract_text_from_pdf(file_bytes)
         elif filename.lower().endswith('.docx'):
             extracted_text = extract_text_from_docx(file_bytes)
         else:
-            flash("Unsupported file extension. Only PDF and DOCX are allowed.", "danger")
-            return redirect(url_for('features.resume_analyzer'))
-    elif text_paste:
-        extracted_text = text_paste
-    else:
-        flash("Please upload a file or paste your resume text.", "danger")
-        return redirect(url_for('features.resume_analyzer'))
+            return jsonify({"success": False, "error": "Unsupported file format. Use PDF or DOCX."}), 400
+    except Exception as e:
+        return jsonify({"success": False, "error": f"Failed to parse file: {str(e)}"}), 500
         
     if not extracted_text:
-        flash("Could not extract any readable text from the file.", "danger")
-        return redirect(url_for('features.resume_analyzer'))
+        return jsonify({"success": False, "error": "No readable text extracted."}), 400
         
+    fields = parse_text_to_resume_fields(extracted_text)
     analysis = heuristic_parse_resume(extracted_text)
-    analysis['target_role'] = target_role
     
     new_analysis = ResumeAnalysis(
         user_id=current_user.id,
@@ -653,14 +875,75 @@ def upload_resume():
         ats_score=analysis['atsScore'],
         readability_score=analysis['readabilityScore'],
         industry_match_score=analysis['industryMatchScore'],
-        target_role=target_role,
+        target_role="Software Engineer",
         analysis_json=json.dumps(analysis)
     )
     db.session.add(new_analysis)
     db.session.commit()
     
-    flash("Resume analyzed successfully!", "success")
-    return redirect(url_for('features.resume_analyzer'))
+    return jsonify({
+        "success": True,
+        "data": fields,
+        "score": analysis['atsScore'],
+        "readability": analysis['readabilityScore'],
+        "alignment": analysis['industryMatchScore'],
+        "feedback": {
+            "score": analysis['atsScore'],
+            "missingKeywords": analysis['missingKeywords'],
+            "improvements": analysis['improvements'],
+            "mistakes": analysis['mistakes'],
+            "suggestions": analysis['suggestions']
+        }
+    })
+
+@features_bp.route('/resume-analyzer/save-version', methods=['POST'])
+@login_required
+def save_resume_version():
+    data = request.get_json() or {}
+    title = data.get('title', 'My Draft Resume')
+    theme = data.get('theme', 'classic')
+    content = data.get('content', {})
+    ats_score = data.get('ats_score', 0)
+    
+    # Check if a resume with this title already exists for the user
+    resume = UserResume.query.filter_by(user_id=current_user.id, title=title).first()
+    if resume:
+        resume.theme = theme
+        resume.content_json = json.dumps(content)
+        resume.ats_score = ats_score
+        resume.updated_at = datetime.utcnow()
+    else:
+        resume = UserResume(
+            user_id=current_user.id,
+            title=title,
+            theme=theme,
+            content_json=json.dumps(content),
+            ats_score=ats_score
+        )
+        db.session.add(resume)
+        
+    db.session.commit()
+    return jsonify({"success": True, "message": "Resume version saved successfully!"})
+
+@features_bp.route('/resume-analyzer/versions', methods=['GET'])
+@login_required
+def list_resume_versions():
+    resumes = UserResume.query.filter_by(user_id=current_user.id).order_by(UserResume.updated_at.desc()).all()
+    results = []
+    for r in resumes:
+        try:
+            content = json.loads(r.content_json)
+        except Exception:
+            content = {}
+        results.append({
+            "id": r.id,
+            "title": r.title,
+            "theme": r.theme,
+            "ats_score": r.ats_score,
+            "content": content,
+            "updated_at": r.updated_at.strftime('%Y-%m-%d %H:%M')
+        })
+    return jsonify({"success": True, "versions": results})
 
 # 3. AI Chatbot / AI Mentor
 @features_bp.route('/ai-mentor', methods=['GET'])
@@ -679,6 +962,130 @@ def chat():
     if not message_content:
         return jsonify({"success": False, "error": "Message is required"}), 400
         
+    # Rate limiting check: enforce 3 seconds delay between messages
+    last_msg = ChatMessage.query.filter_by(user_id=current_user.id).order_by(ChatMessage.created_at.desc()).first()
+    if last_msg:
+        delta = datetime.utcnow() - last_msg.created_at
+        if delta.total_seconds() < 3.0:
+            return jsonify({
+                "success": False, 
+                "error": "Rate limit exceeded. Please wait 3 seconds between messages."
+            }), 429
+
+        
+    # 1. Command Center Keywords Interceptor
+    message_lower = message_content.lower()
+    command_response = None
+    
+    if "create roadmap for" in message_lower or "generate roadmap for" in message_lower or "create track for" in message_lower:
+        parts = message_content.split("for")
+        track_part = parts[-1].strip().strip("!.")
+        
+        all_tracks = [
+            "Cyber Security", "Ethical Hacking", "SOC Analyst", "Digital Forensics",
+            "AI Engineering", "Machine Learning", "Deep Learning", "Generative AI", "Prompt Engineering", "Agentic AI",
+            "Data Science", "Data Analytics", "Python Developer", "Java Developer", "C++ Developer",
+            "Full Stack Development", "Frontend Development", "Backend Development", "React Developer", "Node.js Developer",
+            "Mobile App Development", "Android Development", "Flutter Development",
+            "Cloud Computing", "AWS", "Azure", "Google Cloud",
+            "DevOps", "Kubernetes", "Docker", "Linux Engineering", "Network Engineering",
+            "Blockchain", "Web3", "UI/UX Design", "Product Design", "Product Management",
+            "Software Testing", "QA Automation", "Game Development", "AR/VR Development",
+            "Robotics", "IoT", "Embedded Systems", "Database Engineering",
+            "Site Reliability Engineering", "Business Analysis", "SAP", "Salesforce", "Competitive Programming"
+        ]
+        
+        matched_track = None
+        for t in all_tracks:
+            if t.lower() in track_part.lower() or track_part.lower() in t.lower():
+                matched_track = t
+                break
+                
+        if not matched_track:
+            matched_track = track_part.title()
+            
+        progress = RoadmapProgress.query.filter_by(user_id=current_user.id).first()
+        if not progress:
+            progress = RoadmapProgress(user_id=current_user.id, role=matched_track, completed_nodes="")
+            db.session.add(progress)
+        else:
+            progress.role = matched_track
+            progress.completed_nodes = ""
+        db.session.commit()
+        
+        command_response = (
+            f"🎯 **Command Center Triggered: Track Seeding**\n\n"
+            f"I have initialized and seeded your active learning pathway to **{matched_track}**!\n\n"
+            f"The learning engine generated a visual tree containing 200 checkpoints, custom practice projects, and Microsoft Learn resources.\n\n"
+            f"👉 [Click here to view your new Roadmap](/roadmaps)"
+        )
+        
+    elif "improve resume" in message_lower or "analyze resume" in message_lower or "check resume" in message_lower or "resume score" in message_lower:
+        command_response = (
+            f"📝 **Command Center Triggered: Resume Analysis**\n\n"
+            f"I have loaded the resume analyzer module settings.\n\n"
+            f"You can upload your PDF or DOCX file, check real-time ATS scores, compare before/after modifications, and get keywords checklist suggestions.\n\n"
+            f"👉 [Click here to access Resume Builder 3.0](/resume-analyzer)"
+        )
+        
+    elif "mock interview" in message_lower or "practice interview" in message_lower or "interview simulator" in message_lower:
+        command_response = (
+            f"🎙️ **Command Center Triggered: Interview Simulator**\n\n"
+            f"I have prepared the technical and HR interview simulator.\n\n"
+            f"Test your real-time responses with local Web Speech API text-to-speech feedback, score metrics, and FAANG level questions.\n\n"
+            f"👉 [Click here to start the AI Interview Simulator](/interview-simulator)"
+        )
+        
+    elif "portfolio builder" in message_lower or "generate portfolio" in message_lower or "create website" in message_lower:
+        command_response = (
+            f"🌐 **Command Center Triggered: Portfolio Generator**\n\n"
+            f"Let's build a stunning responsive HTML portfolio website based on your profile details.\n\n"
+            f"Click the link below to generate, preview, and download your personal website code with one click.\n\n"
+            f"👉 [Click here to access AI Portfolio Builder](/portfolio-builder)"
+        )
+        
+    elif "project architect" in message_lower or "design database" in message_lower or "folders structure" in message_lower:
+        command_response = (
+            f"🏗️ **Command Center Triggered: Project Architect**\n\n"
+            f"I have loaded the project blueprint blueprinting engine.\n\n"
+            f"Generate database schemas, file tree layouts, and configurations for Node.js, Python, or Web projects instantly.\n\n"
+            f"👉 [Click here to use AI Project Architect](/project-architect)"
+        )
+        
+    elif "internship center" in message_lower or "apply internships" in message_lower or "check openings" in message_lower:
+        command_response = (
+            f"💼 **Command Center Triggered: Internship Matcher**\n\n"
+            f"I have processed the live student internships catalog.\n\n"
+            f"Review available roles matched with your current branch and year, and see your customized AI eligibility ranking details.\n\n"
+            f"👉 [Click here to browse the Internship Center](/internship-center)"
+        )
+        
+    elif "help" == message_lower or "commands" == message_lower:
+        command_response = (
+            f"🤖 **CampusMate AI Chat Command Center**\n\n"
+            f"You can use these shortcut keywords directly in chat to operate features:\n"
+            f"- `create roadmap for [Track]` (e.g. `create roadmap for Web3`)\n"
+            f"- `improve resume` or `analyze resume`\n"
+            f"- `mock interview` or `practice interview`\n"
+            f"- `portfolio builder` or `generate portfolio`\n"
+            f"- `project architect` or `design database`\n"
+            f"- `internship center` or `apply internships`"
+        )
+
+    if command_response:
+        # Save user message to database
+        user_msg = ChatMessage(user_id=current_user.id, sender='user', content=message_content)
+        db.session.add(user_msg)
+        # Save command response to database
+        ai_msg = ChatMessage(user_id=current_user.id, sender='ai', content=command_response)
+        db.session.add(ai_msg)
+        db.session.commit()
+        
+        return jsonify({
+            "success": True,
+            "response": command_response
+        })
+
     # Get user profile information to form a context system prompt
     progress = RoadmapProgress.query.filter_by(user_id=current_user.id).first()
     role = progress.role if progress else "Not Selected"
@@ -809,7 +1216,9 @@ def analyze_resume_ajax():
 @features_bp.route('/interview-prep', methods=['GET'])
 @login_required
 def interview_prep():
-    return render_template('interview_prep.html')
+    progress = RoadmapProgress.query.filter_by(user_id=current_user.id).first()
+    user_track = progress.role if progress else "Full Stack Development"
+    return render_template('interview_prep.html', user_track=user_track)
 
 @features_bp.route('/interview-prep/evaluate', methods=['POST'])
 @login_required
@@ -906,5 +1315,218 @@ def hackathon_generate():
     return jsonify({
         "success": True,
         "response": ai_res
+    })
+
+
+# 7. Internship Center
+@features_bp.route('/internship-center', methods=['GET'])
+@login_required
+def internship_center():
+    progress = RoadmapProgress.query.filter_by(user_id=current_user.id).first()
+    user_track = progress.role if progress else "Full Stack Development"
+    
+    # Mock list of internship jobs matching user profiles
+    all_jobs = [
+        {"title": "Software Engineer Intern", "company": "Microsoft", "track": "Full Stack Development", "stipend": "$8,500/mo", "location": "Redmond, WA (Hybrid)", "skills": "Python, React, Data Structures"},
+        {"title": "AI Engineering Intern", "company": "Google DeepMind", "track": "AI Engineering", "stipend": "$9,200/mo", "location": "London, UK (On-site)", "skills": "PyTorch, Transformers, LLMs"},
+        {"title": "Machine Learning Intern", "company": "Meta", "track": "Machine Learning", "stipend": "$9,000/mo", "location": "Menlo Park, CA (Hybrid)", "skills": "Scikit-Learn, PyTorch, SQL"},
+        {"title": "Cyber Security Analyst Intern", "company": "CrowdStrike", "track": "Cyber Security", "stipend": "$7,500/mo", "location": "Austin, TX (Remote)", "skills": "Nmap, Wireshark, Linux Scripting"},
+        {"title": "DevOps Engineer Intern", "company": "HashiCorp", "track": "DevOps", "stipend": "$7,800/mo", "location": "San Francisco, CA (Hybrid)", "skills": "Docker, Kubernetes, Terraform"},
+        {"title": "Cloud Operations Intern", "company": "Amazon Web Services", "track": "Cloud Computing", "stipend": "$8,200/mo", "location": "Seattle, WA (On-site)", "skills": "AWS IAM, EC2, CloudFormation"},
+        {"title": "Blockchain Developer Intern", "company": "ConsenSys", "track": "Web3", "stipend": "$8,000/mo", "location": "Remote", "skills": "Solidity, Ethereum, Smart Contracts"},
+        {"title": "UI/UX Product Design Intern", "company": "Figma", "track": "UI/UX Design", "stipend": "$7,200/mo", "location": "San Francisco, CA (Hybrid)", "skills": "Figma, User Research, Wireframing"},
+        {"title": "QA Automation Engineer Intern", "company": "BrowserStack", "track": "QA Automation", "stipend": "$6,500/mo", "location": "Dublin, Ireland (Hybrid)", "skills": "Selenium, Playwright, Python"},
+        {"title": "Product Management Intern", "company": "Stripe", "track": "Product Management", "stipend": "$8,800/mo", "location": "New York, NY (Hybrid)", "skills": "Agile Scrum, Figma, Business Analytics"}
+    ]
+    
+    resume = ResumeAnalysis.query.filter_by(user_id=current_user.id).order_by(ResumeAnalysis.created_at.desc()).first()
+    resume_score = resume.ats_score if resume else 0
+    
+    jobs = []
+    for idx, job in enumerate(all_jobs):
+        compatibility = 40
+        if user_track.lower() in job["track"].lower() or job["track"].lower() in user_track.lower():
+            compatibility += 40
+        compatibility += min(15, int((current_user.xp or 0) / 100))
+        compatibility += min(15, int(resume_score / 10))
+        compatibility = min(98, compatibility)
+        
+        jobs.append({
+            "id": idx + 1,
+            "title": job["title"],
+            "company": job["company"],
+            "track": job["track"],
+            "stipend": job["stipend"],
+            "location": job["location"],
+            "skills": job["skills"],
+            "compatibility": compatibility
+        })
+        
+    return render_template('internship_center.html', jobs=jobs, user_track=user_track, resume_score=resume_score)
+
+
+# 8. Portfolio Builder
+@features_bp.route('/portfolio-builder', methods=['GET'])
+@login_required
+def portfolio_builder():
+    return render_template('portfolio_builder.html')
+
+@features_bp.route('/portfolio-builder/generate', methods=['POST'])
+@login_required
+def portfolio_builder_generate():
+    data = request.get_json() or {}
+    theme = data.get('theme', 'modern')
+    
+    name = current_user.username.title()
+    email = current_user.email
+    branch = current_user.branch or "Computer Science"
+    year = current_user.year or "3rd Year"
+    track = current_user.career_goal or "Software Engineer"
+    skills = current_user.skills or "Python, JavaScript, HTML/CSS, SQL"
+    xp = current_user.xp
+    
+    projects_list = [
+        {"title": "CampusMate AI Core Engine", "desc": "Built a unified student platform mapping curriculum trees and ATS feedback workflows.", "tech": "Python, Flask, SQLite"},
+        {"title": "Distributed Task Scheduler", "desc": "Implemented a concurrent cron scheduler containerized with Docker and monitored via Prometheus.", "tech": "Go, Docker, Prometheus"},
+        {"title": "Real-time Chat Application", "desc": "Developed a full-stack real-time messaging workspace utilizing WebSockets and Redis memory cache.", "tech": "Node.js, Express, WebSockets, Redis"}
+    ]
+    
+    if theme == "dark":
+        bg = "#111827"
+        text_primary = "#f3f4f6"
+        text_secondary = "#9ca3af"
+        accent = "#3b82f6"
+        card_bg = "#1f2937"
+        border = "#374151"
+    elif theme == "gradient":
+        bg = "#fafafa"
+        text_primary = "#171717"
+        text_secondary = "#737373"
+        accent = "#ec4899"
+        card_bg = "#ffffff"
+        border = "#e5e5e5"
+    else: # modern light
+        bg = "#f8fafc"
+        text_primary = "#0f172a"
+        text_secondary = "#475569"
+        accent = "#0f766e"
+        card_bg = "#ffffff"
+        border = "#e2e8f0"
+        
+    portfolio_html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{name} - Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        * {{ margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }}
+        body {{ background-color: {bg}; color: {text_primary}; line-height: 1.6; padding: 2rem 1rem; }}
+        .container {{ max-width: 800px; margin: 0 auto; }}
+        header {{ margin-bottom: 3rem; text-align: center; }}
+        header h1 {{ font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem; color: {accent}; }}
+        header p {{ color: {text_secondary}; font-size: 1.1rem; }}
+        .badge {{ display: inline-block; padding: 0.25rem 0.75rem; background: {accent}; color: white; border-radius: 50px; font-size: 0.8rem; margin: 0.25rem; font-weight: 600; }}
+        section {{ margin-bottom: 3rem; }}
+        h2 {{ font-size: 1.5rem; font-weight: 800; margin-bottom: 1rem; border-bottom: 2px solid {border}; padding-bottom: 0.5rem; }}
+        .grid {{ display: grid; grid-template-columns: 1fr; gap: 1.5rem; }}
+        @media (min-width: 600px) {{ .grid {{ grid-template-columns: 1fr 1fr; }} }}
+        .card {{ background: {card_bg}; border: 1px solid {border}; padding: 1.5rem; border-radius: 8px; }}
+        .card h3 {{ font-size: 1.15rem; margin-bottom: 0.5rem; }}
+        .card p {{ color: {text_secondary}; font-size: 0.9rem; margin-bottom: 1rem; }}
+        .contact {{ text-align: center; margin-top: 4rem; color: {text_secondary}; font-size: 0.85rem; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>{name}</h1>
+            <p>{track} • {year} ({branch})</p>
+            <p style="margin-top: 0.5rem; font-size: 0.95rem;">Learning Progress: <strong>{xp} XP</strong> accumulated in study track.</p>
+        </header>
+        
+        <section>
+            <h2>Skills & Technologies</h2>
+            <div style="display: flex; flex-wrap: wrap; justify-content: center;">
+                {" ".join(f'<span class="badge">{s.strip()}</span>' for s in skills.split(','))}
+            </div>
+        </section>
+        
+        <section>
+            <h2>Featured Projects</h2>
+            <div class="grid">
+                {"".join(f'<div class="card"><h3>{p["title"]}</h3><p>{p["desc"]}</p><div style="font-size:0.8rem; font-weight:600; color:{accent};">{p["tech"]}</div></div>' for p in projects_list)}
+            </div>
+        </section>
+        
+        <section>
+            <h2>Professional Profile</h2>
+            <div class="card" style="width: 100%;">
+                <p>Hello! I am a student pursuing career milestones in {branch}. I utilize automated AI advisors to structure my resume, practice interviews, and complete technical certifications.</p>
+                <p style="margin-top: 0.5rem;">Feel free to contact me via email at: <strong>{email}</strong></p>
+            </div>
+        </section>
+        
+        <div class="contact">
+            <p>Generated via CampusMate AI Portfolio Builder • 2026</p>
+        </div>
+    </div>
+</body>
+</html>"""
+    return jsonify({"success": True, "html": portfolio_html})
+
+
+# 9. Project Architect
+@features_bp.route('/project-architect', methods=['GET'])
+@login_required
+def project_architect():
+    return render_template('project_architect.html')
+
+@features_bp.route('/project-architect/generate', methods=['POST'])
+@login_required
+def project_architect_generate():
+    data = request.get_json() or {}
+    idea = data.get('idea', '').strip()
+    custom_key = data.get('custom_key', '').strip()
+    
+    if not idea:
+        return jsonify({"success": False, "error": "Project idea is required"}), 400
+        
+    system_prompt = (
+        "You are a Principal Software Architect. For the project idea provided, generate the project architecture blueprint. "
+        "Provide your response in JSON format containing 4 keys:\n"
+        "- \"folder_tree\": a text representation of the folder structure\n"
+        "- \"config_file\": contents of a relevant Dockerfile or package.json\n"
+        "- \"schema\": SQL table schemas or database models configuration\n"
+        "- \"mermaid\": a mermaid diagram description (do not include markdown wrapper inside JSON values)"
+    )
+    user_prompt = f"Project Idea: {idea}"
+    
+    ai_res = call_gemini(system_prompt, user_prompt, user_key=custom_key)
+    
+    folder_tree = f"my-app/\n├── app/\n│   ├── __init__.py\n│   ├── models.py\n│   └── routes.py\n├── static/\n│   └── style.css\n├── templates/\n│   └── index.html\n├── Dockerfile\n├── requirements.txt\n└── database.db"
+    config_file = "FROM python:3.12-slim\nWORKDIR /app\nCOPY requirements.txt .\nRUN pip install -r requirements.txt\nCOPY . .\nEXPOSE 5000\nCMD [\"python\", \"main.py\"]"
+    schema = "CREATE TABLE users (\n    id INTEGER PRIMARY KEY AUTOINCREMENT,\n    username TEXT UNIQUE NOT NULL,\n    email TEXT UNIQUE NOT NULL,\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE projects (\n    id INTEGER PRIMARY KEY AUTOINCREMENT,\n    user_id INTEGER FOREIGN KEY REFERENCES users(id),\n    title TEXT NOT NULL,\n    status TEXT DEFAULT 'draft'\n);"
+    mermaid = "graph TD\n    Client[Web Client] -->|HTTP Request| Server[Flask API Server]\n    Server -->|SQL Queries| DB[(SQLite Database)]"
+    
+    if ai_res:
+        try:
+            json_match = re.search(r'\{.*\}', ai_res, re.DOTALL)
+            if json_match:
+                parsed = json.loads(json_match.group(0))
+                folder_tree = parsed.get('folder_tree', folder_tree)
+                config_file = parsed.get('config_file', config_file)
+                schema = parsed.get('schema', schema)
+                mermaid = parsed.get('mermaid', mermaid)
+        except Exception:
+            pass
+            
+    return jsonify({
+        "success": True,
+        "folder_tree": folder_tree,
+        "config_file": config_file,
+        "schema": schema,
+        "mermaid": mermaid
     })
 

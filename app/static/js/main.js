@@ -102,3 +102,186 @@ async function triggerDatabaseReset(url, csrfToken) {
         alert("Connection error: Failed to trigger database control panel reset.");
     }
 }
+
+// --- GLOBAL SEARCH & NOTIFICATION MANAGEMENT ---
+
+// Toggle Notification Dropdown
+function toggleNotificationDropdown(event) {
+    if (event) event.stopPropagation();
+    const dropdown = document.getElementById("notification-dropdown");
+    if (dropdown) {
+        dropdown.classList.toggle("hidden");
+    }
+}
+
+// Close dropdowns when clicking outside
+window.addEventListener("click", (e) => {
+    const dropdown = document.getElementById("notification-dropdown");
+    const bellBtn = document.getElementById("notification-bell-btn");
+    if (dropdown && !dropdown.classList.contains("hidden")) {
+        if (!dropdown.contains(e.target) && (!bellBtn || !bellBtn.contains(e.target))) {
+            dropdown.classList.add("hidden");
+        }
+    }
+    
+    // Also close search dropdown if clicking outside
+    const searchDropdown = document.getElementById("global-search-results");
+    const searchInput = document.getElementById("global-search-input");
+    if (searchDropdown && !searchDropdown.classList.contains("hidden")) {
+        if (!searchDropdown.contains(e.target) && (!searchInput || !searchInput.contains(e.target))) {
+            searchDropdown.classList.add("hidden");
+        }
+    }
+});
+
+// Dismiss single notification
+async function dismissNotification(event, notifId) {
+    if (event) event.stopPropagation();
+    const notifItem = document.getElementById(`notif-item-${notifId}`);
+    if (!notifItem) return;
+    
+    notifItem.style.opacity = "0.5";
+    notifItem.style.pointerEvents = "none";
+    
+    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
+    try {
+        const response = await fetch(`/notifications/read/${notifId}`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrfToken
+            }
+        });
+        
+        if (response.ok) {
+            notifItem.remove();
+            const badge = document.getElementById("notif-badge-count");
+            if (badge) {
+                let count = parseInt(badge.innerText) - 1;
+                if (count > 0) {
+                    badge.innerText = count;
+                } else {
+                    badge.remove();
+                    const markAllBtn = document.querySelector(".mark-all-read-btn");
+                    if (markAllBtn) markAllBtn.remove();
+                    const notifBody = document.getElementById("notif-dropdown-body");
+                    if (notifBody) {
+                        notifBody.innerHTML = `
+                            <div class="notif-empty text-center py-4 text-muted">
+                                <i class="fa-regular fa-bell-slash mb-2 d-block" style="font-size: 1.5rem;"></i>
+                                <p style="font-size: 0.75rem; margin-bottom: 0;">All caught up! No new notifications.</p>
+                            </div>
+                        `;
+                    }
+                }
+            }
+        } else {
+            notifItem.style.opacity = "1";
+            notifItem.style.pointerEvents = "auto";
+            alert("Failed to dismiss notification.");
+        }
+    } catch (e) {
+        console.error(e);
+        notifItem.style.opacity = "1";
+        notifItem.style.pointerEvents = "auto";
+    }
+}
+
+// Mark all read
+async function markAllNotificationsRead(event) {
+    if (event) event.stopPropagation();
+    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
+    try {
+        const response = await fetch("/notifications/read-all", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrfToken
+            }
+        });
+        
+        if (response.ok) {
+            const badge = document.getElementById("notif-badge-count");
+            if (badge) badge.remove();
+            
+            const markAllBtn = document.querySelector(".mark-all-read-btn");
+            if (markAllBtn) markAllBtn.remove();
+            
+            const notifBody = document.getElementById("notif-dropdown-body");
+            if (notifBody) {
+                notifBody.innerHTML = `
+                    <div class="notif-empty text-center py-4 text-muted">
+                        <i class="fa-regular fa-bell-slash mb-2 d-block" style="font-size: 1.5rem;"></i>
+                        <p style="font-size: 0.75rem; margin-bottom: 0;">All caught up! No new notifications.</p>
+                    </div>
+                `;
+            }
+        } else {
+            alert("Failed to clear notifications.");
+        }
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+// Live Global Search keyup handler
+document.addEventListener("DOMContentLoaded", () => {
+    const searchInput = document.getElementById("global-search-input");
+    const searchResults = document.getElementById("global-search-results");
+    
+    if (searchInput && searchResults) {
+        let debounceTimer;
+        searchInput.addEventListener("input", () => {
+            clearTimeout(debounceTimer);
+            const query = searchInput.value.trim();
+            
+            if (query.length < 1) {
+                searchResults.innerHTML = "";
+                searchResults.classList.add("hidden");
+                return;
+            }
+            
+            debounceTimer = setTimeout(async () => {
+                try {
+                    const response = await fetch(`/global-search?q=${encodeURIComponent(query)}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.results && data.results.length > 0) {
+                            searchResults.innerHTML = data.results.map(item => `
+                                <a href="${item.url}" class="search-result-item">
+                                    <span class="item-title">${escapeHtml(item.title)}</span>
+                                    <span class="item-category">${escapeHtml(item.category)}</span>
+                                </a>
+                            `).join("");
+                            searchResults.classList.remove("hidden");
+                        } else {
+                            searchResults.innerHTML = `
+                                <div class="p-3 text-center text-muted" style="font-size: 0.75rem;">
+                                    No matching roadmaps or tools found.
+                                </div>
+                            `;
+                            searchResults.classList.remove("hidden");
+                        }
+                    }
+                } catch (e) {
+                    console.error("Global search failed:", e);
+                }
+            }, 200);
+        });
+        
+        searchInput.addEventListener("focus", () => {
+            if (searchInput.value.trim().length > 0) {
+                searchResults.classList.remove("hidden");
+            }
+        });
+    }
+});
+
+// Helper for escaping search result HTML
+function escapeHtml(text) {
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+

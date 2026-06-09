@@ -1,0 +1,215 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Internship Command Center - CampusMate AI{% endblock %}
+
+{% block header_title %}AI Internship Command Center{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Top Stats / Application Pipeline Tracker -->
+    <div class="col-12">
+        <div class="flat-card shadow-sm border-light bg-white p-3">
+            <h3 class="fw-bold text-dark mb-3" style="font-size: 1rem;"><i class="fa-solid fa-briefcase text-primary me-2"></i> Application Status Pipeline</h3>
+            <div class="row g-2 text-center">
+                <div class="col-6 col-sm-3">
+                    <div class="p-3 border rounded shadow-sm" style="background:#f8fafc; border-color:#dee2e6;">
+                        <span class="text-secondary d-block" style="font-size:0.75rem; text-transform:uppercase; font-weight:700;">Applied</span>
+                        <strong id="pipeline-applied" class="text-dark" style="font-size:1.5rem;">0</strong>
+                    </div>
+                </div>
+                <div class="col-6 col-sm-3">
+                    <div class="p-3 border rounded shadow-sm" style="background:#f0f9ff; border-color:#b9e6fe;">
+                        <span class="text-secondary d-block" style="font-size:0.75rem; text-transform:uppercase; font-weight:700;">Under Review</span>
+                        <strong id="pipeline-review" class="text-primary" style="font-size:1.5rem;">0</strong>
+                    </div>
+                </div>
+                <div class="col-6 col-sm-3">
+                    <div class="p-3 border rounded shadow-sm" style="background:#fffbeb; border-color:#fde047;">
+                        <span class="text-secondary d-block" style="font-size:0.75rem; text-transform:uppercase; font-weight:700;">Interviews</span>
+                        <strong id="pipeline-interviews" class="text-warning" style="font-size:1.5rem;">0</strong>
+                    </div>
+                </div>
+                <div class="col-6 col-sm-3">
+                    <div class="p-3 border rounded shadow-sm" style="background:#f0fdf4; border-color:#bbf7d0;">
+                        <span class="text-secondary d-block" style="font-size:0.75rem; text-transform:uppercase; font-weight:700;">Offers</span>
+                        <strong id="pipeline-offers" class="text-success" style="font-size:1.5rem;">0</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Left side: Student career profile summary -->
+    <div class="col-lg-4">
+        <div class="flat-card shadow-sm border-light mb-4">
+            <h3 class="fw-bold text-dark mb-3" style="font-size:1.05rem;"><i class="fa-solid fa-address-card text-primary me-2"></i> Match Profile</h3>
+            
+            <div class="d-flex flex-column gap-3">
+                <div class="p-2 border rounded" style="background:#f8f9fa;">
+                    <span class="text-muted d-block" style="font-size:0.7rem; text-transform:uppercase; font-weight:700;">Target Track</span>
+                    <strong class="text-dark" style="font-size:0.9rem;">{{ user_track }}</strong>
+                </div>
+                <div class="p-2 border rounded" style="background:#f8f9fa;">
+                    <span class="text-muted d-block" style="font-size:0.7rem; text-transform:uppercase; font-weight:700;">Current Class</span>
+                    <strong class="text-dark" style="font-size:0.9rem;">{{ current_user.year or "Not specified" }} Year ({{ current_user.branch or "General" }})</strong>
+                </div>
+                <div class="p-2 border rounded" style="background:#f8f9fa;">
+                    <span class="text-muted d-block" style="font-size:0.7rem; text-transform:uppercase; font-weight:700;">ATS Resume Score</span>
+                    <strong class="text-primary" style="font-size:1rem;">{{ resume_score }}/100</strong>
+                </div>
+                <div class="p-2 border rounded" style="background:#f8f9fa;">
+                    <span class="text-muted d-block" style="font-size:0.7rem; text-transform:uppercase; font-weight:700;">Learning Experience</span>
+                    <strong class="text-dark" style="font-size:0.95rem;">{{ current_user.xp }} XP Accumulated</strong>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flat-card shadow-sm border-light">
+            <h3 class="fw-bold text-dark mb-2" style="font-size:1.05rem;"><i class="fa-solid fa-circle-info text-primary me-2"></i> AI Eligibility Rules</h3>
+            <p class="text-secondary mb-0" style="font-size:0.82rem; line-height:1.5;">
+                Eligibility scores are calculated in real-time matching the job requirement checklist against your selected target track, gamified XP achievements, and parsed resume keywords score. Complete milestones to increase your ratings!
+            </p>
+        </div>
+    </div>
+
+    <!-- Right side: Matchings Internships List -->
+    <div class="col-lg-8">
+        <div class="flat-card shadow-sm border-light">
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom flex-wrap gap-2" style="border-color:#dee2e6;">
+                <div>
+                    <h3 class="fw-bold text-dark mb-0" style="font-size:1.1rem;"><i class="fa-solid fa-list-check text-primary me-2"></i> Matched Student Openings</h3>
+                    <span class="text-muted" style="font-size:0.75rem;">Showing live matched listings matching your qualifications</span>
+                </div>
+            </div>
+
+            <div class="d-flex flex-column gap-3" id="jobs-container">
+                {% for job in jobs %}
+                <div class="job-card p-3 border rounded shadow-sm bg-white" id="job-card-{{ job.id }}" style="transition: all 0.2s ease;">
+                    <div class="row g-3">
+                        <div class="col-md-9">
+                            <div class="d-flex align-items-center gap-2 mb-1.5 flex-wrap">
+                                <h4 class="fw-bold text-dark mb-0" style="font-size: 1.05rem;">{{ job.title }}</h4>
+                                <span class="badge bg-light text-primary border border-primary px-2" style="font-size:0.72rem;">{{ job.company }}</span>
+                                <span class="badge bg-secondary-subtle text-secondary px-2" style="font-size:0.72rem;">{{ job.location }}</span>
+                            </div>
+                            <div class="d-flex gap-4 text-muted mb-3" style="font-size: 0.78rem;">
+                                <span><i class="fa-solid fa-money-bill-wave text-success me-1"></i> {{ job.stipend }}</span>
+                                <span><i class="fa-solid fa-route text-muted me-1"></i> Track: {{ job.track }}</span>
+                            </div>
+                            <div class="mb-2">
+                                <span class="text-muted d-block mb-1" style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Skills Checklist</span>
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for skill in job.skills.split(',') %}
+                                    <span class="badge bg-light text-dark border px-2 py-1" style="font-size:0.7rem;">{{ skill.strip() }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Match Rating / Application trigger -->
+                        <div class="col-md-3 d-flex flex-column justify-content-between align-items-md-end text-md-end">
+                            <div>
+                                <span class="text-secondary d-block" style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">AI Eligibility</span>
+                                <div class="d-flex align-items-center gap-2 justify-content-md-end mt-1">
+                                    <div class="progress-bar-container" style="background:#e9ecef; width: 60px; height: 6px; border-radius: 3px; overflow: hidden;">
+                                        <div class="progress-bar-fill" style="width: {{ job.compatibility }}%; height: 100%; background: {% if job.compatibility >= 80 %}#10b981{% elif job.compatibility >= 60 %}#f59e0b{% else %}#ef4444{% endif %};"></div>
+                                    </div>
+                                    <strong style="font-size: 0.95rem; color: {% if job.compatibility >= 80 %}#10b981{% elif job.compatibility >= 60 %}#f59e0b{% else %}#ef4444{% endif %};">{{ job.compatibility }}%</strong>
+                                </div>
+                            </div>
+
+                            <div class="mt-3 mt-md-0" id="apply-action-box-{{ job.id }}">
+                                <button class="btn btn-sm btn-primary py-1.5 px-3" onclick="simulateApply({{ job.id }}, '{{ job.title }}', '{{ job.company }}')" style="background: linear-gradient(135deg, #0078d4, #00bcf2); border: none; font-size:0.78rem; font-weight:600;">
+                                    Quick Apply <i class="fa-solid fa-paper-plane ms-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Local application tracking using localStorage
+let applications = JSON.parse(localStorage.getItem("campusmate_internships") || "[]");
+
+function updatePipelineUI() {
+    let counts = { applied: 0, review: 0, interviews: 0, offers: 0 };
+    
+    applications.forEach(app => {
+        if (app.status === "Applied") counts.applied++;
+        else if (app.status === "Review") counts.review++;
+        else if (app.status === "Interview") counts.interviews++;
+        else if (app.status === "Offer") counts.offers++;
+    });
+
+    document.getElementById("pipeline-applied").innerText = counts.applied;
+    document.getElementById("pipeline-review").innerText = counts.review;
+    document.getElementById("pipeline-interviews").innerText = counts.interviews;
+    document.getElementById("pipeline-offers").innerText = counts.offers;
+    
+    // Update individual buttons if already applied
+    applications.forEach(app => {
+        const actionBox = document.getElementById(`apply-action-box-${app.jobId}`);
+        if (actionBox) {
+            actionBox.innerHTML = `<span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1.5" style="font-size:0.78rem;"><i class="fa-solid fa-circle-check me-1"></i> ${app.status}</span>`;
+            
+            const card = document.getElementById(`job-card-${app.jobId}`);
+            if (card) {
+                card.style.borderLeft = "4px solid #10b981";
+            }
+        }
+    });
+}
+
+function simulateApply(jobId, title, company) {
+    if (applications.some(a => a.jobId === jobId)) return;
+    
+    // Add application entry
+    // Cycle statuses simulation: starts at "Applied", then after a few seconds we can simulate shifting to Review
+    const newApp = {
+        jobId: jobId,
+        title: title,
+        company: company,
+        status: "Applied",
+        timestamp: Date.now()
+    };
+    
+    applications.push(newApp);
+    localStorage.setItem("campusmate_internships", JSON.stringify(applications));
+    
+    updatePipelineUI();
+    
+    // Play sound or alert
+    alert(`Successfully applied to ${title} at ${company}! Application logged in pipeline.`);
+    
+    // Mock progression: 5 seconds later it shifts to "Review", and 15 seconds later to "Interview"!
+    setTimeout(() => {
+        applications = applications.map(a => {
+            if (a.jobId === jobId) a.status = "Review";
+            return a;
+        });
+        localStorage.setItem("campusmate_internships", JSON.stringify(applications));
+        updatePipelineUI();
+    }, 5000);
+
+    setTimeout(() => {
+        applications = applications.map(a => {
+            if (a.jobId === jobId) a.status = "Interview";
+            return a;
+        });
+        localStorage.setItem("campusmate_internships", JSON.stringify(applications));
+        updatePipelineUI();
+    }, 15000);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    updatePipelineUI();
+});
+</script>
+{% endblock %}
