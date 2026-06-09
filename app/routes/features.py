@@ -558,10 +558,12 @@ def get_predefined_roadmap(role: str) -> list:
         track_type = "product_qa"
     elif "vlsi" in role_lower or "ece" in role_lower or "electrical" in role_lower or "electronics" in role_lower or "power systems" in role_lower or "circuits" in role_lower or "robotics" in role_lower or "iot" in role_lower or "embedded" in role_lower:
         track_type = "hardware_ece"
-    elif "csbs" in role_lower or "bio science" in role_lower or "biotech" in role_lower or "biological" in role_lower or "bioinformatics" in role_lower:
+    elif "csbs" in role_lower or "bio science" in role_lower or "biotech" in role_lower or "biological" in role_lower or "bioinformatics" in role_lower or "medical" in role_lower or "biomedical" in role_lower:
         track_type = "csbs"
-    elif "mechanical" in role_lower or "civil" in role_lower or "chemical" in role_lower or "systems engineering" in role_lower:
+    elif "mechanical" in role_lower or "civil" in role_lower or "chemical" in role_lower or "systems engineering" in role_lower or "aerospace" in role_lower or "automotive" in role_lower or "renewable" in role_lower or "nuclear" in role_lower or "marine" in role_lower or "environmental" in role_lower or "materials" in role_lower:
         track_type = "traditional_eng"
+    elif "quantum" in role_lower:
+        track_type = "quantum"
     else:
         track_type = "dev" # standard programming and full-stack development
 
@@ -742,6 +744,28 @@ def get_predefined_roadmap(role: str) -> list:
         ]
         cert_name = "Professional Engineer (PE) License Prep"
         cert_provider = "NCEES"
+    elif track_type == "quantum":
+        beginner_themes = [
+            "Dirac Notation & Quantum States", "Quantum Superposition Principle",
+            "Bloch Sphere Geometry & Operations", "Quantum Logic Gates (H, X, Y, Z, CNOT)",
+            "Qiskit Framework Setup & SDK", "Quantum Circuit Simulation Basics"
+        ]
+        inter_themes = [
+            "Quantum Entanglement & EPR Pairs", "Bell States & Quantum Teleportation",
+            "Quantum Fourier Transform (QFT)", "Quantum Phase Estimation Algorithm",
+            "Deutsch-Jozsa & Bernstein-Vazirani Algorithms", "Quantum SDK Circuit Execution"
+        ]
+        adv_themes = [
+            "Shor's Integer Factoring Algorithm", "Grover's Database Search Algorithm",
+            "Quantum Error Correction (QEC) Basics", "Variational Quantum Eigensolver (VQE)",
+            "Quantum Approximation Optimization Algorithm (QAOA)"
+        ]
+        prof_themes = [
+            "Superconducting Qubits & Hardware", "Quantum Key Distribution (QKD) Protocols",
+            "Quantum Chemistry Simulations", "Quantum Machine Learning (QML) Capstone"
+        ]
+        cert_name = "IBM Certified Associate Developer: Quantum Computation"
+        cert_provider = "IBM"
     else: # dev / Full Stack
         beginner_themes = [
             "HTTP Protocols & Web Architectures", "Semantic HTML5 Page Layouts",
@@ -881,12 +905,15 @@ def list_roadmaps():
             "DevOps", "Kubernetes", "Docker", "Linux Engineering", "Network Engineering",
             "Blockchain", "Web3", "UI/UX Design", "Product Design", "Product Management",
             "Software Testing", "QA Automation", "Game Development", "AR/VR Development",
-            "Robotics & Automation", "IoT", "Embedded Systems", "Database Engineering",
+            "Robotics & Automation", "IoT", "Embedded Systems", "Embedded Systems and Electronics", "Database Engineering",
             "Site Reliability Engineering", "Business Analysis", "SAP", "Salesforce", "Competitive Programming",
             "VLSI Design", "Electronics & Communication (ECE)", "Electrical Engineering",
             "Power Systems Engineering", "Computer Science & Bio Science (CSBS)",
             "Mechanical Engineering", "Civil Engineering", "Chemical Engineering",
-            "Data Engineering", "Biotechnology"
+            "Data Engineering", "Biotechnology", "Quantum Computing Engineering",
+            "Aerospace Engineering", "Automotive Engineering", "Renewable Energy Engineering",
+            "Nuclear Engineering", "Marine Engineering", "Environmental Engineering",
+            "Materials Science & Engineering", "Bio-Medical Engineering"
         ]
         
         selected_role = None
