@@ -1,40 +1,41 @@
-# CampusMate AI 2.0
-> **The Premium AI Career & Learning Operating System for Students.**
+# 🎓 CampusMate AI
+> **The Premium, Glassmorphic AI Career & Learning Operating System for Students.**
 
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new?template=https://github.com/251801390006-blip/campusmate-ai)
-
-[![Python Version](https://img.shields.io/badge/python-3.12%20%7C%203.14-blue?style=flat-square&logo=python)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![Python Version](https://img.shields.io/badge/python-3.12-blue?style=flat-square&logo=python)](https://www.python.org/)
+[![Flask Version](https://img.shields.io/badge/Flask-3.0.3-009688?style=flat-square&logo=flask)](https://flask.palletsprojects.com/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/251801390006-blip/campusmate-ai?style=flat-square)](https://github.com/251801390006-blip/campusmate-ai/stargazers)
 
-CampusMate AI is an advanced educational SaaS platform designed to accelerate student learning and career goals. It functions in two modes: a client-side **Standalone Sandbox Mode** (using `localStorage` for offline use) and a **Connected Server Mode** backed by a FastAPI/SQLite service.
-
 ---
 
-## 🏗️ System Architecture & Data Flow
+## 🏗️ Architecture & Data Flow
+
+CampusMate AI is built on a robust, state-of-the-art Python stack using a Flask backend, SQLAlchemy database layers, and HTML5/Vanilla CSS frontend modules. It features contextual generative AI workflows using the official Google GenAI SDK.
 
 ```
-                      +---------------------------------------+
-                      |         Student Browser UI            |
-                      |   (HTML5 / Outfit Font / CSS Vars)     |
-                      +-------------------+-------------------+
+                      +------------------------------------------+
+                      |           Student Client Browser         |
+                      |   - HSL tailored glassmorphic styles     |
+                      |   - Interactive visual roadmap canvas    |
+                      |   - Single-page A4 PDF rendering         |
+                      +-------------------+----------------------+
                                           |
-                     +--------------------+--------------------+
-                     |                                         |
-                     v [Offline Fallback]                      v [API Requests]
-        +------------+-------------+             +-------------+-------------+
-        |  Browser LocalStorage    |             |    FastAPI App Server     |
-        |  - Streak & XP meters    |             |    - Auth & JWT tokens    |
-        |  - 8-Track Sandbox Maps  |             |    - Upload parser logic  |
-        |  - Emulated ATS scores   |             |    - SQLite Persistence   |
-        +--------------------------+             +-------------+-------------+
-                                                               |
-                                                               v [LLM API call]
-                                                 +-------------+-------------+
-                                                 |      Gemini API Gateway   |
-                                                 |      (gemini-2.5-flash)   |
-                                                 +---------------------------+
+                                          v  [HTTPS requests]
+                      +-------------------+----------------------+
+                      |             Flask Web Server             |
+                      |   - Blueprints routing & API endpoints   |
+                      |   - Flask-Login secure sessions          |
+                      |   - CSRF & WTF forms validation schemas  |
+                      +---+----------------------------------+---+
+                          |                                  |
+                          v  [SQLAlchemy ORM]                v  [GenAI SDK]
+            +-------------+-------------+      +-------------+-------------+
+            |      SQLite / Postgres    |      |     Google Gemini API     |
+            |      - User & Admin logs  |      |     - gemini-2.5-flash    |
+            |      - Draft resume states|      |     - Live stream responses|
+            |      - Roadmap progress   |      |     - Heuristic audit maps|
+            +---------------------------+      +---------------------------+
 ```
 
 ---
@@ -42,56 +43,66 @@ CampusMate AI is an advanced educational SaaS platform designed to accelerate st
 ## 📂 Repository File Structure
 
 ```
-├── .github/workflows/
-│   └── verify.yml           # Automated CI syntax compiler checks
-├── static/                  # Frontend single-page app (SPA) assets
-│   ├── css/
-│   │   └── style.css        # Light-mode first glassmorphic variables & rules
-│   ├── js/
-│   │   ├── api.js           # REST client wrapper endpoints
-│   │   └── app.js           # Client-side router, sandbox database seeds
-│   └── index.html           # 9-section landing page and student dashboard UI
-├── Dockerfile               # Dynamic port binding deployment configuration
-├── railway.json             # Service instructions for Railway builders
-├── requirements.txt         # Declared python dependencies
-├── models.py                # SQLModel relational database definitions
-├── database.py              # SQLite engine connection setup
-├── main.py                  # API endpoints, JWT, and Gemini client wrappers
-├── LICENSE                  # MIT open-source license
-└── README.md                # Enterprise-grade project documentation
+├── .github/
+│   └── workflows/
+│       └── verify.yml       # Automated CI workflow compilation checking
+├── app/                     # Main Flask Application
+│   ├── __init__.py          # App initialization, SQLAlchemy config, Flask-Login setup
+│   ├── forms.py             # Form validation schemas (Login, Register, Settings)
+│   ├── models.py            # Relational database models (User, Resume, RoadmapProgress, etc.)
+│   ├── routes/              # Blueprints containing views and API controllers
+│   │   ├── admin.py         # Admin Dashboard metrics, logs, user control, announcements
+│   │   ├── auth.py          # Secure student authentication logic (onboarding)
+│   │   ├── dashboard.py     # Main student dashboard workspace and activity tracker
+│   │   ├── features.py      # Core AI engines (Roadmaps, Resume Analyzer, Interview Prep, etc.)
+│   │   └── feedback.py      # User feedback log dispatchers
+│   ├── static/              # Static assets directory
+│   │   ├── css/
+│   │   │   └── style.css    # Premium CSS design variables (Light & Day/Dark themes)
+│   │   └── js/
+│   │       ├── mentor.js    # Floating AI Mentor chat drawer stream controller
+│   │       └── roadmaps.js  # Roadmap canvas rendering with interactive nodes
+│   └── templates/           # Server-side HTML layout templates (Jinja2)
+│       ├── base.html        # App-wide layout base
+│       ├── dashboard_base.html # Student sidebar dashboard base
+│       └── ...              # Feature-specific pages (dashboard.html, roadmaps.html, etc.)
+├── Dockerfile               # Production container build recipe
+├── railway.json             # Railway app configurations and bindings
+├── main.py                  # App entrypoint execution script
+├── requirements.txt         # Locked project packages dependencies list
+├── database.db              # SQLite development database
+└── LICENSE                  # Open-source MIT License
 ```
 
 ---
 
-## 🛠️ Key Product Features
+## 🛠️ Feature Breakdown
 
-### 1. AI Mentor 2.0 (Deep Dialog System)
-*   **Typewriter Animation**: Displays response segments incrementally to match server-streaming styles.
-*   **Active Memory Ribbon**: Renders active student statistics (career path, XP, resume grade) directly inside the chatbot interface.
-*   **Suggestion Chips**: Clickable prompt bubbles that refresh contextually to trigger technical guidelines immediately.
-*   **Chat History Persistence**: Logs conversations to local storage, maintaining context even after view transitions.
+### 1. 🗺️ Non-Linear Visual Roadmaps
+- **200+ Career Checkpoints**: Interactive node diagrams for **8 target fields** (Cybersecurity, AI Engineering, Machine Learning, Data Science, Cloud Computing, DevOps, Full Stack Web, and Mobile Development).
+- **Navigation Console**: Fluid canvas controls featuring Zoom In, Zoom Out, Reset, Up, Down, Left, and Right navigations.
+- **Resource Routing**: Curated learning references mapping directly to industry platforms (Google, GeeksForGeeks, MDN).
+- **Day / Dark Mode**: Integrated workspace toggles adapting UI elements to HSL tailored color schemes dynamically.
 
-### 2. Double-Mode ATS Resume Builder 2.0
-*   **Manual Form Sync**: Dynamic input forms updating Ivory, Modern Cyan, or Slate Glass print layouts.
-*   **Drag-and-Drop Parsing**: Interactive file zone supporting PDF/DOCX uploads. Analyzes files and extracts content vectors automatically.
-*   **Checklist Audit**: Generates missing keywords guidelines and Google XYZ formula suggestions.
+### 2. 📝 Single-Page ATS Resume Builder
+- **Strict Single-Page PDF Layout**: Strict `.pdf-export-mode` styling compressing fonts, margins, and section spacing to guarantee the output prints on exactly a single A4 page (`297mm`).
+- **Clean Job-Focused Editor**: Strictly focused on essential tech resume sections: **Education**, **Technical Skills**, **Experience**, **Projects**, and **Certifications**.
+- **Interactive Parsing & Audit Zone**: Drag-and-drop zone extracting PDF/DOCX content to analyze with a real-time keyword scanner and Google XYZ formula validator.
+- **Enhanced Downloads**: Fast, responsive download controller scaling canvas resolution (`2.5`) for sharp vector texts, preventing concurrent triggers, and rendering loader indicators during PDF generation.
 
-### 3. Expandable Roadmap Engine 2.0
-*   Supports **8 custom target tracks**: Cyber Security, AI Engineering, Machine Learning, Data Science, Cloud Computing, DevOps, Full Stack Web, and Mobile Development.
-*   Seeds non-linear checkposts populated with duration targets, task checklists, and matched certifications.
+### 3. 💬 Floating AI Career Mentor
+- **Typewriter Streaming**: Simulates real-time word-by-word response formulation with elegant glassmorphic drawer elements.
+- **統計 Performance Memory Ribbon**: Displays active student statistics (track, XP achievements, resume score) within the chat console to maintain continuous advisor context.
+- **Context Suggestion Chips**: Auto-generated guidance query chips updating contextually based on user messages.
 
----
+### 4. 🎙️ AI Interview Simulator
+- **Live Text-to-Speech (TTS)**: Practicing typical tech screening questions with speech output support and progress evaluations.
 
-## 🚀 Deployment Guide
+### 5. 🏗️ AI Project Architect
+- **Component Schemas**: Generates directory tree blueprints and database structures for target projects.
 
-### One-Click Deployment via Railway
-
-To deploy this project to your own live URL instantly:
-
-1.  Click the **Deploy on Railway** button at the top of this document.
-2.  Grant Railway access to your GitHub account.
-3.  Add the optional **`GEMINI_API_KEY`** environment variable to enable live AI responses.
-4.  Railway will configure everything, build the container, and assign a public HTTPS domain.
+### 6. 💼 Internship Command Center
+- **Rate Eligibility**: Automatically extracts user skills, filters internships populated by the Admin dashboard, maps matched tags, and ratings eligibility.
 
 ---
 
@@ -102,31 +113,41 @@ To deploy this project to your own live URL instantly:
 *   Git
 
 ### Installation
-1.  **Clone the Repository:**
-    ```bash
-    git clone https://github.com/251801390006-blip/campusmate-ai.git
-    cd campusmate-ai
-    ```
 
-2.  **Create and Activate Virtual Environment:**
-    ```bash
-    python -m venv .venv
-    # Windows
-    .venv\Scripts\activate
-    # macOS/Linux
-    source .venv/bin/activate
-    ```
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/251801390006-blip/campusmate-ai.git
+   cd campusmate-ai
+   ```
 
-3.  **Install Required Libraries:**
-    ```bash
-    pip install -r requirements.txt
-    ```
+2. **Set up virtual environment:**
+   ```bash
+   python -m venv .venv
+   
+   # Windows (PowerShell/CMD)
+   .venv\Scripts\activate
+   
+   # macOS / Linux
+   source .venv/bin/activate
+   ```
 
-4.  **Launch Server:**
-    ```bash
-    uvicorn main:app --host 127.0.0.1 --port 8000
-    ```
-    Visit **`http://127.0.0.1:8000`** in your browser to view the application.
+3. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-5.  **Offline Sandbox Mode:**
-    If you do not want to run a local server, simply double-click **`static/index.html`** in your file manager to run 100% locally inside your browser!
+4. **Run development server:**
+   ```bash
+   python main.py
+   ```
+   Open **`http://127.0.0.1:5000`** in your browser to view the application.
+
+---
+
+## 🚀 Production Deployment
+
+### Live Deployment via Railway
+1. Click the **Deploy on Railway** button at the top of the README.
+2. Grant Railway permissions to build from this fork.
+3. Inject the environment variable **`GEMINI_API_KEY`** using your API key from Google AI Studio.
+4. Railway will automatically build the container via the `Dockerfile` and publish an HTTPS endpoint.
