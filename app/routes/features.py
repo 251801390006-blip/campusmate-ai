@@ -13,12 +13,49 @@ from pypdf import PdfReader
 
 features_bp = Blueprint('features', __name__)
 
-# --- GEMINI CLIENT WRAPPER ---
+# --- AI CLIENT WRAPPER (supports Groq + Gemini) ---
 def call_gemini(system_prompt: str, user_prompt: str, user_key: str = None) -> str:
-    api_key = user_key or os.environ.get("GEMINI_API_KEY")
+    """
+    Multi-provider AI router.
+    - Groq key  (starts with gsk_) → uses Groq API with LLaMA 3.3-70B (free)
+    - Gemini key (AIza...)          → uses Google Gemini 2.5 Flash
+    - No key                        → returns '' to trigger offline mock
+    """
+    api_key = user_key or os.environ.get("GEMINI_API_KEY") or os.environ.get("GROQ_API_KEY")
     if not api_key:
-        return "" # Trigger mock fallback
-        
+        return ""  # Trigger mock fallback
+
+    # ── Groq (free, fast, any personal email) ──────────────────────────────
+    if api_key.startswith("gsk_"):
+        try:
+            import urllib.request as urllib_req
+            import json as json_lib
+            payload = json_lib.dumps({
+                "model": "llama-3.3-70b-versatile",
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user",   "content": user_prompt}
+                ],
+                "temperature": 0.4,
+                "max_tokens": 1024
+            }).encode("utf-8")
+            req = urllib_req.Request(
+                "https://api.groq.com/openai/v1/chat/completions",
+                data=payload,
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json"
+                },
+                method="POST"
+            )
+            with urllib_req.urlopen(req, timeout=30) as resp:
+                data = json_lib.loads(resp.read().decode("utf-8"))
+                return data["choices"][0]["message"]["content"]
+        except Exception as e:
+            print(f"Groq API call failed: {e}")
+            return ""
+
+    # ── Google Gemini ───────────────────────────────────────────────────────
     try:
         from google import genai
         from google.genai import types
@@ -35,6 +72,7 @@ def call_gemini(system_prompt: str, user_prompt: str, user_key: str = None) -> s
     except Exception as e:
         print(f"Gemini API call failed: {e}")
         return ""
+
 
 # --- PARSING HELPERS ---
 def extract_text_from_pdf(file_bytes: bytes) -> str:

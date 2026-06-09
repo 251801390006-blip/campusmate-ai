@@ -78,13 +78,28 @@
             </form>
         </div>
 
-        <!-- Gemini AI API Key Card -->
-        <div class="flat-card shadow-sm border-light mb-4">
+        <!-- AI Chatbot API Key Card -->
+        <div class="flat-card shadow-sm mb-4" style="border: 1.5px solid #0078d422;">
             <h3 class="fw-bold text-dark mb-1" style="font-size:1.05rem;"><i class="fa-solid fa-robot text-primary me-2"></i> AI Chatbot API Key</h3>
-            <p class="text-secondary mb-3" style="font-size:0.8rem;">Enter your free Gemini API key to unlock the live AI Career Mentor chatbot. Get one instantly at <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-primary fw-semibold">aistudio.google.com</a>.</p>
+            <p class="text-secondary mb-3" style="font-size:0.82rem;">Power the live AI Career Mentor chatbot. Both providers are <strong>free</strong> — paste your key below.</p>
+
+            <!-- Provider pills -->
+            <div class="d-flex gap-2 mb-3 flex-wrap">
+                <div style="background: linear-gradient(135deg, #f97316, #fb923c); color: white; border-radius: 8px; padding: 8px 14px; font-size: 0.8rem; flex: 1; min-width: 180px;">
+                    <div class="fw-bold mb-1"><i class="fa-solid fa-star me-1"></i> Groq (Recommended)</div>
+                    <div style="font-size: 0.72rem; opacity: 0.92;">Free · LLaMA 3.3-70B · Any Gmail/Outlook</div>
+                    <a href="https://console.groq.com/keys" target="_blank" style="color: white; font-size: 0.72rem; text-decoration: underline;">→ console.groq.com/keys</a>
+                </div>
+                <div style="background: linear-gradient(135deg, #1a73e8, #4285f4); color: white; border-radius: 8px; padding: 8px 14px; font-size: 0.8rem; flex: 1; min-width: 180px;">
+                    <div class="fw-bold mb-1"><i class="fa-brands fa-google me-1"></i> Google Gemini</div>
+                    <div style="font-size: 0.72rem; opacity: 0.92;">Free · Gemini 2.5 Flash · Personal Gmail only</div>
+                    <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: white; font-size: 0.72rem; text-decoration: underline;">→ aistudio.google.com</a>
+                </div>
+            </div>
+
             <div class="d-flex flex-column gap-2">
                 <div class="d-flex gap-2 align-items-center">
-                    <input type="password" id="settings-api-key-input" class="form-control shadow-sm" placeholder="Paste your Gemini API key here..." style="font-size: 0.85rem;">
+                    <input type="password" id="settings-api-key-input" class="form-control shadow-sm" placeholder="Paste Groq key (gsk_...) or Gemini key (AIza...)" style="font-size: 0.85rem;">
                     <button onclick="saveSettingsApiKey()" class="btn btn-primary px-3 py-2" style="font-size:0.85rem; white-space:nowrap; background: linear-gradient(135deg, #0078d4, #00bcf2); border:none;">
                         <i class="fa-solid fa-save me-1"></i> Save Key
                     </button>
@@ -93,6 +108,12 @@
                     </button>
                 </div>
                 <p id="settings-api-key-status" class="mb-0" style="font-size: 0.78rem; color: #6b7280;"><i class="fa-solid fa-circle-info me-1"></i> Not configured — chatbot is offline.</p>
+                <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; padding: 8px 12px; font-size: 0.76rem; color: #0369a1;">
+                    <strong>How to get a Groq key (2 min):</strong><br>
+                    1. Open <a href="https://console.groq.com/keys" target="_blank" class="text-primary">console.groq.com/keys</a> → Sign up with any Gmail/Outlook<br>
+                    2. Click <strong>Create API Key</strong> → Copy the key (starts with <code>gsk_</code>)<br>
+                    3. Paste it above → Save. Done! The AI chat is now live.
+                </div>
             </div>
         </div>
 
