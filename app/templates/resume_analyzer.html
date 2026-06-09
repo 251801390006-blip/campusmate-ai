@@ -7,8 +7,138 @@
 {% block content %}
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-<!-- Responsive Premium Layout Container -->
-<div class="resume-workspace-wrapper tab-edit">
+    <!-- Unified Premium Workspace Toolbar (Always Visible) -->
+    <div class="resume-workspace-toolbar flat-card bg-primary-card border p-2 mb-3 d-flex justify-content-between align-items-center flex-wrap gap-2 shadow-sm" style="background-color: var(--bg-secondary) !important;">
+        <!-- Left: Template Select & Gallery & Import -->
+        <div class="d-flex align-items-center gap-2 flex-wrap" style="font-size:0.8rem;">
+            <label for="resume-theme-select" class="fw-bold text-secondary-text mb-0">Theme:</label>
+            <select id="resume-theme-select" onchange="applyTheme(this.value)" class="form-input py-1 px-2 w-auto" style="max-width:145px; font-size:0.75rem; height:32px;">
+                <optgroup label="Original Classic">
+                    <option value="classic">Classic Ivory</option>
+                    <option value="modern-cyan">Modern Cyan Accent</option>
+                    <option value="slate-glass">Slate Glassmorphic</option>
+                    <option value="minimalist-executive">Minimalist Executive</option>
+                    <option value="tech-mono">Tech Minimalist</option>
+                    <option value="creative-violet">Creative Violet</option>
+                    <option value="emerald-forest">Emerald Forest</option>
+                    <option value="royal-indigo">Royal Indigo</option>
+                    <option value="corporate-navy">Corporate Navy</option>
+                    <option value="modern-warm">Modern Warm</option>
+                    <option value="clean-slate">Clean Slate</option>
+                    <option value="elegant-georgia">Elegant Georgia</option>
+                    <option value="stanford-academic">Stanford Academic</option>
+                    <option value="sleek-tech">Sleek Tech</option>
+                    <option value="compact-cv">Compact CV</option>
+                    <option value="hybrid-columns">Double Column Hybrid</option>
+                </optgroup>
+                <optgroup label="ATS Friendly">
+                    <option value="ats-classic">Classic Executive</option>
+                    <option value="ats-modern">Modern Professional</option>
+                    <option value="ats-minimal">Clean Minimalist</option>
+                    <option value="ats-compact">Compact Standard</option>
+                    <option value="ats-formal">Formal Traditional</option>
+                </optgroup>
+                <optgroup label="Modern Premium">
+                    <option value="modern-teal">Teal Accent</option>
+                    <option value="modern-slate">Slate Clean</option>
+                    <option value="modern-indigo">Indigo Startup</option>
+                    <option value="modern-coral">Coral Serif</option>
+                    <option value="modern-glass">Glassmorphism</option>
+                </optgroup>
+                <optgroup label="Microsoft Style">
+                    <option value="ms-learn">Learn Blue</option>
+                    <option value="ms-docs">Technical Writer</option>
+                    <option value="ms-azure">Azure Cloud</option>
+                    <option value="ms-office">Office Corporate</option>
+                    <option value="ms-team">MS Collaborative</option>
+                </optgroup>
+                <optgroup label="Student CV">
+                    <option value="student-academic">Academic CV</option>
+                    <option value="student-entry">Entry Level</option>
+                    <option value="student-grad">Graduate Fellowship</option>
+                    <option value="student-campus">Campus Leader</option>
+                    <option value="student-scholar">Scholar Traditional</option>
+                </optgroup>
+                <optgroup label="Internships">
+                    <option value="intern-general">General Internship</option>
+                    <option value="intern-tech">Tech Intern Prep</option>
+                    <option value="intern-business">Corporate Intern</option>
+                    <option value="intern-creative">Creative Portfolio</option>
+                    <option value="intern-research">Research Assistant</option>
+                </optgroup>
+                <optgroup label="Cyber Security">
+                    <option value="cyber-mono">Terminal Mono</option>
+                    <option value="cyber-dark">Dark Operations</option>
+                    <option value="cyber-shield">Shield Defensive</option>
+                    <option value="cyber-matrix">Matrix Green</option>
+                    <option value="cyber-audit">Compliance Auditor</option>
+                </optgroup>
+                <optgroup label="AI/ML Engineer">
+                    <option value="ai-tensor">Tensor Graph</option>
+                    <option value="ai-neural">Neural Network</option>
+                    <option value="ai-agent">Agentic Engineer</option>
+                    <option value="ai-vision">CV/NLP Specialist</option>
+                    <option value="ai-prompt">Prompt Analyst</option>
+                </optgroup>
+                <optgroup label="Cloud Ops">
+                    <option value="cloud-infra">Infrastructure</option>
+                    <option value="cloud-ops">Cloud Operations</option>
+                    <option value="cloud-k8s">Kubernetes Architect</option>
+                    <option value="cloud-aws">AWS Cloud</option>
+                    <option value="cloud-hybrid">Hybrid Cloud</option>
+                </optgroup>
+                <optgroup label="Software Eng">
+                    <option value="swe-git">Git Committer</option>
+                    <option value="swe-fullstack">Full Stack Engineer</option>
+                    <option value="swe-backend">Backend Architect</option>
+                    <option value="swe-frontend">Frontend Developer</option>
+                    <option value="swe-cloud">Cloud Engineer</option>
+                </optgroup>
+                <optgroup label="Minimalist">
+                    <option value="minimal-light">Light Standard</option>
+                    <option value="minimal-dark">Dark Elegant</option>
+                    <option value="minimal-border">Border Accent</option>
+                    <option value="minimal-compact">Compact Line</option>
+                    <option value="minimal-swiss">Swiss Editorial</option>
+                </optgroup>
+                <optgroup label="Executive">
+                    <option value="exec-director">Director Gold</option>
+                    <option value="exec-vp">VP Operations</option>
+                    <option value="exec-board">Board Member</option>
+                    <option value="exec-legal">Legal Counsel</option>
+                    <option value="exec-partner">Managing Partner</option>
+                </optgroup>
+                <optgroup label="Canva Premium">
+                    <option value="canva-sidebar">Left Sidebar Modern</option>
+                    <option value="canva-elegant">Olivia Wilson Elegant</option>
+                    <option value="canva-split">Minimalist Split</option>
+                </optgroup>
+            </select>
+            
+            <button type="button" class="btn btn-sm btn-outline py-1 px-3 rounded shadow-sm" style="height:32px; font-size:0.75rem;" onclick="openTemplateGallery()"><i class="fa-solid fa-palette me-1"></i> Gallery</button>
+            <button type="button" class="btn btn-sm btn-outline py-1 px-3 rounded shadow-sm" style="height:32px; font-size:0.75rem;" onclick="document.getElementById('resume-file-input-builder').click()"><i class="fa-solid fa-file-arrow-up me-1"></i> Import CV</button>
+            <input type="file" id="resume-file-input-builder" style="display:none;" accept=".pdf,.docx">
+        </div>
+
+        <!-- Right: Export / PDF / Print Actions -->
+        <div class="d-flex gap-1.5 flex-wrap">
+            <button class="btn btn-sm btn-primary py-1 px-3.5 rounded fw-semibold shadow-sm" style="height:32px; font-size:0.75rem;" onclick="downloadResumePDF()"><i class="fa-solid fa-download me-1"></i> Download PDF</button>
+            <button class="btn btn-sm btn-outline py-1 px-3 d-none d-sm-inline-block rounded" style="height:32px; font-size:0.75rem;" onclick="window.print()"><i class="fa-solid fa-print"></i> Print</button>
+            
+            <!-- Export Dropdown -->
+            <div class="dropdown" style="position:relative; display:inline-block;">
+                <button class="btn btn-sm btn-outline py-1 px-3 rounded dropdown-toggle" style="height:32px; font-size:0.75rem;" onclick="toggleExportMenu()"><i class="fa-solid fa-file-export me-1"></i> Export <i class="fa-solid fa-chevron-down ms-1" style="font-size:8px;"></i></button>
+                <div id="export-dropdown-menu" class="dropdown-menu border shadow-sm p-1" style="display:none; position:absolute; right:0; top:35px; background:var(--bg-secondary); border-radius:6px; z-index:1500; min-width:140px;">
+                    <a href="javascript:void(0)" onclick="downloadResumeDOCX()" class="dropdown-item py-2 px-3 d-block text-secondary-text" style="font-size:0.75rem; text-decoration:none;"><i class="fa-solid fa-file-word text-primary me-2"></i> Word (DOCX)</a>
+                    <a href="javascript:void(0)" onclick="downloadResumeJSON()" class="dropdown-item py-2 px-3 d-block text-secondary-text" style="font-size:0.75rem; text-decoration:none;"><i class="fa-solid fa-file-code text-info me-2"></i> JSON Schema</a>
+                    <a href="javascript:void(0)" onclick="generateShareLink()" class="dropdown-item py-2 px-3 d-block text-secondary-text" style="font-size:0.75rem; text-decoration:none;"><i class="fa-solid fa-share-nodes text-success me-2"></i> Share Link</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Responsive Premium Layout Container -->
+    <div class="resume-workspace-wrapper tab-edit">
     
     <!-- Left Column: Scrollable Editor Sections (col-xl-5) -->
     <div class="editor-form-column">
@@ -34,7 +164,10 @@
             </div>
 
             <!-- Scrollable Accordion Sections List -->
-            <div class="form-scroller flex-grow-1 pr-1 pb-3" style="overflow-y: auto; display: flex; flex-direction: column; gap: 12px;">
+            <div class="form-scroller flex-grow-1 pr-1 pb-3" style="overflow-y: auto; min-height:0; display: flex; flex-direction: column; gap: 12px;">
+                
+                <!-- Upload status text -->
+                <div id="upload-status-text-builder" class="text-center p-2 mb-2 border rounded bg-secondary-card text-secondary animate-fade-in" style="font-size: 0.72rem; display:none; border-color: var(--accent-color) !important;"></div>
                 
                 <!-- 1. Profile Info Accordion -->
                 <details class="accordion-section p-2 border rounded bg-primary-card" open id="accordion-profile">
@@ -253,138 +386,9 @@
         </div>
     </div>
 
-    <!-- Right Column: Visual Preview, Toolbar & ATS Panel (col-xl-7) -->
+    <!-- Right Column: Visual Preview & ATS Panel (col-xl-7) -->
     <div class="visual-viewer-column">
         <div class="flat-card h-100 bg-secondary-card border d-flex flex-column" style="overflow-y: auto; overflow-x: hidden; padding: 15px;">
-            
-            <!-- Preview Toolbar -->
-            <div class="flat-card bg-primary-card border p-3 mb-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                
-                <!-- Dropdown Select & Gallery Button -->
-                <div class="d-flex align-items-center gap-2 flex-wrap" style="font-size:0.8rem;">
-                    <label for="resume-theme-select" class="fw-bold text-secondary-text">Template Theme:</label>
-                    <select id="resume-theme-select" onchange="applyTheme(this.value)" class="form-input py-1 px-2 w-auto" style="max-width:160px; font-size:0.75rem;">
-                        <optgroup label="Original Classic">
-                            <option value="classic">Classic Ivory</option>
-                            <option value="modern-cyan">Modern Cyan Accent</option>
-                            <option value="slate-glass">Slate Glassmorphic</option>
-                            <option value="minimalist-executive">Minimalist Executive</option>
-                            <option value="tech-mono">Tech Minimalist</option>
-                            <option value="creative-violet">Creative Violet</option>
-                            <option value="emerald-forest">Emerald Forest</option>
-                            <option value="royal-indigo">Royal Indigo</option>
-                            <option value="corporate-navy">Corporate Navy</option>
-                            <option value="modern-warm">Modern Warm</option>
-                            <option value="clean-slate">Clean Slate</option>
-                            <option value="elegant-georgia">Elegant Georgia</option>
-                            <option value="stanford-academic">Stanford Academic</option>
-                            <option value="sleek-tech">Sleek Tech</option>
-                            <option value="compact-cv">Compact CV</option>
-                            <option value="hybrid-columns">Double Column Hybrid</option>
-                        </optgroup>
-                        <optgroup label="ATS Friendly">
-                            <option value="ats-classic">Classic Executive</option>
-                            <option value="ats-modern">Modern Professional</option>
-                            <option value="ats-minimal">Clean Minimalist</option>
-                            <option value="ats-compact">Compact Standard</option>
-                            <option value="ats-formal">Formal Traditional</option>
-                        </optgroup>
-                        <optgroup label="Modern Premium">
-                            <option value="modern-teal">Teal Accent</option>
-                            <option value="modern-slate">Slate Clean</option>
-                            <option value="modern-indigo">Indigo Startup</option>
-                            <option value="modern-coral">Coral Serif</option>
-                            <option value="modern-glass">Glassmorphism</option>
-                        </optgroup>
-                        <optgroup label="Microsoft Style">
-                            <option value="ms-learn">Learn Blue</option>
-                            <option value="ms-docs">Technical Writer</option>
-                            <option value="ms-azure">Azure Cloud</option>
-                            <option value="ms-office">Office Corporate</option>
-                            <option value="ms-team">MS Collaborative</option>
-                        </optgroup>
-                        <optgroup label="Student CV">
-                            <option value="student-academic">Academic CV</option>
-                            <option value="student-entry">Entry Level</option>
-                            <option value="student-grad">Graduate Fellowship</option>
-                            <option value="student-campus">Campus Leader</option>
-                            <option value="student-scholar">Scholar Traditional</option>
-                        </optgroup>
-                        <optgroup label="Internships">
-                            <option value="intern-general">General Internship</option>
-                            <option value="intern-tech">Tech Intern Prep</option>
-                            <option value="intern-business">Corporate Intern</option>
-                            <option value="intern-creative">Creative Portfolio</option>
-                            <option value="intern-research">Research Assistant</option>
-                        </optgroup>
-                        <optgroup label="Cyber Security">
-                            <option value="cyber-mono">Terminal Mono</option>
-                            <option value="cyber-dark">Dark Operations</option>
-                            <option value="cyber-shield">Shield Defensive</option>
-                            <option value="cyber-matrix">Matrix Green</option>
-                            <option value="cyber-audit">Compliance Auditor</option>
-                        </optgroup>
-                        <optgroup label="AI/ML Engineer">
-                            <option value="ai-tensor">Tensor Graph</option>
-                            <option value="ai-neural">Neural Network</option>
-                            <option value="ai-agent">Agentic Engineer</option>
-                            <option value="ai-vision">CV/NLP Specialist</option>
-                            <option value="ai-prompt">Prompt Analyst</option>
-                        </optgroup>
-                        <optgroup label="Cloud Ops">
-                            <option value="cloud-infra">Infrastructure</option>
-                            <option value="cloud-ops">Cloud Operations</option>
-                            <option value="cloud-k8s">Kubernetes Architect</option>
-                            <option value="cloud-aws">AWS Cloud</option>
-                            <option value="cloud-hybrid">Hybrid Cloud</option>
-                        </optgroup>
-                        <optgroup label="Software Eng">
-                            <option value="swe-git">Git Committer</option>
-                            <option value="swe-fullstack">Full Stack Engineer</option>
-                            <option value="swe-backend">Backend Architect</option>
-                            <option value="swe-frontend">Frontend Developer</option>
-                            <option value="swe-cloud">Cloud Engineer</option>
-                        </optgroup>
-                        <optgroup label="Minimalist">
-                            <option value="minimal-light">Light Standard</option>
-                            <option value="minimal-dark">Dark Elegant</option>
-                            <option value="minimal-border">Border Accent</option>
-                            <option value="minimal-compact">Compact Line</option>
-                            <option value="minimal-swiss">Swiss Editorial</option>
-                        </optgroup>
-                        <optgroup label="Executive">
-                            <option value="exec-director">Director Gold</option>
-                            <option value="exec-vp">VP Operations</option>
-                            <option value="exec-board">Board Member</option>
-                            <option value="exec-legal">Legal Counsel</option>
-                            <option value="exec-partner">Managing Partner</option>
-                        </optgroup>
-                        <optgroup label="Canva Premium">
-                            <option value="canva-sidebar">Left Sidebar Modern</option>
-                            <option value="canva-elegant">Olivia Wilson Elegant</option>
-                            <option value="canva-split">Minimalist Split</option>
-                        </optgroup>
-                    </select>
-                    
-                    <button type="button" class="btn btn-sm btn-outline py-1.5 px-3 rounded" onclick="openTemplateGallery()"><i class="fa-solid fa-palette me-1"></i> Browse Gallery</button>
-                </div>
-
-                <!-- Export / PDF / Print Actions -->
-                <div class="d-flex gap-1 flex-wrap">
-                    <button class="btn btn-sm btn-primary" onclick="downloadResumePDF()"><i class="fa-solid fa-download me-1"></i> Download PDF</button>
-                    <button class="btn btn-sm btn-outline" onclick="window.print()"><i class="fa-solid fa-print"></i> Print</button>
-                    
-                    <!-- Export Dropdown -->
-                    <div class="dropdown" style="position:relative; display:inline-block;">
-                        <button class="btn btn-sm btn-outline dropdown-toggle" onclick="toggleExportMenu()"><i class="fa-solid fa-file-export me-1"></i> Export <i class="fa-solid fa-chevron-down ms-1" style="font-size:8px;"></i></button>
-                        <div id="export-dropdown-menu" class="dropdown-menu border shadow-sm p-1" style="display:none; position:absolute; right:0; top:35px; background:var(--bg-secondary); border-radius:6px; z-index:1500; min-width:140px;">
-                            <a href="javascript:void(0)" onclick="downloadResumeDOCX()" class="dropdown-item py-2 px-3 d-block text-secondary-text" style="font-size:0.75rem; text-decoration:none;"><i class="fa-solid fa-file-word text-primary me-2"></i> Word (DOCX)</a>
-                            <a href="javascript:void(0)" onclick="downloadResumeJSON()" class="dropdown-item py-2 px-3 d-block text-secondary-text" style="font-size:0.75rem; text-decoration:none;"><i class="fa-solid fa-file-code text-info me-2"></i> JSON Schema</a>
-                            <a href="javascript:void(0)" onclick="generateShareLink()" class="dropdown-item py-2 px-3 d-block text-secondary-text" style="font-size:0.75rem; text-decoration:none;"><i class="fa-solid fa-share-nodes text-success me-2"></i> Share Link</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <!-- Before/After optimizations panel -->
             <div class="flat-card border p-2 mb-3 bg-primary-card" id="before-after-card" style="display:none; border-color: rgba(16,185,129,0.2) !important;">
@@ -408,15 +412,7 @@
                 </div>
             </div>
 
-            <!-- Drag & Drop Upload Zone -->
-            <div class="upload-zone-wrapper p-3 border rounded text-center mb-3 bg-primary-card" style="border-style: dashed !important; cursor: pointer;" id="drop-zone-builder">
-                <i class="fa-solid fa-cloud-arrow-up text-muted mb-1" style="font-size: 1.4rem;"></i>
-                <h4 style="font-size: 0.75rem;" class="fw-bold mb-0">Drag & Drop Resume PDF/DOCX</h4>
-                <p class="text-secondary mb-1" style="font-size: 0.62rem;">AI will automatically fill out your editor inputs.</p>
-                <span class="badge badge-info cursor-pointer px-2 py-0.5" style="font-size: 0.6rem;">Browse Files</span>
-                <input type="file" id="resume-file-input-builder" style="display:none;" accept=".pdf,.docx">
-                <div id="upload-status-text-builder" class="text-secondary mt-1" style="font-size: 0.68rem; display:none;"></div>
-            </div>
+
 
             <!-- Share Link Container -->
             <div id="share-link-container" class="mt-1 mb-3 p-3 border rounded bg-primary-card" style="display:none;">
@@ -2498,6 +2494,11 @@ function scaleResumePreview() {
     const wrapper = document.querySelector(".resume-preview-sheet-wrapper");
     if (!paper || !wrapper) return;
     
+    // Return early if the wrapper is currently hidden (e.g. display: none)
+    if (wrapper.offsetWidth === 0) {
+        return;
+    }
+    
     paper.style.transform = "none";
     wrapper.style.height = "auto";
     
@@ -2505,6 +2506,7 @@ function scaleResumePreview() {
     const paperHeight = paper.offsetHeight || 1123;
     
     const containerWidth = wrapper.clientWidth - 30; // subtract padding
+    if (containerWidth <= 0) return;
     
     let scale = containerWidth / paperWidth;
     if (scale > 1) scale = 1;
@@ -2532,9 +2534,21 @@ document.addEventListener("DOMContentLoaded", () => {
     display: grid;
     grid-template-columns: 1.15fr 1.35fr;
     gap: 20px;
-    height: calc(100vh - 120px);
+    height: 100%;
     overflow: hidden;
     box-sizing: border-box;
+}
+.form-scroller {
+    overflow-y: auto;
+    min-height: 0;
+    scrollbar-width: thin;
+}
+.form-scroller::-webkit-scrollbar {
+    width: 6px;
+}
+.form-scroller::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 4px;
 }
 
 .editor-form-column {
@@ -2772,13 +2786,38 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 }
 
+/* Lock page scroll on desktop/tablet to force column scrolling */
+@media (min-width: 768px) {
+    html, body {
+        height: 100vh !important;
+        overflow: hidden !important;
+    }
+    .main-with-sidebar {
+        height: 100vh !important;
+        overflow: hidden !important;
+    }
+    .dashboard-inner-container {
+        height: calc(100vh - 64px) !important;
+        overflow: hidden !important;
+        display: flex;
+        flex-direction: column;
+        padding: 15px 20px !important;
+        box-sizing: border-box;
+    }
+    .resume-workspace-wrapper {
+        flex-grow: 1;
+        height: 0 !important;
+        min-height: 0;
+    }
+}
+
 /* Tablet viewport (768px - 1099px) styles */
 @media (min-width: 768px) and (max-width: 1099px) {
     .resume-workspace-wrapper {
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
         gap: 15px !important;
-        height: calc(100vh - 120px) !important;
+        height: 100% !important;
         overflow: hidden !important;
     }
     .editor-form-column, .visual-viewer-column {
