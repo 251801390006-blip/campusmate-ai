@@ -308,4 +308,63 @@ async function sendMentorMessage(e) {
 // Sync displays on DOM load
 document.addEventListener("DOMContentLoaded", () => {
     loadMentorChatHistory();
+    updateApiKeyStatus();
 });
+
+// --- Gemini API Key Management ---
+function updateApiKeyStatus() {
+    const existing = localStorage.getItem("campusmate_gemini_key") || "";
+    const statusEl = document.getElementById("mentor-api-status");
+    if (!statusEl) return;
+    if (existing) {
+        const masked = existing.substring(0, 8) + "..." + existing.slice(-4);
+        statusEl.innerHTML = `<i class="fa-solid fa-circle" style="font-size: 0.45rem; color: #22c55e; margin-right: 4px;"></i>AI Online — Key set (${masked})`;
+    } else {
+        statusEl.innerHTML = `<i class="fa-solid fa-circle" style="font-size: 0.45rem; color: #ef4444; margin-right: 4px;"></i>No API Key — AI offline`;
+    }
+}
+
+function toggleMentorApiKey() {
+    const form = document.getElementById("mentor-api-key-form");
+    if (!form) return;
+    const isHidden = form.style.display === "none";
+    form.style.display = isHidden ? "block" : "none";
+    if (isHidden) {
+        const existing = localStorage.getItem("campusmate_gemini_key") || "";
+        const input = document.getElementById("mentor-api-key-input");
+        if (input && existing) input.value = existing;
+    }
+}
+
+function saveMentorApiKey() {
+    const input = document.getElementById("mentor-api-key-input");
+    if (!input) return;
+    const key = input.value.trim();
+    if (!key) {
+        alert("Please enter a valid Gemini API key.");
+        return;
+    }
+    localStorage.setItem("campusmate_gemini_key", key);
+    updateApiKeyStatus();
+    const form = document.getElementById("mentor-api-key-form");
+    if (form) form.style.display = "none";
+    
+    // Show confirmation in chat
+    const messagesBox = document.getElementById("mentor-chat-messages");
+    if (messagesBox) {
+        const sysDiv = document.createElement("div");
+        sysDiv.className = "message mentor";
+        sysDiv.innerHTML = `<p><i class="fa-solid fa-circle-check text-success me-1"></i><strong>Gemini API key saved!</strong> The AI advisor is now online. Ask me anything!</p>`;
+        messagesBox.appendChild(sysDiv);
+        messagesBox.scrollTop = messagesBox.scrollHeight;
+    }
+}
+
+function clearMentorApiKey() {
+    localStorage.removeItem("campusmate_gemini_key");
+    const input = document.getElementById("mentor-api-key-input");
+    if (input) input.value = "";
+    updateApiKeyStatus();
+    const form = document.getElementById("mentor-api-key-form");
+    if (form) form.style.display = "none";
+}

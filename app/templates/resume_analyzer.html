@@ -1445,46 +1445,69 @@ function downloadResumePDF() {
         originalHtml = btn.innerHTML;
         btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Downloading...`;
     }
+
+    // Clone the element so we don't disturb the live preview
+    const clone = element.cloneNode(true);
+
+    // Place clone off-screen but still "in the document" so it renders fully
+    clone.style.cssText = [
+        "position: fixed",
+        "top: 0",
+        "left: 0",
+        "width: 794px",
+        "height: 1123px",
+        "padding: 28px 36px",
+        "margin: 0",
+        "border: none",
+        "box-shadow: none",
+        "overflow: hidden",
+        "box-sizing: border-box",
+        "background: #ffffff",
+        "font-size: 10px",
+        "line-height: 1.35",
+        "color: #374151",
+        "z-index: -9999",
+        "opacity: 1",
+        "visibility: visible",
+        "pointer-events: none"
+    ].join(" !important; ") + " !important";
+
+    // Copy the current theme class to clone
+    clone.className = element.className;
     
-    element.classList.add('pdf-export-mode');
+    document.body.appendChild(clone);
     
-    // Tiny timeout to let the class take visual effect in DOM
-    setTimeout(() => {
-        const nameVal = document.getElementById('res-name').value || 'Resume';
-        const opt = {
-            margin:       0,
-            filename:     `${nameVal.trim().replace(/\s+/g, '_')}_Resume.pdf`,
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { 
-                scale: 2.5, 
-                useCORS: true, 
-                letterRendering: true,
-                scrollY: 0,
-                width: 794,
-                height: 1123,
-                windowWidth: 794,
-                windowHeight: 1123
-            },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            pagebreak:    { mode: 'avoid-all' }
-        };
-        
-        html2pdf().set(opt).from(element).save().then(() => {
-            element.classList.remove('pdf-export-mode');
-            if (btn) {
-                btn.disabled = false;
-                btn.innerHTML = originalHtml;
-            }
-        }).catch(err => {
-            console.error(err);
-            element.classList.remove('pdf-export-mode');
-            if (btn) {
-                btn.disabled = false;
-                btn.innerHTML = originalHtml;
-            }
-            alert("Failed to export PDF: " + err.message);
-        });
-    }, 150);
+    const nameVal = document.getElementById('res-name').value || 'Resume';
+    const opt = {
+        margin:    0,
+        filename:  `${nameVal.trim().replace(/\s+/g, '_')}_Resume.pdf`,
+        image:     { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+            scale: 2.5,
+            useCORS: true,
+            letterRendering: true,
+            scrollX: 0,
+            scrollY: 0
+        },
+        jsPDF:     { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: 'avoid-all' }
+    };
+
+    html2pdf().set(opt).from(clone).save().then(() => {
+        clone.remove();
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
+    }).catch(err => {
+        console.error(err);
+        clone.remove();
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
+        alert("Failed to export PDF: " + err.message);
+    });
 }
 </script>
 <style>
@@ -1663,22 +1686,7 @@ function downloadResumePDF() {
 .resume-sheet.exec-partner h1, .resume-sheet.exec-partner h3 { color: #1e3a8a !important; }
 .resume-sheet.exec-partner h3 { border-bottom: 2px solid #1e3a8a !important; }
 
-.pdf-export-mode {
-    position: absolute !important;
-    left: -9999px !important;
-    top: 0 !important;
-    width: 794px !important;
-    height: 1123px !important;
-    max-height: 1123px !important;
-    min-height: 1123px !important;
-    padding: 30px 40px !important;
-    margin: 0 !important;
-    border: none !important;
-    box-shadow: none !important;
-    overflow: hidden !important;
-    box-sizing: border-box !important;
-    background: #ffffff !important;
-}
+/* pdf-export-mode now applied inline via JS clone - no CSS override needed */
 .pdf-export-mode .resume-render-header {
     margin-bottom: 4px !important;
     padding-bottom: 3px !important;

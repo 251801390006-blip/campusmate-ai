@@ -78,6 +78,24 @@
             </form>
         </div>
 
+        <!-- Gemini AI API Key Card -->
+        <div class="flat-card shadow-sm border-light mb-4">
+            <h3 class="fw-bold text-dark mb-1" style="font-size:1.05rem;"><i class="fa-solid fa-robot text-primary me-2"></i> AI Chatbot API Key</h3>
+            <p class="text-secondary mb-3" style="font-size:0.8rem;">Enter your free Gemini API key to unlock the live AI Career Mentor chatbot. Get one instantly at <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-primary fw-semibold">aistudio.google.com</a>.</p>
+            <div class="d-flex flex-column gap-2">
+                <div class="d-flex gap-2 align-items-center">
+                    <input type="password" id="settings-api-key-input" class="form-control shadow-sm" placeholder="Paste your Gemini API key here..." style="font-size: 0.85rem;">
+                    <button onclick="saveSettingsApiKey()" class="btn btn-primary px-3 py-2" style="font-size:0.85rem; white-space:nowrap; background: linear-gradient(135deg, #0078d4, #00bcf2); border:none;">
+                        <i class="fa-solid fa-save me-1"></i> Save Key
+                    </button>
+                    <button onclick="clearSettingsApiKey()" class="btn btn-outline-danger px-3 py-2" style="font-size:0.85rem; white-space:nowrap;">
+                        <i class="fa-solid fa-trash me-1"></i> Clear
+                    </button>
+                </div>
+                <p id="settings-api-key-status" class="mb-0" style="font-size: 0.78rem; color: #6b7280;"><i class="fa-solid fa-circle-info me-1"></i> Not configured — chatbot is offline.</p>
+            </div>
+        </div>
+
         <!-- Theme & Appearance Settings Card -->
         <div class="flat-card shadow-sm border-light mb-4">
             <h3 class="fw-bold text-dark mb-3" style="font-size:1.05rem;"><i class="fa-solid fa-palette text-primary me-2"></i> Theme & Appearance</h3>
@@ -185,6 +203,16 @@
         if (select) {
             select.value = savedTheme;
         }
+
+        // Load existing API key status
+        const existingKey = localStorage.getItem("campusmate_gemini_key") || "";
+        const statusEl = document.getElementById("settings-api-key-status");
+        const keyInput = document.getElementById("settings-api-key-input");
+        if (existingKey) {
+            const masked = existingKey.substring(0, 8) + "..." + existingKey.slice(-4);
+            if (statusEl) statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-success me-1"></i> Key configured (${masked}) — AI chatbot is <strong class="text-success">online</strong>.`;
+            if (keyInput) keyInput.value = existingKey;
+        }
     });
 
     function changeThemePreference(val) {
@@ -196,6 +224,28 @@
             document.documentElement.classList.remove("dark");
             document.body.classList.remove("dark");
         }
+    }
+
+    function saveSettingsApiKey() {
+        const input = document.getElementById("settings-api-key-input");
+        const statusEl = document.getElementById("settings-api-key-status");
+        if (!input) return;
+        const key = input.value.trim();
+        if (!key) {
+            alert("Please enter a valid Gemini API key.");
+            return;
+        }
+        localStorage.setItem("campusmate_gemini_key", key);
+        const masked = key.substring(0, 8) + "..." + key.slice(-4);
+        if (statusEl) statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-success me-1"></i> Key saved (${masked}) — AI chatbot is now <strong class="text-success">online</strong>!`;
+    }
+
+    function clearSettingsApiKey() {
+        localStorage.removeItem("campusmate_gemini_key");
+        const input = document.getElementById("settings-api-key-input");
+        const statusEl = document.getElementById("settings-api-key-status");
+        if (input) input.value = "";
+        if (statusEl) statusEl.innerHTML = `<i class="fa-solid fa-circle-info me-1"></i> Not configured — chatbot is offline.`;
     }
 </script>
 {% endblock %}
