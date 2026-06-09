@@ -22,244 +22,11 @@
                 
                 <div class="mb-3">
                     <label for="mock-role-input" class="fw-semibold text-secondary d-block mb-1" style="font-size: 0.82rem;">Target Career Role</label>
-                    <input type="text" id="mock-role-input" list="role-datalist" class="form-control shadow-sm" placeholder="e.g. Backend Engineer, SOC Analyst" value="{{ user_track }}" style="font-size:0.9rem;" autocomplete="off">
-                    <datalist id="role-datalist">
-                        <!-- Software Engineering & Development -->
-                        <option value="Software Engineer">
-                        <option value="Senior Software Engineer">
-                        <option value="Staff Software Engineer">
-                        <option value="Principal Engineer">
-                        <option value="Full Stack Developer">
-                        <option value="Frontend Developer">
-                        <option value="Backend Developer">
-                        <option value="Web Developer">
-                        <option value="Mobile App Developer">
-                        <option value="iOS Developer">
-                        <option value="Android Developer">
-                        <option value="React Developer">
-                        <option value="Angular Developer">
-                        <option value="Vue.js Developer">
-                        <option value="Node.js Developer">
-                        <option value="Python Developer">
-                        <option value="Java Developer">
-                        <option value="C++ Developer">
-                        <option value="Rust Developer">
-                        <option value="Go Developer">
-                        <option value="Ruby on Rails Developer">
-                        <option value="PHP Developer">
-                        <option value="Swift Developer">
-                        <option value="Kotlin Developer">
-                        <option value="TypeScript Developer">
-                        <option value="Embedded Systems Engineer">
-                        <option value="Firmware Engineer">
-                        <option value="Game Developer">
-                        <option value="Graphics Programmer">
-                        <option value="Low-Level Systems Programmer">
-                        <!-- Data Science & AI/ML -->
-                        <option value="Data Scientist">
-                        <option value="Senior Data Scientist">
-                        <option value="Machine Learning Engineer">
-                        <option value="Deep Learning Engineer">
-                        <option value="AI Research Scientist">
-                        <option value="NLP Engineer">
-                        <option value="Computer Vision Engineer">
-                        <option value="MLOps Engineer">
-                        <option value="Data Engineer">
-                        <option value="Data Analyst">
-                        <option value="Business Intelligence Analyst">
-                        <option value="Quantitative Analyst">
-                        <option value="Statistician">
-                        <option value="AI Product Manager">
-                        <option value="Prompt Engineer">
-                        <option value="LLM Engineer">
-                        <option value="Reinforcement Learning Engineer">
-                        <option value="Robotics Engineer">
-                        <option value="Research Engineer">
-                        <option value="Applied Scientist">
-                        <!-- Cybersecurity -->
-                        <option value="Cybersecurity Analyst">
-                        <option value="SOC Analyst">
-                        <option value="Security Engineer">
-                        <option value="Penetration Tester">
-                        <option value="Ethical Hacker">
-                        <option value="Information Security Manager">
-                        <option value="Threat Intelligence Analyst">
-                        <option value="Incident Response Analyst">
-                        <option value="Digital Forensics Analyst">
-                        <option value="Malware Analyst">
-                        <option value="Application Security Engineer">
-                        <option value="Cloud Security Engineer">
-                        <option value="Network Security Engineer">
-                        <option value="Cryptography Engineer">
-                        <option value="Security Architect">
-                        <option value="Compliance Analyst">
-                        <option value="GRC Analyst">
-                        <option value="Red Team Operator">
-                        <option value="Blue Team Analyst">
-                        <option value="Bug Bounty Hunter">
-                        <!-- Cloud & DevOps -->
-                        <option value="Cloud Engineer">
-                        <option value="Cloud Architect">
-                        <option value="AWS Solutions Architect">
-                        <option value="Azure Cloud Engineer">
-                        <option value="GCP Cloud Engineer">
-                        <option value="DevOps Engineer">
-                        <option value="Site Reliability Engineer (SRE)">
-                        <option value="Platform Engineer">
-                        <option value="Infrastructure Engineer">
-                        <option value="Kubernetes Engineer">
-                        <option value="Docker Engineer">
-                        <option value="CI/CD Engineer">
-                        <option value="Systems Administrator">
-                        <option value="Linux Administrator">
-                        <option value="Network Engineer">
-                        <option value="Release Engineer">
-                        <option value="Build Engineer">
-                        <option value="Configuration Manager">
-                        <option value="Terraform Engineer">
-                        <option value="Ansible Automation Engineer">
-                        <!-- Product & Design -->
-                        <option value="Product Manager">
-                        <option value="Senior Product Manager">
-                        <option value="Technical Product Manager">
-                        <option value="Product Designer">
-                        <option value="UX Designer">
-                        <option value="UI Designer">
-                        <option value="UX Researcher">
-                        <option value="Interaction Designer">
-                        <option value="Visual Designer">
-                        <option value="Design Systems Engineer">
-                        <option value="Motion Designer">
-                        <option value="Creative Director">
-                        <option value="Art Director">
-                        <option value="Brand Designer">
-                        <option value="Graphic Designer">
-                        <!-- QA & Testing -->
-                        <option value="QA Engineer">
-                        <option value="SDET (Software Dev Engineer in Test)">
-                        <option value="Automation Test Engineer">
-                        <option value="Performance Test Engineer">
-                        <option value="Manual Tester">
-                        <option value="Quality Assurance Lead">
-                        <!-- Database & Storage -->
-                        <option value="Database Administrator">
-                        <option value="Database Developer">
-                        <option value="Data Warehouse Engineer">
-                        <option value="ETL Developer">
-                        <option value="Big Data Engineer">
-                        <option value="Hadoop Developer">
-                        <option value="Spark Developer">
-                        <option value="Kafka Engineer">
-                        <!-- Blockchain & Web3 -->
-                        <option value="Blockchain Developer">
-                        <option value="Smart Contract Developer">
-                        <option value="Web3 Engineer">
-                        <option value="Solidity Developer">
-                        <option value="DeFi Engineer">
-                        <!-- Management & Leadership -->
-                        <option value="Engineering Manager">
-                        <option value="VP of Engineering">
-                        <option value="CTO">
-                        <option value="Technical Lead">
-                        <option value="Team Lead">
-                        <option value="Scrum Master">
-                        <option value="Agile Coach">
-                        <option value="Project Manager">
-                        <option value="Program Manager">
-                        <option value="Delivery Manager">
-                        <!-- Business & Finance -->
-                        <option value="Business Analyst">
-                        <option value="Management Consultant">
-                        <option value="Strategy Analyst">
-                        <option value="Financial Analyst">
-                        <option value="Investment Banking Analyst">
-                        <option value="Risk Analyst">
-                        <option value="Operations Manager">
-                        <option value="Supply Chain Analyst">
-                        <option value="Procurement Analyst">
-                        <option value="Logistics Coordinator">
-                        <!-- Marketing & Sales -->
-                        <option value="Digital Marketing Manager">
-                        <option value="SEO Specialist">
-                        <option value="Content Marketing Manager">
-                        <option value="Social Media Manager">
-                        <option value="Growth Hacker">
-                        <option value="Performance Marketing Analyst">
-                        <option value="Sales Engineer">
-                        <option value="Account Executive">
-                        <option value="Customer Success Manager">
-                        <option value="Technical Account Manager">
-                        <!-- Healthcare & Life Sciences -->
-                        <option value="Biomedical Engineer">
-                        <option value="Clinical Data Analyst">
-                        <option value="Health Informatics Specialist">
-                        <option value="Bioinformatics Engineer">
-                        <option value="Pharmaceutical Scientist">
-                        <option value="Healthcare IT Specialist">
-                        <option value="Medical Device Engineer">
-                        <option value="Genomics Data Scientist">
-                        <!-- Education & Research -->
-                        <option value="EdTech Developer">
-                        <option value="Instructional Designer">
-                        <option value="Research Scientist">
-                        <option value="Academic Researcher">
-                        <option value="Curriculum Developer">
-                        <option value="Teaching Assistant">
-                        <!-- Legal & Compliance -->
-                        <option value="Legal Analyst">
-                        <option value="Compliance Officer">
-                        <option value="Privacy Engineer">
-                        <option value="Intellectual Property Analyst">
-                        <option value="Contract Manager">
-                        <!-- Media & Entertainment -->
-                        <option value="Video Producer">
-                        <option value="Sound Engineer">
-                        <option value="3D Artist">
-                        <option value="Animation Engineer">
-                        <option value="VR/AR Developer">
-                        <option value="Technical Writer">
-                        <option value="Content Strategist">
-                        <!-- Telecom & Networking -->
-                        <option value="Telecom Engineer">
-                        <option value="RF Engineer">
-                        <option value="5G Network Engineer">
-                        <option value="VoIP Engineer">
-                        <option value="Optical Network Engineer">
-                        <!-- Aerospace & Automotive -->
-                        <option value="Aerospace Engineer">
-                        <option value="Avionics Engineer">
-                        <option value="Automotive Software Engineer">
-                        <option value="ADAS Engineer">
-                        <option value="Autonomous Vehicle Engineer">
-                        <!-- Energy & Environment -->
-                        <option value="Renewable Energy Engineer">
-                        <option value="Environmental Data Analyst">
-                        <option value="Power Systems Engineer">
-                        <option value="Smart Grid Engineer">
-                        <!-- Hardware & Electronics -->
-                        <option value="Hardware Engineer">
-                        <option value="VLSI Design Engineer">
-                        <option value="FPGA Engineer">
-                        <option value="PCB Design Engineer">
-                        <option value="Chip Architect">
-                        <option value="Semiconductor Process Engineer">
-                        <option value="IoT Engineer">
-                        <option value="Sensor Engineer">
-                        <!-- Other Technical Roles -->
-                        <option value="Solutions Architect">
-                        <option value="Enterprise Architect">
-                        <option value="Integration Engineer">
-                        <option value="API Developer">
-                        <option value="Microservices Architect">
-                        <option value="ERP Consultant">
-                        <option value="SAP Consultant">
-                        <option value="Salesforce Developer">
-                        <option value="ServiceNow Developer">
-                        <option value="SharePoint Developer">
-                        <option value="Technical Support Engineer">
-                        <option value="IT Help Desk Specialist">
-                        <option value="IT Auditor">
-                    </datalist>
+                    <select id="mock-role-input" class="form-select shadow-sm" style="font-size:0.9rem; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); width: 100%;">
+                        {% for track in tracks %}
+                            <option value="{{ track }}" {% if user_track == track %}selected{% endif %}>{{ track }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
 
                 <div class="mb-4">
@@ -579,7 +346,12 @@ let mockInterviewState = {
             "Describe how you would implement infinite scrolling with virtualized lists. What libraries or techniques would you use?",
             "What is a Service Worker? How does it enable offline-first Progressive Web Apps (PWAs)?",
             "Explain the difference between controlled and uncontrolled components in React. When would you use each?",
-            "How do you handle state management in a large-scale React application? Compare Redux, Zustand, and React Context."
+            "How do you handle state management in a large-scale React application? Compare Redux, Zustand, and React Context.",
+            "What is the difference between client-side hydration and rendering in frameworks like Next.js? How does it affect performance?",
+            "Explain the CSS property contain and how it aids rendering optimizations for large, complex scrollable lists.",
+            "How does the browser event loop process microtasks (like Promises) vs macrotasks (like setTimeout)? What is the ordering?",
+            "What are the performance differences between CSS transitions, keyframe animations, and Web Animations API? When is the GPU utilized?",
+            "Describe how you would design a client-side telemetry tracker that aggregates events without blocking the main thread or degrading UI responsiveness."
         ],
         "backend_systems": [
             "Design a URL shortener service like bit.ly. Discuss the database schema, hashing strategy, and read/write optimization.",
@@ -599,7 +371,12 @@ let mockInterviewState = {
             "What are ACID properties in databases? How do distributed transactions maintain these properties across microservices?",
             "Explain the concept of API versioning. What strategies (URI path, header, query param) would you use and why?",
             "Design a file storage service like Google Drive. Discuss chunked uploads, deduplication, and CDN distribution.",
-            "What is the Circuit Breaker pattern? How does it prevent cascading failures in microservice architectures?"
+            "What is the Circuit Breaker pattern? How does it prevent cascading failures in microservice architectures?",
+            "How do database locking strategies differ between Optimistic Concurrency Control (OCC) and Pessimistic Concurrency Control (PCC)? When is each preferred?",
+            "What is the N+1 query problem? How do you diagnose and resolve it using eager loading, prefetching, or batch loading in ORMs?",
+            "Explain the Raft consensus algorithm. How does leader election work, and how does it guarantee log replication safety?",
+            "What is CQRS (Command Query Responsibility Segregation)? What are the benefits and challenges of separating read and write models?",
+            "How do you implement distributed locking in microservices using Redis (Redlock) or Zookeeper? What are the potential failure scenarios?"
         ],
         "data_ai": [
             "Explain the bias-variance tradeoff. How does regularization (L1 vs L2) help control model complexity?",
@@ -619,7 +396,12 @@ let mockInterviewState = {
             "What is reinforcement learning? Explain the policy gradient method and the explore-exploit tradeoff.",
             "How do you design a recommendation system? Compare collaborative filtering, content-based filtering, and hybrid approaches.",
             "What are embedding vectors? How are they used in NLP (Word2Vec, GloVe) and recommendation systems?",
-            "Explain the concept of model interpretability. Compare SHAP values, LIME, and attention visualization techniques."
+            "Explain the concept of model interpretability. Compare SHAP values, LIME, and attention visualization techniques.",
+            "Describe the differences between Encoder-only (like BERT), Decoder-only (like GPT), and Encoder-Decoder (like T5) architectures.",
+            "Explain how model quantization (e.g., INT8 vs FP16) works. How does it reduce memory footprints while preserving model accuracy?",
+            "What is Reinforcement Learning from Human Feedback (RLHF)? Detail the reward model training and PPO alignment phases.",
+            "How do Vector DB indexing structures like HNSW (Hierarchical Navigable Small World) compare to IVF-Flat for high-dimensional vector similarity search?",
+            "What is model drift? How do you establish monitoring metrics like Population Stability Index (PSI) to detect feature or concept drift?"
         ],
         "cybersecurity": [
             "Explain the OWASP Top 10 vulnerabilities. How would you defend against SQL Injection and Cross-Site Scripting (XSS)?",
@@ -639,7 +421,12 @@ let mockInterviewState = {
             "What is container security? How do you scan Docker images for vulnerabilities and enforce runtime security policies?",
             "Explain the concept of least privilege access. How does Role-Based Access Control (RBAC) differ from ABAC?",
             "What is a buffer overflow attack? How do ASLR, DEP, and stack canaries protect against it?",
-            "Describe how digital forensics investigators analyze a compromised system. What artifacts do you collect and preserve?"
+            "Describe how digital forensics investigators analyze a compromised system. What artifacts do you collect and preserve?",
+            "Describe how OAuth 2.0 flow works. What is the difference between Authorization Code flow with and without PKCE?",
+            "What is Kerberos authentication? Explain the Ticket Granting Ticket (TGT) and how Ticket Granting Services (TGS) validate credentials.",
+            "Explain how blind SQL injection differs from standard SQL injection. How do time-based and boolean-based payloads gather database names?",
+            "What is DNS Tunneling? How do attackers use TXT records to exfiltrate data, and how can you detect it using network traffic anomalies?",
+            "Describe the difference between symmetric and asymmetric cryptography key lengths. Why is a 256-bit AES key considered secure, while a 2048-bit RSA key is required?"
         ],
         "cloud_devops": [
             "Explain the difference between IaaS, PaaS, and SaaS. Give examples of when you would choose each service model.",
@@ -659,7 +446,12 @@ let mockInterviewState = {
             "Describe how you would design a disaster recovery plan for a multi-region cloud architecture.",
             "What is observability? Explain the three pillars: logs, metrics, and traces with tools for each.",
             "How do you implement zero-downtime database migrations in a production environment?",
-            "What is a CDN? Explain how CloudFront or Cloudflare accelerates content delivery and reduces origin server load."
+            "What is a CDN? Explain how CloudFront or Cloudflare accelerates content delivery and reduces origin server load.",
+            "How does the Kubernetes control plane maintain state consistency? Explain the interaction between API Server, Controller Manager, Scheduler, and etcd.",
+            "Explain the difference between a StatefulSet and a Deployment in Kubernetes. How are persistent volume claims bound and resolved during pod restarts?",
+            "What is Terraform state locking? Why is a backend configuration using S3 with DynamoDB lock tables essential for team workflows?",
+            "Describe a canary release configuration using Istio Service Mesh. How are virtual service route weights shifted progressively based on error rates?",
+            "What is Chaos Engineering? How would you design a chaos experiment using tools like Chaos Mesh to test a cluster's resilience to network partition latency?"
         ],
         "behavioral_hr": [
             "Tell me about a time you had to work under a tight deadline. How did you prioritize tasks and manage stress?",
@@ -679,7 +471,61 @@ let mockInterviewState = {
             "Tell me about a time you received vague or ambiguous requirements. How did you clarify and move forward?",
             "How do you stay up-to-date with new technologies and industry trends? Give specific examples.",
             "Describe a cross-functional collaboration experience. How did you ensure alignment between different teams?",
-            "Where do you see yourself in 3-5 years? How does this role align with your long-term career goals?"
+            "Where do you see yourself in 3-5 years? How does this role align with your long-term career goals?",
+            "Describe a time when you had to take a major calculated risk in a software deployment or project direction. What factors did you weigh?",
+            "Tell me about a time when you inherited a poorly documented legacy codebase. How did you organize your onboarding and tackle technical debt?",
+            "How do you handle alignment and prioritization when working with cross-functional stakeholders who have conflicting goals?",
+            "Describe a time when you had to advocate for technical debt reduction to product managers who wanted to focus solely on new features.",
+            "Tell me about a time you made a design or architectural mistake. How did you identify it, communicate it to the team, and rectify it?"
+        ],
+        "hardware_ece": [
+            "Explain the difference between a microcontroller and a microprocessor. When would you use each?",
+            "What is setup time and hold time in digital circuits? What happens if they are violated, and how do you fix it?",
+            "Describe the basic operation of an Operational Amplifier (Op-Amp) and explain virtual short and virtual ground concepts.",
+            "Explain the difference between blocking (=) and non-blocking (<=) assignments in Verilog. Give examples of when to use each.",
+            "What is an Embedded Real-Time Operating System (RTOS)? How does preemptive scheduling differ from cooperative scheduling?",
+            "Explain setup/hold time violations in ASIC design and how clock tree synthesis (CTS) affects them.",
+            "How do you design a high-frequency PCB to prevent signal integrity issues like crosstalk and electromagnetic interference (EMI)?",
+            "Explain the architecture of an ARM Cortex-M processor. What is the role of the Nested Vectored Interrupt Controller (NVIC)?",
+            "What are the major steps in an ASIC/VLSI tape-out flow from RTL description to GDSII layout?",
+            "What are pull-up and pull-down resistors? Why are they essential in Open-Drain/Open-Collector bus protocols like I2C?"
+        ],
+        "csbs": [
+            "Explain the dynamic programming algorithm used in sequence alignment (e.g., Needleman-Wunsch vs. Smith-Waterman).",
+            "What is variant calling in genomics? Differentiate between GATK pipelines and standard alignment algorithms.",
+            "How does AlphaFold predict 3D protein structures? Explain the role of Multiple Sequence Alignment (MSA) and Evoformer.",
+            "What are the primary differences between RNA-Seq expression profiling and DNA sequencing? How is expression level measured (e.g., TPM/FPKM)?",
+            "Explain molecular docking. How do scoring functions estimate the binding affinity of a ligand to a receptor?",
+            "How do you structure bio-data formats like FASTA, FASTQ, BAM, and VCF? What unique information does each hold?",
+            "Explain the HIPAA compliance guidelines for handling electronic protected health information (ePHI) in medical software.",
+            "What is a Vector Database (like Chroma or Milvus) and how is it used to query genomic sequences or biomedical literature?",
+            "Describe the concept of a phylogenetic tree and how algorithms like Neighbor-Joining or Maximum Likelihood reconstruct it.",
+            "How do machine learning classifiers help in identifying biomarkers from gene expression profiling data?"
+        ],
+        "traditional_eng": [
+            "Explain the Finite Element Method (FEM). How do you verify the mesh convergence in a structural analysis model?",
+            "What is the difference between laminar and turbulent flow? How does the Reynolds number determine the transition between them?",
+            "Explain the first and second laws of thermodynamics. How do they apply to heat exchangers and power generation cycles?",
+            "Describe the difference between elastic deformation and plastic deformation in materials. What is the yield strength?",
+            "What is Computational Fluid Dynamics (CFD)? What are the Navier-Stokes equations and how are they solved numerically?",
+            "How do you design a hydraulic circuit to control a double-acting cylinder? What is the role of relief valves?",
+            "Describe the standard manufacturing processes (injection molding, CNC milling, 3D printing). Compare their speed, cost, and tolerances.",
+            "Explain the difference between load-bearing structural design in Civil engineering and process design in Chemical engineering.",
+            "What is the role of a proportional-integral-derivative (PID) controller in automotive powertrain controls?",
+            "Describe the key safety considerations and plant layout designs required for handling hazardous chemicals under OSHA/EPA guidelines."
+        ],
+        "quantum": [
+            "Explain Dirac notation (bra-ket notation) for representing quantum states. How do you write a qubit state in vector form?",
+            "What is quantum superposition? How does a Hadamard gate create a superposition state from a |0⟩ state?",
+            "Describe the Bloch sphere. How do X, Y, and Z rotations correspond to single-qubit quantum logic gates?",
+            "What is quantum entanglement? Write the state of a Bell state and explain how to create it using quantum gates.",
+            "Describe the Quantum Fourier Transform (QFT). What is its time complexity compared to the classical Fast Fourier Transform (FFT)?",
+            "How does Shor's algorithm factor large integers in polynomial time? What is the role of Quantum Phase Estimation?",
+            "Explain Grover's database search algorithm. What is its query complexity and how does it achieve a quadratic speedup?",
+            "What is Quantum Error Correction (QEC)? Why is it necessary, and how does the 3-qubit bit-flip code work?",
+            "Explain the Variational Quantum Eigensolver (VQE). How does it combine classical optimization with quantum circuits?",
+            "What are superconducting qubits? Compare their coherence times and gate fidelities with trapped-ion qubits.",
+            "What is Quantum Key Distribution (QKD)? Describe the BB84 protocol and how quantum mechanics guarantees its security."
         ]
     }
 };
@@ -806,6 +652,10 @@ function startMockInterview() {
         data_ai: ['data sci', 'machine learning', 'ml ', 'ml/', 'artificial intelligence', 'ai ', 'ai/', 'deep learning', 'nlp', 'natural language', 'analytics', 'scientist', 'neural', 'pytorch', 'tensorflow', 'llm', 'computer vision', 'cv ', 'recommendation', 'mlops'],
         cybersecurity: ['security', 'cyber', 'soc ', 'soc/', 'penetration', 'pentest', 'network sec', 'hacking', 'hacker', 'forensic', 'malware', 'threat', 'incident', 'compliance', 'grc', 'vulnerability', 'encryption', 'firewall', 'ids', 'ips', 'siem'],
         cloud_devops: ['cloud', 'devops', 'dev ops', 'sre', 'aws', 'azure', 'gcp', 'kubernetes', 'k8s', 'docker', 'terraform', 'ansible', 'jenkins', 'ci/cd', 'cicd', 'infrastructure', 'platform eng', 'reliability', 'serverless', 'lambda'],
+        hardware_ece: ['vlsi', 'ece', 'electrical', 'electronics', 'circuits', 'robotics', 'iot', 'embedded', 'hardware', 'semiconductor', 'microcontroller', 'chip'],
+        csbs: ['csbs', 'biotech', 'bio science', 'biological', 'bioinformatics', 'medical', 'biomedical'],
+        traditional_eng: ['mechanical', 'civil', 'chemical', 'systems engineering', 'aerospace', 'automotive', 'renewable', 'nuclear', 'marine', 'environmental', 'materials', 'cad', 'cfd', 'thermodynamics'],
+        quantum: ['quantum'],
         behavioral_hr: ['hr ', 'hr/', 'human resource', 'behavioral', 'behaviour', 'manager', 'management', 'leadership', 'communication', 'product manager', 'project manager', 'scrum', 'agile', 'people', 'recruiter', 'general']
     };
 

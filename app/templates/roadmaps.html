@@ -107,7 +107,46 @@
                         <div id="canvas-nodes"></div>
                     </div>
                     
-
+                    <!-- Laptop-only Navigation Pad (Hidden on mobile) -->
+                    <div class="canvas-controls d-none d-lg-flex" style="position: absolute; bottom: 20px; right: 20px; z-index: 100; display: flex; flex-direction: column; align-items: center; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(8px); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); gap: 6px;">
+                        <!-- Pan Up -->
+                        <button class="btn btn-light btn-sm shadow-sm" onclick="panCanvas('up')" title="Pan Up" style="width: 32px; height: 32px; border-radius: 4px; border: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; padding:0; background:#ffffff; cursor:pointer;">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 15l-6-6-6 6"></path></svg>
+                        </button>
+                        
+                        <!-- Pan Left, Reset, Pan Right -->
+                        <div class="d-flex gap-1">
+                            <button class="btn btn-light btn-sm shadow-sm" onclick="panCanvas('left')" title="Pan Left" style="width: 32px; height: 32px; border-radius: 4px; border: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; padding:0; background:#ffffff; cursor:pointer;">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"></path></svg>
+                            </button>
+                            <button class="btn btn-light btn-sm shadow-sm" onclick="resetZoom()" title="Reset Zoom" style="width: 32px; height: 32px; border-radius: 4px; border: 1px solid #bae6fd; display:flex; align-items:center; justify-content:center; padding:0; background:#e0f2fe; cursor:pointer;">
+                                <svg width="14" height="14" fill="none" stroke="#0078d4" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
+                            </button>
+                            <button class="btn btn-light btn-sm shadow-sm" onclick="panCanvas('right')" title="Pan Right" style="width: 32px; height: 32px; border-radius: 4px; border: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; padding:0; background:#ffffff; cursor:pointer;">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"></path></svg>
+                            </button>
+                        </div>
+                        
+                        <!-- Pan Down -->
+                        <button class="btn btn-light btn-sm shadow-sm" onclick="panCanvas('down')" title="Pan Down" style="width: 32px; height: 32px; border-radius: 4px; border: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; padding:0; background:#ffffff; cursor:pointer;">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg>
+                        </button>
+                        
+                        <div style="width: 100%; border-top: 1px solid #e2e8f0; margin: 2px 0;"></div>
+                        
+                        <!-- Zoom In, Zoom Out, Fit -->
+                        <div class="d-flex gap-1">
+                            <button class="btn btn-light btn-sm shadow-sm" onclick="zoomIn()" title="Zoom In" style="width: 32px; height: 32px; border-radius: 4px; border: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; padding:0; background:#ffffff; cursor:pointer;">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+                            </button>
+                            <button class="btn btn-light btn-sm shadow-sm" onclick="zoomOut()" title="Zoom Out" style="width: 32px; height: 32px; border-radius: 4px; border: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; padding:0; background:#ffffff; cursor:pointer;">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+                            </button>
+                            <button class="btn btn-light btn-sm shadow-sm" onclick="fitToScreen()" title="Fit to Screen" style="width: 32px; height: 32px; border-radius: 4px; border: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; padding:0; background:#ffffff; cursor:pointer;">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 14V4h10m6 6v10H10"></path></svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -274,24 +313,6 @@ function renderRoadmapTree() {
         const p2 = coords[i+1];
         const nextNode = activeNodes[i+1];
 
-        // Check visibility of the line bounding box
-        const minX = Math.min(p1.x, p2.x);
-        const maxX = Math.max(p1.x, p2.x);
-        const minY = Math.min(p1.y, p2.y);
-        const maxY = Math.max(p1.y, p2.y);
-
-        const lineLeft = translateX + minX * scale;
-        const lineRight = translateX + maxX * scale;
-        const lineTop = translateY + minY * scale;
-        const lineBottom = translateY + maxY * scale;
-
-        const isVisible = (lineRight >= -buffer) && 
-                          (lineLeft <= viewport.clientWidth + buffer) && 
-                          (lineBottom >= -buffer) && 
-                          (lineTop <= viewport.clientHeight + buffer);
-
-        if (!isVisible) continue;
-
         const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
         line.setAttribute("x1", p1.x);
         line.setAttribute("y1", p1.y);
@@ -318,22 +339,9 @@ function renderRoadmapTree() {
     activeNodes.forEach((node, index) => {
         const pt = coords[index];
 
-        // Check visibility of the node card (width is 200px, height is 90px)
-        const nodeLeft = translateX + (pt.x - 100) * scale;
-        const nodeRight = translateX + (pt.x + 100) * scale;
-        const nodeTop = translateY + (pt.y - 45) * scale;
-        const nodeBottom = translateY + (pt.y + 45) * scale;
-
-        const isVisible = (nodeRight >= -buffer) && 
-                          (nodeLeft <= viewport.clientWidth + buffer) && 
-                          (nodeBottom >= -buffer) && 
-                          (nodeTop <= viewport.clientHeight + buffer);
-
-        if (!isVisible) return;
-
         const div = document.createElement("div");
         div.id = `node-badge-${index + 1}`;
-        div.className = `roadmap-node-badge shadow-sm ${node.status}`;
+        div.className = `roadmap-node-badge shadow-sm ${node.status} ${node.difficulty}`;
         div.style.left = `${pt.x - 100}px`;
         div.style.top = `${pt.y - 45}px`;
         
@@ -353,14 +361,10 @@ function renderRoadmapTree() {
             </div>
         `;
 
-        if (node.status !== "LOCKED") {
-            div.onclick = (e) => {
-                e.stopPropagation();
-                openNodeModal(node, index + 1);
-            };
-        } else {
-            div.title = "Complete preceding steps to unlock.";
-        }
+        div.onclick = (e) => {
+            e.stopPropagation();
+            openNodeModal(node, index + 1);
+        };
 
         canvasNodes.appendChild(div);
     });
@@ -582,23 +586,16 @@ let isDragging = false;
 let startX, startY;
 let translateX = 0;
 let translateY = 0;
-let scale = 0.85; // slightly zoomed out by default to see tree shape
+const isMobile = window.innerWidth < 768;
+let scale = isMobile ? 0.45 : 0.85; 
 let touchStartDist = 0;
 let initialScale = 1;
 
 const viewport = document.getElementById("canvas-viewport");
 const container = document.getElementById("canvas-container");
 
-let renderFrameId = null;
 function updateTransform() {
     container.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-    
-    if (renderFrameId) {
-        cancelAnimationFrame(renderFrameId);
-    }
-    renderFrameId = requestAnimationFrame(() => {
-        renderRoadmapTree();
-    });
 }
 
 viewport.addEventListener("mousedown", (e) => {
@@ -629,24 +626,13 @@ window.addEventListener("mouseup", () => {
     viewport.style.cursor = "grab";
 });
 
-// Mouse Wheel Zoom
+// Mouse Wheel Pan
 viewport.addEventListener("wheel", (e) => {
     e.preventDefault();
-    const zoomFactor = 1.05;
-    const prevScale = scale;
     
-    const rect = viewport.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    
-    if (e.deltaY < 0) {
-        scale = Math.min(1.8, scale * zoomFactor);
-    } else {
-        scale = Math.max(0.3, scale / zoomFactor);
-    }
-    
-    translateX = mouseX - (mouseX - translateX) * (scale / prevScale);
-    translateY = mouseY - (mouseY - translateY) * (scale / prevScale);
+    // Pan instead of zoom
+    translateY -= e.deltaY;
+    translateX -= e.deltaX;
     
     // Bounds boundaries
     const totalHeight = activeNodes.length * 150 + 200;
@@ -730,7 +716,8 @@ function zoomOut() {
 }
 
 function resetZoom() {
-    scale = 0.85;
+    const isMobile = window.innerWidth < 768;
+    scale = isMobile ? 0.45 : 0.85;
     translateX = (viewport.clientWidth - 900 * scale) / 2;
     translateY = 30;
     updateTransform();
@@ -940,46 +927,73 @@ document.addEventListener("DOMContentLoaded", () => {
 /* Roadmap node badge styling */
 .roadmap-node-badge {
     position: absolute;
-    border-radius: 8px;
-    background: #ffffff;
-    border: 1.5px solid #dee2e6;
+    width: 200px;
+    height: 90px;
+    border-radius: 12px;
+    backdrop-filter: blur(8px) saturate(180%);
+    -webkit-backdrop-filter: blur(8px) saturate(180%);
+    background-color: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(226, 232, 240, 0.8);
     padding: 12px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     cursor: pointer;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .roadmap-node-badge:hover {
-    transform: translateY(-4px) scale(1.03);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08) !important;
-    border-color: #0078d4;
+    transform: translateY(-5px) scale(1.03);
+    box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.08) !important;
+    background-color: rgba(255, 255, 255, 0.95);
 }
+
+/* Difficulty left borders */
+.roadmap-node-badge.BEGINNER {
+    border-left: 5px solid #10b981 !important; /* Emerald Green */
+}
+.roadmap-node-badge.INTERMEDIATE {
+    border-left: 5px solid #0078d4 !important; /* Azure Blue */
+}
+.roadmap-node-badge.ADVANCED {
+    border-left: 5px solid #8b5cf6 !important; /* Deep Violet */
+}
+.roadmap-node-badge.PROFESSIONAL {
+    border-left: 5px solid #f59e0b !important; /* Amber Gold */
+}
+
 .roadmap-node-badge.LOCKED {
-    opacity: 0.65;
-    background: #f1f5f9;
-    border-color: #e2e8f0;
-    cursor: not-allowed;
+    opacity: 0.75;
+    background-color: rgba(248, 250, 252, 0.85);
+    border-color: #cbd5e1;
 }
 .roadmap-node-badge.LOCKED:hover {
-    transform: none;
-    box-shadow: none !important;
+    opacity: 0.95;
+    background-color: rgba(255, 255, 255, 0.95);
 }
 .roadmap-node-badge.IN_PROGRESS {
-    border: 2px solid #0078d4;
-    box-shadow: 0 0 12px rgba(0, 120, 212, 0.15);
-    background: #f0f9ff;
-    animation: active-pulse 2s infinite alternate;
+    background-color: rgba(240, 249, 255, 0.9);
+    animation: active-glow-pulse 2s infinite alternate;
 }
 .roadmap-node-badge.COMPLETED {
-    border: 1.5px solid #0078d4;
-    background: #f8fafc;
+    background-color: rgba(240, 253, 250, 0.95);
+    border-color: rgba(16, 185, 129, 0.4);
 }
 .roadmap-node-badge.highlighted-node {
     border-color: #00bcf2 !important;
     box-shadow: 0 0 15px #00bcf2 !important;
     animation: pulse-highlight 1s infinite alternate !important;
     z-index: 9999 !important;
+}
+@keyframes active-glow-pulse {
+    0% {
+        box-shadow: 0 0 8px rgba(0, 120, 212, 0.2);
+        border-color: rgba(0, 120, 212, 0.6);
+    }
+    100% {
+        box-shadow: 0 0 20px rgba(0, 188, 242, 0.45);
+        border-color: rgba(0, 188, 242, 0.8);
+    }
 }
 @keyframes pulse-highlight {
     0% {

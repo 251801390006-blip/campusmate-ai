@@ -1523,7 +1523,29 @@ def analyze_resume_ajax():
 def interview_prep():
     progress = RoadmapProgress.query.filter_by(user_id=current_user.id).first()
     user_track = progress.role if progress else "Full Stack Development"
-    return render_template('interview_prep.html', user_track=user_track)
+    
+    tracks = [
+        "Cyber Security", "Ethical Hacking", "SOC Analyst", "Digital Forensics",
+        "AI Engineering", "Machine Learning", "Deep Learning", "Generative AI", "Prompt Engineering", "Agentic AI",
+        "Data Science", "Data Analytics", "Python Developer", "Java Developer", "C++ Developer",
+        "Full Stack Development", "Frontend Development", "Backend Development", "React Developer", "Node.js Developer",
+        "Mobile App Development", "Android Development", "Flutter Development",
+        "Cloud Computing", "AWS", "Azure", "Google Cloud",
+        "DevOps", "Kubernetes", "Docker", "Linux Engineering", "Network Engineering",
+        "Blockchain", "Web3", "UI/UX Design", "Product Design", "Product Management",
+        "Software Testing", "QA Automation", "Game Development", "AR/VR Development",
+        "Robotics & Automation", "IoT", "Embedded Systems", "Embedded Systems and Electronics", "Database Engineering",
+        "Site Reliability Engineering", "Business Analysis", "SAP", "Salesforce", "Competitive Programming",
+        "VLSI Design", "Electronics & Communication (ECE)", "Electrical Engineering",
+        "Power Systems Engineering", "Computer Science & Bio Science (CSBS)",
+        "Mechanical Engineering", "Civil Engineering", "Chemical Engineering",
+        "Data Engineering", "Biotechnology", "Quantum Computing Engineering",
+        "Aerospace Engineering", "Automotive Engineering", "Renewable Energy Engineering",
+        "Nuclear Engineering", "Marine Engineering", "Environmental Engineering",
+        "Materials Science & Engineering", "Bio-Medical Engineering"
+    ]
+    
+    return render_template('interview_prep.html', user_track=user_track, tracks=tracks)
 
 @features_bp.route('/interview-prep/evaluate', methods=['POST'])
 @login_required
