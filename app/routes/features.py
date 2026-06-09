@@ -2286,6 +2286,9 @@ def render_resume_pdf_html(content, theme):
     .resume-container {{
         {container_css_str}
     }}
+    table, tr, td, th, ul, li, p, span, h1, h2, h3, h4, h5, h6 {{
+        border: 0;
+    }}
     h1 {{
         font-size: 18px;
         font-weight: bold;
@@ -2304,7 +2307,7 @@ def render_resume_pdf_html(content, theme):
         font-size: 10px;
         font-weight: bold;
         color: {primary};
-        border-bottom: 1.5px solid {primary};
+        border-bottom: 1.5px solid {primary} !important;
         margin-top: 8px;
         margin-bottom: 4px;
         padding-bottom: 1.5px;

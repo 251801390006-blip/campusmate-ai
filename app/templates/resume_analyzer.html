@@ -2626,36 +2626,82 @@ document.addEventListener("DOMContentLoaded", () => {
 <style>
 /* Hide mobile bottom tabs on desktop/tablet by default */
 .mobile-bottom-tabs-nav {
-    display: none;
+    display: none !important;
 }
-/* Premium Workspace styling rules */
+/* Hide dashboard mobile nav bottom bar globally on this page */
+.mobile-bottom-nav {
+    display: none !important;
+}
+/* Force stacked vertical scrollable layout globally for all screens (overridden on laptop) */
+html, body, .main-with-sidebar, .dashboard-inner-container, .resume-workspace-wrapper {
+    height: auto !important;
+    overflow: visible !important;
+}
 .resume-workspace-wrapper {
-    display: grid;
-    grid-template-columns: 1.15fr 1.35fr;
-    gap: 20px;
-    height: 100%;
-    overflow: hidden;
+    display: block !important;
+    width: 100% !important;
     box-sizing: border-box;
+    padding-bottom: 40px !important;
+}
+.editor-form-column, .visual-viewer-column {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    margin-bottom: 30px !important;
+}
+.editor-form-column .flat-card, .visual-viewer-column .flat-card {
+    height: auto !important;
+    overflow: visible !important;
 }
 .form-scroller {
-    overflow-y: auto;
-    min-height: 0;
-    scrollbar-width: thin;
-}
-.form-scroller::-webkit-scrollbar {
-    width: 6px;
-}
-.form-scroller::-webkit-scrollbar-thumb {
-    background-color: var(--border-color);
-    border-radius: 4px;
+    height: auto !important;
+    overflow-y: visible !important;
 }
 
-.editor-form-column {
-    height: 100%;
-}
-
-.visual-viewer-column {
-    height: 100%;
+/* Lock page scroll on laptop/desktop viewports only to force column scrolling */
+@media (min-width: 1100px) {
+    html, body {
+        height: 100vh !important;
+        overflow: hidden !important;
+    }
+    .main-with-sidebar {
+        height: 100vh !important;
+        overflow: hidden !important;
+    }
+    .dashboard-inner-container {
+        height: calc(100vh - 64px) !important;
+        overflow: hidden !important;
+        display: flex;
+        flex-direction: column;
+        padding: 15px 20px !important;
+        box-sizing: border-box;
+    }
+    .resume-workspace-wrapper {
+        display: grid !important;
+        grid-template-columns: 1.15fr 1.35fr !important;
+        gap: 20px !important;
+        height: 0 !important;
+        min-height: 0 !important;
+        flex-grow: 1 !important;
+        overflow: hidden !important;
+        padding-bottom: 0 !important;
+    }
+    .editor-form-column, .visual-viewer-column {
+        display: block !important;
+        height: 100% !important;
+        width: auto !important;
+        margin-bottom: 0 !important;
+    }
+    .editor-form-column .flat-card, .visual-viewer-column .flat-card {
+        height: 100% !important;
+        overflow: hidden !important;
+        display: flex;
+        flex-direction: column;
+    }
+    .form-scroller {
+        overflow-y: auto !important;
+        height: auto !important;
+    }
 }
 
 /* Form inputs & styles */
@@ -3003,75 +3049,5 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 }
 
-/* Lock page scroll on laptop/desktop viewports only to force column scrolling */
-@media (min-width: 1100px) {
-    html, body {
-        height: 100vh !important;
-        overflow: hidden !important;
-    }
-    .main-with-sidebar {
-        height: 100vh !important;
-        overflow: hidden !important;
-    }
-    .dashboard-inner-container {
-        height: calc(100vh - 64px) !important;
-        overflow: hidden !important;
-        display: flex;
-        flex-direction: column;
-        padding: 15px 20px !important;
-        box-sizing: border-box;
-    }
-    .resume-workspace-wrapper {
-        display: grid !important;
-        grid-template-columns: 1.15fr 1.35fr !important;
-        gap: 20px !important;
-        height: 0 !important;
-        min-height: 0 !important;
-        flex-grow: 1 !important;
-        overflow: hidden !important;
-        padding-bottom: 0 !important;
-    }
-    .editor-form-column, .visual-viewer-column {
-        display: block !important;
-        height: 100% !important;
-        width: auto !important;
-        margin-bottom: 0 !important;
-    }
-    .form-scroller {
-        overflow-y: auto !important;
-    }
-}
-
-/* Stacked scrollable layout for mobile/tablet viewports (< 1100px) */
-@media (max-width: 1099px) {
-    html, body, .main-with-sidebar, .dashboard-inner-container, .resume-workspace-wrapper {
-        height: auto !important;
-        overflow: visible !important;
-    }
-    .resume-workspace-wrapper {
-        display: block !important;
-        padding-bottom: 40px !important;
-    }
-    .editor-form-column, .visual-viewer-column {
-        display: block !important;
-        width: 100% !important;
-        height: auto !important;
-        margin-bottom: 30px !important;
-    }
-    .editor-form-column .flat-card, .visual-viewer-column .flat-card {
-        height: auto !important;
-        overflow: visible !important;
-    }
-    .form-scroller {
-        height: auto !important;
-        overflow-y: visible !important;
-    }
-    .mobile-bottom-tabs-nav {
-        display: none !important;
-    }
-    .mobile-bottom-nav {
-        display: none !important;
-    }
-}
 </style>
 {% endblock %}
