@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ content.name or 'Resume' }} - CampusMate AI Portfolio</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --accent-color: #6366f1;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Top Action Bar */
+        .action-bar {
+            width: 100%;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: justify;
+            align-items: center;
+            box-sizing: border-box;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .bar-container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo i {
+            color: var(--accent-color);
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            border-color: var(--accent-color);
+            background-color: var(--bg-secondary);
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        /* Resume Sheet Wrapper */
+        .resume-wrapper {
+            width: 100%;
+            max-width: 210mm;
+            margin: 40px auto;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* --- Theme Styling Rules --- */
+        .resume-sheet {
+            background: #fff;
+            padding: 20px;
+            font-size: 11px;
+            line-height: 1.5;
+            color: #374151;
+            min-height: 297mm;
+            box-sizing: border-box;
+        }
+
+        /* 1. ATS Professional Styles Group */
+        .resume-sheet.ats-classic, .resume-sheet.ats-modern, .resume-sheet.ats-minimal, .resume-sheet.ats-compact, .resume-sheet.ats-formal {
+            font-family: 'Inter', Arial, sans-serif !important;
+            color: #1f2937;
+        }
+        .resume-sheet.ats-classic h1, .resume-sheet.ats-modern h1, .resume-sheet.ats-minimal h1, .resume-sheet.ats-compact h1, .resume-sheet.ats-formal h1 {
+            color: #111827 !important;
+        }
+        .resume-sheet.ats-classic .resume-render-section h3, .resume-sheet.ats-modern .resume-render-section h3, .resume-sheet.ats-minimal .resume-render-section h3, .resume-sheet.ats-compact .resume-render-section h3, .resume-sheet.ats-formal .resume-render-section h3 {
+            border-bottom: 1.5px solid #111827 !important;
+            color: #111827 !important;
+            text-transform: uppercase;
+        }
+        .resume-sheet.ats-classic { font-family: Georgia, serif !important; }
+        .resume-sheet.ats-classic .resume-render-header { text-align: center !important; }
+        .resume-sheet.ats-minimal { padding: 30px !important; }
+        .resume-sheet.ats-minimal .resume-render-section h3 { border-bottom: none !important; margin-bottom: 2px !important; }
+        .resume-sheet.ats-compact { font-size: 10px !important; line-height: 1.35 !important; }
+        .resume-sheet.ats-compact .resume-render-section { margin-bottom: 8px !important; }
+        .resume-sheet.ats-formal { border: 1px double #374151; padding: 25px !important; }
+
+        /* 2. Modern Styles Group */
+        .resume-sheet.modern-teal { border-top: 6px solid #0d9488 !important; }
+        .resume-sheet.modern-teal h1, .resume-sheet.modern-teal h3 { color: #0d9488 !important; }
+        .resume-sheet.modern-teal h3 { border-bottom: 2px solid #0d9488 !important; }
+        .resume-sheet.modern-slate { border-top: 6px solid #475569 !important; }
+        .resume-sheet.modern-slate h1, .resume-sheet.modern-slate h3 { color: #475569 !important; }
+        .resume-sheet.modern-slate h3 { border-bottom: 2px solid #475569 !important; }
+        .resume-sheet.modern-indigo { border-top: 6px solid #4f46e5 !important; }
+        .resume-sheet.modern-indigo h1, .resume-sheet.modern-indigo h3 { color: #4f46e5 !important; }
+        .resume-sheet.modern-indigo h3 { border-bottom: 2px solid #4f46e5 !important; }
+        .resume-sheet.modern-coral { border-top: 6px solid #f43f5e !important; }
+        .resume-sheet.modern-coral h1, .resume-sheet.modern-coral h3 { color: #f43f5e !important; }
+        .resume-sheet.modern-coral h3 { border-bottom: 2px solid #f43f5e !important; }
+        .resume-sheet.modern-glass { background: rgba(255, 255, 255, 0.95) !important; border-top: 6px solid #0078d4 !important; }
+        .resume-sheet.modern-glass h1, .resume-sheet.modern-glass h3 { color: #0078d4 !important; }
+        .resume-sheet.modern-glass h3 { border-bottom: 2px solid #0078d4 !important; }
+
+        /* 3. Microsoft Styles Group */
+        .resume-sheet.ms-learn { border-top: 6px solid #0078d4 !important; }
+        .resume-sheet.ms-learn h1, .resume-sheet.ms-learn h3 { color: #0078d4 !important; }
+        .resume-sheet.ms-learn h3 { border-bottom: 2px solid #0078d4 !important; }
+        .resume-sheet.ms-docs { border-left: 6px solid #475569 !important; padding-left: 18px !important; }
+        .resume-sheet.ms-docs h1 { color: #1e293b !important; }
+        .resume-sheet.ms-docs h3 { color: #475569 !important; border-bottom: 1.5px solid #cbd5e1 !important; }
+        .resume-sheet.ms-azure { border-top: 6px solid #008ad7 !important; }
+        .resume-sheet.ms-azure h1, .resume-sheet.ms-azure h3 { color: #008ad7 !important; }
+        .resume-sheet.ms-azure h3 { border-bottom: 2px solid #008ad7 !important; }
+        .resume-sheet.ms-office { font-family: 'Segoe UI', sans-serif !important; }
+        .resume-sheet.ms-office h1, .resume-sheet.ms-office h3 { color: #004b87 !important; }
+        .resume-sheet.ms-office h3 { border-bottom: 2px solid #004b87 !important; }
+        .resume-sheet.ms-team { border-top: 6px solid #7f3d8a !important; }
+        .resume-sheet.ms-team h1, .resume-sheet.ms-team h3 { color: #7f3d8a !important; }
+        .resume-sheet.ms-team h3 { border-bottom: 2px solid #7f3d8a !important; }
+
+        /* 4. Student Styles Group */
+        .resume-sheet.student-academic { font-family: Georgia, serif !important; text-align: justify; }
+        .resume-sheet.student-academic h1 { text-align: center !important; font-size: 20px !important; }
+        .resume-sheet.student-academic h3 { text-align: center; border-bottom: 1.5px solid #000 !important; }
+        .resume-sheet.student-entry { background-color: #fafbfc; }
+        .resume-sheet.student-entry h3 { color: #0f766e !important; border-bottom: 2px solid #0f766e !important; }
+        .resume-sheet.student-grad { font-family: Garamond, serif !important; }
+        .resume-sheet.student-grad h3 { border-bottom: 1.5px double #374151 !important; }
+        .resume-sheet.student-campus { border-top: 6px solid #059669 !important; }
+        .resume-sheet.student-campus h1, .resume-sheet.student-campus h3 { color: #059669 !important; }
+        .resume-sheet.student-campus h3 { border-bottom: 2px solid #059669 !important; }
+        .resume-sheet.student-scholar { font-family: 'Times New Roman', serif !important; }
+        .resume-sheet.student-scholar h3 { border-bottom: 1.5px solid #111827 !important; text-transform: uppercase; }
+
+        /* 5. Internship Styles Group */
+        .resume-sheet.intern-general { border-top: 6px solid #10b981 !important; }
+        .resume-sheet.intern-general h1, .resume-sheet.intern-general h3 { color: #10b981 !important; }
+        .resume-sheet.intern-general h3 { border-bottom: 2px solid #10b981 !important; }
+        .resume-sheet.intern-tech { border-top: 6px solid #0f172a !important; font-family: 'Courier New', Courier, monospace !important; }
+        .resume-sheet.intern-tech h3 { border-bottom: 2px solid #0f172a !important; }
+        .resume-sheet.intern-business { border-top: 6px solid #1e3b8b !important; }
+        .resume-sheet.intern-business h1, .resume-sheet.intern-business h3 { color: #1e3b8b !important; }
+        .resume-sheet.intern-business h3 { border-bottom: 2px solid #1e3b8b !important; }
+        .resume-sheet.intern-creative { border-top: 6px solid #ec4899 !important; }
+        .resume-sheet.intern-creative h1, .resume-sheet.intern-creative h3 { color: #ec4899 !important; }
+        .resume-sheet.intern-creative h3 { border-bottom: 2px solid #ec4899 !important; }
+        .resume-sheet.intern-research { border-top: 6px solid #b45309 !important; }
+        .resume-sheet.intern-research h1, .resume-sheet.intern-research h3 { color: #b45309 !important; }
+        .resume-sheet.intern-research h3 { border-bottom: 2px solid #b45309 !important; }
+
+        /* 6. Cyber Security Styles Group */
+        .resume-sheet.cyber-mono { font-family: 'Courier New', monospace !important; color: #16a34a !important; }
+        .resume-sheet.cyber-mono h1, .resume-sheet.cyber-mono h3 { color: #16a34a !important; }
+        .resume-sheet.cyber-mono h3 { border-bottom: 1.5px solid #16a34a !important; }
+        .resume-sheet.cyber-dark { border-top: 6px solid #020617 !important; background-color: #f8fafc; }
+        .resume-sheet.cyber-dark h1, .resume-sheet.cyber-dark h3 { color: #020617 !important; }
+        .resume-sheet.cyber-dark h3 { border-bottom: 2px solid #020617 !important; }
+        .resume-sheet.cyber-shield { border-top: 6px solid #1e3a8a !important; }
+        .resume-sheet.cyber-shield h1, .resume-sheet.cyber-shield h3 { color: #1e3a8a !important; }
+        .resume-sheet.cyber-shield h3 { border-bottom: 2px solid #1e3a8a !important; }
+        .resume-sheet.cyber-matrix { font-family: monospace !important; border-top: 6px solid #22c55e !important; }
+        .resume-sheet.cyber-matrix h1, .resume-sheet.cyber-matrix h3 { color: #22c55e !important; }
+        .resume-sheet.cyber-matrix h3 { border-bottom: 1.5px solid #22c55e !important; }
+        .resume-sheet.cyber-audit { border-top: 6px solid #475569 !important; }
+        .resume-sheet.cyber-audit h1, .resume-sheet.cyber-audit h3 { color: #475569 !important; }
+        .resume-sheet.cyber-audit h3 { border-bottom: 2px solid #475569 !important; }
+
+        /* 7. Software Engineering Styles Group */
+        .resume-sheet.swe-git { border-top: 6px solid #24292f !important; }
+        .resume-sheet.swe-git h1, .resume-sheet.swe-git h3 { color: #24292f !important; }
+        .resume-sheet.swe-git h3 { border-bottom: 2px solid #24292f !important; }
+        .resume-sheet.swe-fullstack { border-top: 6px solid #6366f1 !important; }
+        .resume-sheet.swe-fullstack h1, .resume-sheet.swe-fullstack h3 { color: #6366f1 !important; }
+        .resume-sheet.swe-fullstack h3 { border-bottom: 2px solid #6366f1 !important; }
+        .resume-sheet.swe-backend { border-top: 6px solid #0f172a !important; }
+        .resume-sheet.swe-backend h1, .resume-sheet.swe-backend h3 { color: #0f172a !important; }
+        .resume-sheet.swe-backend h3 { border-bottom: 2px solid #0f172a !important; }
+        .resume-sheet.swe-frontend { border-top: 6px solid #06b6d4 !important; }
+        .resume-sheet.swe-frontend h1, .resume-sheet.swe-frontend h3 { color: #06b6d4 !important; }
+        .resume-sheet.swe-frontend h3 { border-bottom: 2px solid #06b6d4 !important; }
+        .resume-sheet.swe-cloud { border-top: 6px solid #0ea5e9 !important; }
+        .resume-sheet.swe-cloud h1, .resume-sheet.swe-cloud h3 { color: #0ea5e9 !important; }
+        .resume-sheet.swe-cloud h3 { border-bottom: 2px solid #0ea5e9 !important; }
+
+        /* 8. AI/ML Styles Group */
+        .resume-sheet.ai-tensor { border-top: 6px solid #f97316 !important; }
+        .resume-sheet.ai-tensor h1, .resume-sheet.ai-tensor h3 { color: #f97316 !important; }
+        .resume-sheet.ai-tensor h3 { border-bottom: 2px solid #f97316 !important; }
+        .resume-sheet.ai-neural { border-top: 6px solid #8b5cf6 !important; }
+        .resume-sheet.ai-neural h1, .resume-sheet.ai-neural h3 { color: #8b5cf6 !important; }
+        .resume-sheet.ai-neural h3 { border-bottom: 2px solid #8b5cf6 !important; }
+        .resume-sheet.ai-agent { border-top: 6px solid #6366f1 !important; }
+        .resume-sheet.ai-agent h1, .resume-sheet.ai-agent h3 { color: #6366f1 !important; }
+        .resume-sheet.ai-agent h3 { border-bottom: 2px solid #6366f1 !important; }
+        .resume-sheet.ai-vision { border-top: 6px solid #3b82f6 !important; }
+        .resume-sheet.ai-vision h1, .resume-sheet.ai-vision h3 { color: #3b82f6 !important; }
+        .resume-sheet.ai-vision h3 { border-bottom: 2px solid #3b82f6 !important; }
+        .resume-sheet.ai-prompt { border-top: 6px solid #14b8a6 !important; }
+        .resume-sheet.ai-prompt h1, .resume-sheet.ai-prompt h3 { color: #14b8a6 !important; }
+        .resume-sheet.ai-prompt h3 { border-bottom: 2px solid #14b8a6 !important; }
+
+        /* 9. Cloud Styles Group */
+        .resume-sheet.cloud-infra { border-top: 6px solid #0284c7 !important; }
+        .resume-sheet.cloud-infra h1, .resume-sheet.cloud-infra h3 { color: #0284c7 !important; }
+        .resume-sheet.cloud-infra h3 { border-bottom: 2px solid #0284c7 !important; }
+        .resume-sheet.cloud-ops { border-top: 6px solid #10b981 !important; }
+        .resume-sheet.cloud-ops h1, .resume-sheet.cloud-ops h3 { color: #10b981 !important; }
+        .resume-sheet.cloud-ops h3 { border-bottom: 2px solid #10b981 !important; }
+        .resume-sheet.cloud-k8s { border-left: 6px solid #38bdf8 !important; padding-left: 18px !important; }
+        .resume-sheet.cloud-k8s h1 { color: #1e293b !important; }
+        .resume-sheet.cloud-k8s h3 { color: #38bdf8 !important; border-bottom: 1.5px solid #cbd5e1 !important; }
+        .resume-sheet.cloud-aws { border-top: 6px solid #ff9900 !important; }
+        .resume-sheet.cloud-aws h1, .resume-sheet.cloud-aws h3 { color: #ff9900 !important; }
+        .resume-sheet.cloud-aws h3 { border-bottom: 2px solid #ff9900 !important; }
+        .resume-sheet.cloud-hybrid { border-left: 6px solid #6b21a8 !important; padding-left: 18px !important; }
+        .resume-sheet.cloud-hybrid h1 { color: #1e293b !important; }
+        .resume-sheet.cloud-hybrid h3 { color: #6b21a8 !important; border-bottom: 1.5px solid #cbd5e1 !important; }
+
+        /* 10. Minimal Styles Group */
+        .resume-sheet.minimal-light { padding: 30px !important; }
+        .resume-sheet.minimal-light h3 { border-bottom: none !important; color: #1f2937 !important; }
+        .resume-sheet.minimal-dark { background-color: #f8fafc; color: #0f172a; }
+        .resume-sheet.minimal-dark h1, .resume-sheet.minimal-dark h3 { color: #0f172a !important; border-bottom: 1.5px solid #cbd5e1 !important; }
+        .resume-sheet.minimal-border { border: 1px solid #e2e8f0; padding: 25px !important; }
+        .resume-sheet.minimal-border h3 { border-bottom: 1.5px solid #cbd5e1 !important; }
+        .resume-sheet.minimal-compact { font-size: 10px !important; line-height: 1.35 !important; }
+        .resume-sheet.minimal-compact .resume-render-section { margin-bottom: 8px !important; }
+        .resume-sheet.minimal-swiss { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important; letter-spacing: -0.01em; }
+        .resume-sheet.minimal-swiss h1 { font-weight: 900 !important; font-size: 24px !important; }
+        .resume-sheet.minimal-swiss h3 { border-bottom: 3px solid #000 !important; font-weight: 800; color: #000 !important; }
+
+        /* 11. Executive Styles Group */
+        .resume-sheet.exec-director { border-top: 6px solid #b45309 !important; font-family: Garamond, serif !important; }
+        .resume-sheet.exec-director h1, .resume-sheet.exec-director h3 { color: #b45309 !important; }
+        .resume-sheet.exec-director h3 { border-bottom: 1.5px solid #b45309 !important; }
+        .resume-sheet.exec-vp { border-top: 6px solid #1e293b !important; }
+        .resume-sheet.exec-vp h1, .resume-sheet.exec-vp h3 { color: #1e293b !important; }
+        .resume-sheet.exec-vp h3 { border-bottom: 2px solid #1e293b !important; }
+        .resume-sheet.exec-board { font-family: Georgia, serif !important; text-align: center; }
+        .resume-sheet.exec-board h1 { font-size: 24px !important; }
+        .resume-sheet.exec-board h3 { text-align: center; border-bottom: 1.5px solid #000 !important; }
+        .resume-sheet.exec-legal { font-family: 'Times New Roman', Times, serif !important; }
+        .resume-sheet.exec-legal h3 { border-bottom: 2px double #000 !important; text-transform: uppercase; }
+        .resume-sheet.exec-partner { border-top: 6px solid #1e3a8a !important; }
+        .resume-sheet.exec-partner h1, .resume-sheet.exec-partner h3 { color: #1e3a8a !important; }
+        .resume-sheet.exec-partner h3 { border-bottom: 2px solid #1e3a8a !important; }
+
+        /* General Inner Layouts */
+        .bullet-list {
+            margin-top: 4px;
+            margin-bottom: 4px;
+            padding-left: 20px;
+        }
+
+        .resume-render-section {
+            margin-bottom: 16px;
+        }
+
+        .resume-render-header {
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Hide elements on print */
+        @media print {
+            .action-bar {
+                display: none !important;
+            }
+            body {
+                background: #fff !important;
+            }
+            .resume-wrapper {
+                margin: 0 !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                max-width: 100% !important;
+            }
+            .resume-sheet {
+                padding: 10mm !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Actions header (hidden on print) -->
+    <div class="action-bar">
+        <div class="bar-container">
+            <a href="/" class="logo">
+                <i class="fa-solid fa-graduation-cap"></i> CampusMate AI
+            </a>
+            <div class="actions">
+                <button class="btn" onclick="window.print()">
+                    <i class="fa-solid fa-print"></i> Print Resume
+                </button>
+                <button class="btn btn-primary" onclick="downloadServerPDF()">
+                    <i class="fa-solid fa-download"></i> Download PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resume Page Paper Container -->
+    <div class="resume-wrapper">
+        <div class="resume-sheet {{ resume.theme }}" id="resume-print-sheet">
+            <div class="resume-render-header" style="border-bottom: 2px solid #2563eb; padding-bottom: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px;">
+                <div style="flex-grow: 1;">
+                    <h1 style="font-size: 22px; font-weight:800; color: #1e3a8a; margin-bottom: 4px; text-transform: uppercase;">{{ content.name or 'Alex Smith' }}</h1>
+                    <div class="resume-render-meta" style="font-size: 11px; color: #4b5563; line-height: 1.4;">
+                        {% if content.address %}<span><i class="fa-solid fa-location-dot me-1 text-muted"></i> {{ content.address }}</span> | {% endif %}
+                        {% if content.email %}<span><i class="fa-solid fa-envelope me-1 text-muted"></i> {{ content.email }}</span>{% endif %}<br>
+                        {% if content.phone %}<span><i class="fa-solid fa-phone me-1 text-muted"></i> {{ content.phone }}</span> | {% endif %}
+                        {% if content.linkedin %}<span><i class="fa-brands fa-linkedin me-1 text-muted"></i> {{ content.linkedin }}</span> | {% endif %}
+                        {% if content.github %}<span><i class="fa-brands fa-github me-1 text-muted"></i> {{ content.github }}</span>{% endif %}
+                        {% if content.portfolio %} | <span><i class="fa-solid fa-globe me-1 text-muted"></i> {{ content.portfolio }}</span>{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div id="resume-sections-container">
+                {% for sec in content.sectionOrder or ["education", "skills", "experience", "projects", "certifications", "achievements", "hackathons", "languages"] %}
+                    {% if sec == "education" and (content.edu1Inst or content.edu1Degree) %}
+                        <div class="resume-render-section" data-section="education">
+                            <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Education</h3>
+                            <div>
+                                <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
+                                    <span>{{ content.edu1Inst }}</span>
+                                    <span style="font-weight:normal;">{{ content.edu1Degree }}</span>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; font-size:10px; color:#6b7280; margin-top:1px;">
+                                    <span>{{ content.edu1Dates }}</span>
+                                    <span>GPA: <strong>{{ content.edu1Gpa }}</strong></span>
+                                </div>
+                                {% if content.edu1Coursework %}
+                                <div style="font-size:10px; margin-top:2px; color:#4b5563;">
+                                    Relevant Coursework: {{ content.edu1Coursework }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% elif sec == "skills" and (content.skillsProg or content.skillsCyber or content.skillsTools or content.skillsWeb) %}
+                        <div class="resume-render-section" data-section="skills">
+                            <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Technical Skills</h3>
+                            <div style="font-size:10.5px; line-height:1.4; color:#374151;">
+                                {% if content.skillsProg %}<div><strong>Languages:</strong> <span>{{ content.skillsProg }}</span></div>{% endif %}
+                                {% if content.skillsCyber %}<div><strong>Databases & Core CS:</strong> <span>{{ content.skillsCyber }}</span></div>{% endif %}
+                                {% if content.skillsTools %}<div><strong>Tools & Cloud:</strong> <span>{{ content.skillsTools }}</span></div>{% endif %}
+                                {% if content.skillsWeb %}<div><strong>Frameworks:</strong> <span>{{ content.skillsWeb }}</span></div>{% endif %}
+                            </div>
+                        </div>
+                    {% elif sec == "experience" and (content.experienceRole or content.experienceComp) %}
+                        <div class="resume-render-section" data-section="experience">
+                            <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Experience</h3>
+                            <div>
+                                <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
+                                    <span>{{ content.experienceRole }}</span>
+                                    <span>{{ content.experienceDates }}</span>
+                                </div>
+                                <div style="font-size:10.5px; font-style:italic; color:#6b7280; margin-bottom:2px;">{{ content.experienceComp }}</div>
+                                <ul class="bullet-list" style="font-size:10px; margin-top:2px; line-height:1.4; color:#374151;">
+                                    {% if content.experienceB1 %}<li style="margin-bottom: 2px;">{{ content.experienceB1 }}</li>{% endif %}
+                                    {% if content.experienceB2 %}<li style="margin-bottom: 2px;">{{ content.experienceB2 }}</li>{% endif %}
+                                    {% if content.experienceB3 %}<li style="margin-bottom: 2px;">{{ content.experienceB3 }}</li>{% endif %}
+                                    {% if content.experienceB4 %}<li style="margin-bottom: 2px;">{{ content.experienceB4 }}</li>{% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    {% elif sec == "projects" and content.projectTitle %}
+                        <div class="resume-render-section" data-section="projects">
+                            <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Projects</h3>
+                            <div>
+                                <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
+                                    <span>{{ content.projectTitle }}</span>
+                                    <span style="font-weight:normal; font-size:10px; color:#4b5563;">{{ content.projectLink }}</span>
+                                </div>
+                                <ul class="bullet-list" style="font-size:10px; margin-top:2px; line-height:1.4; color:#374151;">
+                                    {% if content.projectB1 %}<li style="margin-bottom: 2px;">{{ content.projectB1 }}</li>{% endif %}
+                                    {% if content.projectB2 %}<li style="margin-bottom: 2px;">{{ content.projectB2 }}</li>{% endif %}
+                                    {% if content.projectB3 %}<li style="margin-bottom: 2px;">{{ content.projectB3 }}</li>{% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    {% elif sec == "certifications" and (content.certC1 or content.certC2) %}
+                        <div class="resume-render-section" data-section="certifications">
+                            <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Certifications</h3>
+                            <ul class="bullet-list" style="font-size:10px; margin-top:2px; line-height:1.4; color:#374151;">
+                                {% if content.certC1 %}<li style="margin-bottom: 2px;">{{ content.certC1 }}</li>{% endif %}
+                                {% if content.certC2 %}<li style="margin-bottom: 2px;">{{ content.certC2 }}</li>{% endif %}
+                                {% if content.certC3 %}<li style="margin-bottom: 2px;">{{ content.certC3 }}</li>{% endif %}
+                                {% if content.certC4 %}<li style="margin-bottom: 2px;">{{ content.certC4 }}</li>{% endif %}
+                            </ul>
+                        </div>
+                    {% elif sec == "achievements" and content.achievements %}
+                        <div class="resume-render-section" data-section="achievements">
+                            <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Achievements</h3>
+                            <div style="font-size:10px; line-height:1.4; color:#374151;">{{ content.achievements }}</div>
+                        </div>
+                    {% elif sec == "hackathons" and (content.hackathons or content.workshops) %}
+                        <div class="resume-render-section" data-section="hackathons">
+                            <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Hackathons & Workshops</h3>
+                            <div style="font-size:10px; line-height:1.4; color:#374151;">
+                                {% if content.hackathons %}<div><strong>Hackathons:</strong> {{ content.hackathons }}</div>{% endif %}
+                                {% if content.workshops %}<div style="margin-top:2px;"><strong>Workshops:</strong> {{ content.workshops }}</div>{% endif %}
+                            </div>
+                        </div>
+                    {% elif sec == "languages" and (content.languages or content.interests) %}
+                        <div class="resume-render-section" data-section="languages">
+                            <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Languages & Interests</h3>
+                            <div style="font-size:10px; line-height:1.4; color:#374151;">
+                                {% if content.languages %}<div><strong>Languages:</strong> {{ content.languages }}</div>{% endif %}
+                                {% if content.interests %}<div style="margin-top:2px;"><strong>Interests:</strong> {{ content.interests }}</div>{% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function downloadServerPDF() {
+            try {
+                const response = await fetch('/resume-analyzer/export-pdf', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        content: {{ content|tojson }},
+                        theme: '{{ resume.theme }}'
+                    })
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = '{{ content.name or "Resume" }}_Resume.pdf';
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                } else {
+                    alert('Failed to generate PDF from server.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Connection error occurred while exporting PDF.');
+            }
+        }
+    </script>
+</body>
+</html>

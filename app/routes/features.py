@@ -6,10 +6,12 @@ import uuid
 import zipfile
 import xml.etree.ElementTree as ET
 from datetime import datetime
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, current_app, abort
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, current_app, abort, make_response
 from flask_login import login_required, current_user
 from app.models import db, User, ChatMessage, ResumeAnalysis, RoadmapProgress, UserResume, Internship, SavedItem
 from pypdf import PdfReader
+from xhtml2pdf import pisa
+from io import BytesIO
 
 features_bp = Blueprint('features', __name__)
 
@@ -930,6 +932,8 @@ def resume_analyzer():
 @login_required
 def upload_resume():
     file = request.files.get('resume_file')
+    custom_key = (request.form.get('custom_key') or '').strip()
+    
     if not file or file.filename == '':
         return jsonify({"success": False, "error": "No file uploaded"}), 400
         
@@ -950,9 +954,96 @@ def upload_resume():
     if not extracted_text:
         return jsonify({"success": False, "error": "No readable text extracted."}), 400
         
-    fields = parse_text_to_resume_fields(extracted_text)
-    analysis = heuristic_parse_resume(extracted_text)
+    # Check for AI key (User provided, DB global, or Env)
+    from app.models import SiteConfig
+    api_key = custom_key or os.environ.get("GEMINI_API_KEY") or os.environ.get("GROQ_API_KEY") or SiteConfig.get('global_ai_key', '')
     
+    fields = None
+    analysis = None
+    
+    if api_key:
+        parser_system_prompt = (
+            "You are a recruitment database parser. Extract details from the resume text into the following JSON format:\n"
+            "{\n"
+            "  \"name\": \"...\",\n"
+            "  \"address\": \"...\",\n"
+            "  \"email\": \"...\",\n"
+            "  \"phone\": \"...\",\n"
+            "  \"linkedin\": \"...\",\n"
+            "  \"github\": \"...\",\n"
+            "  \"portfolio\": \"...\",\n"
+            "  \"edu1Inst\": \"...\",\n"
+            "  \"edu1Degree\": \"...\",\n"
+            "  \"edu1Dates\": \"...\",\n"
+            "  \"edu1Gpa\": \"...\",\n"
+            "  \"edu1Coursework\": \"...\",\n"
+            "  \"skillsProg\": \"...\",\n"
+            "  \"skillsCyber\": \"...\",\n"
+            "  \"skillsTools\": \"...\",\n"
+            "  \"skillsWeb\": \"...\",\n"
+            "  \"experienceRole\": \"...\",\n"
+            "  \"experienceComp\": \"...\",\n"
+            "  \"experienceDates\": \"...\",\n"
+            "  \"experienceB1\": \"...\",\n"
+            "  \"experienceB2\": \"...\",\n"
+            "  \"experienceB3\": \"...\",\n"
+            "  \"experienceB4\": \"...\",\n"
+            "  \"projectTitle\": \"...\",\n"
+            "  \"projectLink\": \"...\",\n"
+            "  \"projectB1\": \"...\",\n"
+            "  \"projectB2\": \"...\",\n"
+            "  \"projectB3\": \"...\",\n"
+            "  \"certC1\": \"...\",\n"
+            "  \"certC2\": \"...\",\n"
+            "  \"certC3\": \"...\",\n"
+            "  \"certC4\": \"...\",\n"
+            "  \"achievements\": \"...\",\n"
+            "  \"hackathons\": \"...\",\n"
+            "  \"workshops\": \"...\",\n"
+            "  \"volunteering\": \"...\",\n"
+            "  \"languages\": \"...\",\n"
+            "  \"interests\": \"...\",\n"
+            "  \"references\": \"...\",\n"
+            "  \"custom\": \"...\"\n"
+            "}\n"
+            "Ensure everything is returned as a plain JSON object without any additional conversational text or markdown wrappers."
+        )
+        try:
+            parsed_res = call_gemini(parser_system_prompt, extracted_text, user_key=api_key)
+            if parsed_res:
+                json_match = re.search(r'\{.*\}', parsed_res, re.DOTALL)
+                if json_match:
+                    fields = json.loads(json_match.group(0))
+        except Exception as e:
+            print(f"Failed to parse resume using AI: {e}")
+
+        ats_system_prompt = (
+            "You are an expert ATS (Applicant Tracking System) Resumes Auditor. Analyze the resume text and provide a structured audit in JSON format.\n"
+            "The JSON must have these exact keys:\n"
+            "- \"atsScore\": integer 0 to 100\n"
+            "- \"readabilityScore\": integer 0 to 100\n"
+            "- \"industryMatchScore\": integer 0 to 100\n"
+            "- \"missingKeywords\": list of strings\n"
+            "- \"improvements\": list of objects, each with \"originalText\", \"suggestedText\", \"reason\"\n"
+            "- \"mistakes\": list of strings\n"
+            "- \"suggestions\": list of strings\n\n"
+            "Return only the valid JSON block without markdown wrappers or extra text."
+        )
+        try:
+            analysis_res = call_gemini(ats_system_prompt, extracted_text, user_key=api_key)
+            if analysis_res:
+                json_match = re.search(r'\{.*\}', analysis_res, re.DOTALL)
+                if json_match:
+                    analysis = json.loads(json_match.group(0))
+        except Exception as e:
+            print(f"Failed to analyze resume using AI: {e}")
+
+    # Fallbacks to heuristics
+    if not fields:
+        fields = parse_text_to_resume_fields(extracted_text)
+    if not analysis:
+        analysis = heuristic_parse_resume(extracted_text)
+        
     new_analysis = ResumeAnalysis(
         user_id=current_user.id,
         filename=filename,
@@ -1242,6 +1333,7 @@ def generate_certification_plan():
 @login_required
 def analyze_resume_ajax():
     data = request.get_json() or {}
+    custom_key = (data.get('custom_key') or '').strip()
     
     name = data.get('name', '')
     email = data.get('email', '')
@@ -1255,7 +1347,36 @@ def analyze_resume_ajax():
     
     full_text = f"{name}\n{email}\n{phone}\n{github}\n{linkedin}\n{skills}\n{experience}\n{projects}\n{certs}"
     
-    analysis = heuristic_parse_resume(full_text)
+    # Check for AI key (User provided, DB global, or Env)
+    from app.models import SiteConfig
+    api_key = custom_key or os.environ.get("GEMINI_API_KEY") or os.environ.get("GROQ_API_KEY") or SiteConfig.get('global_ai_key', '')
+    
+    analysis = None
+    
+    if api_key:
+        ats_system_prompt = (
+            "You are an expert ATS (Applicant Tracking System) Resumes Auditor. Analyze the resume text and provide a structured audit in JSON format.\n"
+            "The JSON must have these exact keys:\n"
+            "- \"atsScore\": integer 0 to 100\n"
+            "- \"readabilityScore\": integer 0 to 100\n"
+            "- \"industryMatchScore\": integer 0 to 100\n"
+            "- \"missingKeywords\": list of strings\n"
+            "- \"improvements\": list of objects, each with \"originalText\", \"suggestedText\", \"reason\"\n"
+            "- \"mistakes\": list of strings\n"
+            "- \"suggestions\": list of strings\n\n"
+            "Return only the valid JSON block without markdown wrappers or extra text."
+        )
+        try:
+            analysis_res = call_gemini(ats_system_prompt, full_text, user_key=api_key)
+            if analysis_res:
+                json_match = re.search(r'\{.*\}', analysis_res, re.DOTALL)
+                if json_match:
+                    analysis = json.loads(json_match.group(0))
+        except Exception as e:
+            print(f"Failed to analyze resume using AI: {e}")
+            
+    if not analysis:
+        analysis = heuristic_parse_resume(full_text)
     
     progress = RoadmapProgress.query.filter_by(user_id=current_user.id).first()
     target_role = progress.role if progress else "Software Engineer"
@@ -1719,4 +1840,789 @@ def public_portfolio(username):
     if not user or not user.published_portfolio_html:
         abort(404)
     return user.published_portfolio_html
+
+
+# --- RESUME 5.0 THEMES & EXPORT ENDPOINTS ---
+
+THEME_STYLES = {
+    # Original Themes (Classic)
+    "classic": {"font": "Helvetica", "primary": "#1e293b", "bg": "#fffdfa", "border_bottom": "2px solid #1e293b"},
+    "modern-cyan": {"font": "Helvetica", "primary": "#06b6d4", "bg": "#ffffff", "border_bottom": "2px solid #06b6d4"},
+    "slate-glass": {"font": "Helvetica", "primary": "#475569", "bg": "#ffffff", "border_bottom": "2px solid #475569"},
+    "minimalist-executive": {"font": "Helvetica", "primary": "#1e293b", "bg": "#ffffff", "border_bottom": "2px solid #1e293b"},
+    "tech-mono": {"font": "Courier", "primary": "#111827", "bg": "#ffffff", "border_bottom": "1px solid #111827"},
+    "creative-violet": {"font": "Helvetica", "primary": "#7c3aed", "bg": "#ffffff", "border_bottom": "2px solid #7c3aed"},
+    "emerald-forest": {"font": "Helvetica", "primary": "#059669", "bg": "#ffffff", "border_bottom": "2px solid #059669"},
+    "royal-indigo": {"font": "Helvetica", "primary": "#4f46e5", "bg": "#ffffff", "border_bottom": "2px solid #4f46e5"},
+    "corporate-navy": {"font": "Helvetica", "primary": "#1e3a8a", "bg": "#ffffff", "border_bottom": "2px solid #1e3a8a"},
+    "modern-warm": {"font": "Helvetica", "primary": "#b45309", "bg": "#ffffff", "border_bottom": "2px solid #b45309"},
+    "clean-slate": {"font": "Helvetica", "primary": "#475569", "bg": "#ffffff", "border_bottom": "2px solid #475569"},
+    "elegant-georgia": {"font": "Times-Roman", "primary": "#111827", "bg": "#ffffff", "border_bottom": "1px solid #111827"},
+    "stanford-academic": {"font": "Times-Roman", "primary": "#8c1515", "bg": "#ffffff", "border_bottom": "1.5px solid #8c1515"},
+    "sleek-tech": {"font": "Helvetica", "primary": "#1e293b", "bg": "#ffffff", "border_bottom": "2px solid #1e293b"},
+    "compact-cv": {"font": "Helvetica", "primary": "#111827", "bg": "#ffffff", "border_bottom": "1px solid #111827"},
+    "hybrid-columns": {"font": "Helvetica", "primary": "#1e293b", "bg": "#ffffff", "border_bottom": "2px solid #1e293b"},
+
+    # 1. Student
+    "student-academic": {"font": "Times-Roman", "primary": "#1e3a8a", "align": "center", "border_bottom": "1.5px solid #111"},
+    "student-entry": {"font": "Helvetica", "primary": "#0f766e", "bg": "#fafbfc"},
+    "student-grad": {"font": "Times-Roman", "primary": "#1e293b", "border_bottom": "1.5px double #374151"},
+    "student-campus": {"font": "Helvetica", "primary": "#059669", "border_top": "6px solid #059669"},
+    "student-scholar": {"font": "Times-Roman", "primary": "#111827", "border_bottom": "1.5px solid #111827"},
+    
+    # 2. ATS
+    "ats-classic": {"font": "Times-Roman", "primary": "#111827", "align": "center", "border_bottom": "1.5px solid #111827"},
+    "ats-modern": {"font": "Helvetica", "primary": "#111827", "border_bottom": "1.5px solid #111827"},
+    "ats-minimal": {"font": "Helvetica", "primary": "#111827", "border_bottom": "none"},
+    "ats-compact": {"font": "Helvetica", "primary": "#111827", "line_height": "1.1", "font_size": "8.5px"},
+    "ats-formal": {"font": "Times-Roman", "primary": "#111827", "border": "1px double #374151"},
+    
+    # 3. Modern
+    "modern-teal": {"font": "Helvetica", "primary": "#0d9488", "border_top": "6px solid #0d9488"},
+    "modern-slate": {"font": "Helvetica", "primary": "#475569", "border_top": "6px solid #475569"},
+    "modern-indigo": {"font": "Helvetica", "primary": "#4f46e5", "border_top": "6px solid #4f46e5"},
+    "modern-coral": {"font": "Helvetica", "primary": "#f43f5e", "border_top": "6px solid #f43f5e"},
+    "modern-glass": {"font": "Helvetica", "primary": "#0078d4", "border_top": "6px solid #0078d4"},
+    
+    # 4. Professional (MS)
+    "ms-learn": {"font": "Helvetica", "primary": "#0078d4", "border_top": "6px solid #0078d4"},
+    "ms-docs": {"font": "Helvetica", "primary": "#1e293b", "border_left": "6px solid #475569"},
+    "ms-azure": {"font": "Helvetica", "primary": "#008ad7", "border_top": "6px solid #008ad7"},
+    "ms-office": {"font": "Helvetica", "primary": "#004b87", "border_top": "3px solid #004b87"},
+    "ms-team": {"font": "Helvetica", "primary": "#7f3d8a", "border_top": "6px solid #7f3d8a"},
+    
+    # 5. Internship
+    "intern-general": {"font": "Helvetica", "primary": "#10b981", "border_top": "6px solid #10b981"},
+    "intern-tech": {"font": "Courier", "primary": "#0f172a", "border_top": "6px solid #0f172a"},
+    "intern-business": {"font": "Helvetica", "primary": "#1e3b8b", "border_top": "6px solid #1e3b8b"},
+    "intern-creative": {"font": "Helvetica", "primary": "#ec4899", "border_top": "6px solid #ec4899"},
+    "intern-research": {"font": "Helvetica", "primary": "#b45309", "border_top": "6px solid #b45309"},
+    
+    # 6. Cyber Security
+    "cyber-mono": {"font": "Courier", "primary": "#16a34a", "color": "#16a34a"},
+    "cyber-dark": {"font": "Helvetica", "primary": "#020617", "border_top": "6px solid #020617"},
+    "cyber-shield": {"font": "Helvetica", "primary": "#1e3a8a", "border_top": "6px solid #1e3a8a"},
+    "cyber-matrix": {"font": "Courier", "primary": "#22c55e", "border_top": "6px solid #22c55e"},
+    "cyber-audit": {"font": "Helvetica", "primary": "#475569", "border_top": "6px solid #475569"},
+    
+    # 7. AI/ML
+    "ai-tensor": {"font": "Helvetica", "primary": "#f97316", "border_top": "6px solid #f97316"},
+    "ai-neural": {"font": "Helvetica", "primary": "#8b5cf6", "border_top": "6px solid #8b5cf6"},
+    "ai-agent": {"font": "Helvetica", "primary": "#6366f1", "border_top": "6px solid #6366f1"},
+    "ai-vision": {"font": "Helvetica", "primary": "#3b82f6", "border_top": "6px solid #3b82f6"},
+    "ai-prompt": {"font": "Helvetica", "primary": "#14b8a6", "border_top": "6px solid #14b8a6"},
+    
+    # 8. Cloud
+    "cloud-infra": {"font": "Helvetica", "primary": "#0284c7", "border_top": "6px solid #0284c7"},
+    "cloud-ops": {"font": "Helvetica", "primary": "#10b981", "border_top": "6px solid #0f172a"},
+    "cloud-k8s": {"font": "Helvetica", "primary": "#38bdf8", "border_left": "6px solid #38bdf8"},
+    "cloud-aws": {"font": "Helvetica", "primary": "#ff9900", "border_top": "4px solid #111"},
+    "cloud-hybrid": {"font": "Helvetica", "primary": "#6b21a8", "border_left": "6px solid #6b21a8"},
+    
+    # 9. Software Engineering
+    "swe-git": {"font": "Helvetica", "primary": "#24292f", "border_top": "6px solid #24292f"},
+    "swe-fullstack": {"font": "Helvetica", "primary": "#6366f1", "border_top": "6px solid #6366f1"},
+    "swe-backend": {"font": "Helvetica", "primary": "#0f172a", "border_top": "6px solid #0f172a"},
+    "swe-frontend": {"font": "Helvetica", "primary": "#06b6d4", "border_top": "6px solid #06b6d4"},
+    "swe-cloud": {"font": "Helvetica", "primary": "#0ea5e9", "border_top": "6px solid #0ea5e9"},
+    
+    # 10. Minimal
+    "minimal-light": {"font": "Helvetica", "primary": "#1f2937"},
+    "minimal-dark": {"font": "Helvetica", "primary": "#0f172a", "bg": "#fafbfc"},
+    "minimal-border": {"font": "Helvetica", "primary": "#cbd5e1", "border": "1px solid #cbd5e1"},
+    "minimal-compact": {"font": "Helvetica", "primary": "#1f2937", "line_height": "1.1", "font_size": "8.5px"},
+    "minimal-swiss": {"font": "Helvetica", "primary": "#000", "border_bottom": "3px solid #000"},
+    
+    # 11. Executive
+    "exec-director": {"font": "Times-Roman", "primary": "#b45309", "border_top": "6px solid #b45309"},
+    "exec-vp": {"font": "Helvetica", "primary": "#1e293b", "border_top": "6px solid #1e293b"},
+    "exec-board": {"font": "Times-Roman", "primary": "#000", "align": "center", "border_bottom": "1.5px solid #000"},
+    "exec-legal": {"font": "Times-Roman", "primary": "#000", "border_bottom": "2px double #000"},
+    "exec-partner": {"font": "Times-Roman", "primary": "#1e3a8a", "border_top": "6px solid #1e3a8a"},
+    
+    # 12. Canva-style Premium Themes
+    "canva-sidebar": {"font": "Helvetica", "primary": "#0d9488", "bg": "#ffffff"},
+    "canva-elegant": {"font": "Helvetica", "primary": "#1e3b8b", "bg": "#ffffff"},
+    "canva-split": {"font": "Helvetica", "primary": "#1f2937", "bg": "#ffffff"}
+}
+
+def render_resume_pdf_html(content, theme):
+    style_config = THEME_STYLES.get(theme, THEME_STYLES["classic"])
+    font = style_config.get("font", "Helvetica")
+    primary = style_config.get("primary", "#111827")
+    bg = style_config.get("bg", "#ffffff")
+    text_color = style_config.get("color", "#374151")
+    align = style_config.get("align", "left")
+    border_top = style_config.get("border_top", "none")
+    border_left = style_config.get("border_left", "none")
+    border_bottom = style_config.get("border_bottom", "none")
+    border = style_config.get("border", "none")
+    line_h = style_config.get("line_height", "1.3")
+    f_size = style_config.get("font_size", "9.5px")
+    
+    # 1. Parse Education List
+    edu_list = content.get('education')
+    if edu_list and isinstance(edu_list, list):
+        edu_entries = edu_list
+    else:
+        edu_entries = []
+        inst1 = content.get('edu1Inst', '').strip()
+        deg1 = content.get('edu1Degree', '').strip()
+        if inst1 or deg1:
+            edu_entries.append({
+                "inst": inst1,
+                "degree": deg1,
+                "dates": content.get('edu1Dates', '').strip(),
+                "gpa": content.get('edu1Gpa', '').strip(),
+                "coursework": content.get('edu1Coursework', '').strip()
+            })
+        inst2 = content.get('edu2Inst', '').strip()
+        deg2 = content.get('edu2Degree', '').strip()
+        if inst2 or deg2:
+            edu_entries.append({
+                "inst": inst2,
+                "degree": deg2,
+                "dates": content.get('edu2Dates', '').strip(),
+                "gpa": content.get('edu2Gpa', '').strip(),
+                "coursework": ""
+            })
+
+    # 2. Parse Experience List
+    exp_list = content.get('experience')
+    if exp_list and isinstance(exp_list, list):
+        exp_entries = exp_list
+    else:
+        exp_entries = []
+        role = content.get('experienceRole', '').strip()
+        comp = content.get('experienceComp', '').strip()
+        if role or comp:
+            bullets = []
+            b1 = content.get('experienceB1', '').strip()
+            b2 = content.get('experienceB2', '').strip()
+            b3 = content.get('experienceB3', '').strip()
+            b4 = content.get('experienceB4', '').strip()
+            if b1: bullets.append(b1)
+            if b2: bullets.append(b2)
+            if b3: bullets.append(b3)
+            if b4: bullets.append(b4)
+            exp_entries.append({
+                "role": role,
+                "company": comp,
+                "dates": content.get('experienceDates', '').strip(),
+                "bullets": bullets
+            })
+
+    # 3. Parse Projects List
+    proj_list = content.get('projects')
+    if proj_list and isinstance(proj_list, list):
+        proj_entries = proj_list
+    else:
+        proj_entries = []
+        title = content.get('projectTitle', '').strip()
+        if title:
+            bullets = []
+            pb1 = content.get('projectB1', '').strip()
+            pb2 = content.get('projectB2', '').strip()
+            pb3 = content.get('projectB3', '').strip()
+            if pb1: bullets.append(pb1)
+            if pb2: bullets.append(pb2)
+            if pb3: bullets.append(pb3)
+            proj_entries.append({
+                "title": title,
+                "link": content.get('projectLink', '').strip(),
+                "bullets": bullets
+            })
+
+    # 4. Parse Certifications List
+    cert_list = content.get('certifications')
+    if cert_list and isinstance(cert_list, list):
+        cert_entries = cert_list
+    else:
+        cert_entries = []
+        c1 = content.get('certC1', '').strip()
+        c2 = content.get('certC2', '').strip()
+        c3 = content.get('certC3', '').strip()
+        c4 = content.get('certC4', '').strip()
+        if c1: cert_entries.append({"name": c1})
+        if c2: cert_entries.append({"name": c2})
+        if c3: cert_entries.append({"name": c3})
+        if c4: cert_entries.append({"name": c4})
+
+    order = content.get('sectionOrder', ["education", "skills", "experience", "projects", "certifications", "achievements", "hackathons", "languages"])
+    
+    addr = content.get('address', '').strip()
+    email = content.get('email', '').strip()
+    phone = content.get('phone', '').strip()
+    linkedin = content.get('linkedin', '').strip()
+    github = content.get('github', '').strip()
+    portfolio = content.get('portfolio', '').strip()
+    
+    meta_parts = []
+    if addr: meta_parts.append(addr)
+    if email: meta_parts.append(email)
+    if phone: meta_parts.append(phone)
+    if linkedin: meta_parts.append(linkedin)
+    if github: meta_parts.append(github)
+    if portfolio: meta_parts.append(portfolio)
+
+    # TWO-COLUMN CANVA TEMPLATES (canva-sidebar and canva-split)
+    if theme in ["canva-sidebar", "canva-split"]:
+        is_dark = (theme == "canva-sidebar")
+        left_bg = "#0d9488" if is_dark else "#ffffff"
+        left_color = "#ffffff" if is_dark else "#374151"
+        left_border = "none" if is_dark else "border-right: 1px solid #cbd5e1;"
+        divider_color = "#ffffff" if is_dark else "#cbd5e1"
+        accent_color = "#ffffff" if is_dark else primary
+        
+        # Left sidebar html
+        left_html = ""
+        pic_url = content.get('profilePic', '').strip()
+        if pic_url:
+            left_html += f'<div style="text-align: center; margin-bottom: 12px;"><img src="{pic_url}" style="width: 70px; height: 70px; border-radius: 35px; border: 2px solid {"#ffffff" if is_dark else primary};" /></div>'
+            
+        left_html += '<div style="margin-bottom: 12px;">'
+        left_html += f'<h4 style="font-size: 8px; font-weight: bold; border-bottom: 1px solid {divider_color}; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase; color: {accent_color};">Contact</h4>'
+        left_html += f'<div style="font-size: 7px; line-height: 1.3; color: {"#e2e8f0" if is_dark else "#4b5563"};">'
+        if addr: left_html += f'<div style="margin-bottom: 2px;">📍 {addr}</div>'
+        if email: left_html += f'<div style="margin-bottom: 2px;">✉️ {email}</div>'
+        if phone: left_html += f'<div style="margin-bottom: 2px;">📞 {phone}</div>'
+        if linkedin: left_html += f'<div style="margin-bottom: 2px;">🔗 {linkedin}</div>'
+        if github: left_html += f'<div style="margin-bottom: 2px;">🐙 {github}</div>'
+        if portfolio: left_html += f'<div style="margin-bottom: 2px;">🌐 {portfolio}</div>'
+        left_html += '</div></div>'
+        
+        # Skills
+        skills_prog = content.get('skillsProg', '').strip()
+        skills_cyber = content.get('skillsCyber', '').strip()
+        skills_tools = content.get('skillsTools', '').strip()
+        skills_web = content.get('skillsWeb', '').strip()
+        if skills_prog or skills_cyber or skills_tools or skills_web:
+            left_html += '<div style="margin-bottom: 12px;">'
+            left_html += f'<h4 style="font-size: 8px; font-weight: bold; border-bottom: 1px solid {divider_color}; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase; color: {accent_color};">Skills</h4>'
+            left_html += f'<div style="font-size: 7px; line-height: 1.3; color: {"#e2e8f0" if is_dark else "#4b5563"};">'
+            if skills_prog: left_html += f'<div style="margin-bottom: 2px;"><strong>Lang:</strong> {skills_prog}</div>'
+            if skills_cyber: left_html += f'<div style="margin-bottom: 2px;"><strong>Cyber:</strong> {skills_cyber}</div>'
+            if skills_tools: left_html += f'<div style="margin-bottom: 2px;"><strong>Tools:</strong> {skills_tools}</div>'
+            if skills_web: left_html += f'<div style="margin-bottom: 2px;"><strong>Web:</strong> {skills_web}</div>'
+            left_html += '</div></div>'
+            
+        # Languages & Interests
+        langs = content.get('languages', '').strip()
+        interests = content.get('interests', '').strip()
+        if langs or interests:
+            left_html += '<div style="margin-bottom: 12px;">'
+            left_html += f'<h4 style="font-size: 8px; font-weight: bold; border-bottom: 1px solid {divider_color}; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase; color: {accent_color};">Languages</h4>'
+            left_html += f'<div style="font-size: 7px; line-height: 1.3; color: {"#e2e8f0" if is_dark else "#4b5563"};">'
+            if langs: left_html += f'<div style="margin-bottom: 2px;"><strong>Langs:</strong> {langs}</div>'
+            if interests: left_html += f'<div style="margin-bottom: 2px;"><strong>Interests:</strong> {interests}</div>'
+            left_html += '</div></div>'
+            
+        # Right Panel
+        right_html = ""
+        name_val = content.get('name', 'Alex Smith')
+        summary_val = content.get('custom', '').strip()
+        
+        right_html += f'<h1 style="font-size: 18px; font-weight: bold; color: {primary}; margin-bottom: 2px; text-transform: uppercase;">{name_val}</h1>'
+        right_html += '<div style="font-size: 8px; font-weight: bold; color: #64748b; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Resume Portfolio</div>'
+        
+        if summary_val:
+            right_html += f'<div style="font-size: 8px; line-height: 1.3; color: #4b5563; margin-bottom: 10px; border-left: 2px solid {primary}; padding-left: 6px;">{summary_val}</div>'
+            
+        for sec in order:
+            if sec == "experience" and exp_entries:
+                right_html += f'<div style="margin-bottom: 10px;"><h4 style="font-size: 9px; font-weight: bold; color: {primary}; border-bottom: 1px solid #cbd5e1; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase;">Experience</h4>'
+                for exp in exp_entries:
+                    role = exp.get('role', '').strip()
+                    comp = exp.get('company', '').strip()
+                    dates = exp.get('dates', '').strip()
+                    bullets = exp.get('bullets', [])
+                    if role or comp:
+                        right_html += f"""
+                        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 3px;">
+                            <tr>
+                                <td style="font-size: 8px; font-weight: bold; color: #1e293b;">{role}</td>
+                                <td style="font-size: 7.5px; text-align: right; color: #64748b;">{dates}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" style="font-size: 7.5px; font-style: italic; color: #475569;">{comp}</td>
+                            </tr>
+                        </table>
+                        """
+                        if bullets:
+                            right_html += '<ul style="margin: 0 0 4px 0; padding-left: 10px; font-size: 7.5px; line-height: 1.25; color: #4b5563;">'
+                            for b in bullets:
+                                if b.strip():
+                                    right_html += f'<li style="margin-bottom: 1px;">{b.strip()}</li>'
+                            right_html += '</ul>'
+                right_html += '</div>'
+                
+            elif sec == "projects" and proj_entries:
+                right_html += f'<div style="margin-bottom: 10px;"><h4 style="font-size: 9px; font-weight: bold; color: {primary}; border-bottom: 1px solid #cbd5e1; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase;">Projects</h4>'
+                for proj in proj_entries:
+                    title = proj.get('title', '').strip()
+                    link = proj.get('link', '').strip()
+                    bullets = proj.get('bullets', [])
+                    if title:
+                        right_html += f"""
+                        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 3px;">
+                            <tr>
+                                <td style="font-size: 8px; font-weight: bold; color: #1e293b;">{title}</td>
+                                <td style="font-size: 7.5px; text-align: right; color: #64748b;">{link}</td>
+                            </tr>
+                        </table>
+                        """
+                        if bullets:
+                            right_html += '<ul style="margin: 0 0 4px 0; padding-left: 10px; font-size: 7.5px; line-height: 1.25; color: #4b5563;">'
+                            for b in bullets:
+                                if b.strip():
+                                    right_html += f'<li style="margin-bottom: 1px;">{b.strip()}</li>'
+                            right_html += '</ul>'
+                right_html += '</div>'
+                
+            elif sec == "education" and edu_entries:
+                right_html += f'<div style="margin-bottom: 10px;"><h4 style="font-size: 9px; font-weight: bold; color: {primary}; border-bottom: 1px solid #cbd5e1; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase;">Education</h4>'
+                for edu in edu_entries:
+                    inst = edu.get('inst', '').strip()
+                    degree = edu.get('degree', '').strip()
+                    dates = edu.get('dates', '').strip()
+                    gpa = edu.get('gpa', '').strip()
+                    cw = edu.get('coursework', '').strip()
+                    if inst or degree:
+                        right_html += f"""
+                        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 2px;">
+                            <tr>
+                                <td style="font-size: 8px; font-weight: bold; color: #1e293b;">{inst}</td>
+                                <td style="font-size: 7.5px; text-align: right; color: #64748b;">{dates}</td>
+                            </tr>
+                            <tr>
+                                <td style="font-size: 7.5px; font-style: italic; color: #475569;">{degree}</td>
+                                <td style="font-size: 7.5px; text-align: right; color: #475569;">{gpa}</td>
+                            </tr>
+                        </table>
+                        """
+                        if cw:
+                            right_html += f'<div style="font-size: 7px; color: #64748b; margin-top: 1px; margin-bottom: 2px;">Relevant Coursework: {cw}</div>'
+                right_html += '</div>'
+                
+            elif sec == "certifications" and cert_entries:
+                right_html += f'<div style="margin-bottom: 10px;"><h4 style="font-size: 9px; font-weight: bold; color: {primary}; border-bottom: 1px solid #cbd5e1; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase;">Certifications</h4>'
+                right_html += '<ul style="margin: 0; padding-left: 10px; font-size: 7.5px; line-height: 1.25; color: #4b5563;">'
+                for cert in cert_entries:
+                    name = cert.get('name', '').strip()
+                    if name:
+                        right_html += f'<li style="margin-bottom: 1px;">{name}</li>'
+                right_html += '</ul></div>'
+                
+            elif sec == "achievements" and content.get('achievements', '').strip():
+                ach = content.get('achievements', '').strip()
+                right_html += f'<div style="margin-bottom: 10px;"><h4 style="font-size: 9px; font-weight: bold; color: {primary}; border-bottom: 1px solid #cbd5e1; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase;">Achievements</h4><div style="font-size: 7.5px; line-height: 1.25; color: #4b5563;">{ach}</div></div>'
+                
+        # output pdf wrapper with tables
+        full_html = f"""<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <style>
+                @page {{
+                    size: a4;
+                    margin: 0mm;
+                }}
+                body {{
+                    font-family: {font};
+                    font-size: 8px;
+                    background-color: #ffffff;
+                    color: #374151;
+                    margin: 0mm;
+                    padding: 0mm;
+                }}
+            </style>
+        </head>
+        <body>
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="height: 285mm; table-layout: fixed;">
+                <tr>
+                    <td width="30%" bgcolor="{left_bg}" valign="top" style="padding: 8mm 5mm 8mm 5mm; color: {left_color}; {left_border}">
+                        {left_html}
+                    </td>
+                    <td width="70%" bgcolor="#ffffff" valign="top" style="padding: 8mm 8mm 8mm 8mm; color: #374151;">
+                        {right_html}
+                    </td>
+                </tr>
+            </table>
+        </body>
+        </html>
+        """
+        return full_html
+
+    # SINGLE-COLUMN RENDERING (Standard and canva-elegant)
+    is_elegant = (theme == "canva-elegant")
+    css = f"""
+    @page {{
+        size: a4;
+        margin-top: 10mm;
+        margin-bottom: 10mm;
+        margin-left: 12mm;
+        margin-right: 12mm;
+    }}
+    body {{
+        font-family: {font};
+        font-size: {f_size};
+        line-height: {line_h};
+        color: {text_color};
+        background-color: {bg};
+    }}
+    h1 {{
+        font-size: 18px;
+        font-weight: bold;
+        color: {primary};
+        margin: 0 0 3px 0;
+        text-transform: uppercase;
+    }}
+    .meta {{
+        font-size: 8px;
+        color: #4b5563;
+        line-height: 1.25;
+        margin-top: 3px;
+        margin-bottom: 8px;
+    }}
+    .section-title {{
+        font-size: 10px;
+        font-weight: bold;
+        color: {primary};
+        border-bottom: 1.5px solid {primary};
+        margin-top: 8px;
+        margin-bottom: 4px;
+        padding-bottom: 1.5px;
+        text-transform: uppercase;
+    }}
+    .item-header {{
+        font-weight: bold;
+    }}
+    .item-date {{
+        text-align: right;
+        color: #4b5563;
+    }}
+    .bullet-list {{
+        margin-top: 2px;
+        margin-bottom: 4px;
+        padding-left: 12px;
+    }}
+    .bullet-item {{
+        margin-bottom: 1.5px;
+        font-size: 8.5px;
+    }}
+    """
+    
+    container_styles = []
+    if border_top != "none":
+        container_styles.append(f"border-top: {border_top}; padding-top: 8px;")
+    if border_left != "none":
+        container_styles.append(f"border-left: {border_left}; padding-left: 12px;")
+    if border_bottom != "none":
+        container_styles.append(f"border-bottom: {border_bottom};")
+    if border != "none":
+        container_styles.append(f"border: {border}; padding: 12px;")
+        
+    container_style_str = " ".join(container_styles)
+    
+    # Render sections
+    sections_html = ""
+    
+    summary_val = content.get('custom', '').strip()
+    if summary_val:
+        sections_html += f'<div style="font-size: 8.5px; line-height: 1.3; color: #4b5563; margin-bottom: 8px; text-align: {"center" if is_elegant else "left"};">{summary_val}</div>'
+
+    for sec in order:
+        if sec == "education" and edu_entries:
+            sections_html += f"""
+            <div class="resume-section">
+                <h3 class="section-title" style="text-align: {"center" if is_elegant else "left"};">Education</h3>
+            """
+            for edu in edu_entries:
+                inst = edu.get('inst', '').strip()
+                degree = edu.get('degree', '').strip()
+                dates = edu.get('dates', '').strip()
+                gpa = edu.get('gpa', '').strip()
+                cw = edu.get('coursework', '').strip()
+                if inst or degree:
+                    sections_html += f"""
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 3px;">
+                        <tr>
+                            <td class="item-header" style="font-size: 8.5px;">{inst}</td>
+                            <td class="item-date" style="font-size: 8px;">{dates}</td>
+                        </tr>
+                        <tr>
+                            <td style="font-style: italic; font-size: 8px;">{degree}</td>
+                            <td style="text-align: right; font-size: 8px;">{gpa}</td>
+                        </tr>
+                    </table>
+                    """
+                    if cw:
+                        sections_html += f'<div style="margin-top: 1px; margin-bottom: 3px; font-size: 7.5px; color: #4b5563;">Relevant Coursework: {cw}</div>'
+            sections_html += "</div>"
+            
+        elif sec == "skills":
+            prog = content.get('skillsProg', '').strip()
+            cyber = content.get('skillsCyber', '').strip()
+            tools = content.get('skillsTools', '').strip()
+            web = content.get('skillsWeb', '').strip()
+            
+            if prog or cyber or tools or web:
+                sections_html += f"""
+                <div class="resume-section">
+                    <h3 class="section-title" style="text-align: {"center" if is_elegant else "left"};">Technical Skills</h3>
+                    <table width="100%" cellpadding="1.5" cellspacing="0" style="font-size: 8px;">
+                """
+                if prog:
+                    sections_html += f'<tr><td width="22%"><strong>Programming:</strong></td><td>{prog}</td></tr>'
+                if cyber:
+                    sections_html += f'<tr><td width="22%"><strong>Cybersecurity & DB:</strong></td><td>{cyber}</td></tr>'
+                if tools:
+                    sections_html += f'<tr><td width="22%"><strong>Tools & OS:</strong></td><td>{tools}</td></tr>'
+                if web:
+                    sections_html += f'<tr><td width="22%"><strong>Web & Libraries:</strong></td><td>{web}</td></tr>'
+                sections_html += """
+                    </table>
+                </div>
+                """
+                
+        elif sec == "experience" and exp_entries:
+            sections_html += f"""
+            <div class="resume-section">
+                <h3 class="section-title" style="text-align: {"center" if is_elegant else "left"};">Experience</h3>
+            """
+            for exp in exp_entries:
+                role = exp.get('role', '').strip()
+                comp = exp.get('company', '').strip()
+                dates = exp.get('dates', '').strip()
+                bullets = exp.get('bullets', [])
+                if role or comp:
+                    sections_html += f"""
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 2px; margin-bottom: 2px;">
+                        <tr>
+                            <td class="item-header" style="font-size: 8.5px;">{role}</td>
+                            <td class="item-date" style="font-size: 8px;">{dates}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="font-style: italic; font-size: 8px; color: #4b5563;">{comp}</td>
+                        </tr>
+                    </table>
+                    """
+                    if bullets:
+                        sections_html += '<ul class="bullet-list">'
+                        for b in bullets:
+                            if b.strip():
+                                sections_html += f'<li class="bullet-item">{b.strip()}</li>'
+                        sections_html += '</ul>'
+            sections_html += "</div>"
+            
+        elif sec == "projects" and proj_entries:
+            sections_html += f"""
+            <div class="resume-section">
+                <h3 class="section-title" style="text-align: {"center" if is_elegant else "left"};">Projects</h3>
+            """
+            for proj in proj_entries:
+                title = proj.get('title', '').strip()
+                link = proj.get('link', '').strip()
+                bullets = proj.get('bullets', [])
+                if title:
+                    sections_html += f"""
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 2px; margin-bottom: 2px;">
+                        <tr>
+                            <td class="item-header" style="font-size: 8.5px;">{title}</td>
+                            <td class="item-date" style="font-size: 7.5px; font-weight: normal; color: #4b5563;">{link}</td>
+                        </tr>
+                    </table>
+                    """
+                    if bullets:
+                        sections_html += '<ul class="bullet-list">'
+                        for b in bullets:
+                            if b.strip():
+                                sections_html += f'<li class="bullet-item">{b.strip()}</li>'
+                        sections_html += '</ul>'
+            sections_html += "</div>"
+            
+        elif sec == "certifications" and cert_entries:
+            sections_html += f"""
+            <div class="resume-section">
+                <h3 class="section-title" style="text-align: {"center" if is_elegant else "left"};">Certifications</h3>
+                <ul class="bullet-list">
+            """
+            for cert in cert_entries:
+                name = cert.get('name', '').strip()
+                if name:
+                    sections_html += f'<li class="bullet-item">{name}</li>'
+            sections_html += """
+                </ul>
+            </div>
+            """
+            
+        elif sec == "achievements" and content.get('achievements', '').strip():
+            ach = content.get('achievements', '').strip()
+            sections_html += f"""
+            <div class="resume-section">
+                <h3 class="section-title" style="text-align: {"center" if is_elegant else "left"};">Achievements</h3>
+                <div style="font-size: 8px; line-height: 1.3;">{ach}</div>
+            </div>
+            """
+            
+        elif sec == "hackathons":
+            hacks = content.get('hackathons', '').strip()
+            workshops = content.get('workshops', '').strip()
+            if hacks or workshops:
+                sections_html += f"""
+                <div class="resume-section">
+                    <h3 class="section-title" style="text-align: {"center" if is_elegant else "left"};">Hackathons & Workshops</h3>
+                """
+                if hacks:
+                    sections_html += f'<div style="font-size: 8px; line-height: 1.3; margin-bottom: 2px;"><strong>Hackathons:</strong> {hacks}</div>'
+                if workshops:
+                    sections_html += f'<div style="font-size: 8px; line-height: 1.3;"><strong>Workshops:</strong> {workshops}</div>'
+                sections_html += "</div>"
+                
+        elif sec == "languages":
+            langs = content.get('languages', '').strip()
+            interests = content.get('interests', '').strip()
+            if langs or interests:
+                sections_html += f"""
+                <div class="resume-section">
+                    <h3 class="section-title" style="text-align: {"center" if is_elegant else "left"};">Languages & Interests</h3>
+                """
+                if langs:
+                    sections_html += f'<div style="font-size: 8px; line-height: 1.3; margin-bottom: 2px;"><strong>Languages:</strong> {langs}</div>'
+                if interests:
+                    sections_html += f'<div style="font-size: 8px; line-height: 1.3;"><strong>Interests:</strong> {interests}</div>'
+                sections_html += "</div>"
+
+    meta_str = (" &bull; " if is_elegant else " | ").join(meta_parts)
+    
+    full_html = f"""<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <style>
+            {css}
+        </style>
+    </head>
+    <body>
+        <div class="resume-container" style="{container_style_str}">
+            <div style="text-align: {"center" if is_elegant else align}; margin-bottom: 8px;">
+                <h1>{content.get('name', 'Alex Smith')}</h1>
+                <div class="meta">{meta_str}</div>
+            </div>
+            {sections_html}
+        </div>
+    </body>
+    </html>
+    """
+    return full_html
+
+
+@features_bp.route('/resume-analyzer/export-pdf', methods=['POST'])
+@login_required
+def export_pdf():
+    try:
+        data = request.get_json() or {}
+        content = data.get('content', {})
+        theme = data.get('theme', 'ats-modern')
+        
+        html_content = render_resume_pdf_html(content, theme)
+        
+        pdf_io = BytesIO()
+        pisa_status = pisa.CreatePDF(html_content, dest=pdf_io)
+        
+        if pisa_status.err:
+            return jsonify({"success": False, "error": "PDF generation failed"}), 500
+            
+        pdf_io.seek(0)
+        
+        name_val = content.get('name', 'Resume').strip().replace(' ', '_')
+        filename = f"{name_val}_Resume.pdf"
+        
+        response = make_response(pdf_io.getvalue())
+        response.headers['Content-Disposition'] = f'attachment; filename={filename}'
+        response.headers['Content-Type'] = 'application/pdf'
+        return response
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@features_bp.route('/resume-analyzer/export-json', methods=['POST'])
+@login_required
+def export_json():
+    try:
+        data = request.get_json() or {}
+        content = data.get('content', {})
+        
+        name_val = content.get('name', 'Resume').strip().replace(' ', '_')
+        filename = f"{name_val}_Resume.json"
+        
+        buffer = BytesIO(json.dumps(content, indent=2).encode('utf-8'))
+        response = make_response(buffer.getvalue())
+        response.headers['Content-Disposition'] = f'attachment; filename={filename}'
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@features_bp.route('/resume-analyzer/duplicate-version', methods=['POST'])
+@login_required
+def duplicate_version():
+    try:
+        data = request.get_json() or {}
+        resume_id = data.get('id')
+        new_title = data.get('title', 'Copy of Resume')
+        
+        if not resume_id:
+            return jsonify({"success": False, "error": "Resume ID required"}), 400
+            
+        orig = UserResume.query.filter_by(id=resume_id, user_id=current_user.id).first()
+        if not orig:
+            return jsonify({"success": False, "error": "Resume not found"}), 404
+            
+        new_resume = UserResume(
+            user_id=current_user.id,
+            title=new_title,
+            theme=orig.theme,
+            content_json=orig.content_json,
+            ats_score=orig.ats_score
+        )
+        db.session.add(new_resume)
+        db.session.commit()
+        
+        return jsonify({"success": True, "message": "Version duplicated!", "id": new_resume.id})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@features_bp.route('/resume-analyzer/share-link', methods=['POST'])
+@login_required
+def share_link():
+    try:
+        data = request.get_json() or {}
+        resume_id = data.get('id')
+        if not resume_id:
+            return jsonify({"success": False, "error": "Resume ID required"}), 400
+            
+        resume = UserResume.query.filter_by(id=resume_id, user_id=current_user.id).first()
+        if not resume:
+            return jsonify({"success": False, "error": "Resume not found"}), 404
+            
+        share_url = url_for('features.shared_resume', resume_id=resume.id, _external=True)
+        return jsonify({"success": True, "share_url": share_url})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@features_bp.route('/resume-analyzer/shared/<int:resume_id>', methods=['GET'])
+@features_bp.route('/published-portfolio/shared/<int:resume_id>', methods=['GET'])
+def shared_resume(resume_id):
+    resume = UserResume.query.get_or_404(resume_id)
+    try:
+        content = json.loads(resume.content_json)
+    except Exception:
+        content = {}
+    return render_template('public_resume.html', resume=resume, content=content)
 
