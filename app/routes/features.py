@@ -17,13 +17,21 @@ features_bp = Blueprint('features', __name__)
 def call_gemini(system_prompt: str, user_prompt: str, user_key: str = None) -> str:
     """
     Multi-provider AI router.
-    - Groq key  (starts with gsk_) → uses Groq API with LLaMA 3.3-70B (free)
-    - Gemini key (AIza...)          → uses Google Gemini 2.5 Flash
-    - No key                        → returns '' to trigger offline mock
+    Priority: user_key → DB global key → env var GEMINI_API_KEY → env var GROQ_API_KEY
+    - Groq key  (starts with gsk_) → Groq LLaMA 3.3-70B (free)
+    - Gemini key (AIza...)          → Google Gemini 2.5 Flash
+    - No key anywhere               → returns '' to trigger offline message
     """
     api_key = user_key or os.environ.get("GEMINI_API_KEY") or os.environ.get("GROQ_API_KEY")
+    # Last resort: read global key saved by admin in the database
     if not api_key:
-        return ""  # Trigger mock fallback
+        try:
+            from app.models import SiteConfig
+            api_key = SiteConfig.get('global_ai_key', '') or ''
+        except Exception:
+            pass
+    if not api_key:
+        return ""  # No key anywhere — trigger offline message
 
     # ── Groq (free, fast, any personal email) ──────────────────────────────
     if api_key.startswith("gsk_"):
@@ -1190,13 +1198,14 @@ def chat():
     # Call Gemini API
     ai_response_content = call_gemini(system_prompt, message_content, user_key=custom_key)
     
-    # Fallback if Gemini/Groq API key is not configured or call failed
+    # Fallback if no key is set anywhere or API call failed
     if not ai_response_content:
-        short_q = message_content[:80] + ("..." if len(message_content) > 80 else "")
         ai_response_content = (
-            f"⚠️ **No AI key configured** — I can't answer: *\"{short_q}\"*\n\n"
-            f"To get real AI responses, please add your **Gemini** or **Groq** API key in [⚙️ Settings](/settings).\n\n"
-            f"Groq is **free** — get your key in 60 seconds at [console.groq.com](https://console.groq.com)."
+            f"🔑 **Activate AI in 2 minutes — it's free!**\n\n"
+            f"1. Go to **[console.groq.com/keys](https://console.groq.com/keys)** (sign in with any Gmail)\n"
+            f"2. Click **Create API Key** → copy it\n"
+            f"3. Open the **AI Mentor chat** drawer below → click the key icon → paste → Save\n\n"
+            f"_Once done, ask me anything — I can help with coding, resume, interview prep, career advice, and more!_ 🚀"
         )
         
     # Save AI response to database

@@ -314,7 +314,7 @@ function toggleMentorApiKey() {
     }
 }
 
-function saveMentorApiKey() {
+async function saveMentorApiKey() {
     const input = document.getElementById("mentor-api-key-input");
     if (!input) return;
     const key = input.value.trim();
@@ -322,22 +322,62 @@ function saveMentorApiKey() {
         showToast("Please enter a valid API key (Groq: gsk_... or Gemini: AIza...)", "warning");
         return;
     }
+
+    // Always save locally so this browser session works immediately
     localStorage.setItem("campusmate_gemini_key", key);
     updateApiKeyStatus();
+
     const form = document.getElementById("mentor-api-key-form");
     if (form) form.style.display = "none";
 
     const provider = key.startsWith("gsk_") ? "Groq LLaMA 3.3-70B" : "Gemini 2.5 Flash";
-    const messagesBox = document.getElementById("mentor-chat-messages");
-    if (messagesBox) {
-        const sysDiv = document.createElement("div");
-        sysDiv.className = "message mentor animate-fade-in";
-        sysDiv.innerHTML = `<p style="margin:0;"><i class="fa-solid fa-circle-check text-success me-1"></i><strong>API key saved!</strong> Now using <strong>${provider}</strong>. Ask me anything!</p>`;
-        messagesBox.appendChild(sysDiv);
-        messagesBox.scrollTop = messagesBox.scrollHeight;
+
+    // Also save to the SERVER DATABASE so ALL users / all devices benefit permanently
+    try {
+        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrf = csrfMeta ? csrfMeta.content : "";
+        const resp = await fetch("/admin/global-ai-key", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": csrf },
+            body: JSON.stringify({ api_key: key })
+        });
+        const data = await resp.json();
+        if (data.success) {
+            const messagesBox = document.getElementById("mentor-chat-messages");
+            if (messagesBox) {
+                const sysDiv = document.createElement("div");
+                sysDiv.className = "message mentor animate-fade-in";
+                sysDiv.innerHTML = `<p style="margin:0;"><i class="fa-solid fa-circle-check text-success me-1"></i><strong>API key saved to server!</strong> Now using <strong>${provider}</strong>. All students can now chat with AI. Ask me anything!</p>`;
+                messagesBox.appendChild(sysDiv);
+                messagesBox.scrollTop = messagesBox.scrollHeight;
+            }
+            showToast(`✅ ${provider} connected for ALL users!`, "success");
+        } else {
+            // Non-admin user: key saved locally only (works for them personally)
+            const messagesBox = document.getElementById("mentor-chat-messages");
+            if (messagesBox) {
+                const sysDiv = document.createElement("div");
+                sysDiv.className = "message mentor animate-fade-in";
+                sysDiv.innerHTML = `<p style="margin:0;"><i class="fa-solid fa-circle-check text-success me-1"></i><strong>API key saved!</strong> Now using <strong>${provider}</strong>. Ask me anything!</p>`;
+                messagesBox.appendChild(sysDiv);
+                messagesBox.scrollTop = messagesBox.scrollHeight;
+            }
+            showToast(`✅ ${provider} connected!`, "success");
+        }
+    } catch (e) {
+        // Network error saving to server — still works locally
+        const messagesBox = document.getElementById("mentor-chat-messages");
+        if (messagesBox) {
+            const sysDiv = document.createElement("div");
+            sysDiv.className = "message mentor animate-fade-in";
+            sysDiv.innerHTML = `<p style="margin:0;"><i class="fa-solid fa-circle-check text-success me-1"></i><strong>API key saved!</strong> Now using <strong>${provider}</strong>. Ask me anything!</p>`;
+            messagesBox.appendChild(sysDiv);
+            messagesBox.scrollTop = messagesBox.scrollHeight;
+        }
+        showToast(`✅ ${provider} connected!`, "success");
     }
-    showToast(`✅ ${provider} connected!`, "success");
 }
+
 
 function clearMentorApiKey() {
     localStorage.removeItem("campusmate_gemini_key");
