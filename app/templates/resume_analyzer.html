@@ -1,522 +1,571 @@
 {% extends "dashboard_base.html" %}
 
-{% block title %}Resume Builder 5.0 - CampusMate AI{% endblock %}
+{% block title %}Resume Builder - CampusMate AI{% endblock %}
 
-{% block header_title %}ATS Resume Builder v5.0{% endblock %}
+{% block header_title %}ATS Resume Builder{% endblock %}
 
 {% block content %}
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
 <!-- Responsive Premium Layout Container -->
 <div class="resume-workspace-wrapper tab-edit">
-    <!-- Desktop Left Column: Editor Sections Sidebar List -->
-    <div class="editor-sidebar-column">
-        <div class="flat-card h-100 p-3 bg-secondary-card border d-flex flex-column">
-            <h4 class="fw-bold mb-3 section-card-header"><i class="fa-solid fa-file-pen text-accent me-2"></i> Sections</h4>
-            
-            <div class="sidebar-section-list flex-grow-1">
-                <div class="sidebar-section-item active" data-section="profile" onclick="setActiveSection('profile')">
-                    <i class="fa-solid fa-user me-2 text-muted"></i> Profile & Contact
-                </div>
-                <div class="sidebar-section-item" data-section="education" onclick="setActiveSection('education')">
-                    <i class="fa-solid fa-graduation-cap me-2 text-muted"></i> Education
-                </div>
-                <div class="sidebar-section-item" data-section="skills" onclick="setActiveSection('skills')">
-                    <i class="fa-solid fa-gears me-2 text-muted"></i> Skills List
-                </div>
-                <div class="sidebar-section-item" data-section="experience" onclick="setActiveSection('experience')">
-                    <i class="fa-solid fa-briefcase me-2 text-muted"></i> Experience
-                </div>
-                <div class="sidebar-section-item" data-section="projects" onclick="setActiveSection('projects')">
-                    <i class="fa-solid fa-code me-2 text-muted"></i> Projects
-                </div>
-                <div class="sidebar-section-item" data-section="certifications" onclick="setActiveSection('certifications')">
-                    <i class="fa-solid fa-award me-2 text-muted"></i> Certifications
-                </div>
-                <div class="sidebar-section-item" data-section="achievements" onclick="setActiveSection('achievements')">
-                    <i class="fa-solid fa-trophy me-2 text-muted"></i> Achievements
-                </div>
-                <div class="sidebar-section-item" data-section="hackathons" onclick="setActiveSection('hackathons')">
-                    <i class="fa-solid fa-laptop-code me-2 text-muted"></i> Hackathons
-                </div>
-                <div class="sidebar-section-item" data-section="languages" onclick="setActiveSection('languages')">
-                    <i class="fa-solid fa-language me-2 text-muted"></i> Languages & Hobbies
-                </div>
-                <div class="sidebar-section-item" data-section="reorder" onclick="setActiveSection('reorder')">
-                    <i class="fa-solid fa-arrows-up-down me-2 text-muted"></i> Reorder Sections
-                </div>
-                <div class="sidebar-section-item" data-section="history" onclick="setActiveSection('history')">
-                    <i class="fa-solid fa-clock-rotate-left me-2 text-muted"></i> Version History
-                </div>
-                <div class="sidebar-section-item" data-section="compare" onclick="setActiveSection('compare')">
-                    <i class="fa-solid fa-code-compare me-2 text-muted"></i> Compare Versions
-                </div>
-            </div>
-            
-            <div class="sidebar-footer pt-3 border-top">
-                <span id="save-status-badge" class="badge badge-success w-100 py-1.5" style="font-size:0.65rem;">Saved to Cloud</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Desktop Center Column: Active Input Form Pane -->
+    
+    <!-- Left Column: Scrollable Editor Sections (col-xl-5) -->
     <div class="editor-form-column">
         <div class="flat-card h-100 p-3 bg-secondary-card border d-flex flex-column" style="overflow: hidden;">
-            <div id="mobile-sections-header" class="d-none justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                <h4 class="fw-bold mb-0 text-accent" style="font-size: 0.95rem;"><i class="fa-solid fa-file-pen"></i> Form Editor</h4>
-                <button class="btn btn-xs btn-outline py-0.5 px-2" onclick="showMobileSectionsMenu()" style="font-size:0.7rem; cursor:pointer;"><i class="fa-solid fa-bars me-1"></i> All Sections</button>
+            
+            <!-- Editor Title & Version Info -->
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
+                <div>
+                    <h3 class="fw-bold mb-0" style="font-size:1.05rem;"><i class="fa-solid fa-file-pen text-accent me-2"></i> Editor Sections</h3>
+                    <span id="save-status-badge" class="badge badge-success mt-1" style="font-size: 0.62rem;">Saved to Cloud</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <select id="resume-version-select" onchange="handleVersionChange()" class="form-input py-1 px-2 w-auto" style="max-width:140px; font-size:0.75rem;">
+                        <option value="new">+ Save New</option>
+                    </select>
+                </div>
             </div>
 
-            <!-- Scrollable input field viewports -->
-            <div class="form-scroller flex-grow-1 pr-1" style="overflow-y: auto;">
+            <!-- Version Title Input -->
+            <div class="mb-3">
+                <label for="resume-title-field" class="fw-bold mb-1 d-block text-secondary-text" style="font-size:0.65rem; text-transform:uppercase;">Active Version Title</label>
+                <input type="text" id="resume-title-field" value="My Master CV" onchange="triggerAutoSave()" class="form-input py-1.5 px-2">
+            </div>
+
+            <!-- Scrollable Accordion Sections List -->
+            <div class="form-scroller flex-grow-1 pr-1 pb-3" style="overflow-y: auto; display: flex; flex-direction: column; gap: 12px;">
                 
-                <!-- 1. Profile Info -->
-                <div id="form-sec-profile" class="form-section-wrapper">
-                    <h3 class="fw-bold fs-6 mb-3 text-secondary-text"><i class="fa-solid fa-user text-muted me-2"></i> Profile & Contacts</h3>
-                    
-                    <div class="row g-3">
+                <!-- 1. Profile Info Accordion -->
+                <details class="accordion-section p-2 border rounded bg-primary-card" open id="accordion-profile">
+                    <summary class="fw-bold text-secondary-text" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-user me-2 text-muted"></i> Profile & Contacts</summary>
+                    <div class="row g-2 mt-2">
                         <div class="col-12">
-                            <label class="form-label">Full Name</label>
+                            <label class="form-label" style="font-size:0.65rem;">Full Name</label>
                             <input type="text" id="res-name" class="form-input" value="Alex Smith" oninput="syncResumeFields()">
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Location Address</label>
+                            <label class="form-label" style="font-size:0.65rem;">Location Address</label>
                             <input type="text" id="res-address" class="form-input" value="San Francisco, California, USA" oninput="syncResumeFields()">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Email</label>
+                            <label class="form-label" style="font-size:0.65rem;">Email</label>
                             <input type="email" id="res-email" class="form-input" value="alex.smith@example.edu" oninput="syncResumeFields()">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Phone</label>
+                            <label class="form-label" style="font-size:0.65rem;">Phone</label>
                             <input type="text" id="res-phone" class="form-input" value="+1 (555) 019-2834" oninput="syncResumeFields()">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">LinkedIn Profile URL</label>
+                            <label class="form-label" style="font-size:0.65rem;">LinkedIn Profile URL</label>
                             <input type="text" id="res-linkedin" class="form-input" value="linkedin.com/in/alexsmith" oninput="syncResumeFields()">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">GitHub URL</label>
+                            <label class="form-label" style="font-size:0.65rem;">GitHub URL</label>
                             <input type="text" id="res-github" class="form-input" value="github.com/alexsmith" oninput="syncResumeFields()">
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Portfolio Website</label>
+                            <label class="form-label" style="font-size:0.65rem;">Portfolio Website</label>
                             <input type="text" id="res-portfolio" class="form-input" value="" placeholder="https://alexsmith.dev" oninput="syncResumeFields()">
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Upload Profile Photo URL</label>
+                            <label class="form-label" style="font-size:0.65rem;">Profile Photo URL</label>
                             <input type="text" id="res-profile-pic" class="form-input" value="" placeholder="https://example.com/avatar.jpg" oninput="syncResumeFields()">
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Professional Summary</label>
-                            <textarea id="res-custom" class="form-input" rows="4" placeholder="Brief elevator pitch..." oninput="syncResumeFields()"></textarea>
+                            <label class="form-label" style="font-size:0.65rem;">Professional Summary</label>
+                            <textarea id="res-custom" class="form-input" rows="3" placeholder="Brief elevator pitch..." oninput="syncResumeFields()"></textarea>
                         </div>
                     </div>
-                </div>
+                </details>
 
-                <!-- 2. Education (Dynamic List) -->
-                <div id="form-sec-education" class="form-section-wrapper" style="display:none;">
-                    <h3 class="fw-bold fs-6 mb-3 text-secondary-text"><i class="fa-solid fa-graduation-cap text-muted me-2"></i> Education List</h3>
-                    <div id="education-items-list"></div>
-                    <button type="button" class="btn btn-sm btn-outline mt-2 w-100" onclick="addEducationItem()"><i class="fa-solid fa-plus me-1"></i> Add Education Entry</button>
-                </div>
+                <!-- 2. Education Accordion -->
+                <details class="accordion-section p-2 border rounded bg-primary-card" id="accordion-education">
+                    <summary class="fw-bold text-secondary-text" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-graduation-cap me-2 text-muted"></i> Education List</summary>
+                    <div class="mt-2">
+                        <div id="education-items-list"></div>
+                        <button type="button" class="btn btn-sm btn-outline w-100 py-1.5" onclick="addEducationItem()"><i class="fa-solid fa-plus me-1"></i> Add Education Entry</button>
+                    </div>
+                </details>
 
-                <!-- 3. Skills -->
-                <div id="form-sec-skills" class="form-section-wrapper" style="display:none;">
-                    <h3 class="fw-bold fs-6 mb-3 text-secondary-text"><i class="fa-solid fa-gears text-muted me-2"></i> Technical Skills</h3>
-                    
-                    <div class="row g-3">
+                <!-- 3. Skills Accordion -->
+                <details class="accordion-section p-2 border rounded bg-primary-card" id="accordion-skills">
+                    <summary class="fw-bold text-secondary-text" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-gears me-2 text-muted"></i> Technical Skills</summary>
+                    <div class="row g-2 mt-2">
                         <div class="col-12">
-                            <label class="form-label">Programming Languages</label>
+                            <label class="form-label" style="font-size:0.65rem;">Programming Languages</label>
                             <input type="text" id="res-skills-prog" class="form-input" value="Python, Java, Go" oninput="syncResumeFields()">
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Cybersecurity & Databases</label>
+                            <label class="form-label" style="font-size:0.65rem;">Cybersecurity & Databases</label>
                             <input type="text" id="res-skills-cyber" class="form-input" value="PostgreSQL, MongoDB, REST APIs, System Design" oninput="syncResumeFields()">
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Tools & Operating Systems</label>
+                            <label class="form-label" style="font-size:0.65rem;">Tools & Operating Systems</label>
                             <input type="text" id="res-skills-tools" class="form-input" value="Git, Docker, VS Code, Command Line" oninput="syncResumeFields()">
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Web Frameworks & Libraries</label>
+                            <label class="form-label" style="font-size:0.65rem;">Web Frameworks & Libraries</label>
                             <input type="text" id="res-skills-web" class="form-input" value="HTML, CSS, Flask, React" oninput="syncResumeFields()">
                         </div>
                     </div>
-                </div>
+                </details>
 
-                <!-- 4. Experience (Dynamic List) -->
-                <div id="form-sec-experience" class="form-section-wrapper" style="display:none;">
-                    <h3 class="fw-bold fs-6 mb-3 text-secondary-text"><i class="fa-solid fa-briefcase text-muted me-2"></i> Work Experience List</h3>
-                    <div id="experience-items-list"></div>
-                    <button type="button" class="btn btn-sm btn-outline mt-2 w-100" onclick="addExperienceItem()"><i class="fa-solid fa-plus me-1"></i> Add Experience Entry</button>
-                </div>
-
-                <!-- 5. Projects (Dynamic List) -->
-                <div id="form-sec-projects" class="form-section-wrapper" style="display:none;">
-                    <h3 class="fw-bold fs-6 mb-3 text-secondary-text"><i class="fa-solid fa-code text-muted me-2"></i> Projects List</h3>
-                    <div id="projects-items-list"></div>
-                    <button type="button" class="btn btn-sm btn-outline mt-2 w-100" onclick="addProjectItem()"><i class="fa-solid fa-plus me-1"></i> Add Project Entry</button>
-                </div>
-
-                <!-- 6. Certifications (Dynamic List) -->
-                <div id="form-sec-certifications" class="form-section-wrapper" style="display:none;">
-                    <h3 class="fw-bold fs-6 mb-3 text-secondary-text"><i class="fa-solid fa-award text-muted me-2"></i> Certifications List</h3>
-                    <div id="certifications-items-list"></div>
-                    <button type="button" class="btn btn-sm btn-outline mt-2 w-100" onclick="addCertificationItem()"><i class="fa-solid fa-plus me-1"></i> Add Certification</button>
-                </div>
-
-                <!-- 7. Achievements -->
-                <div id="form-sec-achievements" class="form-section-wrapper" style="display:none;">
-                    <h3 class="fw-bold fs-6 mb-3 text-secondary-text"><i class="fa-solid fa-trophy text-muted me-2"></i> Achievements</h3>
-                    
-                    <div class="row g-3">
-                        <div class="col-12">
-                            <label class="form-label">Honor List / Awards</label>
-                            <input type="text" id="res-achievements" class="form-input" value="Dean's List 2025, First Place CodeQuest Hackathon" oninput="syncResumeFields()">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 8. Hackathons -->
-                <div id="form-sec-hackathons" class="form-section-wrapper" style="display:none;">
-                    <h3 class="fw-bold fs-6 mb-3 text-secondary-text"><i class="fa-solid fa-laptop-code text-muted me-2"></i> Hackathons & Workshops</h3>
-                    
-                    <div class="row g-3">
-                        <div class="col-12">
-                            <label class="form-label">Hackathons Completed</label>
-                            <input type="text" id="res-hackathons" class="form-input" value="Participated in DevFest 24, Smart India Hackathon 25" oninput="syncResumeFields()">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Workshops Attended</label>
-                            <input type="text" id="res-workshops" class="form-input" value="Attended AWS Cloud Practitioner Immersion Day" oninput="syncResumeFields()">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 9. Languages & Hobbies -->
-                <div id="form-sec-languages" class="form-section-wrapper" style="display:none;">
-                    <h3 class="fw-bold fs-6 mb-3 text-secondary-text"><i class="fa-solid fa-language text-muted me-2"></i> Languages & Interests</h3>
-                    
-                    <div class="row g-3">
-                        <div class="col-12">
-                            <label class="form-label">Languages Spoken</label>
-                            <input type="text" id="res-languages" class="form-input" value="English (Fluent), Spanish (Conversational)" oninput="syncResumeFields()">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Interests & Hobbies</label>
-                            <input type="text" id="res-interests" class="form-input" value="Cryptography, Robotics, Open Source Contributing" oninput="syncResumeFields()">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">References</label>
-                            <input type="text" id="res-references" class="form-input" value="Available upon request" oninput="syncResumeFields()">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 10. Reorder Sections (Up/Down Buttons) -->
-                <div id="form-sec-reorder" class="form-section-wrapper" style="display:none;">
-                    <h3 class="fw-bold fs-6 mb-3 text-secondary-text"><i class="fa-solid fa-arrows-up-down text-muted me-2"></i> Arrange Sections</h3>
-                    <p class="text-secondary mb-3" style="font-size:0.75rem;">Modify the output order of your resume. Reorders automatically.</p>
-                    
-                    <div id="reorder-sections-list" class="d-flex flex-column gap-2">
-                        <!-- Populated dynamically -->
-                    </div>
-                </div>
-
-                <!-- 11. Version History -->
-                <div id="form-sec-history" class="form-section-wrapper" style="display:none;">
-                    <h3 class="fw-bold fs-6 mb-3 text-secondary-text"><i class="fa-solid fa-clock-rotate-left text-muted me-2"></i> Version History</h3>
-                    <p class="text-secondary mb-3" style="font-size:0.75rem;">Manage and load your previously saved cloud drafts.</p>
-                    
-                    <div class="d-flex flex-column gap-2" id="version-history-list-pane">
-                        <!-- Loaded dynamically -->
-                    </div>
-                </div>
-
-                <!-- 12. Compare Versions -->
-                <div id="form-sec-compare" class="form-section-wrapper" style="display:none;">
-                    <h3 class="fw-bold fs-6 mb-3 text-secondary-text"><i class="fa-solid fa-code-compare text-muted me-2"></i> Compare Versions</h3>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Select Draft to Compare With Current:</label>
-                        <select id="compare-history-select" class="form-input" onchange="runVersionComparison()"></select>
-                    </div>
-
-                    <div class="row g-2">
-                        <div class="col-6">
-                            <div class="compare-heading text-accent fw-bold mb-1" style="font-size:0.7rem;">Current Draft</div>
-                            <div id="compare-current-content" class="p-2 border rounded bg-primary-card" style="min-height:100px;"></div>
-                        </div>
-                        <div class="col-6">
-                            <div class="compare-heading text-warning fw-bold mb-1" style="font-size:0.7rem;">Selected Historical Draft</div>
-                            <div id="compare-history-content" class="p-2 border rounded bg-primary-card" style="min-height:100px;">
-                                <p class="text-muted text-center py-4" style="font-size:0.7rem;">No draft selected.</p>
+                <!-- 4. Experience Accordion -->
+                <details class="accordion-section p-2 border rounded bg-primary-card" id="accordion-experience">
+                    <summary class="fw-bold text-secondary-text" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-briefcase me-2 text-muted"></i> Work Experience List</summary>
+                    <div class="mt-2">
+                        <div id="experience-items-list"></div>
+                        <button type="button" class="btn btn-sm btn-outline w-100 py-1.5" onclick="addExperienceItem()"><i class="fa-solid fa-plus me-1"></i> Add Experience Entry</button>
+                        
+                        <!-- Action Verb Prepender helper -->
+                        <div class="p-2 border rounded mt-3 bg-secondary-card">
+                            <span class="fw-bold d-block text-secondary mb-1" style="font-size:0.65rem; text-transform:uppercase;"><i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> Prepend Action Verbs</span>
+                            <div class="d-flex flex-wrap gap-1">
+                                <span class="badge badge-info cursor-pointer hover-scale px-2 py-0.5" onclick="insertActionVerb('Architected')" style="font-size:0.65rem;">Architected</span>
+                                <span class="badge badge-info cursor-pointer hover-scale px-2 py-0.5" onclick="insertActionVerb('Engineered')" style="font-size:0.65rem;">Engineered</span>
+                                <span class="badge badge-info cursor-pointer hover-scale px-2 py-0.5" onclick="insertActionVerb('Optimized')" style="font-size:0.65rem;">Optimized</span>
+                                <span class="badge badge-info cursor-pointer hover-scale px-2 py-0.5" onclick="insertActionVerb('Automated')" style="font-size:0.65rem;">Automated</span>
+                                <span class="badge badge-info cursor-pointer hover-scale px-2 py-0.5" onclick="insertActionVerb('Hardened')" style="font-size:0.65rem;">Hardened</span>
                             </div>
                         </div>
                     </div>
-                </div>
+                </details>
 
-            </div>
-
-            <!-- Version Control & Actions bar -->
-            <div class="form-actions-panel pt-3 border-top mt-3 d-flex gap-2">
-                <div class="flex-grow-1">
-                    <label class="fw-bold mb-1 d-block text-secondary-text" style="font-size:0.62rem; text-transform:uppercase;">Active Version Title</label>
-                    <div class="d-flex gap-2">
-                        <input type="text" id="resume-title-field" class="form-input py-1 px-2" value="My Master CV" onchange="triggerAutoSave()">
-                        <select id="resume-version-select" onchange="handleVersionChange()" class="form-input py-1 px-2 w-auto" style="max-width:140px;">
-                            <option value="new">+ Save New</option>
-                        </select>
+                <!-- 5. Projects Accordion -->
+                <details class="accordion-section p-2 border rounded bg-primary-card" id="accordion-projects">
+                    <summary class="fw-bold text-secondary-text" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-code me-2 text-muted"></i> Projects List</summary>
+                    <div class="mt-2">
+                        <div id="projects-items-list"></div>
+                        <button type="button" class="btn btn-sm btn-outline w-100 py-1.5" onclick="addProjectItem()"><i class="fa-solid fa-plus me-1"></i> Add Project Entry</button>
                     </div>
-                </div>
+                </details>
+
+                <!-- 6. Certifications Accordion -->
+                <details class="accordion-section p-2 border rounded bg-primary-card" id="accordion-certifications">
+                    <summary class="fw-bold text-secondary-text" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-award me-2 text-muted"></i> Certifications List</summary>
+                    <div class="mt-2">
+                        <div id="certifications-items-list"></div>
+                        <button type="button" class="btn btn-sm btn-outline w-100 py-1.5" onclick="addCertificationItem()"><i class="fa-solid fa-plus me-1"></i> Add Certification</button>
+                    </div>
+                </details>
+
+                <!-- 7. Achievements Accordion -->
+                <details class="accordion-section p-2 border rounded bg-primary-card" id="accordion-achievements">
+                    <summary class="fw-bold text-secondary-text" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-trophy me-2 text-muted"></i> Achievements</summary>
+                    <div class="row g-2 mt-2">
+                        <div class="col-12">
+                            <label class="form-label" style="font-size:0.65rem;">Honor List / Awards</label>
+                            <input type="text" id="res-achievements" class="form-input" value="Dean's List 2025, First Place CodeQuest Hackathon" oninput="syncResumeFields()">
+                        </div>
+                    </div>
+                </details>
+
+                <!-- 8. Hackathons Accordion -->
+                <details class="accordion-section p-2 border rounded bg-primary-card" id="accordion-hackathons">
+                    <summary class="fw-bold text-secondary-text" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-laptop-code me-2 text-muted"></i> Hackathons & Workshops</summary>
+                    <div class="row g-2 mt-2">
+                        <div class="col-12">
+                            <label class="form-label" style="font-size:0.65rem;">Hackathons Completed</label>
+                            <input type="text" id="res-hackathons" class="form-input" value="Participated in DevFest 24, Smart India Hackathon 25" oninput="syncResumeFields()">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" style="font-size:0.65rem;">Workshops Attended</label>
+                            <input type="text" id="res-workshops" class="form-input" value="Attended AWS Cloud Practitioner Immersion Day" oninput="syncResumeFields()">
+                        </div>
+                    </div>
+                </details>
+
+                <!-- 9. Languages Accordion -->
+                <details class="accordion-section p-2 border rounded bg-primary-card" id="accordion-languages">
+                    <summary class="fw-bold text-secondary-text" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-language me-2 text-muted"></i> Languages & Interests</summary>
+                    <div class="row g-2 mt-2">
+                        <div class="col-12">
+                            <label class="form-label" style="font-size:0.65rem;">Languages Spoken</label>
+                            <input type="text" id="res-languages" class="form-input" value="English (Fluent), Spanish (Conversational)" oninput="syncResumeFields()">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" style="font-size:0.65rem;">Interests & Hobbies</label>
+                            <input type="text" id="res-interests" class="form-input" value="Cryptography, Robotics, Open Source Contributing" oninput="syncResumeFields()">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" style="font-size:0.65rem;">References</label>
+                            <input type="text" id="res-references" class="form-input" value="Available upon request" oninput="syncResumeFields()">
+                        </div>
+                    </div>
+                </details>
+
+                <!-- 10. Reorder Sections Accordion -->
+                <details class="accordion-section p-2 border rounded bg-primary-card" id="accordion-reorder">
+                    <summary class="fw-bold text-secondary-text" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-arrows-up-down me-2 text-muted"></i> Arrange / Reorder Sections</summary>
+                    <div class="mt-2">
+                        <p class="text-secondary mb-3" style="font-size:0.75rem;">Modify the output order of your resume sections. Reorders automatically.</p>
+                        <div id="reorder-sections-list" class="d-flex flex-column gap-2"></div>
+                    </div>
+                </details>
+
+                <!-- 11. Version History Accordion -->
+                <details class="accordion-section p-2 border rounded bg-primary-card" id="accordion-history">
+                    <summary class="fw-bold text-secondary-text" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-clock-rotate-left me-2 text-muted"></i> Version History</summary>
+                    <div class="mt-2">
+                        <p class="text-secondary mb-3" style="font-size:0.75rem;">Manage and load your previously saved cloud drafts.</p>
+                        <div class="d-flex flex-column gap-2" id="version-history-list-pane"></div>
+                    </div>
+                </details>
+
+                <!-- 12. Compare Versions Accordion -->
+                <details class="accordion-section p-2 border rounded bg-primary-card" id="accordion-compare">
+                    <summary class="fw-bold text-secondary-text" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-code-compare me-2 text-muted"></i> Compare Versions</summary>
+                    <div class="mt-2">
+                        <div class="mb-3">
+                            <label class="form-label" style="font-size:0.65rem;">Select Draft to Compare With Current:</label>
+                            <select id="compare-history-select" class="form-input" onchange="runVersionComparison()"></select>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="compare-heading text-accent fw-bold mb-1" style="font-size:0.7rem;">Current Draft</div>
+                                <div id="compare-current-content" class="p-2 border rounded bg-secondary-card" style="min-height:100px;"></div>
+                            </div>
+                            <div class="col-6">
+                                <div class="compare-heading text-warning fw-bold mb-1" style="font-size:0.7rem;">Selected Historical Draft</div>
+                                <div id="compare-history-content" class="p-2 border rounded bg-secondary-card" style="min-height:100px;">
+                                    <p class="text-muted text-center py-4" style="font-size:0.7rem;">No draft selected.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
             </div>
-            
-            <div class="d-flex gap-2 mt-2">
-                <button class="btn btn-sm btn-outline flex-grow-1" onclick="saveResumeCloud()"><i class="fa-solid fa-cloud-arrow-up"></i> Save Cloud Draft</button>
-                <button class="btn btn-sm btn-outline" onclick="duplicateCurrentVersion()" title="Duplicate this Draft"><i class="fa-solid fa-copy"></i> Duplicate</button>
-                <button class="btn btn-sm btn-primary px-3" onclick="triggerResumeATSAnalysis()">Analyze ATS <i class="fa-solid fa-wand-magic-sparkles"></i></button>
+
+            <!-- Editor Actions Footer -->
+            <div class="pt-3 border-top mt-auto">
+                <div class="d-flex gap-2 mb-2">
+                    <button id="btn-undo" class="btn btn-sm btn-outline flex-grow-1" onclick="undo()" title="Undo" disabled><i class="fa-solid fa-rotate-left"></i> Undo</button>
+                    <button id="btn-redo" class="btn btn-sm btn-outline flex-grow-1" onclick="redo()" title="Redo" disabled><i class="fa-solid fa-rotate-right"></i> Redo</button>
+                    <button class="btn btn-sm btn-outline" onclick="duplicateCurrentVersion()" title="Duplicate Draft"><i class="fa-solid fa-copy"></i> Duplicate</button>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-outline flex-grow-1 py-2 fw-semibold" onclick="saveResumeCloud()"><i class="fa-solid fa-cloud-arrow-up"></i> Save Cloud Draft</button>
+                    <button class="btn btn-sm btn-primary flex-grow-1 py-2 fw-semibold" onclick="triggerResumeATSAnalysis()">Analyze ATS <i class="fa-solid fa-wand-magic-sparkles"></i></button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Desktop Right Column: Sub-Tabbed Visual Viewer (Preview, ATS, Templates, Export) -->
+    <!-- Right Column: Visual Preview, Toolbar & ATS Panel (col-xl-7) -->
     <div class="visual-viewer-column">
-        <div class="flat-card h-100 bg-secondary-card border d-flex flex-column" style="overflow: hidden;">
-            <!-- Tab Headers at Top of Panel -->
-            <div class="viewer-tabs-header d-flex border-bottom bg-primary-card">
-                <button id="viewer-tab-btn-preview" class="viewer-tab-btn active" onclick="setViewerTab('preview')"><i class="fa-solid fa-file-invoice"></i> Preview</button>
-                <button id="viewer-tab-btn-ats" class="viewer-tab-btn" onclick="setViewerTab('ats')"><i class="fa-solid fa-chart-line"></i> ATS Diagnostics</button>
-                <button id="viewer-tab-btn-templates" class="viewer-tab-btn" onclick="setViewerTab('templates')"><i class="fa-solid fa-palette"></i> Templates</button>
-                <button id="viewer-tab-btn-export" class="viewer-tab-btn" onclick="setViewerTab('export')"><i class="fa-solid fa-file-export"></i> Export</button>
-            </div>
-
-            <div class="viewer-tab-content flex-grow-1 p-3" style="overflow-y: auto;">
+        <div class="flat-card h-100 bg-secondary-card border d-flex flex-column" style="overflow-y: auto; overflow-x: hidden; padding: 15px;">
+            
+            <!-- Preview Toolbar -->
+            <div class="flat-card bg-primary-card border p-3 mb-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
                 
-                <!-- Tab 1: Live A4 sheet Preview -->
-                <div id="viewer-tab-preview" class="viewer-tab-wrapper">
-                    <!-- Before/After optimizations bar -->
-                    <div class="flat-card border p-2 mb-3 bg-primary-card" id="before-after-card" style="display:none; border-color: rgba(16,185,129,0.2) !important;">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="fw-bold text-success" style="font-size:0.65rem;"><i class="fa-solid fa-circle-check"></i> Action Verb Prepend Optimization applied!</span>
-                            <button class="btn-close" onclick="document.getElementById('before-after-card').style.display='none'" style="background:none; border:none; color:var(--text-secondary); cursor:pointer;"><i class="fa-solid fa-x"></i></button>
-                        </div>
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <div class="p-1.5 border rounded bg-secondary-card" style="font-size:0.65rem;">
-                                    <span class="text-danger d-block fw-bold mb-0.5">Original:</span>
-                                    <div id="compare-original" class="text-secondary italic"></div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="p-1.5 border rounded bg-secondary-card" style="font-size:0.65rem;">
-                                    <span class="text-success d-block fw-bold mb-0.5">Optimized:</span>
-                                    <div id="compare-optimized" class="text-primary fw-semibold"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Dropdown Select & Gallery Button -->
+                <div class="d-flex align-items-center gap-2 flex-wrap" style="font-size:0.8rem;">
+                    <label for="resume-theme-select" class="fw-bold text-secondary-text">Template Theme:</label>
+                    <select id="resume-theme-select" onchange="applyTheme(this.value)" class="form-input py-1 px-2 w-auto" style="max-width:160px; font-size:0.75rem;">
+                        <optgroup label="Original Classic">
+                            <option value="classic">Classic Ivory</option>
+                            <option value="modern-cyan">Modern Cyan Accent</option>
+                            <option value="slate-glass">Slate Glassmorphic</option>
+                            <option value="minimalist-executive">Minimalist Executive</option>
+                            <option value="tech-mono">Tech Minimalist</option>
+                            <option value="creative-violet">Creative Violet</option>
+                            <option value="emerald-forest">Emerald Forest</option>
+                            <option value="royal-indigo">Royal Indigo</option>
+                            <option value="corporate-navy">Corporate Navy</option>
+                            <option value="modern-warm">Modern Warm</option>
+                            <option value="clean-slate">Clean Slate</option>
+                            <option value="elegant-georgia">Elegant Georgia</option>
+                            <option value="stanford-academic">Stanford Academic</option>
+                            <option value="sleek-tech">Sleek Tech</option>
+                            <option value="compact-cv">Compact CV</option>
+                            <option value="hybrid-columns">Double Column Hybrid</option>
+                        </optgroup>
+                        <optgroup label="ATS Friendly">
+                            <option value="ats-classic">Classic Executive</option>
+                            <option value="ats-modern">Modern Professional</option>
+                            <option value="ats-minimal">Clean Minimalist</option>
+                            <option value="ats-compact">Compact Standard</option>
+                            <option value="ats-formal">Formal Traditional</option>
+                        </optgroup>
+                        <optgroup label="Modern Premium">
+                            <option value="modern-teal">Teal Accent</option>
+                            <option value="modern-slate">Slate Clean</option>
+                            <option value="modern-indigo">Indigo Startup</option>
+                            <option value="modern-coral">Coral Serif</option>
+                            <option value="modern-glass">Glassmorphism</option>
+                        </optgroup>
+                        <optgroup label="Microsoft Style">
+                            <option value="ms-learn">Learn Blue</option>
+                            <option value="ms-docs">Technical Writer</option>
+                            <option value="ms-azure">Azure Cloud</option>
+                            <option value="ms-office">Office Corporate</option>
+                            <option value="ms-team">MS Collaborative</option>
+                        </optgroup>
+                        <optgroup label="Student CV">
+                            <option value="student-academic">Academic CV</option>
+                            <option value="student-entry">Entry Level</option>
+                            <option value="student-grad">Graduate Fellowship</option>
+                            <option value="student-campus">Campus Leader</option>
+                            <option value="student-scholar">Scholar Traditional</option>
+                        </optgroup>
+                        <optgroup label="Internships">
+                            <option value="intern-general">General Internship</option>
+                            <option value="intern-tech">Tech Intern Prep</option>
+                            <option value="intern-business">Corporate Intern</option>
+                            <option value="intern-creative">Creative Portfolio</option>
+                            <option value="intern-research">Research Assistant</option>
+                        </optgroup>
+                        <optgroup label="Cyber Security">
+                            <option value="cyber-mono">Terminal Mono</option>
+                            <option value="cyber-dark">Dark Operations</option>
+                            <option value="cyber-shield">Shield Defensive</option>
+                            <option value="cyber-matrix">Matrix Green</option>
+                            <option value="cyber-audit">Compliance Auditor</option>
+                        </optgroup>
+                        <optgroup label="AI/ML Engineer">
+                            <option value="ai-tensor">Tensor Graph</option>
+                            <option value="ai-neural">Neural Network</option>
+                            <option value="ai-agent">Agentic Engineer</option>
+                            <option value="ai-vision">CV/NLP Specialist</option>
+                            <option value="ai-prompt">Prompt Analyst</option>
+                        </optgroup>
+                        <optgroup label="Cloud Ops">
+                            <option value="cloud-infra">Infrastructure</option>
+                            <option value="cloud-ops">Cloud Operations</option>
+                            <option value="cloud-k8s">Kubernetes Architect</option>
+                            <option value="cloud-aws">AWS Cloud</option>
+                            <option value="cloud-hybrid">Hybrid Cloud</option>
+                        </optgroup>
+                        <optgroup label="Software Eng">
+                            <option value="swe-git">Git Committer</option>
+                            <option value="swe-fullstack">Full Stack Engineer</option>
+                            <option value="swe-backend">Backend Architect</option>
+                            <option value="swe-frontend">Frontend Developer</option>
+                            <option value="swe-cloud">Cloud Engineer</option>
+                        </optgroup>
+                        <optgroup label="Minimalist">
+                            <option value="minimal-light">Light Standard</option>
+                            <option value="minimal-dark">Dark Elegant</option>
+                            <option value="minimal-border">Border Accent</option>
+                            <option value="minimal-compact">Compact Line</option>
+                            <option value="minimal-swiss">Swiss Editorial</option>
+                        </optgroup>
+                        <optgroup label="Executive">
+                            <option value="exec-director">Director Gold</option>
+                            <option value="exec-vp">VP Operations</option>
+                            <option value="exec-board">Board Member</option>
+                            <option value="exec-legal">Legal Counsel</option>
+                            <option value="exec-partner">Managing Partner</option>
+                        </optgroup>
+                        <optgroup label="Canva Premium">
+                            <option value="canva-sidebar">Left Sidebar Modern</option>
+                            <option value="canva-elegant">Olivia Wilson Elegant</option>
+                            <option value="canva-split">Minimalist Split</option>
+                        </optgroup>
+                    </select>
+                    
+                    <button type="button" class="btn btn-sm btn-outline py-1.5 px-3 rounded" onclick="openTemplateGallery()"><i class="fa-solid fa-palette me-1"></i> Browse Gallery</button>
+                </div>
 
-                    <!-- Drop-Zone / PDF drag and drop overlay -->
-                    <div class="upload-zone-wrapper p-3 border rounded text-center mb-3 bg-primary-card" style="border-style: dashed !important; cursor: pointer;" id="drop-zone-builder">
-                        <i class="fa-solid fa-cloud-arrow-up text-muted mb-1" style="font-size: 1.4rem;"></i>
-                        <h4 style="font-size: 0.75rem;" class="fw-bold mb-0">Drag & Drop Resume PDF/DOCX</h4>
-                        <p class="text-secondary mb-1" style="font-size: 0.62rem;">Gemini will auto-fill your profile inputs below.</p>
-                        <span class="badge badge-info cursor-pointer px-2 py-0.5" style="font-size: 0.6rem;">Browse Files</span>
-                        <input type="file" id="resume-file-input-builder" style="display:none;" accept=".pdf,.docx">
-                        <div id="upload-status-text-builder" class="text-secondary mt-1" style="font-size: 0.68rem; display:none;"></div>
-                    </div>
-
-                    <!-- Sheet Preview Wrapper -->
-                    <div class="resume-preview-sheet-wrapper border shadow-sm" style="background:#fff; padding: 25px; min-height:842px;">
-                        <!-- A4 Sheet Paper -->
-                        <div class="resume-sheet modern-ats" id="resume-sheet-paper" style="font-family: 'Outfit', sans-serif;">
-                            <div class="resume-render-header" style="border-bottom: 2px solid #2563eb; padding-bottom: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px;">
-                                <div style="flex-grow: 1;">
-                                    <h1 id="res-render-name" style="font-size: 20px; font-weight:800; color: #1e3a8a; margin-bottom: 4px; text-transform: uppercase;">Alex Smith</h1>
-                                    <div class="resume-render-meta" style="font-size: 10px; color: #4b5563; line-height: 1.4;">
-                                        <!-- Built dynamically in syncResumeFields to prevent trailing/leading separators -->
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div id="resume-sections-container">
-                                <!-- Reordered dynamically -->
-                            </div>
+                <!-- Export / PDF / Print Actions -->
+                <div class="d-flex gap-1 flex-wrap">
+                    <button class="btn btn-sm btn-primary" onclick="downloadResumePDF()"><i class="fa-solid fa-download me-1"></i> Download PDF</button>
+                    <button class="btn btn-sm btn-outline" onclick="window.print()"><i class="fa-solid fa-print"></i> Print</button>
+                    
+                    <!-- Export Dropdown -->
+                    <div class="dropdown" style="position:relative; display:inline-block;">
+                        <button class="btn btn-sm btn-outline dropdown-toggle" onclick="toggleExportMenu()"><i class="fa-solid fa-file-export me-1"></i> Export <i class="fa-solid fa-chevron-down ms-1" style="font-size:8px;"></i></button>
+                        <div id="export-dropdown-menu" class="dropdown-menu border shadow-sm p-1" style="display:none; position:absolute; right:0; top:35px; background:var(--bg-secondary); border-radius:6px; z-index:1500; min-width:140px;">
+                            <a href="javascript:void(0)" onclick="downloadResumeDOCX()" class="dropdown-item py-2 px-3 d-block text-secondary-text" style="font-size:0.75rem; text-decoration:none;"><i class="fa-solid fa-file-word text-primary me-2"></i> Word (DOCX)</a>
+                            <a href="javascript:void(0)" onclick="downloadResumeJSON()" class="dropdown-item py-2 px-3 d-block text-secondary-text" style="font-size:0.75rem; text-decoration:none;"><i class="fa-solid fa-file-code text-info me-2"></i> JSON Schema</a>
+                            <a href="javascript:void(0)" onclick="generateShareLink()" class="dropdown-item py-2 px-3 d-block text-secondary-text" style="font-size:0.75rem; text-decoration:none;"><i class="fa-solid fa-share-nodes text-success me-2"></i> Share Link</a>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Tab 2: ATS Diagnostics & Improvement suggestions -->
-                <div id="viewer-tab-ats" class="viewer-tab-wrapper" style="display:none;">
+            <!-- Before/After optimizations panel -->
+            <div class="flat-card border p-2 mb-3 bg-primary-card" id="before-after-card" style="display:none; border-color: rgba(16,185,129,0.2) !important;">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="fw-bold text-success" style="font-size:0.65rem;"><i class="fa-solid fa-circle-check"></i> Phrasing Optimization applied!</span>
+                    <button class="btn-close" onclick="document.getElementById('before-after-card').style.display='none'" style="background:none; border:none; color:var(--text-secondary); cursor:pointer;"><i class="fa-solid fa-x"></i></button>
+                </div>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <div class="p-1.5 border rounded bg-secondary-card" style="font-size:0.65rem;">
+                            <span class="text-danger d-block fw-bold mb-0.5">Original:</span>
+                            <div id="compare-original" class="text-secondary italic"></div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-1.5 border rounded bg-secondary-card" style="font-size:0.65rem;">
+                            <span class="text-success d-block fw-bold mb-0.5">Optimized:</span>
+                            <div id="compare-optimized" class="text-primary fw-semibold"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Drag & Drop Upload Zone -->
+            <div class="upload-zone-wrapper p-3 border rounded text-center mb-3 bg-primary-card" style="border-style: dashed !important; cursor: pointer;" id="drop-zone-builder">
+                <i class="fa-solid fa-cloud-arrow-up text-muted mb-1" style="font-size: 1.4rem;"></i>
+                <h4 style="font-size: 0.75rem;" class="fw-bold mb-0">Drag & Drop Resume PDF/DOCX</h4>
+                <p class="text-secondary mb-1" style="font-size: 0.62rem;">AI will automatically fill out your editor inputs.</p>
+                <span class="badge badge-info cursor-pointer px-2 py-0.5" style="font-size: 0.6rem;">Browse Files</span>
+                <input type="file" id="resume-file-input-builder" style="display:none;" accept=".pdf,.docx">
+                <div id="upload-status-text-builder" class="text-secondary mt-1" style="font-size: 0.68rem; display:none;"></div>
+            </div>
+
+            <!-- Share Link Container -->
+            <div id="share-link-container" class="mt-1 mb-3 p-3 border rounded bg-primary-card" style="display:none;">
+                <label class="form-label" style="font-size: 0.65rem;">Public Read-Only Portfolio URL</label>
+                <div class="d-flex gap-2">
+                    <input type="text" id="share-link-input" class="form-input" readonly>
+                    <button class="btn btn-sm btn-primary px-3 text-nowrap" onclick="copyShareLink()">Copy URL</button>
+                </div>
+            </div>
+
+            <!-- Preview wrapper parent (A4 Resume render container) -->
+            <div id="resume-preview-sheet-wrapper-parent">
+                <div class="resume-preview-sheet-wrapper border shadow-sm" style="background:#fff; padding: 25px; min-height:842px;">
+                    <!-- A4 Sheet Paper -->
+                    <div class="resume-sheet classic" id="resume-sheet-paper" style="font-family: 'Outfit', sans-serif;">
+                        <div class="resume-render-header" style="border-bottom: 2px solid #2563eb; padding-bottom: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px;">
+                            <div style="flex-grow: 1;">
+                                <h1 id="res-render-name" style="font-size: 20px; font-weight:800; color: #1e3a8a; margin-bottom: 4px; text-transform: uppercase;">Alex Smith</h1>
+                                <div class="resume-render-meta" style="font-size: 10px; color: #4b5563; line-height: 1.4;">
+                                    <!-- Built dynamically in syncResumeFields -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="resume-sections-container">
+                            <!-- Reordered dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ATS Diagnostics & Scoring Panel (Placed directly under the preview A4 sheet) -->
+            <div id="ats-dashboard-parent" class="mt-4">
+                <div class="flat-card bg-primary-card border p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
+                        <h4 class="fw-bold mb-0 text-secondary-text" style="font-size:0.9rem;"><i class="fa-solid fa-chart-line text-accent me-2"></i> ATS Diagnostics Dashboard</h4>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="text-secondary" style="font-size: 0.72rem;">ATS Score:</span>
+                            <h3 class="fw-bold mb-0 text-accent" id="score-text-main" style="font-size: 1.25rem;">80/100</h3>
+                        </div>
+                    </div>
+
+                    <!-- Visual sub-scores progress indicators -->
                     <div class="row g-3 text-center mb-4">
-                        <div class="col-4">
-                            <div class="p-3 border rounded bg-primary-card">
-                                <h3 class="fw-bold mb-0 text-accent" id="score-text-main" style="font-size: 1.25rem;">80/100</h3>
-                                <span class="text-secondary" style="font-size:0.65rem;">ATS Alignment</span>
+                        <div class="col-6">
+                            <div class="p-2 border rounded bg-secondary-card">
+                                <h4 class="fw-bold mb-0 text-success" id="score-readability" style="font-size: 1.15rem;">85%</h4>
+                                <span class="text-secondary d-block" style="font-size:0.65rem;">Readability Score</span>
                             </div>
                         </div>
-                        <div class="col-4">
-                            <div class="p-3 border rounded bg-primary-card">
-                                <h3 class="fw-bold mb-0 text-success" id="score-readability" style="font-size: 1.25rem;">85%</h3>
-                                <span class="text-secondary" style="font-size:0.65rem;">Readability</span>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="p-3 border rounded bg-primary-card">
-                                <h3 class="fw-bold mb-0 text-info" id="score-skills" style="font-size: 1.25rem;">90%</h3>
-                                <span class="text-secondary" style="font-size:0.65rem;">Keywords Matching</span>
+                        <div class="col-6">
+                            <div class="p-2 border rounded bg-secondary-card">
+                                <h4 class="fw-bold mb-0 text-info" id="score-skills" style="font-size: 1.15rem;">90%</h4>
+                                <span class="text-secondary d-block" style="font-size:0.65rem;">Keyword Relevance</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Diagnostics feedback list -->
-                    <div class="flat-card border p-3 bg-primary-card mb-3">
-                        <h4 class="fw-bold fs-6 mb-3 text-secondary-text"><i class="fa-solid fa-chart-bar text-muted me-2"></i> ATS Checkpoints</h4>
-                        <div class="space-y-3" id="ats-analysis-body">
-                            <!-- Populated dynamically -->
+                    <!-- Realtime Keyword checklist matching -->
+                    <div class="p-3 border rounded bg-secondary-card mb-3">
+                        <span class="fw-bold text-secondary-text d-block mb-2" style="font-size:0.7rem; text-transform:uppercase;"><i class="fa-solid fa-satellite-dish text-cyan me-1"></i> Real-time Keyword Alignment Check</span>
+                        <div id="live-keywords-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap:6px;">
+                            <div class="live-keyword-item" id="kw-python" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Python</div>
+                            <div class="live-keyword-item" id="kw-flask" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Flask</div>
+                            <div class="live-keyword-item" id="kw-docker" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Docker</div>
+                            <div class="live-keyword-item" id="kw-wireshark" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Wireshark</div>
+                            <div class="live-keyword-item" id="kw-git" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Git</div>
+                            <div class="live-keyword-item" id="kw-react" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> React</div>
+                        </div>
+                    </div>
+
+                    <!-- Phrasing Suggestions body -->
+                    <div class="flat-card border p-3 bg-secondary-card">
+                        <h4 class="fw-bold fs-6 mb-3 text-secondary-text"><i class="fa-solid fa-chart-bar text-muted me-2"></i> ATS Checkpoints & Phrasing Suggestions</h4>
+                        <div class="space-y-3" id="ats-analysis-body" style="font-size: 0.78rem;">
                             <p class="text-muted text-center py-4">Click "Analyze ATS" in the editor pane to evaluate text metrics.</p>
                         </div>
                     </div>
                 </div>
-
-                <!-- Tab 3: Template Gallery (55 Styles) -->
-                <div id="viewer-tab-templates" class="viewer-tab-wrapper" style="display:none;">
-                    <h4 class="fw-bold fs-6 mb-2 text-secondary-text"><i class="fa-solid fa-palette text-muted me-2"></i> Select Template Theme</h4>
-                    
-                    <!-- category picker -->
-                    <div class="templates-categories-bar d-flex gap-1 overflow-x-auto pb-2 mb-3">
-                        <!-- Loaded dynamically -->
-                    </div>
-
-                    <!-- Style Grid -->
-                    <div class="templates-grid row g-3">
-                        <!-- Cards loaded dynamically based on active category -->
-                    </div>
-                    
-                    <input type="hidden" id="resume-theme-select" value="classic">
-                </div>
-
-                <!-- Tab 4: Export Center -->
-                <div id="viewer-tab-export" class="viewer-tab-wrapper" style="display:none;">
-                    <h4 class="fw-bold fs-6 mb-3 text-secondary-text"><i class="fa-solid fa-file-export text-muted me-2"></i> Export & Share</h4>
-                    
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="export-card p-3 border rounded bg-primary-card text-center hover-scale cursor-pointer" onclick="downloadResumePDF()">
-                                <i class="fa-solid fa-file-pdf text-danger mb-2" style="font-size: 1.8rem;"></i>
-                                <h5 class="fw-bold mb-1" style="font-size:0.85rem;">Download PDF</h5>
-                                <span class="text-secondary d-block" style="font-size:0.65rem;">Server-side high fidelity render</span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="export-card p-3 border rounded bg-primary-card text-center hover-scale cursor-pointer" onclick="downloadResumeDOCX()">
-                                <i class="fa-solid fa-file-word text-primary mb-2" style="font-size: 1.8rem;"></i>
-                                <h5 class="fw-bold mb-1" style="font-size:0.85rem;">Export Word (DOCX)</h5>
-                                <span class="text-secondary d-block" style="font-size:0.65rem;">Editable Microsoft Word format</span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="export-card p-3 border rounded bg-primary-card text-center hover-scale cursor-pointer" onclick="downloadResumeJSON()">
-                                <i class="fa-solid fa-file-code text-cyan mb-2" style="font-size: 1.8rem;"></i>
-                                <h5 class="fw-bold mb-1" style="font-size:0.85rem;">Export JSON Schema</h5>
-                                <span class="text-secondary d-block" style="font-size:0.65rem;">Raw resume backup schema</span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="export-card p-3 border rounded bg-primary-card text-center hover-scale cursor-pointer" onclick="window.print()">
-                                <i class="fa-solid fa-print text-success mb-2" style="font-size: 1.8rem;"></i>
-                                <h5 class="fw-bold mb-1" style="font-size:0.85rem;">Print CV Document</h5>
-                                <span class="text-secondary d-block" style="font-size:0.65rem;">Direct system printing / Save PDF</span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="export-card p-3 border rounded bg-primary-card text-center hover-scale cursor-pointer" onclick="downloadATSReportText()">
-                                <i class="fa-solid fa-file-lines text-warning mb-2" style="font-size: 1.8rem;"></i>
-                                <h5 class="fw-bold mb-1" style="font-size:0.85rem;">ATS Audit Report</h5>
-                                <span class="text-secondary d-block" style="font-size:0.65rem;">Text outline of suggestions</span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="export-card p-3 border rounded bg-primary-card text-center hover-scale cursor-pointer" onclick="generateShareLink()">
-                                <i class="fa-solid fa-share-nodes text-accent mb-2" style="font-size: 1.8rem;"></i>
-                                <h5 class="fw-bold mb-1" style="font-size:0.85rem;">Get Shareable Link</h5>
-                                <span class="text-secondary d-block" style="font-size:0.65rem;">Generate read-only portfolio link</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Shared Link Output -->
-                    <div id="share-link-container" class="mt-4 p-3 border rounded bg-primary-card" style="display:none;">
-                        <span class="fw-bold d-block text-success mb-1" style="font-size:0.7rem;"><i class="fa-solid fa-circle-check"></i> Public link ready!</span>
-                        <div class="input-group">
-                            <input type="text" id="share-link-input" class="form-input flex-grow-1" readonly>
-                            <button class="btn btn-primary px-3" onclick="copyShareLink()"><i class="fa-solid fa-copy"></i> Copy</button>
-                        </div>
-                    </div>
-                </div>
-
             </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- 55 Themes Browser Gallery Modal -->
+<div id="templateGalleryModal" class="modal-backdrop" style="display: none;">
+    <div class="modal-content-wrapper flat-card border shadow-lg">
+        <div class="modal-header d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
+            <h4><i class="fa-solid fa-palette text-accent me-2"></i> Select Premium Template Theme</h4>
+            <button class="btn-close" onclick="closeTemplateGallery()" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:1.2rem;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        
+        <!-- Category Tab Buttons inside Modal -->
+        <div class="modal-tabs-header">
+            <button class="modal-tab-btn active" onclick="filterModalTemplates('original', this)">Original Themes</button>
+            <button class="modal-tab-btn" onclick="filterModalTemplates('ats', this)">ATS Standard</button>
+            <button class="modal-tab-btn" onclick="filterModalTemplates('modern', this)">Modern Premium</button>
+            <button class="modal-tab-btn" onclick="filterModalTemplates('professional', this)">Professional</button>
+            <button class="modal-tab-btn" onclick="filterModalTemplates('student', this)">Student CV</button>
+            <button class="modal-tab-btn" onclick="filterModalTemplates('internship', this)">Internships</button>
+            <button class="modal-tab-btn" onclick="filterModalTemplates('cyber', this)">Cyber Security</button>
+            <button class="modal-tab-btn" onclick="filterModalTemplates('ai', this)">AI/ML Engineer</button>
+            <button class="modal-tab-btn" onclick="filterModalTemplates('cloud', this)">Cloud Ops</button>
+            <button class="modal-tab-btn" onclick="filterModalTemplates('swe', this)">Software Eng</button>
+            <button class="modal-tab-btn" onclick="filterModalTemplates('minimal', this)">Minimalist</button>
+            <button class="modal-tab-btn" onclick="filterModalTemplates('executive', this)">Executive</button>
+            <button class="modal-tab-btn" onclick="filterModalTemplates('canva', this)">Canva Premium</button>
+        </div>
+        
+        <!-- Template Grid Container (Dynamically rendered cards) -->
+        <div class="templates-grid modal-templates-grid">
+            <!-- Rendered via JavaScript -->
         </div>
     </div>
 </div>
 
-<!-- Mobile Tabbed Bottom Navigation Bar -->
-<div class="mobile-bottom-tabs-nav d-none">
-    <button id="mobile-tab-btn-edit" class="mobile-tab-item active" onclick="setMobileTab('edit')">
+<!-- Mobile Bottom Navigation Tab Bar (Shown < 1100px) -->
+<div class="mobile-bottom-tabs-nav">
+    <button class="mobile-tab-item active" id="mobile-tab-btn-edit" onclick="setMobileTab('edit')">
         <i class="fa-solid fa-file-pen"></i>
-        <span>Edit</span>
+        <span>Edit Sections</span>
     </button>
-    <button id="mobile-tab-btn-preview" class="mobile-tab-item" onclick="setMobileTab('preview')">
-        <i class="fa-solid fa-file-invoice"></i>
-        <span>Preview</span>
+    <button class="mobile-tab-item" id="mobile-tab-btn-preview" onclick="setMobileTab('preview')">
+        <i class="fa-solid fa-eye"></i>
+        <span>Live Preview</span>
     </button>
-    <button id="mobile-tab-btn-ats" class="mobile-tab-item" onclick="setMobileTab('ats')">
+    <button class="mobile-tab-item" id="mobile-tab-btn-ats" onclick="setMobileTab('ats')">
         <i class="fa-solid fa-chart-line"></i>
-        <span>ATS</span>
-    </button>
-    <button id="mobile-tab-btn-templates" class="mobile-tab-item" onclick="setMobileTab('templates')">
-        <i class="fa-solid fa-palette"></i>
-        <span>Themes</span>
-    </button>
-    <button id="mobile-tab-btn-export" class="mobile-tab-item" onclick="setMobileTab('export')">
-        <i class="fa-solid fa-file-export"></i>
-        <span>Export</span>
+        <span>ATS Report</span>
     </button>
 </div>
 
-<!-- Mobile Sections Menu Modal -->
-<div id="mobile-sections-menu-backdrop" class="mobile-menu-backdrop" onclick="hideMobileSectionsMenu()"></div>
-<div id="mobile-sections-menu-container" class="mobile-menu-pane">
-    <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
-        <h4 class="fw-bold mb-0 text-primary-text" style="font-size:0.95rem;"><i class="fa-solid fa-bars"></i> Select Section</h4>
-        <button class="btn-close" onclick="hideMobileSectionsMenu()"><i class="fa-solid fa-x"></i></button>
-    </div>
-    <div class="p-2" id="mobile-sections-menu-list">
-        <!-- Loaded dynamically -->
-    </div>
-</div>
+{% endblock %}
 
-<!-- html2pdf JS client-side library -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/html2pdf.bundle.min.js') }}"></script>
 <script>
-// Workspace Global State
-let activeSection = "profile";
-let activeViewerTab = "preview";
-let activeMobileTab = "edit";
-let sectionOrder = ["education", "skills", "experience", "projects", "certifications", "achievements", "hackathons", "languages"];
-let savedVersions = [];
-let lastATSFeedback = null;
-let activeBulletInput = null;
-
-// Dynamic Lists state
 let educationList = [];
 let experienceList = [];
 let projectsList = [];
 let certificationsList = [];
 
-// Undo/Redo Stacks
+let activeBulletInput = null;
+let savedVersions = [];
+let lastATSFeedback = null;
+let sectionOrder = ["education", "skills", "experience", "projects", "certifications", "achievements", "hackathons", "languages"];
+
 let undoStack = [];
 let redoStack = [];
 let isApplyingState = false;
@@ -631,14 +680,13 @@ let activeTemplateCategory = "original";
 document.addEventListener("DOMContentLoaded", () => {
     // Initial UI render & loaders
     renderReorderUI();
-    renderTemplatesCategoryPicker();
     renderTemplatesList();
     setupUploadDragAndDrop();
     loadVersionsFromCloud();
     
     // Add default single items if empty initially
     if (educationList.length === 0) {
-        educationList.push({ inst: "State Tech University", degree: "B.S. in Computer Science", dates: "2024 – 2028", gpa: "GPA: 3.8/4.0", coursework: "Data Structures, Cryptography, Database Systems, Computer Networks" });
+        educationList.push({ inst: "Centurion University of Technology and Management", degree: "B.Tech", dates: "2025 - 2029", gpa: "CGPA: 8.6/10", coursework: "Data Structures, Cryptography, Database Systems, Computer Networks" });
     }
     if (experienceList.length === 0) {
         experienceList.push({
@@ -678,115 +726,86 @@ document.addEventListener("DOMContentLoaded", () => {
 
     syncResumeFields();
     
+    // Close modal on click outside content window
+    document.getElementById("templateGalleryModal").addEventListener("click", (e) => {
+        if (e.target.id === "templateGalleryModal") {
+            closeTemplateGallery();
+        }
+    });
+
     setTimeout(() => {
         pushState();
     }, 1000);
 });
 
-// Layout Section Selection logic
+// Layout Section Scroll-to/Accordion expansion logic
 function setActiveSection(secId) {
-    activeSection = secId;
-    
-    // Update Sidebar highlight
-    document.querySelectorAll(".sidebar-section-item").forEach(item => {
-        item.classList.toggle("active", item.dataset.section === secId);
-    });
-
-    // Hide all forms, show selected
-    document.querySelectorAll(".form-section-wrapper").forEach(wrap => {
-        wrap.style.display = wrap.id === `form-sec-${secId}` ? "block" : "none";
-    });
-
-    // On mobile/tablet screens, hide selector list drawer
-    if (window.innerWidth < 768) {
-        hideMobileSectionsMenu();
-        setMobileTab("edit");
-    } else if (window.innerWidth < 1100) {
-        hideMobileSectionsMenu();
+    const det = document.getElementById(`accordion-${secId}`);
+    if (det) {
+        // Expand target accordion details
+        document.querySelectorAll(".accordion-section").forEach(d => {
+            if (d !== det) d.removeAttribute("open");
+        });
+        det.setAttribute("open", "");
+        det.scrollIntoView({ behavior: "smooth", block: "start" });
+        
+        // On mobile viewports, toggle back to "Edit" tab so they see form
+        if (window.innerWidth < 1100) {
+            setMobileTab("edit");
+        }
     }
 }
 
-// Mobile-specific Navigation Functions (Visibility managed entirely via CSS wrapper classes)
+// Mobile tab toggling
 function setMobileTab(tabId) {
-    activeMobileTab = tabId;
-    
-    // Highlight Bottom Tab items
+    // Highlight Bottom Tab item
     document.querySelectorAll(".mobile-tab-item").forEach(btn => {
         btn.classList.toggle("active", btn.id === `mobile-tab-btn-${tabId}`);
     });
 
     const workspace = document.querySelector(".resume-workspace-wrapper");
     if (workspace) {
-        workspace.classList.remove("tab-edit", "tab-preview", "tab-ats", "tab-templates", "tab-export");
+        workspace.classList.remove("tab-edit", "tab-preview", "tab-ats");
         workspace.classList.add(`tab-${tabId}`);
     }
+}
 
-    // Match visual viewer sub-tab content
-    if (tabId !== "edit") {
-        setViewerTab(tabId);
+// Export Dropdown menu trigger
+function toggleExportMenu() {
+    const menu = document.getElementById("export-dropdown-menu");
+    if (menu) {
+        menu.style.display = menu.style.display === "none" ? "block" : "none";
     }
 }
 
-// Viewer Pane Tabs (Desktop Sub-tabs)
-function setViewerTab(tabId) {
-    activeViewerTab = tabId;
+// Close dropdown when clicking outside
+document.addEventListener("click", (e) => {
+    const dropdown = document.querySelector(".dropdown");
+    if (dropdown && !dropdown.contains(e.target)) {
+        const menu = document.getElementById("export-dropdown-menu");
+        if (menu) menu.style.display = "none";
+    }
+});
+
+// Modal Template Browser actions
+function openTemplateGallery() {
+    document.getElementById("templateGalleryModal").style.display = "flex";
+    renderTemplatesList();
+}
+
+function closeTemplateGallery() {
+    document.getElementById("templateGalleryModal").style.display = "none";
+}
+
+function filterModalTemplates(categoryId, btnElement) {
+    activeTemplateCategory = categoryId;
     
-    // Update Sub-tab Button highlight
-    document.querySelectorAll(".viewer-tab-btn").forEach(btn => {
-        btn.classList.toggle("active", btn.id === `viewer-tab-btn-${tabId}`);
+    // Highlight category tab button in modal
+    document.querySelectorAll(".modal-tab-btn").forEach(btn => {
+        btn.classList.toggle("active", btn === btnElement);
     });
-
-    // Hide all wrappers inside viewer pane, show selected
-    document.querySelectorAll(".viewer-tab-wrapper").forEach(wrap => {
-        wrap.style.display = wrap.id === `viewer-tab-${tabId}` ? "block" : "none";
-    });
-}
-
-// Mobile sections selector drawer
-function showMobileSectionsMenu() {
-    const list = document.getElementById("mobile-sections-menu-list");
-    if (!list) return;
-    list.innerHTML = "";
     
-    // Populate drawer with sections list
-    document.querySelectorAll(".sidebar-section-item").forEach(item => {
-        const row = document.createElement("div");
-        row.className = "mobile-menu-item p-3 border-bottom d-flex align-items-center";
-        row.style.cursor = "pointer";
-        row.innerHTML = item.innerHTML;
-        row.onclick = () => {
-            setActiveSection(item.dataset.section);
-        };
-        list.appendChild(row);
-    });
-
-    document.getElementById("mobile-sections-menu-backdrop").style.display = "block";
-    document.getElementById("mobile-sections-menu-container").style.display = "block";
-}
-
-function hideMobileSectionsMenu() {
-    document.getElementById("mobile-sections-menu-backdrop").style.display = "none";
-    document.getElementById("mobile-sections-menu-container").style.display = "none";
-}
-
-// Templates picker drawing logic
-function renderTemplatesCategoryPicker() {
-    const bar = document.querySelector(".templates-categories-bar");
-    if (!bar) return;
-    bar.innerHTML = "";
-    categories.forEach(cat => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = `btn btn-xs ${activeTemplateCategory === cat.id ? 'btn-primary' : 'btn-light'} py-1 px-3 border rounded-pill text-nowrap`;
-        btn.style.fontSize = "0.7rem";
-        btn.innerText = cat.name;
-        btn.onclick = () => {
-            activeTemplateCategory = cat.id;
-            renderTemplatesCategoryPicker();
-            renderTemplatesList();
-        };
-        bar.appendChild(btn);
-    });
+    renderTemplatesList();
 }
 
 function renderTemplatesList() {
@@ -799,10 +818,12 @@ function renderTemplatesList() {
 
     cat.templates.forEach(t => {
         const col = document.createElement("div");
-        col.className = "col-6 col-sm-4";
+        col.className = "template-card-col";
+        col.style.cursor = "pointer";
+        col.onclick = () => applyTheme(t.id);
         
         col.innerHTML = `
-            <div class="template-card border rounded p-2 text-center bg-secondary-card hover-scale cursor-pointer ${document.getElementById("resume-theme-select").value === t.id ? 'selected-theme-border' : ''}" onclick="applyTheme('${t.id}')" style="min-height:90px; border-width: 1.5px;">
+            <div class="template-card border rounded p-2 text-center bg-secondary-card hover-scale ${document.getElementById("resume-theme-select").value === t.id ? 'selected-theme-border' : ''}" style="min-height:90px; border-width: 1.5px;">
                 <div class="theme-thumbnail-bar mx-auto mb-2 border rounded" style="width:100%; height:40px; background:#fafafa; border-top: 4px solid ${getAccentColorForTheme(t.id)} !important;">
                     <div style="width:30%; height:4px; background:#e2e8f0; margin:4px;"></div>
                     <div style="width:80%; height:3px; background:#f1f5f9; margin:2px 4px;"></div>
@@ -843,11 +864,13 @@ function applyTheme(themeId) {
     if (paper) {
         paper.className = "resume-sheet " + themeId;
     }
+    syncResumeFields();
     renderTemplatesList();
     triggerAutoSave();
+    closeTemplateGallery();
 }
 
-// Reordering sections manager
+// Reorder layout sections
 function renderReorderUI() {
     const list = document.getElementById("reorder-sections-list");
     if (!list) return;
@@ -897,7 +920,7 @@ function reorderDOM() {
     });
 }
 
-// Dynamic multi-item Form list renderers
+// Dynamic multi-entry item form builders
 function renderEducationListForm() {
     const container = document.getElementById("education-items-list");
     if (!container) return;
@@ -990,7 +1013,7 @@ function renderExperienceListForm() {
                 </div>
                 <div class="col-12">
                     <label class="form-label" style="font-size:0.65rem;">Bullet points (one per line)</label>
-                    <textarea class="form-input" rows="3" oninput="updateExperienceBullets(${idx}, this.value)">${(item.bullets || []).join('\n')}</textarea>
+                    <textarea class="form-input res-bullet-input" rows="3" onfocus="setActiveBullet(this)" oninput="updateExperienceBullets(${idx}, this.value)">${(item.bullets || []).join('\n')}</textarea>
                 </div>
             </div>
         `;
@@ -1050,7 +1073,7 @@ function renderProjectsListForm() {
                 </div>
                 <div class="col-12">
                     <label class="form-label" style="font-size:0.65rem;">Project Details (one per line)</label>
-                    <textarea class="form-input" rows="3" oninput="updateProjectBullets(${idx}, this.value)">${(item.bullets || []).join('\n')}</textarea>
+                    <textarea class="form-input res-bullet-input" rows="3" onfocus="setActiveBullet(this)" oninput="updateProjectBullets(${idx}, this.value)">${(item.bullets || []).join('\n')}</textarea>
                 </div>
             </div>
         `;
@@ -1099,8 +1122,11 @@ function renderCertificationsListForm() {
                 <button type="button" class="btn btn-xs btn-outline p-0 px-1" onclick="moveCertificationItem(${idx}, 1)" ${idx === certificationsList.length - 1 ? 'disabled' : ''} style="cursor:pointer; background:none; border:none;"><i class="fa-solid fa-arrow-down text-muted" style="font-size:10px;"></i></button>
                 <button type="button" class="btn btn-xs btn-danger p-0 px-1" onclick="removeCertificationItem(${idx})" style="cursor:pointer; background:none; border:none;"><i class="fa-solid fa-trash text-danger" style="font-size:10px;"></i></button>
             </div>
-            <div style="padding-right: 70px;">
-                <input type="text" class="form-input form-input-sm" value="${item.name || ''}" oninput="updateCertificationField(${idx}, this.value)">
+            <div class="row g-2">
+                <div class="col-12">
+                    <label class="form-label" style="font-size:0.65rem;">Certification / Award Title</label>
+                    <input type="text" class="form-input" value="${item.name || ''}" oninput="updateCertificationField(${idx}, this.value)">
+                </div>
             </div>
         `;
         container.appendChild(div);
@@ -1131,7 +1157,7 @@ function moveCertificationItem(idx, dir) {
     syncResumeFields();
 }
 
-// Live sync updates in paper preview DOM
+// Live Resume Preview Fields syncing
 function syncResumeFields() {
     const nameVal = document.getElementById("res-name").value || "Alex Smith";
     const themeId = document.getElementById("resume-theme-select").value || "classic";
@@ -1143,7 +1169,6 @@ function syncResumeFields() {
         paper.style.fontFamily = font;
     }
     
-    // Dynamic meta line builder to filter out empty items (no double or leading separators)
     const addressVal = document.getElementById("res-address").value.trim();
     const emailVal = document.getElementById("res-email").value.trim();
     const phoneVal = document.getElementById("res-phone").value.trim();
@@ -1160,7 +1185,7 @@ function syncResumeFields() {
     if (portfolioVal) metaParts.push(`<i class="fa-solid fa-globe me-1 text-muted"></i> ${portfolioVal}`);
 
     if (themeId === "canva-sidebar" || themeId === "canva-split") {
-        // TWO-COLUMN LAYOUTS
+        // TWO-COLUMN CANVAS LAYOUT
         let leftSideHtml = "";
         let rightSideHtml = "";
         const isDarkSidebar = themeId === "canva-sidebar";
@@ -1326,7 +1351,7 @@ function syncResumeFields() {
         return;
     }
 
-    // SINGLE COLUMN LAYOUTS
+    // SINGLE COLUMN CLASSIC LAYOUTS
     const isElegant = themeId === "canva-elegant";
     paper.className = `resume-sheet ${themeId}`;
     paper.style.padding = "25px";
@@ -1742,7 +1767,12 @@ function pushState() {
     if (undoStack.length > 0 && undoStack[undoStack.length - 1] === stateStr) return;
     undoStack.push(stateStr);
     if (undoStack.length > maxStackSize) undoStack.shift();
-    redoStack = [];
+    
+    // Toggle state status elements
+    const undoBtn = document.getElementById("btn-undo");
+    const redoBtn = document.getElementById("btn-redo");
+    if (undoBtn) undoBtn.disabled = undoStack.length <= 1;
+    if (redoBtn) redoBtn.disabled = redoStack.length === 0;
 }
 
 function undo() {
@@ -1754,7 +1784,20 @@ function undo() {
     populateForm(JSON.parse(prevState));
     syncResumeFields();
     isApplyingState = false;
+    
+    const undoBtn = document.getElementById("btn-undo");
+    const redoBtn = document.getElementById("btn-redo");
+    if (undoBtn) undoBtn.disabled = undoStack.length <= 1;
+    if (redoBtn) redoBtn.disabled = redoStack.length === 0;
+    
     saveResumeCloud();
+}
+
+function undoBtnToggle() {
+    const undoBtn = document.getElementById("btn-undo");
+    const redoBtn = document.getElementById("btn-redo");
+    if (undoBtn) undoBtn.disabled = undoStack.length <= 1;
+    if (redoBtn) redoBtn.disabled = redoStack.length === 0;
 }
 
 function redo() {
@@ -1765,6 +1808,12 @@ function redo() {
     populateForm(JSON.parse(nextState));
     syncResumeFields();
     isApplyingState = false;
+    
+    const undoBtn = document.getElementById("btn-undo");
+    const redoBtn = document.getElementById("btn-redo");
+    if (undoBtn) undoBtn.disabled = undoStack.length <= 1;
+    if (redoBtn) redoBtn.disabled = redoStack.length === 0;
+    
     saveResumeCloud();
 }
 
@@ -1983,12 +2032,12 @@ function runVersionComparison() {
 
 // Server-side PDF export trigger
 async function downloadResumePDF() {
-    const btn = document.querySelector('button[onclick="downloadResumePDF()"]') || document.getElementById('viewer-tab-btn-export');
+    const btn = document.querySelector('button[onclick="downloadResumePDF()"]');
     let originalHtml = "";
     if (btn) {
         btn.disabled = true;
         originalHtml = btn.innerHTML;
-        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Generating PDF...`;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Downloading...`;
     }
     
     const content = getFormContent();
@@ -2161,7 +2210,7 @@ async function downloadResumeJSON() {
     }
 }
 
-// Download local Text Audit report
+// Download text report
 function downloadATSReportText() {
     if (!lastATSFeedback) {
         alert("Please run ATS Analysis first to compile the diagnostic report.");
@@ -2202,7 +2251,7 @@ function downloadATSReportText() {
     a.remove();
 }
 
-// Generate shareable link
+// Share Link Public URL
 async function generateShareLink() {
     const select = document.getElementById("resume-version-select");
     const val = select.value;
@@ -2251,7 +2300,7 @@ function copyShareLink() {
     }
 }
 
-// Drag & Drop Parser File handlers
+// Drag & Drop File handler
 function setupUploadDragAndDrop() {
     const zone = document.getElementById("drop-zone-builder");
     const input = document.getElementById("resume-file-input-builder");
@@ -2333,7 +2382,7 @@ async function uploadFileAJAX(file, statusText) {
     }
 }
 
-// Side-by-side verification ATS grader
+// Side-by-side ATS checker
 async function triggerResumeATSAnalysis() {
     const atsBox = document.getElementById("ats-analysis-body");
     atsBox.innerHTML = `<div class="text-center py-2"><i class="fa-solid fa-spinner fa-spin text-muted me-2"></i> Graded via ATS check...</div>`;
@@ -2365,7 +2414,11 @@ async function triggerResumeATSAnalysis() {
             
             lastATSFeedback = data.feedback;
             renderATSFeedback(data.feedback);
-            setViewerTab("ats");
+            
+            // Switch mobile view tab to ATS if on screen < 1100px
+            if (window.innerWidth < 1100) {
+                setMobileTab("ats");
+            }
         } else {
             atsBox.innerHTML = `<p class="text-danger text-center mb-0">Check failed: ${data.error || "Unknown"}</p>`;
         }
@@ -2440,15 +2493,11 @@ function applySuggestion(index) {
 /* Premium Workspace styling rules */
 .resume-workspace-wrapper {
     display: grid;
-    grid-template-columns: 240px 1.1fr 1.3fr;
+    grid-template-columns: 1.15fr 1.35fr;
     gap: 20px;
     height: calc(100vh - 120px);
     overflow: hidden;
     box-sizing: border-box;
-}
-
-.editor-sidebar-column {
-    height: 100%;
 }
 
 .editor-form-column {
@@ -2459,34 +2508,7 @@ function applySuggestion(index) {
     height: 100%;
 }
 
-.sidebar-section-list {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    overflow-y: auto;
-}
-
-.sidebar-section-item {
-    padding: 10px 14px;
-    border-radius: 6px;
-    font-size: 0.82rem;
-    font-weight: 500;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.sidebar-section-item:hover {
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-}
-
-.sidebar-section-item.active {
-    background-color: var(--accent-color);
-    color: #fff !important;
-}
-
-/* Form Styles */
+/* Form inputs & styles */
 .form-label {
     display: block;
     font-size: 0.72rem;
@@ -2513,32 +2535,19 @@ function applySuggestion(index) {
     border-color: var(--accent-color);
 }
 
-/* Sub-Tabbed Viewer styles */
-.viewer-tabs-header {
-    width: 100%;
+.accordion-section {
+    transition: border-color 0.2s ease;
 }
 
-.viewer-tab-btn {
-    flex-grow: 1;
-    background: none;
-    border: none;
-    padding: 12px;
-    color: var(--text-secondary);
-    font-size: 0.78rem;
-    font-weight: 600;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s;
+.accordion-section summary {
+    font-weight: 700;
+    user-select: none;
+    outline: none;
+    padding: 2px 0;
 }
 
-.viewer-tab-btn:hover {
-    color: var(--text-primary);
-}
-
-.viewer-tab-btn.active {
-    color: var(--accent-color);
-    border-bottom-color: var(--accent-color);
-    background-color: rgba(99,102,241,0.04);
+.accordion-section[open] {
+    border-color: var(--accent-color) !important;
 }
 
 .resume-preview-sheet-wrapper {
@@ -2546,15 +2555,23 @@ function applySuggestion(index) {
     border-radius: 6px;
     overflow-x: auto;
     background-color: #eaeaea;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
 }
 
-/* 55 Themes selector elements */
-.templates-categories-bar::-webkit-scrollbar {
-    height: 4px;
+/* Template card list thumbnails */
+.templates-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
 }
-.templates-categories-bar::-webkit-scrollbar-thumb {
-    background: var(--border-color);
-    border-radius: 2px;
+
+.template-card-col {
+    width: calc(33.333% - 8px);
+    max-width: 150px;
+    box-sizing: border-box;
 }
 
 .template-card {
@@ -2568,14 +2585,96 @@ function applySuggestion(index) {
     background-color: rgba(99,102,241,0.04);
 }
 
-.export-card {
+/* Template Gallery Modal Styles */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 20px;
+}
+.modal-content-wrapper {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    width: 100%;
+    max-width: 900px;
+    border-radius: 12px;
+    padding: 24px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+.modal-tabs-header {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+.modal-tab-btn {
+    background: none;
+    border: 1px solid var(--border-color);
+    padding: 6px 14px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-radius: 20px;
+    cursor: pointer;
+    white-space: nowrap;
     transition: all 0.2s ease;
 }
-.export-card:hover {
-    border-color: var(--accent-color) !important;
-    background-color: rgba(99,102,241,0.04);
+.modal-tab-btn:hover {
+    border-color: var(--accent-color);
+    color: var(--text-primary);
+}
+.modal-tab-btn.active {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #ffffff;
+}
+.modal-templates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 16px;
+    overflow-y: auto;
+    max-height: 55vh;
+    padding-bottom: 10px;
+}
+.modal-templates-grid .template-card-col {
+    width: 100%;
+    max-width: none;
 }
 
+/* Export Dropdown menu styling */
+.dropdown-menu {
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--bg-secondary);
+    min-width: 160px;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+}
+.dropdown-item {
+    transition: background-color 0.15s;
+    cursor: pointer;
+    text-align: left;
+}
+.dropdown-item:hover {
+    background-color: var(--bg-primary);
+    color: var(--accent-color) !important;
+}
+
+/* Bullet list */
 .bullet-list {
     margin-top: 4px;
     margin-bottom: 4px;
@@ -2592,7 +2691,24 @@ function applySuggestion(index) {
     margin-bottom: 15px;
 }
 
-/* Print View override rules */
+.live-keyword-item {
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: var(--bg-tertiary);
+    color: var(--text-muted);
+}
+.live-keyword-item.matched {
+    background: var(--success-bg);
+    color: var(--success);
+    font-weight: 600;
+}
+.hover-scale {
+    transition: transform 0.15s ease;
+}
+.hover-scale:hover {
+    transform: scale(1.05);
+}
+
 @media print {
     body * {
         visibility: hidden;
@@ -2615,42 +2731,8 @@ function applySuggestion(index) {
     }
 }
 
-/* Tablet Layout: Two columns (Form + Preview), Hide Sidebar, Show section selection at top of form */
-@media (min-width: 768px) and (max-width: 1100px) {
-    .resume-workspace-wrapper {
-        display: grid !important;
-        grid-template-columns: 1fr 1.15fr !important;
-        gap: 15px !important;
-        height: calc(100vh - 120px) !important;
-        overflow: hidden !important;
-        padding-bottom: 0 !important;
-    }
-    
-    /* Hide the dashboard's main bottom navigation bar to prevent overlap */
-    .mobile-bottom-nav {
-        display: none !important;
-    }
-    
-    .editor-sidebar-column {
-        display: none !important;
-    }
-    
-    .editor-form-column, .visual-viewer-column {
-        display: block !important;
-        height: 100% !important;
-    }
-
-    #mobile-sections-header {
-        display: flex !important;
-    }
-    
-    .mobile-bottom-tabs-nav {
-        display: none !important;
-    }
-}
-
-/* Mobile Layout: Tab-based interface */
-@media (max-width: 767px) {
+/* Responsive configurations for small/medium screen devices */
+@media (max-width: 1099px) {
     .resume-workspace-wrapper {
         display: block !important;
         height: auto !important;
@@ -2658,18 +2740,13 @@ function applySuggestion(index) {
         padding-bottom: 75px !important;
     }
     
-    /* Hide the dashboard's main bottom navigation bar to prevent overlap */
+    /* Hide default dashboard bottom menu to prevent stacking */
     .mobile-bottom-nav {
         display: none !important;
     }
     
-    /* Adjust spacing */
     .main-with-sidebar {
         margin-bottom: 60px !important;
-    }
-    
-    .editor-sidebar-column {
-        display: none !important;
     }
     
     .editor-form-column, .visual-viewer-column {
@@ -2677,21 +2754,31 @@ function applySuggestion(index) {
         height: auto !important;
     }
     
+    /* Active tab displays based on wrapper state */
     .resume-workspace-wrapper.tab-edit .editor-form-column {
         display: block !important;
     }
     
-    .resume-workspace-wrapper.tab-preview .visual-viewer-column,
-    .resume-workspace-wrapper.tab-ats .visual-viewer-column,
-    .resume-workspace-wrapper.tab-templates .visual-viewer-column,
-    .resume-workspace-wrapper.tab-export .visual-viewer-column {
+    .resume-workspace-wrapper.tab-preview .visual-viewer-column {
+        display: block !important;
+    }
+    .resume-workspace-wrapper.tab-preview #resume-preview-sheet-wrapper-parent {
+        display: block !important;
+    }
+    .resume-workspace-wrapper.tab-preview #ats-dashboard-parent {
+        display: none !important;
+    }
+
+    .resume-workspace-wrapper.tab-ats .visual-viewer-column {
+        display: block !important;
+    }
+    .resume-workspace-wrapper.tab-ats #resume-preview-sheet-wrapper-parent {
+        display: none !important;
+    }
+    .resume-workspace-wrapper.tab-ats #ats-dashboard-parent {
         display: block !important;
     }
 
-    #mobile-sections-header {
-        display: flex !important;
-    }
-    
     .mobile-bottom-tabs-nav {
         display: flex !important;
         position: fixed;
@@ -2701,7 +2788,7 @@ function applySuggestion(index) {
         background-color: var(--bg-secondary);
         border-top: 1px solid var(--border-color);
         height: 60px;
-        z-index: 1010; /* Ensure on top */
+        z-index: 1010;
         box-sizing: border-box;
     }
     
@@ -2730,39 +2817,6 @@ function applySuggestion(index) {
     
     .mobile-tab-item.active {
         color: var(--accent-color);
-    }
-
-    /* Select Section Drawer container */
-    .mobile-menu-backdrop {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.5);
-        z-index: 1200;
-        display: none;
-    }
-    
-    .mobile-menu-pane {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background: var(--bg-secondary);
-        border-top-left-radius: 12px;
-        border-top-right-radius: 12px;
-        max-height: 70%;
-        overflow-y: auto;
-        z-index: 1201;
-        display: none;
-        box-sizing: border-box;
-    }
-
-    .mobile-menu-item {
-        color: var(--text-primary);
-        font-weight: 500;
-        font-size: 0.85rem;
     }
 }
 </style>
