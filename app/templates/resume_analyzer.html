@@ -3003,8 +3003,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 }
 
-/* Lock page scroll on desktop/tablet to force column scrolling */
-@media (min-width: 768px) {
+/* Lock page scroll on laptop/desktop viewports only to force column scrolling */
+@media (min-width: 1100px) {
     html, body {
         height: 100vh !important;
         overflow: hidden !important;
@@ -3022,57 +3022,42 @@ document.addEventListener("DOMContentLoaded", () => {
         box-sizing: border-box;
     }
     .resume-workspace-wrapper {
-        flex-grow: 1;
-        height: 0 !important;
-        min-height: 0;
-    }
-}
-
-/* Tablet viewport (768px - 1099px) styles */
-@media (min-width: 768px) and (max-width: 1099px) {
-    .resume-workspace-wrapper {
         display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        gap: 15px !important;
-        height: 100% !important;
+        grid-template-columns: 1.15fr 1.35fr !important;
+        gap: 20px !important;
+        height: 0 !important;
+        min-height: 0 !important;
+        flex-grow: 1 !important;
         overflow: hidden !important;
+        padding-bottom: 0 !important;
     }
     .editor-form-column, .visual-viewer-column {
         display: block !important;
         height: 100% !important;
+        width: auto !important;
+        margin-bottom: 0 !important;
     }
-    #resume-preview-sheet-wrapper-parent {
-        display: block !important;
-    }
-    #ats-dashboard-parent {
-        display: block !important;
-    }
-    .mobile-bottom-tabs-nav {
-        display: none !important;
+    .form-scroller {
+        height: 100% !important;
+        overflow-y: auto !important;
     }
 }
 
-/* Mobile viewport (< 768px) tabbed layout styles */
-@media (max-width: 767px) {
-    .resume-workspace-wrapper {
-        display: block !important;
+/* Stacked scrollable layout for mobile/tablet viewports (< 1100px) */
+@media (max-width: 1099px) {
+    html, body, .main-with-sidebar, .dashboard-inner-container, .resume-workspace-wrapper {
         height: auto !important;
         overflow: visible !important;
-        padding-bottom: 75px !important;
     }
-    
-    /* Hide default dashboard bottom menu to prevent stacking */
-    .mobile-bottom-nav {
-        display: none !important;
+    .resume-workspace-wrapper {
+        display: block !important;
+        padding-bottom: 40px !important;
     }
-    
-    .main-with-sidebar {
-        margin-bottom: 60px !important;
-    }
-    
     .editor-form-column, .visual-viewer-column {
-        display: none;
+        display: block !important;
+        width: 100% !important;
         height: auto !important;
+        margin-bottom: 30px !important;
     }
     .editor-form-column .flat-card, .visual-viewer-column .flat-card {
         height: auto !important;
@@ -3082,70 +3067,11 @@ document.addEventListener("DOMContentLoaded", () => {
         height: auto !important;
         overflow-y: visible !important;
     }
-    
-    /* Active tab displays based on wrapper state */
-    .resume-workspace-wrapper.tab-edit .editor-form-column {
-        display: block !important;
-    }
-    
-    .resume-workspace-wrapper.tab-preview .visual-viewer-column {
-        display: block !important;
-    }
-    .resume-workspace-wrapper.tab-preview #resume-preview-sheet-wrapper-parent {
-        display: block !important;
-    }
-    .resume-workspace-wrapper.tab-preview #ats-dashboard-parent {
-        display: none !important;
-    }
-
-    .resume-workspace-wrapper.tab-ats .visual-viewer-column {
-        display: block !important;
-    }
-    .resume-workspace-wrapper.tab-ats #resume-preview-sheet-wrapper-parent {
-        display: none !important;
-    }
-    .resume-workspace-wrapper.tab-ats #ats-dashboard-parent {
-        display: block !important;
-    }
-
     .mobile-bottom-tabs-nav {
-        display: flex !important;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background-color: var(--bg-secondary);
-        border-top: 1px solid var(--border-color);
-        height: 60px;
-        z-index: 1010;
-        box-sizing: border-box;
+        display: none !important;
     }
-    
-    .mobile-tab-item {
-        flex-grow: 1;
-        background: none;
-        border: none;
-        color: var(--text-secondary);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 4px;
-        cursor: pointer;
-        padding: 6px 0;
-    }
-    
-    .mobile-tab-item i {
-        font-size: 1.1rem;
-    }
-    
-    .mobile-tab-item span {
-        font-size: 0.62rem;
-        font-weight: 500;
-    }
-    
-    .mobile-tab-item.active {
-        color: var(--accent-color);
+    .mobile-bottom-nav {
+        display: none !important;
     }
 }
 </style>
