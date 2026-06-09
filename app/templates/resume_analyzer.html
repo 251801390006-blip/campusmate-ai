@@ -429,7 +429,7 @@
 
             <!-- Preview wrapper parent (A4 Resume render container) -->
             <div id="resume-preview-sheet-wrapper-parent">
-                <div class="resume-preview-sheet-wrapper border shadow-sm" style="background:#fff; padding: 25px; min-height:842px;">
+                <div class="resume-preview-sheet-wrapper border shadow-sm" style="padding: 15px; position: relative;">
                     <!-- A4 Sheet Paper -->
                     <div class="resume-sheet classic" id="resume-sheet-paper" style="font-family: 'Outfit', sans-serif;">
                         <div class="resume-render-header" style="border-bottom: 2px solid #2563eb; padding-bottom: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px;">
@@ -767,6 +767,10 @@ function setMobileTab(tabId) {
     if (workspace) {
         workspace.classList.remove("tab-edit", "tab-preview", "tab-ats");
         workspace.classList.add(`tab-${tabId}`);
+    }
+    
+    if (tabId === "preview") {
+        setTimeout(scaleResumePreview, 50);
     }
 }
 
@@ -1538,6 +1542,7 @@ function syncResumeFields() {
 
     scanKeywordsInline();
     pushState();
+    scaleResumePreview();
 }
 
 function scanKeywordsInline() {
@@ -2487,9 +2492,41 @@ function applySuggestion(index) {
         alert("Could not locate original text in input fields.");
     }
 }
+
+function scaleResumePreview() {
+    const paper = document.getElementById("resume-sheet-paper");
+    const wrapper = document.querySelector(".resume-preview-sheet-wrapper");
+    if (!paper || !wrapper) return;
+    
+    paper.style.transform = "none";
+    wrapper.style.height = "auto";
+    
+    const paperWidth = paper.offsetWidth || 794;
+    const paperHeight = paper.offsetHeight || 1123;
+    
+    const containerWidth = wrapper.clientWidth - 30; // subtract padding
+    
+    let scale = containerWidth / paperWidth;
+    if (scale > 1) scale = 1;
+    
+    paper.style.transform = `scale(${scale})`;
+    
+    const scaledHeight = paperHeight * scale;
+    wrapper.style.height = `${scaledHeight + 30}px`;
+}
+
+window.addEventListener("resize", scaleResumePreview);
+window.addEventListener("load", scaleResumePreview);
+document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(scaleResumePreview, 200);
+});
 </script>
 
 <style>
+/* Hide mobile bottom tabs on desktop/tablet by default */
+.mobile-bottom-tabs-nav {
+    display: none;
+}
 /* Premium Workspace styling rules */
 .resume-workspace-wrapper {
     display: grid;
@@ -2553,7 +2590,7 @@ function applySuggestion(index) {
 .resume-preview-sheet-wrapper {
     box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
     border-radius: 6px;
-    overflow-x: auto;
+    overflow: hidden;
     background-color: #eaeaea;
     display: flex;
     justify-content: center;
@@ -2621,6 +2658,10 @@ function applySuggestion(index) {
     padding-bottom: 8px;
     margin-bottom: 16px;
     border-bottom: 1px solid var(--border-color);
+    scrollbar-width: none; /* Firefox */
+}
+.modal-tabs-header::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
 }
 .modal-tab-btn {
     background: none;
@@ -2731,8 +2772,32 @@ function applySuggestion(index) {
     }
 }
 
-/* Responsive configurations for small/medium screen devices */
-@media (max-width: 1099px) {
+/* Tablet viewport (768px - 1099px) styles */
+@media (min-width: 768px) and (max-width: 1099px) {
+    .resume-workspace-wrapper {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 15px !important;
+        height: calc(100vh - 120px) !important;
+        overflow: hidden !important;
+    }
+    .editor-form-column, .visual-viewer-column {
+        display: block !important;
+        height: 100% !important;
+    }
+    #resume-preview-sheet-wrapper-parent {
+        display: block !important;
+    }
+    #ats-dashboard-parent {
+        display: block !important;
+    }
+    .mobile-bottom-tabs-nav {
+        display: none !important;
+    }
+}
+
+/* Mobile viewport (< 768px) tabbed layout styles */
+@media (max-width: 767px) {
     .resume-workspace-wrapper {
         display: block !important;
         height: auto !important;
@@ -2752,6 +2817,14 @@ function applySuggestion(index) {
     .editor-form-column, .visual-viewer-column {
         display: none;
         height: auto !important;
+    }
+    .editor-form-column .flat-card, .visual-viewer-column .flat-card {
+        height: auto !important;
+        overflow: visible !important;
+    }
+    .form-scroller {
+        height: auto !important;
+        overflow-y: visible !important;
     }
     
     /* Active tab displays based on wrapper state */

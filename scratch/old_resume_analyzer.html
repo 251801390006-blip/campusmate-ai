@@ -1,0 +1,1738 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Resume Builder - CampusMate AI{% endblock %}
+
+{% block header_title %}ATS Resume Builder{% endblock %}
+
+{% block content %}
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+<!-- Split-Screen Builder Workspace -->
+<div class="row g-4" style="height: calc(100vh - 120px); overflow: hidden;">
+    <!-- Left Column: Editor Controls -->
+    <div class="col-xl-5 h-100 d-flex flex-column">
+        <div class="flat-card h-100 d-flex flex-column bg-white border p-3" style="overflow: hidden;">
+            <!-- Editor Title & Version Selector -->
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
+                <div>
+                    <h3 class="fw-bold mb-0" style="font-size:1.05rem;"><i class="fa-solid fa-file-pen text-muted me-2"></i> Editor Sections</h3>
+                    <span id="save-status-badge" class="badge badge-success mt-1" style="font-size: 0.62rem;">Saved to Cloud</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <select id="resume-version-select" onchange="handleVersionChange()" style="padding:4px 8px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        <!-- Loaded dynamically from server -->
+                        <option value="new">+ Save New Version</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Scrollable Editor Sections Form -->
+            <div class="resume-form-scroller flex-grow-1 pe-2" style="overflow-y: auto; display: flex; flex-direction: column; gap: 16px;">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <h4 class="fw-bold text-secondary mb-0" style="font-size:0.75rem; text-transform:uppercase;"><i class="fa-solid fa-file-invoice text-muted me-1"></i> Workspace Control</h4>
+                    <div class="d-flex gap-1">
+                        <button id="btn-undo" class="btn btn-sm btn-light p-1 px-2 border" style="font-size:0.65rem; background: var(--bg-secondary); color: var(--text-primary); cursor: pointer;" onclick="undo()" title="Undo" disabled><i class="fa-solid fa-rotate-left"></i> Undo</button>
+                        <button id="btn-redo" class="btn btn-sm btn-light p-1 px-2 border" style="font-size:0.65rem; background: var(--bg-secondary); color: var(--text-primary); cursor: pointer;" onclick="redo()" title="Redo" disabled><i class="fa-solid fa-rotate-right"></i> Redo</button>
+                    </div>
+                </div>
+
+                <!-- Version Title -->
+                <div class="input-group">
+                    <label for="resume-title-field" class="fw-bold mb-1" style="font-size:0.72rem; text-transform:uppercase;">Version Title / Name</label>
+                    <input type="text" id="resume-title-field" value="My Master CV" onchange="triggerAutoSave()" style="width:100%; padding:6px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
+                </div>
+
+                <!-- Drag-and-Drop / Upload Zone -->
+                <div class="upload-zone-wrapper p-3 border rounded text-center" style="background-color: var(--bg-primary); border-color: var(--border-color); border-style: dashed !important; cursor: pointer;" id="drop-zone-builder">
+                    <i class="fa-solid fa-cloud-arrow-up text-muted mb-1" style="font-size: 1.5rem;"></i>
+                    <h4 style="font-size: 0.78rem;" class="fw-bold mb-0">Upload Existing Resume</h4>
+                    <p class="text-secondary mb-2" style="font-size: 0.65rem;">PDF or DOCX. AI will extract and populate fields below.</p>
+                    <span class="btn btn-sm btn-outline" style="font-size: 0.65rem; padding: 2px 8px;">Browse</span>
+                    <input type="file" id="resume-file-input-builder" style="display:none;" accept=".pdf,.docx">
+                    <div id="upload-status-text-builder" class="text-secondary mt-1" style="font-size: 0.68rem; display:none;"></div>
+                </div>
+
+                <!-- Section: Profile Details -->
+                <details class="accordion-section p-2 border rounded" style="border-color: var(--border-color); background-color: var(--bg-secondary);" open>
+                    <summary class="fw-bold text-secondary" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-user me-2 text-muted"></i> Profile & Contact Details</summary>
+                    <div class="mt-2 d-flex flex-column gap-2">
+                        <div class="input-group">
+                            <label for="res-name" class="fw-semibold mb-1" style="font-size:0.7rem;">Full Name</label>
+                            <input type="text" id="res-name" value="Alex Smith" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="input-group">
+                            <label for="res-address" class="fw-semibold mb-1" style="font-size:0.7rem;">Location Address</label>
+                            <input type="text" id="res-address" value="San Francisco, California, USA" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-sm-6">
+                                <label for="res-email" class="fw-semibold mb-1" style="font-size:0.7rem;">Email</label>
+                                <input type="email" id="res-email" value="alex.smith@example.edu" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="res-phone" class="fw-semibold mb-1" style="font-size:0.7rem;">Phone</label>
+                                <input type="text" id="res-phone" value="+1 (555) 019-2834" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                            </div>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-sm-6">
+                                <label for="res-linkedin" class="fw-semibold mb-1" style="font-size:0.7rem;">LinkedIn Link</label>
+                                <input type="text" id="res-linkedin" value="linkedin.com/in/alexsmith" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="res-github" class="fw-semibold mb-1" style="font-size:0.7rem;">GitHub Link</label>
+                                <input type="text" id="res-github" value="github.com/alexsmith" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="res-portfolio" class="fw-semibold mb-1" style="font-size:0.7rem;">Portfolio Link</label>
+                            <input type="text" id="res-portfolio" value="" placeholder="portfolio.smith" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Section: Education -->
+                <details class="accordion-section p-2 border rounded" style="border-color: var(--border-color); background-color: var(--bg-secondary);">
+                    <summary class="fw-bold text-secondary" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-graduation-cap me-2 text-muted"></i> Education</summary>
+                    <div class="mt-2 d-flex flex-column gap-2">
+                        <div class="input-group">
+                            <label for="res-edu1-inst" class="fw-semibold mb-1" style="font-size:0.7rem;">Institution Name</label>
+                            <input type="text" id="res-edu1-inst" value="State Tech University" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="input-group">
+                            <label for="res-edu1-degree" class="fw-semibold mb-1" style="font-size:0.7rem;">Degree / Major</label>
+                            <input type="text" id="res-edu1-degree" value="B.S. in Computer Science" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-sm-6">
+                                <label for="res-edu1-dates" class="fw-semibold mb-1" style="font-size:0.7rem;">Dates</label>
+                                <input type="text" id="res-edu1-dates" value="2024 ΓÇô 2028" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="res-edu1-gpa" class="fw-semibold mb-1" style="font-size:0.7rem;">GPA</label>
+                                <input type="text" id="res-edu1-gpa" value="3.8/4.0" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="res-edu1-coursework" class="fw-semibold mb-1" style="font-size:0.7rem;">Relevant Coursework</label>
+                            <input type="text" id="res-edu1-coursework" value="Data Structures, Cryptography, Database Systems, Computer Networks" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Section: Technical Skills -->
+                <details class="accordion-section p-2 border rounded" style="border-color: var(--border-color); background-color: var(--bg-secondary);">
+                    <summary class="fw-bold text-secondary" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-gears me-2 text-muted"></i> Skills</summary>
+                    <div class="mt-2 d-flex flex-column gap-2">
+                        <div class="input-group">
+                            <label for="res-skills-prog" class="fw-semibold mb-1" style="font-size:0.7rem;">Languages</label>
+                            <input type="text" id="res-skills-prog" value="Python, Java, Go" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="input-group">
+                            <label for="res-skills-cyber" class="fw-semibold mb-1" style="font-size:0.7rem;">Databases & Core CS</label>
+                            <input type="text" id="res-skills-cyber" value="PostgreSQL, MongoDB, REST APIs, System Design" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="input-group">
+                            <label for="res-skills-tools" class="fw-semibold mb-1" style="font-size:0.7rem;">Tools & Cloud</label>
+                            <input type="text" id="res-skills-tools" value="Git, Docker, VS Code, Command Line" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="input-group">
+                            <label for="res-skills-web" class="fw-semibold mb-1" style="font-size:0.7rem;">Web Frameworks</label>
+                            <input type="text" id="res-skills-web" value="HTML, CSS, Flask, React" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Section: Experience -->
+                <details class="accordion-section p-2 border rounded" style="border-color: var(--border-color); background-color: var(--bg-secondary);">
+                    <summary class="fw-bold text-secondary" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-briefcase me-2 text-muted"></i> Experience</summary>
+                    <div class="mt-2 d-flex flex-column gap-2">
+                        <div class="input-group">
+                            <label for="res-exp-role" class="fw-semibold mb-1" style="font-size:0.7rem;">Role</label>
+                            <input type="text" id="res-exp-role" value="Software Engineering Intern" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-sm-6">
+                                <label for="res-exp-comp" class="fw-semibold mb-1" style="font-size:0.7rem;">Company</label>
+                                <input type="text" id="res-exp-comp" value="Global Tech Solutions" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="res-exp-dates" class="fw-semibold mb-1" style="font-size:0.7rem;">Dates</label>
+                                <input type="text" id="res-exp-dates" value="June 2025 ΓÇô August 2025" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                            </div>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="fw-semibold mb-1" style="font-size:0.7rem;">Bullet Descriptions</label>
+                            <input type="text" id="res-exp-b1" class="form-control res-bullet-input mb-1" value="Contributed to the design and development of automated data analysis pipelines." oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                            <input type="text" id="res-exp-b2" class="form-control res-bullet-input mb-1" value="Implemented secure coding practices using Python and Flask for backend APIs." oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                            <input type="text" id="res-exp-b3" class="form-control res-bullet-input mb-1" value="Supported data migration and JWT authentication modules to improve security." oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                            <input type="text" id="res-exp-b4" class="form-control res-bullet-input" value="Collaborated with engineers to test and refine code architectures for improved reliability." oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+
+                        <!-- Action Verb Prepend Assistant -->
+                        <div class="p-2 border rounded" style="background: var(--bg-primary); border-color: var(--border-color) !important;">
+                            <span class="fw-bold d-block text-secondary mb-1" style="font-size:0.65rem; text-transform:uppercase;"><i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> Prepend Action Verbs</span>
+                            <div class="d-flex flex-wrap gap-1">
+                                <span class="badge badge-info cursor-pointer hover-scale" onclick="insertActionVerb('Architected')" style="font-size:0.65rem;">Architected</span>
+                                <span class="badge badge-info cursor-pointer hover-scale" onclick="insertActionVerb('Engineered')" style="font-size:0.65rem;">Engineered</span>
+                                <span class="badge badge-info cursor-pointer hover-scale" onclick="insertActionVerb('Optimized')" style="font-size:0.65rem;">Optimized</span>
+                                <span class="badge badge-info cursor-pointer hover-scale" onclick="insertActionVerb('Automated')" style="font-size:0.65rem;">Automated</span>
+                                <span class="badge badge-info cursor-pointer hover-scale" onclick="insertActionVerb('Hardened')" style="font-size:0.65rem;">Hardened</span>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Section: Projects -->
+                <details class="accordion-section p-2 border rounded" style="border-color: var(--border-color); background-color: var(--bg-secondary);">
+                    <summary class="fw-bold text-secondary" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-code me-2 text-muted"></i> Projects</summary>
+                    <div class="mt-2 d-flex flex-column gap-2">
+                        <div class="input-group">
+                            <label for="res-proj-title" class="fw-semibold mb-1" style="font-size:0.7rem;">Project Name</label>
+                            <input type="text" id="res-proj-title" value="CampusMate AI ΓÇô Student Learning Workspace" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="input-group">
+                            <label for="res-proj-link" class="fw-semibold mb-1" style="font-size:0.7rem;">Repository Link</label>
+                            <input type="text" id="res-proj-link" value="github.com/alexsmith/campusmate-ai" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="input-group">
+                            <label class="fw-semibold mb-1" style="font-size:0.7rem;">Project Details</label>
+                            <input type="text" id="res-proj-b1" class="form-control res-bullet-input mb-1" value="Developed a secure Flask web application with SQLAlchemy relational database layers to track student curriculum nodes." oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                            <input type="text" id="res-proj-b2" class="form-control res-bullet-input mb-1" value="Integrated Google Gemini APIs using GenAI SDK to generate personalized visual learning roadmaps dynamically." oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                            <input type="text" id="res-proj-b3" class="form-control res-bullet-input" value="Designed mobile-friendly dashboard views using modern HSL CSS variables, supporting seamless dark/day mode themes." oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Section: Certifications -->
+                <details class="accordion-section p-2 border rounded" style="border-color: var(--border-color); background-color: var(--bg-secondary);">
+                    <summary class="fw-bold text-secondary" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-award me-2 text-muted"></i> Certifications</summary>
+                    <div class="mt-2 d-flex flex-column gap-2">
+                        <div class="input-group">
+                            <label class="fw-semibold mb-1" style="font-size:0.7rem;">List Certifications</label>
+                            <input type="text" id="res-cert-c1" class="form-control mb-1" value="AWS Certified Solutions Architect (Associate)" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                            <input type="text" id="res-cert-c2" class="form-control mb-1" value="Google Cloud Digital Leader Certification" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                            <input type="text" id="res-cert-c3" class="form-control mb-1" value="Meta Front-End Developer Professional Certificate" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                            <input type="text" id="res-cert-c4" class="form-control" value="Python Course for Beginners: Mastering the Essentials (Scaler)" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Section: Extra Details (Optional) -->
+                <details class="accordion-section p-2 border rounded" style="border-color: var(--border-color); background-color: var(--bg-secondary);">
+                    <summary class="fw-bold text-secondary" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-square-plus me-2 text-muted"></i> Extra Details (Optional)</summary>
+                    <div class="mt-2 d-flex flex-column gap-2">
+                        <div class="input-group">
+                            <label for="res-achievements" class="fw-semibold mb-1" style="font-size:0.7rem;">Achievements & Awards</label>
+                            <input type="text" id="res-achievements" value="Dean's List 2025, First Place CodeQuest Hackathon" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="input-group">
+                            <label for="res-hackathons" class="fw-semibold mb-1" style="font-size:0.7rem;">Hackathons</label>
+                            <input type="text" id="res-hackathons" value="Participated in DevFest 24, Smart India Hackathon 25" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="input-group">
+                            <label for="res-workshops" class="fw-semibold mb-1" style="font-size:0.7rem;">Workshops & Seminars</label>
+                            <input type="text" id="res-workshops" value="Attended AWS Cloud Practitioner Immersion Day" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="input-group">
+                            <label for="res-languages" class="fw-semibold mb-1" style="font-size:0.7rem;">Languages</label>
+                            <input type="text" id="res-languages" value="English (Fluent), Spanish (Conversational)" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="input-group">
+                            <label for="res-interests" class="fw-semibold mb-1" style="font-size:0.7rem;">Interests & Hobbies</label>
+                            <input type="text" id="res-interests" value="Cryptography, Robotics, Open Source Contributing" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Section: Reorder Drag Layout toolbar -->
+                <details class="accordion-section p-2 border rounded mb-3" style="border-color: var(--border-color); background-color: var(--bg-secondary);">
+                    <summary class="fw-bold text-secondary" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-arrows-up-down me-2 text-muted"></i> Arrange / Reorder Sections</summary>
+                    <div class="mt-2 d-flex flex-column gap-2" id="reorder-sections-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </details>
+            </div>
+
+            <!-- Editor Action Buttons Footer -->
+            <div class="d-flex gap-2 pt-3 border-top mt-3" style="border-color: var(--border-color);">
+                <button class="btn btn-outline flex-grow-1 py-2" onclick="saveResumeCloud()"><i class="fa-solid fa-cloud-arrow-up"></i> Save Cloud Draft</button>
+                <button class="btn btn-primary flex-grow-1 py-2" onclick="triggerResumeATSAnalysis()">Analyze ATS <i class="fa-solid fa-wand-magic-sparkles"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Visual Preview & ATS Diagnostics -->
+    <div class="col-xl-7 h-100 d-flex flex-column" style="overflow-y: auto;">
+        <!-- Theme & Layout Toolbar -->
+        <div class="flat-card bg-white border p-3 mb-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div class="d-flex align-items-center gap-2" style="font-size:0.8rem;">
+                <label for="resume-theme-select" class="fw-bold text-secondary">A4 Template Style:</label>
+                <select id="resume-theme-select" onchange="changeResumeTheme()" style="padding:4px 8px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
+                    <optgroup label="ATS Professional">
+                        <option value="ats-classic">ATS Classic Executive</option>
+                        <option value="ats-modern" selected>ATS Modern Professional</option>
+                        <option value="ats-minimal">ATS Clean Minimalist</option>
+                        <option value="ats-compact">ATS Compact Standard</option>
+                        <option value="ats-formal">ATS Formal Traditional</option>
+                    </optgroup>
+                    <optgroup label="Modern">
+                        <option value="modern-teal">Modern Teal Accent</option>
+                        <option value="modern-slate">Modern Slate Clean</option>
+                        <option value="modern-indigo">Modern Indigo Startup</option>
+                        <option value="modern-coral">Modern Coral Serif</option>
+                        <option value="modern-glass">Modern Glassmorphism Accent</option>
+                    </optgroup>
+                    <optgroup label="Microsoft Style">
+                        <option value="ms-learn">MS Learn Blue</option>
+                        <option value="ms-docs">MS Technical Writer</option>
+                        <option value="ms-azure">Azure Cloud Engineer</option>
+                        <option value="ms-office">MS Classic Corporate</option>
+                        <option value="ms-team">MS Collaborative Lead</option>
+                    </optgroup>
+                    <optgroup label="Student">
+                        <option value="student-academic">Student Academic CV</option>
+                        <option value="student-entry">Student Entry Level</option>
+                        <option value="student-grad">Graduate Fellowship</option>
+                        <option value="student-campus">Campus Leader</option>
+                        <option value="student-scholar">Scholar Traditional</option>
+                    </optgroup>
+                    <optgroup label="Internship">
+                        <option value="intern-general">General Internship Entry</option>
+                        <option value="intern-tech">Tech Intern Prep</option>
+                        <option value="intern-business">Corporate Intern Clean</option>
+                        <option value="intern-creative">Creative Intern Portfolio</option>
+                        <option value="intern-research">Research Assistant</option>
+                    </optgroup>
+                    <optgroup label="Cyber Security">
+                        <option value="cyber-mono">Cyber Terminal Mono</option>
+                        <option value="cyber-dark">Cyber Dark Operations</option>
+                        <option value="cyber-shield">Cyber Shield Defensive</option>
+                        <option value="cyber-matrix">Cyber Matrix Green</option>
+                        <option value="cyber-audit">Cyber Compliance Auditor</option>
+                    </optgroup>
+                    <optgroup label="Software Engineering">
+                        <option value="swe-git">Git Committer Style</option>
+                        <option value="swe-fullstack">Full Stack Web Engineer</option>
+                        <option value="swe-backend">Backend System Architect</option>
+                        <option value="swe-frontend">Frontend UI/UX Developer</option>
+                        <option value="swe-cloud">Cloud Infrastructure Engineer</option>
+                    </optgroup>
+                    <optgroup label="AI/ML">
+                        <option value="ai-tensor">Tensor Graph ML Engineer</option>
+                        <option value="ai-neural">Neural Network Scientist</option>
+                        <option value="ai-agent">Agentic AI Engineer</option>
+                        <option value="ai-vision">CV/NLP Specialist</option>
+                        <option value="ai-prompt">Prompt Engineer & Analyst</option>
+                    </optgroup>
+                    <optgroup label="Minimal">
+                        <option value="minimal-light">Minimalist Light Standard</option>
+                        <option value="minimal-dark">Minimalist Dark Elegant</option>
+                        <option value="minimal-border">Minimal Border Accent</option>
+                        <option value="minimal-compact">Minimal Compact Line</option>
+                        <option value="minimal-swiss">Swiss Design Editorial</option>
+                    </optgroup>
+                    <optgroup label="Executive">
+                        <option value="exec-director">Executive Director Gold</option>
+                        <option value="exec-vp">VP Operations Slate</option>
+                        <option value="exec-board">Board Member Classic</option>
+                        <option value="exec-legal">Legal Counsel Formal</option>
+                        <option value="exec-partner">Managing Partner Royal</option>
+                    </optgroup>
+                </select>
+
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline" onclick="downloadResumePDF()"><i class="fa-solid fa-download"></i> PDF Resume</button>
+                <button class="btn btn-sm btn-outline" onclick="printResume()"><i class="fa-solid fa-print"></i> Print Resume</button>
+            </div>
+        </div>
+
+        <!-- Before / After Optimization Panel -->
+        <div class="flat-card bg-white border p-3 mb-3" id="before-after-card" style="display:none;">
+            <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom" style="border-color:var(--border-color);">
+                <h4 style="font-size:0.8rem;" class="fw-bold text-secondary mb-0"><i class="fa-solid fa-code-compare text-cyan"></i> Optimization Comparison Preview</h4>
+                <button class="btn-close" onclick="document.getElementById('before-after-card').style.display='none'" style="background:none; border:none; font-size:10px;"><i class="fa-solid fa-x"></i></button>
+            </div>
+            <div class="row g-2">
+                <div class="col-6">
+                    <div class="p-2 border rounded bg-light" style="font-size:0.7rem; min-height:60px;">
+                        <span class="text-danger d-block fw-bold mb-1">Before:</span>
+                        <div id="compare-original" class="text-secondary italic">"Responsible for coding the backend of the student project application."</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-2 border rounded" style="font-size:0.7rem; background: rgba(16,185,129,0.02); border-color: rgba(16,185,129,0.2) !important; min-height:60px;">
+                        <span class="text-success d-block fw-bold mb-1">After (Optimized):</span>
+                        <div id="compare-optimized" class="text-secondary fw-semibold">"Architected performant relational database schemas and API routing structures in Flask, reducing API controller latency by 20%."</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sheet Preview Wrapper -->
+        <div class="resume-preview-sheet-wrapper border shadow-sm mb-4" style="background:#fff; padding: 20px; min-height:842px;">
+            <!-- A4 Sheet Paper -->
+            <div class="resume-sheet modern-ats" id="resume-sheet-paper" style="font-family: 'Outfit', sans-serif;">
+                <div class="resume-render-header" style="border-bottom: 2px solid #2563eb; padding-bottom: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px;">
+                    <div style="flex-grow: 1;">
+                        <h1 id="res-render-name" style="font-size: 22px; font-weight:800; color: #1e3a8a; margin-bottom: 4px; text-transform: uppercase;">Alex Smith</h1>
+                        <div class="resume-render-meta" style="font-size: 11px; color: #4b5563; line-height: 1.4;">
+                            <span id="res-render-address"><i class="fa-solid fa-location-dot me-1 text-muted"></i> San Francisco, California, USA</span> | 
+                            <span id="res-render-email"><i class="fa-solid fa-envelope me-1 text-muted"></i> alex.smith@example.edu</span><br>
+                            <span id="res-render-phone"><i class="fa-solid fa-phone me-1 text-muted"></i> +1 (555) 019-2834</span> | 
+                            <span id="res-render-linkedin"><i class="fa-brands fa-linkedin me-1 text-muted"></i> linkedin.com/in/alexsmith</span> | 
+                            <span id="res-render-links"><i class="fa-brands fa-github me-1 text-muted"></i> github.com/alexsmith</span>
+                            <span id="res-render-portfolio-wrapper" style="display: none;"> | <i class="fa-solid fa-globe me-1 text-muted"></i> <span id="res-render-portfolio"></span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="resume-sections-container">
+                    <!-- Section: Education -->
+                    <div class="resume-render-section" data-section="education" style="margin-bottom:14px;">
+                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Education</h3>
+                        <div>
+                            <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
+                                <span id="res-render-edu1-inst">State Tech University</span>
+                                <span id="res-render-edu1-degree" style="font-weight:normal;">B.S. in Computer Science</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:10px; color:#6b7280; margin-top:1px;">
+                                <span id="res-render-edu1-dates">2024 ΓÇô 2028</span>
+                                <span>GPA: <strong id="res-render-edu1-gpa">3.8/4.0</strong></span>
+                            </div>
+                            <div style="font-size:10px; margin-top:2px; color:#4b5563;" id="res-render-edu1-coursework">
+                                Relevant Coursework: Data Structures, Cryptography, Database Systems, Computer Networks
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section: Skills -->
+                    <div class="resume-render-section" data-section="skills" style="margin-bottom:14px;">
+                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Technical Skills</h3>
+                        <div style="font-size:10.5px; line-height:1.4; color:#374151;">
+                            <div><strong>Languages:</strong> <span id="res-render-skills-prog">Python, Java, Go</span></div>
+                            <div><strong>Databases & Core CS:</strong> <span id="res-render-skills-cyber">PostgreSQL, MongoDB, REST APIs, System Design</span></div>
+                            <div><strong>Tools & Cloud:</strong> <span id="res-render-skills-tools">Git, Docker, VS Code, Command Line</span></div>
+                            <div><strong>Frameworks:</strong> <span id="res-render-skills-web">HTML, CSS, Flask, React</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Section: Experience -->
+                    <div class="resume-render-section" data-section="experience" style="margin-bottom:14px;">
+                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Experience</h3>
+                        <div>
+                            <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
+                                <span id="res-render-exp-role">Software Engineering Intern</span>
+                                <span id="res-render-exp-dates">June 2025 ΓÇô August 2025</span>
+                            </div>
+                            <div style="font-size:10.5px; font-style:italic; color:#6b7280; margin-bottom:2px;" id="res-render-exp-comp">Global Tech Solutions</div>
+                            <ul class="bullet-list" style="font-size:10px; margin-left:14px; margin-top:2px; line-height:1.4; color:#374151;">
+                                <li id="res-render-exp-b1">Contributed to the design and development of automated data analysis pipelines.</li>
+                                <li id="res-render-exp-b2">Implemented secure coding practices using Python and Flask for backend APIs.</li>
+                                <li id="res-render-exp-b3">Supported data migration and JWT authentication modules to improve security.</li>
+                                <li id="res-render-exp-b4">Collaborated with engineers to test and refine code architectures for improved reliability.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Section: Projects -->
+                    <div class="resume-render-section" data-section="projects" style="margin-bottom:14px;">
+                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Projects</h3>
+                        <div>
+                            <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
+                                <span id="res-render-proj-title">CampusMate AI ΓÇô Student Learning Workspace</span>
+                                <span id="res-render-proj-link" style="font-weight:normal; font-size:10px; color:#4b5563;">github.com/alexsmith/campusmate-ai</span>
+                            </div>
+                            <ul class="bullet-list" style="font-size:10px; margin-left:14px; margin-top:2px; line-height:1.4; color:#374151;">
+                                <li id="res-render-proj-b1">Developed a secure Flask web application with SQLAlchemy relational database layers to track student curriculum nodes.</li>
+                                <li id="res-render-proj-b2">Integrated Google Gemini APIs using GenAI SDK to generate personalized visual learning roadmaps dynamically.</li>
+                                <li id="res-render-proj-b3">Designed mobile-friendly dashboard views using modern HSL CSS variables, supporting seamless dark/day mode themes.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Section: Certifications -->
+                    <div class="resume-render-section" data-section="certifications" style="margin-bottom:14px;">
+                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Certifications</h3>
+                        <ul class="bullet-list" style="font-size:10px; margin-left:14px; margin-top:2px; line-height:1.4; color:#374151;">
+                            <li id="res-render-cert-c1">AWS Certified Solutions Architect (Associate)</li>
+                            <li id="res-render-cert-c2">Google Cloud Digital Leader Certification</li>
+                            <li id="res-render-cert-c3">Meta Front-End Developer Professional Certificate</li>
+                            <li id="res-render-cert-c4">Python Course for Beginners: Mastering the Essentials (Scaler)</li>
+                        </ul>
+                    </div>
+
+                    <!-- Section: Achievements -->
+                    <div class="resume-render-section" data-section="achievements" style="margin-bottom:14px; display:none;">
+                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Achievements</h3>
+                        <div id="res-render-achievements" style="font-size:10px; line-height:1.4; color:#374151;"></div>
+                    </div>
+
+                    <!-- Section: Hackathons -->
+                    <div class="resume-render-section" data-section="hackathons" style="margin-bottom:14px; display:none;">
+                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Hackathons & Workshops</h3>
+                        <div id="res-render-hackathons" style="font-size:10px; line-height:1.4; color:#374151;"></div>
+                    </div>
+
+                    <!-- Section: Languages -->
+                    <div class="resume-render-section" data-section="languages" style="margin-bottom:14px; display:none;">
+                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Languages & Interests</h3>
+                        <div style="font-size:10px; line-height:1.4; color:#374151;">
+                            <div id="res-render-languages-row" style="display:none;"><strong>Languages:</strong> <span id="res-render-languages"></span></div>
+                            <div id="res-render-interests-row" style="display:none;"><strong>Interests:</strong> <span id="res-render-interests"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- ATS Scoring visual metrics dashboard -->
+        <div class="flat-card bg-white border p-3 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
+                <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-chart-bar text-muted me-2"></i> ATS Sub-Scores Dashboard</h3>
+                <span id="score-text-main" class="fw-extrabold text-secondary" style="font-size:1.15rem; color: var(--neon-blue) !important;">80/100</span>
+            </div>
+            
+            <div class="row g-3">
+                <div class="col-sm-6">
+                    <div class="d-flex justify-content-between align-items-center mb-1" style="font-size:0.75rem;">
+                        <span class="text-secondary fw-semibold">Formatting Score</span>
+                        <span id="score-format" class="fw-bold">85%</span>
+                    </div>
+                    <div class="progress-bar-container" style="background:var(--bg-tertiary); height:5px; border-radius:3px;">
+                        <div id="bar-format" class="progress-bar-fill" style="background: var(--info); width:85%; height:100%;"></div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="d-flex justify-content-between align-items-center mb-1" style="font-size:0.75rem;">
+                        <span class="text-secondary fw-semibold">Keyword Score</span>
+                        <span id="score-keyword" class="fw-bold">75%</span>
+                    </div>
+                    <div class="progress-bar-container" style="background:var(--bg-tertiary); height:5px; border-radius:3px;">
+                        <div id="bar-keyword" class="progress-bar-fill" style="background: var(--neon-blue); width:75%; height:100%;"></div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="d-flex justify-content-between align-items-center mb-1" style="font-size:0.75rem;">
+                        <span class="text-secondary fw-semibold">Readability Score</span>
+                        <span id="score-readability" class="fw-bold">80%</span>
+                    </div>
+                    <div class="progress-bar-container" style="background:var(--bg-tertiary); height:5px; border-radius:3px;">
+                        <div id="bar-readability" class="progress-bar-fill" style="background: var(--warning); width:80%; height:100%;"></div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="d-flex justify-content-between align-items-center mb-1" style="font-size:0.75rem;">
+                        <span class="text-secondary fw-semibold">Skills Relevance</span>
+                        <span id="score-skills" class="fw-bold">85%</span>
+                    </div>
+                    <div class="progress-bar-container" style="background:var(--bg-tertiary); height:5px; border-radius:3px;">
+                        <div id="bar-skills" class="progress-bar-fill" style="background: var(--success); width:85%; height:100%;"></div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="d-flex justify-content-between align-items-center mb-1" style="font-size:0.75rem;">
+                        <span class="text-secondary fw-semibold">Recruiter Score</span>
+                        <span id="score-recruiter" class="fw-bold">82%</span>
+                    </div>
+                    <div class="progress-bar-container" style="background:var(--bg-tertiary); height:5px; border-radius:3px;">
+                        <div id="bar-recruiter" class="progress-bar-fill" style="background: var(--info); width:82%; height:100%;"></div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="d-flex justify-content-between align-items-center mb-1" style="font-size:0.75rem;">
+                        <span class="text-secondary fw-semibold">Project Score</span>
+                        <span id="score-project" class="fw-bold">78%</span>
+                    </div>
+                    <div class="progress-bar-container" style="background:var(--bg-tertiary); height:5px; border-radius:3px;">
+                        <div id="bar-project" class="progress-bar-fill" style="background: var(--neon-blue); width:78%; height:100%;"></div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Keyword checklist -->
+            <div class="mt-3 p-3 border rounded bg-light" style="border-color: var(--border-color) !important;">
+                <span class="fw-bold text-secondary d-block mb-2" style="font-size:0.7rem; text-transform:uppercase;"><i class="fa-solid fa-satellite-dish text-cyan"></i> Real-time Keyword Alignment Check</span>
+                <div id="live-keywords-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap:6px;">
+                    <div class="live-keyword-item" id="kw-python" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Python</div>
+                    <div class="live-keyword-item" id="kw-flask" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Flask</div>
+                    <div class="live-keyword-item" id="kw-docker" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Docker</div>
+                    <div class="live-keyword-item" id="kw-wireshark" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Wireshark</div>
+                    <div class="live-keyword-item" id="kw-git" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Git</div>
+                    <div class="live-keyword-item" id="kw-react" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> React</div>
+                </div>
+            </div>
+
+            <div class="ats-body mt-3" id="ats-analysis-body" style="font-size:0.75rem;">
+                <p class="text-muted text-center italic mb-0">Run 'Analyze ATS' to see custom phrasing suggestions and warnings.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/html2pdf.bundle.min.js') }}"></script>
+<script>
+let activeBulletInput = null;
+let savedVersions = [];
+let lastATSFeedback = null;
+let sectionOrder = ["education", "skills", "experience", "projects", "certifications", "achievements", "hackathons", "languages"];
+let undoStack = [];
+let redoStack = [];
+let isApplyingState = false;
+let autoSaveTimeout = null;
+let saveStateDebounce = null;
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Register bullet points inputs
+    document.querySelectorAll(".res-bullet-input").forEach(input => {
+        input.addEventListener("focus", () => {
+            activeBulletInput = input;
+        });
+    });
+
+    setupUploadDragAndDrop();
+    loadVersionsFromCloud();
+    renderReorderUI();
+    syncResumeFields();
+    setupChangeTracking();
+
+    // Push base state on load
+    setTimeout(() => {
+        pushToUndoStack();
+    }, 200);
+});
+
+function setupChangeTracking() {
+    const formScroller = document.querySelector(".resume-form-scroller");
+    if (!formScroller) return;
+    
+    formScroller.addEventListener("input", (e) => {
+        if (isApplyingState) return;
+        
+        // Debounce undo stack pushes (500ms)
+        clearTimeout(saveStateDebounce);
+        saveStateDebounce = setTimeout(() => {
+            pushToUndoStack();
+        }, 500);
+        
+        // Debounce auto save to cloud (1s debounce)
+        clearTimeout(autoSaveTimeout);
+        autoSaveTimeout = setTimeout(() => {
+            saveResumeCloud();
+        }, 1000);
+    });
+}
+
+function pushToUndoStack() {
+    const currentState = JSON.stringify(getFormContent());
+    if (undoStack.length === 0 || undoStack[undoStack.length - 1] !== currentState) {
+        undoStack.push(currentState);
+        if (undoStack.length > 50) undoStack.shift();
+        redoStack = [];
+        updateUndoRedoButtons();
+    }
+}
+
+function updateUndoRedoButtons() {
+    const undoBtn = document.getElementById("btn-undo");
+    const redoBtn = document.getElementById("btn-redo");
+    if (undoBtn) undoBtn.disabled = undoStack.length <= 1;
+    if (redoBtn) redoBtn.disabled = redoStack.length === 0;
+}
+
+function undo() {
+    if (undoStack.length <= 1) return;
+    isApplyingState = true;
+    const currentState = undoStack.pop();
+    redoStack.push(currentState);
+    const previousState = undoStack[undoStack.length - 1];
+    populateForm(JSON.parse(previousState));
+    syncResumeFields();
+    isApplyingState = false;
+    updateUndoRedoButtons();
+    saveResumeCloud();
+}
+
+function redo() {
+    if (redoStack.length === 0) return;
+    isApplyingState = true;
+    const nextState = redoStack.pop();
+    undoStack.push(nextState);
+    populateForm(JSON.parse(nextState));
+    syncResumeFields();
+    isApplyingState = false;
+    updateUndoRedoButtons();
+    saveResumeCloud();
+}
+
+function insertActionVerb(verb) {
+    if (!activeBulletInput) {
+        activeBulletInput = document.getElementById("res-exp-b1");
+    }
+    if (!activeBulletInput) return;
+    
+    const originalValue = activeBulletInput.value.trim();
+    const beforeAfterCard = document.getElementById("before-after-card");
+    const originalText = document.getElementById("compare-original");
+    const optimizedText = document.getElementById("compare-optimized");
+    
+    if (originalValue !== "") {
+        if (beforeAfterCard && originalText && optimizedText) {
+            originalText.innerText = `"${originalValue}"`;
+            const newVal = verb + " " + activeBulletInput.value.charAt(0).toLowerCase() + activeBulletInput.value.slice(1);
+            activeBulletInput.value = newVal;
+            optimizedText.innerText = `"${newVal}"`;
+            beforeAfterCard.style.display = "block";
+        } else {
+            activeBulletInput.value = verb + " " + activeBulletInput.value;
+        }
+    } else {
+        activeBulletInput.value = verb + " ";
+    }
+    
+    syncResumeFields();
+    activeBulletInput.focus();
+}
+
+function syncResumeFields() {
+    // Header
+    const nameVal = document.getElementById("res-name").value || "Alex Smith";
+    document.getElementById("res-render-name").innerText = nameVal;
+    document.getElementById("res-render-address").innerHTML = `<i class="fa-solid fa-location-dot me-1 text-muted"></i> ` + (document.getElementById("res-address").value || "San Francisco, California, USA");
+    document.getElementById("res-render-email").innerHTML = `<i class="fa-solid fa-envelope me-1 text-muted"></i> ` + (document.getElementById("res-email").value || "name@university.edu");
+    document.getElementById("res-render-phone").innerHTML = `<i class="fa-solid fa-phone me-1 text-muted"></i> ` + (document.getElementById("res-phone").value || "+1 (555) 000-0000");
+    document.getElementById("res-render-linkedin").innerHTML = `<i class="fa-brands fa-linkedin me-1 text-muted"></i> ` + (document.getElementById("res-linkedin").value || "linkedin.com/in/username");
+    document.getElementById("res-render-links").innerHTML = `<i class="fa-brands fa-github me-1 text-muted"></i> ` + (document.getElementById("res-github").value || "github.com/username");
+    
+    // Portfolio
+    const portfolioVal = document.getElementById("res-portfolio") ? document.getElementById("res-portfolio").value : "";
+    const portfolioWrap = document.getElementById("res-render-portfolio-wrapper");
+    if (portfolioVal && portfolioWrap) {
+        document.getElementById("res-render-portfolio").innerText = portfolioVal;
+        portfolioWrap.style.display = "inline";
+    } else if (portfolioWrap) {
+        portfolioWrap.style.display = "none";
+    }
+
+    // Education
+    const eduInst = document.getElementById("res-edu1-inst").value.trim();
+    const eduDegree = document.getElementById("res-edu1-degree").value.trim();
+    const eduDates = document.getElementById("res-edu1-dates").value.trim();
+    const eduGpa = document.getElementById("res-edu1-gpa").value.trim();
+    const eduSec = document.querySelector('[data-section="education"]');
+    if (eduSec) {
+        if (!eduInst && !eduDegree) {
+            eduSec.style.display = "none";
+        } else {
+            eduSec.style.display = "block";
+            document.getElementById("res-render-edu1-inst").innerText = eduInst || "";
+            document.getElementById("res-render-edu1-degree").innerText = eduDegree || "";
+            document.getElementById("res-render-edu1-dates").innerText = eduDates || "";
+            document.getElementById("res-render-edu1-gpa").innerText = eduGpa || "";
+            
+            const courseworkVal = document.getElementById("res-edu1-coursework").value;
+            const cwEl = document.getElementById("res-render-edu1-coursework");
+            if (courseworkVal && cwEl) {
+                cwEl.innerHTML = `Relevant Coursework: ` + courseworkVal;
+                cwEl.style.display = "block";
+            } else if (cwEl) {
+                cwEl.style.display = "none";
+            }
+        }
+    }
+    
+    // Skills
+    const skillsProg = document.getElementById("res-skills-prog").value.trim();
+    const skillsCyber = document.getElementById("res-skills-cyber").value.trim();
+    const skillsTools = document.getElementById("res-skills-tools").value.trim();
+    const skillsWeb = document.getElementById("res-skills-web").value.trim();
+    const skillsSec = document.querySelector('[data-section="skills"]');
+    if (skillsSec) {
+        if (!skillsProg && !skillsCyber && !skillsTools && !skillsWeb) {
+            skillsSec.style.display = "none";
+        } else {
+            skillsSec.style.display = "block";
+            document.getElementById("res-render-skills-prog").innerText = skillsProg || "";
+            document.getElementById("res-render-skills-cyber").innerText = skillsCyber || "";
+            document.getElementById("res-render-skills-tools").innerText = skillsTools || "";
+            document.getElementById("res-render-skills-web").innerText = skillsWeb || "";
+            
+            document.getElementById("res-render-skills-prog").parentElement.style.display = skillsProg ? "block" : "none";
+            document.getElementById("res-render-skills-cyber").parentElement.style.display = skillsCyber ? "block" : "none";
+            document.getElementById("res-render-skills-tools").parentElement.style.display = skillsTools ? "block" : "none";
+            document.getElementById("res-render-skills-web").parentElement.style.display = skillsWeb ? "block" : "none";
+        }
+    }
+    
+    // Experience
+    const expRole = document.getElementById("res-exp-role").value.trim();
+    const expComp = document.getElementById("res-exp-comp").value.trim();
+    const expDates = document.getElementById("res-exp-dates").value.trim();
+    const expSec = document.querySelector('[data-section="experience"]');
+    if (expSec) {
+        if (!expRole && !expComp) {
+            expSec.style.display = "none";
+        } else {
+            expSec.style.display = "block";
+            document.getElementById("res-render-exp-role").innerText = expRole || "";
+            document.getElementById("res-render-exp-comp").innerText = expComp || "";
+            document.getElementById("res-render-exp-dates").innerText = expDates || "";
+            
+            const b1 = document.getElementById("res-exp-b1").value.trim();
+            const b2 = document.getElementById("res-exp-b2").value.trim();
+            const b3 = document.getElementById("res-exp-b3").value.trim();
+            const b4 = document.getElementById("res-exp-b4").value.trim();
+            
+            const b1El = document.getElementById("res-render-exp-b1");
+            const b2El = document.getElementById("res-render-exp-b2");
+            const b3El = document.getElementById("res-render-exp-b3");
+            const b4El = document.getElementById("res-render-exp-b4");
+            
+            if (b1El) {
+                b1El.innerText = b1;
+                b1El.style.display = b1 ? "list-item" : "none";
+            }
+            if (b2El) {
+                b2El.innerText = b2;
+                b2El.style.display = b2 ? "list-item" : "none";
+            }
+            if (b3El) {
+                b3El.innerText = b3;
+                b3El.style.display = b3 ? "list-item" : "none";
+            }
+            if (b4El) {
+                b4El.innerText = b4;
+                b4El.style.display = b4 ? "list-item" : "none";
+            }
+        }
+    }
+    
+    // Projects
+    const projTitle = document.getElementById("res-proj-title").value.trim();
+    const projLink = document.getElementById("res-proj-link").value.trim();
+    const projSec = document.querySelector('[data-section="projects"]');
+    if (projSec) {
+        if (!projTitle) {
+            projSec.style.display = "none";
+        } else {
+            projSec.style.display = "block";
+            document.getElementById("res-render-proj-title").innerText = projTitle || "";
+            document.getElementById("res-render-proj-link").innerText = projLink || "";
+            
+            const pb1 = document.getElementById("res-proj-b1").value.trim();
+            const pb2 = document.getElementById("res-proj-b2").value.trim();
+            const pb3 = document.getElementById("res-proj-b3").value.trim();
+            
+            const pb1El = document.getElementById("res-render-proj-b1");
+            const pb2El = document.getElementById("res-render-proj-b2");
+            const pb3El = document.getElementById("res-render-proj-b3");
+            
+            if (pb1El) {
+                pb1El.innerText = pb1;
+                pb1El.style.display = pb1 ? "list-item" : "none";
+            }
+            if (pb2El) {
+                pb2El.innerText = pb2;
+                pb2El.style.display = pb2 ? "list-item" : "none";
+            }
+            if (pb3El) {
+                pb3El.innerText = pb3;
+                pb3El.style.display = pb3 ? "list-item" : "none";
+            }
+        }
+    }
+    
+    // Certs
+    const c1 = document.getElementById("res-cert-c1").value.trim();
+    const c2 = document.getElementById("res-cert-c2").value.trim();
+    const c3 = document.getElementById("res-cert-c3").value.trim();
+    const c4 = document.getElementById("res-cert-c4").value.trim();
+    const certSec = document.querySelector('[data-section="certifications"]');
+    if (certSec) {
+        if (!c1 && !c2 && !c3 && !c4) {
+            certSec.style.display = "none";
+        } else {
+            certSec.style.display = "block";
+            
+            const c1El = document.getElementById("res-render-cert-c1");
+            const c2El = document.getElementById("res-render-cert-c2");
+            const c3El = document.getElementById("res-render-cert-c3");
+            const c4El = document.getElementById("res-render-cert-c4");
+            
+            if (c1El) {
+                c1El.innerText = c1;
+                c1El.style.display = c1 ? "list-item" : "none";
+            }
+            if (c2El) {
+                c2El.innerText = c2;
+                c2El.style.display = c2 ? "list-item" : "none";
+            }
+            if (c3El) {
+                c3El.innerText = c3;
+                c3El.style.display = c3 ? "list-item" : "none";
+            }
+            if (c4El) {
+                c4El.innerText = c4;
+                c4El.style.display = c4 ? "list-item" : "none";
+            }
+        }
+    }
+
+    // Achievements (Optional)
+    const achievementsVal = document.getElementById("res-achievements") ? document.getElementById("res-achievements").value.trim() : "";
+    const achievementsEl = document.getElementById("res-render-achievements");
+    const achievementsSec = document.querySelector('[data-section="achievements"]');
+    if (achievementsSec) {
+        if (achievementsVal && achievementsEl) {
+            achievementsEl.innerText = achievementsVal;
+            achievementsSec.style.display = "block";
+        } else {
+            achievementsSec.style.display = "none";
+        }
+    }
+
+    // Hackathons & Workshops (Optional)
+    const hackathonsVal = document.getElementById("res-hackathons") ? document.getElementById("res-hackathons").value.trim() : "";
+    const workshopsVal = document.getElementById("res-workshops") ? document.getElementById("res-workshops").value.trim() : "";
+    const hackathonsEl = document.getElementById("res-render-hackathons");
+    const hackathonsSec = document.querySelector('[data-section="hackathons"]');
+    if (hackathonsSec) {
+        if ((hackathonsVal || workshopsVal) && hackathonsEl) {
+            let combined = [];
+            if (hackathonsVal) combined.push(hackathonsVal);
+            if (workshopsVal) combined.push(workshopsVal);
+            hackathonsEl.innerText = combined.join(" | ");
+            hackathonsSec.style.display = "block";
+        } else {
+            hackathonsSec.style.display = "none";
+        }
+    }
+
+    // Languages & Interests (Optional)
+    const languagesVal = document.getElementById("res-languages") ? document.getElementById("res-languages").value.trim() : "";
+    const interestsVal = document.getElementById("res-interests") ? document.getElementById("res-interests").value.trim() : "";
+    const langRow = document.getElementById("res-render-languages-row");
+    const intRow = document.getElementById("res-render-interests-row");
+    const langEl = document.getElementById("res-render-languages");
+    const intEl = document.getElementById("res-render-interests");
+    const langSec = document.querySelector('[data-section="languages"]');
+    
+    if (languagesVal && langEl) {
+        langEl.innerText = languagesVal;
+        if (langRow) langRow.style.display = "block";
+    } else if (langRow) {
+        langRow.style.display = "none";
+    }
+    
+    if (interestsVal && intEl) {
+        intEl.innerText = interestsVal;
+        if (intRow) intRow.style.display = "block";
+    } else if (intRow) {
+        intRow.style.display = "none";
+    }
+    
+    if (langSec) {
+        if (languagesVal || interestsVal) {
+            langSec.style.display = "block";
+        } else {
+            langSec.style.display = "none";
+        }
+    }
+
+    // Scan keyword list
+    scanKeywordsInline();
+}
+
+function scanKeywordsInline() {
+    const text = document.getElementById("resume-sheet-paper").innerText.toLowerCase();
+    const keywords = ["python", "flask", "docker", "wireshark", "git", "react"];
+    keywords.forEach(kw => {
+        const item = document.getElementById(`kw-${kw}`);
+        if (item) {
+            if (text.includes(kw)) {
+                item.className = "live-keyword-item matched";
+                item.querySelector("i").className = "fa-solid fa-circle-check text-success";
+            } else {
+                item.className = "live-keyword-item";
+                item.querySelector("i").className = "fa-solid fa-circle-notch";
+            }
+        }
+    });
+}
+
+function changeResumeTheme() {
+    const paper = document.getElementById("resume-sheet-paper");
+    const theme = document.getElementById("resume-theme-select").value;
+    paper.className = "resume-sheet " + theme;
+}
+
+async function loadVersionsFromCloud() {
+    const select = document.getElementById("resume-version-select");
+    if (!select) return;
+    
+    try {
+        const response = await fetch("/resume-analyzer/versions");
+        const data = await response.json();
+        if (response.ok && data.success) {
+            savedVersions = data.versions;
+            select.innerHTML = `<option value="new">+ Save New Version</option>`;
+            data.versions.forEach(v => {
+                select.innerHTML += `<option value="${v.id}">${v.title} (${v.ats_score}%)</option>`;
+            });
+        }
+    } catch(e) {
+        console.error("Error loading drafts:", e);
+    }
+}
+
+function handleVersionChange() {
+    const select = document.getElementById("resume-version-select");
+    const val = select.value;
+    if (val === "new") {
+        document.getElementById("resume-title-field").value = "New Version Title";
+    } else {
+        const ver = savedVersions.find(x => x.id == val);
+        if (ver) {
+            document.getElementById("resume-title-field").value = ver.title;
+            document.getElementById("resume-theme-select").value = ver.theme;
+            populateForm(ver.content);
+            changeResumeTheme();
+            syncResumeFields();
+        }
+    }
+}
+
+function getValSafe(id) {
+    const el = document.getElementById(id);
+    return el ? el.value : "";
+}
+function setValSafe(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.value = val || "";
+}
+
+function populateForm(c) {
+    if (!c) return;
+    setValSafe("res-name", c.name);
+    setValSafe("res-address", c.address);
+    setValSafe("res-email", c.email);
+    setValSafe("res-phone", c.phone);
+    setValSafe("res-linkedin", c.linkedin);
+    setValSafe("res-github", c.github);
+    
+    setValSafe("res-edu1-inst", c.edu1Inst);
+    setValSafe("res-edu1-degree", c.edu1Degree);
+    setValSafe("res-edu1-dates", c.edu1Dates);
+    setValSafe("res-edu1-gpa", c.edu1Gpa);
+    setValSafe("res-edu1-coursework", c.edu1Coursework);
+    
+    setValSafe("res-skills-prog", c.skillsProg);
+    setValSafe("res-skills-cyber", c.skillsCyber);
+    setValSafe("res-skills-tools", c.skillsTools);
+    setValSafe("res-skills-web", c.skillsWeb);
+    
+    setValSafe("res-exp-role", c.experienceRole);
+    setValSafe("res-exp-comp", c.experienceComp);
+    setValSafe("res-exp-dates", c.experienceDates);
+    setValSafe("res-exp-b1", c.experienceB1);
+    setValSafe("res-exp-b2", c.experienceB2);
+    setValSafe("res-exp-b3", c.experienceB3);
+    setValSafe("res-exp-b4", c.experienceB4);
+    
+    setValSafe("res-proj-title", c.projectTitle);
+    setValSafe("res-proj-link", c.projectLink);
+    setValSafe("res-proj-b1", c.projectB1);
+    setValSafe("res-proj-b2", c.projectB2);
+    setValSafe("res-proj-b3", c.projectB3);
+    
+    setValSafe("res-cert-c1", c.certC1);
+    setValSafe("res-cert-c2", c.certC2);
+    setValSafe("res-cert-c3", c.certC3);
+    setValSafe("res-cert-c4", c.certC4);
+
+    // Extra details sections
+    setValSafe("res-profile-pic", c.profilePic);
+    setValSafe("res-portfolio", c.portfolio);
+    setValSafe("res-achievements", c.achievements);
+    setValSafe("res-research-papers", c.researchPapers);
+    setValSafe("res-hackathons", c.hackathons);
+    setValSafe("res-workshops", c.workshops);
+    setValSafe("res-volunteering", c.volunteering);
+    setValSafe("res-languages", c.languages);
+    setValSafe("res-interests", c.interests);
+    setValSafe("res-references", c.references);
+    setValSafe("res-custom", c.custom);
+
+    if (c.sectionOrder) {
+        let loadedOrder = c.sectionOrder.filter(sec => ["education", "skills", "experience", "projects", "certifications", "achievements", "hackathons", "languages"].includes(sec));
+        const allSecs = ["education", "skills", "experience", "projects", "certifications", "achievements", "hackathons", "languages"];
+        allSecs.forEach(sec => {
+            if (!loadedOrder.includes(sec)) {
+                loadedOrder.push(sec);
+            }
+        });
+        sectionOrder = loadedOrder;
+        renderReorderUI();
+        reorderDOM();
+    } else {
+        sectionOrder = ["education", "skills", "experience", "projects", "certifications", "achievements", "hackathons", "languages"];
+        renderReorderUI();
+        reorderDOM();
+    }
+}
+
+function getFormContent() {
+    return {
+        name: getValSafe("res-name"),
+        address: getValSafe("res-address"),
+        email: getValSafe("res-email"),
+        phone: getValSafe("res-phone"),
+        linkedin: getValSafe("res-linkedin"),
+        github: getValSafe("res-github"),
+        
+        edu1Inst: getValSafe("res-edu1-inst"),
+        edu1Degree: getValSafe("res-edu1-degree"),
+        edu1Dates: getValSafe("res-edu1-dates"),
+        edu1Gpa: getValSafe("res-edu1-gpa"),
+        edu1Coursework: getValSafe("res-edu1-coursework"),
+        
+        skillsProg: getValSafe("res-skills-prog"),
+        skillsCyber: getValSafe("res-skills-cyber"),
+        skillsTools: getValSafe("res-skills-tools"),
+        skillsWeb: getValSafe("res-skills-web"),
+        
+        experienceRole: getValSafe("res-exp-role"),
+        experienceComp: getValSafe("res-exp-comp"),
+        experienceDates: getValSafe("res-exp-dates"),
+        experienceB1: getValSafe("res-exp-b1"),
+        experienceB2: getValSafe("res-exp-b2"),
+        experienceB3: getValSafe("res-exp-b3"),
+        experienceB4: getValSafe("res-exp-b4"),
+        
+        projectTitle: getValSafe("res-proj-title"),
+        projectLink: getValSafe("res-proj-link"),
+        projectB1: getValSafe("res-proj-b1"),
+        projectB2: getValSafe("res-proj-b2"),
+        projectB3: getValSafe("res-proj-b3"),
+        
+        certC1: getValSafe("res-cert-c1"),
+        certC2: getValSafe("res-cert-c2"),
+        certC3: getValSafe("res-cert-c3"),
+        certC4: getValSafe("res-cert-c4"),
+
+        // New Fields
+        profilePic: getValSafe("res-profile-pic"),
+        portfolio: getValSafe("res-portfolio"),
+        achievements: getValSafe("res-achievements"),
+        researchPapers: getValSafe("res-research-papers"),
+        hackathons: getValSafe("res-hackathons"),
+        workshops: getValSafe("res-workshops"),
+        volunteering: getValSafe("res-volunteering"),
+        languages: getValSafe("res-languages"),
+        interests: getValSafe("res-interests"),
+        references: getValSafe("res-references"),
+        custom: getValSafe("res-custom"),
+        sectionOrder: sectionOrder
+    };
+}
+
+function renderReorderUI() {
+    const list = document.getElementById("reorder-sections-list");
+    if (!list) return;
+    list.innerHTML = "";
+    sectionOrder.forEach((sec, idx) => {
+        let displayName = sec.charAt(0).toUpperCase() + sec.slice(1).replace("-", " ");
+        if (sec === "skills") displayName = "Technical Skills";
+        if (sec === "hackathons") displayName = "Hackathons & Workshops";
+        if (sec === "languages") displayName = "Languages & Interests";
+        const row = document.createElement("div");
+        row.className = "d-flex justify-content-between align-items-center p-1 px-2 border rounded bg-white text-secondary";
+        row.style.fontSize = "0.75rem";
+        row.style.borderColor = "var(--border-color)";
+        
+        row.innerHTML = `
+            <span><i class="fa-solid fa-bars me-2 text-muted" style="cursor:grab;"></i> ${displayName}</span>
+            <div class="d-flex gap-1">
+                <button type="button" class="btn btn-xs btn-light p-0 px-1 border-0" onclick="moveSection(${idx}, -1)" ${idx === 0 ? 'disabled' : ''} style="cursor:pointer; background:none;"><i class="fa-solid fa-arrow-up text-muted" style="font-size:10px;"></i></button>
+                <button type="button" class="btn btn-xs btn-light p-0 px-1 border-0" onclick="moveSection(${idx}, 1)" ${idx === sectionOrder.length - 1 ? 'disabled' : ''} style="cursor:pointer; background:none;"><i class="fa-solid fa-arrow-down text-muted" style="font-size:10px;"></i></button>
+            </div>
+        `;
+        list.appendChild(row);
+    });
+}
+
+function moveSection(index, direction) {
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= sectionOrder.length) return;
+    const temp = sectionOrder[index];
+    sectionOrder[index] = sectionOrder[newIndex];
+    sectionOrder[newIndex] = temp;
+    
+    renderReorderUI();
+    reorderDOM();
+    triggerAutoSave();
+}
+
+function reorderDOM() {
+    const container = document.getElementById("resume-sections-container");
+    if (!container) return;
+    sectionOrder.forEach(secName => {
+        const secEl = container.querySelector(`[data-section="${secName}"]`);
+        if (secEl) {
+            container.appendChild(secEl);
+        }
+    });
+}
+
+async function saveResumeCloud() {
+    const badge = document.getElementById("save-status-badge");
+    if (badge) {
+        badge.innerText = "Saving...";
+        badge.className = "badge badge-warning mt-1";
+    }
+    
+    const content = getFormContent();
+    const title = document.getElementById("resume-title-field").value;
+    const theme = document.getElementById("resume-theme-select").value;
+    const scoreVal = parseInt(document.getElementById("score-text-main").innerText) || 80;
+    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
+    
+    try {
+        const response = await fetch("/resume-analyzer/save-version", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken
+            },
+            body: JSON.stringify({
+                title: title,
+                theme: theme,
+                content: content,
+                ats_score: scoreVal
+            })
+        });
+        const data = await response.json();
+        if (response.ok && data.success) {
+            if (badge) {
+                badge.innerText = "Saved to Cloud";
+                badge.className = "badge badge-success mt-1";
+            }
+            loadVersionsFromCloud();
+        } else {
+            if (badge) {
+                badge.innerText = "Save Failed";
+                badge.className = "badge badge-danger mt-1";
+            }
+        }
+    } catch(e) {
+        console.error(e);
+        if (badge) {
+            badge.innerText = "Offline Error";
+            badge.className = "badge badge-danger mt-1";
+        }
+    }
+}
+
+function triggerAutoSave() {
+    saveResumeCloud();
+}
+
+async function triggerResumeATSAnalysis() {
+    const atsBox = document.getElementById("ats-analysis-body");
+    atsBox.innerHTML = `<div class="text-center py-2"><i class="fa-solid fa-spinner fa-spin text-muted me-2"></i> Analyzing text metrics...</div>`;
+    
+    const content = getFormContent();
+    const title = document.getElementById("resume-title-field").value;
+    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
+    
+    try {
+        const response = await fetch("/resume-analyzer/analyze", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken
+            },
+            body: JSON.stringify({
+                title: title,
+                ...content
+            })
+        });
+        
+        const data = await response.json();
+        if (response.ok && data.success) {
+            document.getElementById("score-text-main").innerText = `${data.score}/100`;
+            document.getElementById("score-format").innerText = `${data.readability}%`;
+            document.getElementById("bar-format").style.width = `${data.readability}%`;
+            
+            document.getElementById("score-keyword").innerText = `${data.alignment}%`;
+            document.getElementById("bar-keyword").style.width = `${data.alignment}%`;
+            
+            document.getElementById("score-readability").innerText = `${data.readability}%`;
+            document.getElementById("bar-readability").style.width = `${data.readability}%`;
+            
+            document.getElementById("score-skills").innerText = `${data.alignment}%`;
+            document.getElementById("bar-skills").style.width = `${data.alignment}%`;
+
+            document.getElementById("score-recruiter").innerText = `${Math.min(100, data.alignment + 5)}%`;
+            document.getElementById("bar-recruiter").style.width = `${Math.min(100, data.alignment + 5)}%`;
+            
+            document.getElementById("score-project").innerText = `${Math.max(0, data.score - 2)}%`;
+            document.getElementById("bar-project").style.width = `${Math.max(0, data.score - 2)}%`;
+
+            
+            lastATSFeedback = data.feedback;
+            renderATSFeedback(data.feedback);
+        } else {
+            atsBox.innerHTML = `<p class="text-danger text-center mb-0">Check failed: ${data.error || "Unknown"}</p>`;
+        }
+    } catch (e) {
+        console.error(e);
+        atsBox.innerHTML = `<p class="text-danger text-center mb-0">Connection failed.</p>`;
+    }
+}
+
+function applySuggestion(index) {
+    if (!lastATSFeedback || !lastATSFeedback.improvements) return;
+    const imp = lastATSFeedback.improvements[index];
+    if (!imp) return;
+    
+    // Find where the original text is in the form inputs and replace it
+    const inputs = document.querySelectorAll("input[type='text'], textarea");
+    let found = false;
+    inputs.forEach(input => {
+        const val = input.value;
+        if (val.includes(imp.originalText)) {
+            input.value = val.replace(imp.originalText, imp.suggestedText);
+            found = true;
+        }
+    });
+    
+    if (found) {
+        syncResumeFields();
+        if (window.showToast) {
+            showToast("Suggestion Applied", "Successfully replaced text in resume!", "fa-circle-check text-success");
+        } else {
+            alert("Suggestion applied successfully!");
+        }
+        triggerAutoSave();
+    } else {
+        if (window.showToast) {
+            showToast("Apply Failed", "Could not locate original text in input fields.", "fa-circle-exclamation text-danger");
+        } else {
+            alert("Could not locate original text in input fields.");
+        }
+    }
+}
+
+function renderATSFeedback(feedback) {
+    const atsBox = document.getElementById("ats-analysis-body");
+    
+    let missingBadges = feedback.missingKeywords.map(k => `<span class="badge badge-info me-1 mb-1" style="font-size:10px;">${k}</span>`).join("");
+    if (!missingBadges) missingBadges = `<span class="text-muted">None flagged.</span>`;
+    
+    let improvementsHtml = feedback.improvements.map((imp, idx) => `
+        <div class="p-2 border rounded mb-2" style="font-size:0.75rem; background-color: var(--bg-primary);">
+            <div class="mb-1"><strong class="text-danger">Original:</strong> "${imp.originalText}"</div>
+            <div class="mb-1"><strong class="text-success">Suggested:</strong> "${imp.suggestedText}"</div>
+            <div style="font-size:0.7rem;" class="mb-2"><strong class="text-muted">Reason:</strong> ${imp.reason}</div>
+            <button type="button" class="btn btn-xs btn-outline py-0.5 px-2" onclick="applySuggestion(${idx})" style="font-size:0.65rem; cursor:pointer; background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px;"><i class="fa-solid fa-wand-magic-sparkles me-1 text-primary"></i> Apply to Resume</button>
+        </div>
+    `).join("");
+    
+    let mistakesHtml = feedback.mistakes.map(m => `<li class="text-danger mb-1"><i class="fa-solid fa-triangle-exclamation me-1"></i> ${m}</li>`).join("");
+    let suggestionsHtml = feedback.suggestions.map(s => `<li class="mb-1"><i class="fa-solid fa-circle-check text-success me-1"></i> ${s}</li>`).join("");
+    
+    atsBox.innerHTML = `
+        <div class="mt-3">
+            <h5 class="fw-bold mb-2 text-secondary" style="font-size:0.75rem; text-transform:uppercase;">Missing Keywords</h5>
+            <div class="mb-3">${missingBadges}</div>
+            
+            <h5 class="fw-bold mb-2 text-secondary" style="font-size:0.75rem; text-transform:uppercase;">Phrasing Improvements</h5>
+            <div class="mb-3">${improvementsHtml}</div>
+            
+            <h5 class="fw-bold mb-2 text-secondary" style="font-size:0.75rem; text-transform:uppercase;">Mistakes & Warnings</h5>
+            <ul class="ps-3 mb-3" style="font-size:0.75rem; line-height:1.4;">${mistakesHtml}</ul>
+            
+            <h5 class="fw-bold mb-2 text-secondary" style="font-size:0.75rem; text-transform:uppercase;">Recruiter Guidelines</h5>
+            <ul class="ps-3 mb-0" style="font-size:0.75rem; line-height:1.4;">${suggestionsHtml}</ul>
+        </div>
+    `;
+}
+
+function setupUploadDragAndDrop() {
+    const zone = document.getElementById("drop-zone-builder");
+    const input = document.getElementById("resume-file-input-builder");
+    const statusText = document.getElementById("upload-status-text-builder");
+    if (!zone || !input) return;
+
+    zone.addEventListener("click", () => {
+        input.click();
+    });
+
+    input.addEventListener("change", (e) => {
+        if (e.target.files.length > 0) {
+            uploadFileAJAX(e.target.files[0], statusText);
+        }
+    });
+
+    zone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        zone.style.backgroundColor = "rgba(124,58,237,0.04)";
+    });
+
+    zone.addEventListener("dragleave", () => {
+        zone.style.backgroundColor = "transparent";
+    });
+
+    zone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        zone.style.backgroundColor = "transparent";
+        if (e.dataTransfer.files.length > 0) {
+            uploadFileAJAX(e.dataTransfer.files[0], statusText);
+        }
+    });
+}
+
+async function uploadFileAJAX(file, statusText) {
+    statusText.style.display = "block";
+    statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-muted me-1"></i> Extracting details...`;
+    
+    const formData = new FormData();
+    formData.append("resume_file", file);
+    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
+    
+    try {
+        const response = await fetch("/resume-analyzer/upload", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrfToken
+            },
+            body: formData
+        });
+        
+        const data = await response.json();
+        if (response.ok && data.success) {
+            statusText.innerHTML = `<span class="text-success"><i class="fa-solid fa-circle-check"></i> "${file.name}" extracted!</span>`;
+            populateForm(data.data);
+            syncResumeFields();
+            triggerResumeATSAnalysis();
+            setTimeout(() => {
+                statusText.style.display = "none";
+            }, 3000);
+        } else {
+            statusText.innerHTML = `<span class="text-danger"><i class="fa-solid fa-circle-xmark"></i> ${data.error || "Failed to extract."}</span>`;
+        }
+    } catch (e) {
+        console.error(e);
+        statusText.innerHTML = `<span class="text-danger"><i class="fa-solid fa-circle-xmark"></i> Connection error.</span>`;
+    }
+}
+
+function downloadResumePDF() {
+    const element = document.getElementById('resume-sheet-paper');
+    if (!element) return;
+    
+    const btn = document.querySelector('button[onclick="downloadResumePDF()"]');
+    let originalHtml = "";
+    if (btn) {
+        btn.disabled = true;
+        originalHtml = btn.innerHTML;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Downloading...`;
+    }
+
+    // Apply PDF export styles temporarily to the real visible element
+    element.classList.add('pdf-export-mode');
+
+    const nameVal = document.getElementById('res-name').value || 'Resume';
+    const opt = {
+        margin:    0,
+        filename:  `${nameVal.trim().replace(/\s+/g, '_')}_Resume.pdf`,
+        image:     { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+            scale: 2.5,
+            useCORS: true,
+            letterRendering: true,
+            scrollX: 0,
+            scrollY: -window.scrollY // offset window scrolling!
+        },
+        jsPDF:     { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save().then(() => {
+        element.classList.remove('pdf-export-mode');
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
+    }).catch(err => {
+        console.error(err);
+        element.classList.remove('pdf-export-mode');
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
+        alert("Failed to export PDF: " + err.message);
+    });
+}
+
+function printResume() {
+    window.print();
+}
+</script>
+<style>
+/* 50 Premium templates styling rules */
+.resume-sheet {
+    background: #fff;
+    padding: 20px;
+    font-size: 11px;
+    line-height: 1.5;
+    color: #374151;
+    min-height: 297mm;
+}
+
+/* 1. ATS Professional Styles Group */
+.resume-sheet.ats-classic, .resume-sheet.ats-modern, .resume-sheet.ats-minimal, .resume-sheet.ats-compact, .resume-sheet.ats-formal {
+    font-family: 'Inter', Arial, sans-serif !important;
+    color: #1f2937;
+}
+.resume-sheet.ats-classic h1, .resume-sheet.ats-modern h1, .resume-sheet.ats-minimal h1, .resume-sheet.ats-compact h1, .resume-sheet.ats-formal h1 {
+    color: #111827 !important;
+}
+.resume-sheet.ats-classic .resume-render-section h3, .resume-sheet.ats-modern .resume-render-section h3, .resume-sheet.ats-minimal .resume-render-section h3, .resume-sheet.ats-compact .resume-render-section h3, .resume-sheet.ats-formal .resume-render-section h3 {
+    border-bottom: 1.5px solid #111827 !important;
+    color: #111827 !important;
+    text-transform: uppercase;
+}
+.resume-sheet.ats-classic { font-family: Georgia, serif !important; }
+.resume-sheet.ats-classic .resume-render-header { text-align: center !important; }
+.resume-sheet.ats-minimal { padding: 30px !important; }
+.resume-sheet.ats-minimal .resume-render-section h3 { border-bottom: none !important; margin-bottom: 2px !important; }
+.resume-sheet.ats-compact { font-size: 10px !important; line-height: 1.35 !important; }
+.resume-sheet.ats-compact .resume-render-section { margin-bottom: 8px !important; }
+.resume-sheet.ats-formal { border: 1px double #374151; padding: 25px !important; }
+
+/* 2. Modern Styles Group */
+.resume-sheet.modern-teal { border-top: 6px solid #0d9488 !important; }
+.resume-sheet.modern-teal h1, .resume-sheet.modern-teal h3 { color: #0d9488 !important; }
+.resume-sheet.modern-teal h3 { border-bottom: 2px solid #0d9488 !important; }
+.resume-sheet.modern-slate { border-top: 6px solid #475569 !important; }
+.resume-sheet.modern-slate h1, .resume-sheet.modern-slate h3 { color: #475569 !important; }
+.resume-sheet.modern-slate h3 { border-bottom: 2px solid #475569 !important; }
+.resume-sheet.modern-indigo { border-top: 6px solid #4f46e5 !important; }
+.resume-sheet.modern-indigo h1, .resume-sheet.modern-indigo h3 { color: #4f46e5 !important; }
+.resume-sheet.modern-indigo h3 { border-bottom: 2px solid #4f46e5 !important; }
+.resume-sheet.modern-coral { border-top: 6px solid #f43f5e !important; }
+.resume-sheet.modern-coral h1, .resume-sheet.modern-coral h3 { color: #f43f5e !important; }
+.resume-sheet.modern-coral h3 { border-bottom: 2px solid #f43f5e !important; }
+.resume-sheet.modern-glass { background: rgba(255, 255, 255, 0.95) !important; border-top: 6px solid #0078d4 !important; }
+.resume-sheet.modern-glass h1, .resume-sheet.modern-glass h3 { color: #0078d4 !important; }
+.resume-sheet.modern-glass h3 { border-bottom: 2px solid #0078d4 !important; }
+
+/* 3. Microsoft Styles Group */
+.resume-sheet.ms-learn { border-top: 6px solid #0078d4 !important; }
+.resume-sheet.ms-learn h1, .resume-sheet.ms-learn h3 { color: #0078d4 !important; }
+.resume-sheet.ms-learn h3 { border-bottom: 2px solid #0078d4 !important; }
+.resume-sheet.ms-docs { border-left: 6px solid #475569 !important; padding-left: 18px !important; }
+.resume-sheet.ms-docs h1 { color: #1e293b !important; }
+.resume-sheet.ms-docs h3 { color: #475569 !important; border-bottom: 1.5px solid #cbd5e1 !important; }
+.resume-sheet.ms-azure { border-top: 6px solid #008ad7 !important; }
+.resume-sheet.ms-azure h1, .resume-sheet.ms-azure h3 { color: #008ad7 !important; }
+.resume-sheet.ms-azure h3 { border-bottom: 2px solid #008ad7 !important; }
+.resume-sheet.ms-office { font-family: 'Segoe UI', sans-serif !important; }
+.resume-sheet.ms-office h1, .resume-sheet.ms-office h3 { color: #004b87 !important; }
+.resume-sheet.ms-office h3 { border-bottom: 2px solid #004b87 !important; }
+.resume-sheet.ms-team { border-top: 6px solid #7f3d8a !important; }
+.resume-sheet.ms-team h1, .resume-sheet.ms-team h3 { color: #7f3d8a !important; }
+.resume-sheet.ms-team h3 { border-bottom: 2px solid #7f3d8a !important; }
+
+/* 4. Student Styles Group */
+.resume-sheet.student-academic { font-family: Georgia, serif !important; text-align: justify; }
+.resume-sheet.student-academic h1 { text-align: center !important; font-size: 20px !important; }
+.resume-sheet.student-academic h3 { text-align: center; border-bottom: 1.5px solid #000 !important; }
+.resume-sheet.student-entry { background-color: #fafbfc; }
+.resume-sheet.student-entry h3 { color: #0f766e !important; border-bottom: 2px solid #0f766e !important; }
+.resume-sheet.student-grad { font-family: Garamond, serif !important; }
+.resume-sheet.student-grad h3 { border-bottom: 1.5px double #374151 !important; }
+.resume-sheet.student-campus { border-top: 6px solid #059669 !important; }
+.resume-sheet.student-campus h1, .resume-sheet.student-campus h3 { color: #059669 !important; }
+.resume-sheet.student-campus h3 { border-bottom: 2px solid #059669 !important; }
+.resume-sheet.student-scholar { font-family: 'Times New Roman', serif !important; }
+.resume-sheet.student-scholar h3 { border-bottom: 1.5px solid #111827 !important; text-transform: uppercase; }
+
+/* 5. Internship Styles Group */
+.resume-sheet.intern-general { border-top: 6px solid #10b981 !important; }
+.resume-sheet.intern-general h1, .resume-sheet.intern-general h3 { color: #10b981 !important; }
+.resume-sheet.intern-general h3 { border-bottom: 2px solid #10b981 !important; }
+.resume-sheet.intern-tech { border-top: 6px solid #0f172a !important; font-family: 'Courier New', Courier, monospace !important; }
+.resume-sheet.intern-tech h3 { border-bottom: 2px solid #0f172a !important; }
+.resume-sheet.intern-business { border-top: 6px solid #1e3b8b !important; }
+.resume-sheet.intern-business h1, .resume-sheet.intern-business h3 { color: #1e3b8b !important; }
+.resume-sheet.intern-business h3 { border-bottom: 2px solid #1e3b8b !important; }
+.resume-sheet.intern-creative { border-top: 6px solid #ec4899 !important; }
+.resume-sheet.intern-creative h1, .resume-sheet.intern-creative h3 { color: #ec4899 !important; }
+.resume-sheet.intern-creative h3 { border-bottom: 2px solid #ec4899 !important; }
+.resume-sheet.intern-research { border-top: 6px solid #b45309 !important; }
+.resume-sheet.intern-research h1, .resume-sheet.intern-research h3 { color: #b45309 !important; }
+.resume-sheet.intern-research h3 { border-bottom: 2px solid #b45309 !important; }
+
+/* 6. Cyber Security Styles Group */
+.resume-sheet.cyber-mono { font-family: 'Courier New', monospace !important; color: #16a34a !important; }
+.resume-sheet.cyber-mono h1, .resume-sheet.cyber-mono h3 { color: #16a34a !important; }
+.resume-sheet.cyber-mono h3 { border-bottom: 1.5px solid #16a34a !important; }
+.resume-sheet.cyber-dark { border-top: 6px solid #020617 !important; background-color: #f8fafc; }
+.resume-sheet.cyber-dark h1, .resume-sheet.cyber-dark h3 { color: #020617 !important; }
+.resume-sheet.cyber-dark h3 { border-bottom: 2px solid #020617 !important; }
+.resume-sheet.cyber-shield { border-top: 6px solid #1e3a8a !important; }
+.resume-sheet.cyber-shield h1, .resume-sheet.cyber-shield h3 { color: #1e3a8a !important; }
+.resume-sheet.cyber-shield h3 { border-bottom: 2px solid #1e3a8a !important; }
+.resume-sheet.cyber-matrix { font-family: monospace !important; border-top: 6px solid #22c55e !important; }
+.resume-sheet.cyber-matrix h1, .resume-sheet.cyber-matrix h3 { color: #22c55e !important; }
+.resume-sheet.cyber-matrix h3 { border-bottom: 1.5px solid #22c55e !important; }
+.resume-sheet.cyber-audit { border-top: 6px solid #475569 !important; }
+.resume-sheet.cyber-audit h1, .resume-sheet.cyber-audit h3 { color: #475569 !important; }
+.resume-sheet.cyber-audit h3 { border-bottom: 2px solid #475569 !important; }
+
+/* 7. Software Engineering Styles Group */
+.resume-sheet.swe-git { border-top: 6px solid #24292f !important; }
+.resume-sheet.swe-git h1, .resume-sheet.swe-git h3 { color: #24292f !important; }
+.resume-sheet.swe-git h3 { border-bottom: 2px solid #24292f !important; }
+.resume-sheet.swe-fullstack { border-top: 6px solid #6366f1 !important; }
+.resume-sheet.swe-fullstack h1, .resume-sheet.swe-fullstack h3 { color: #6366f1 !important; }
+.resume-sheet.swe-fullstack h3 { border-bottom: 2px solid #6366f1 !important; }
+.resume-sheet.swe-backend { border-top: 6px solid #0f172a !important; }
+.resume-sheet.swe-backend h1, .resume-sheet.swe-backend h3 { color: #0f172a !important; }
+.resume-sheet.swe-backend h3 { border-bottom: 2px solid #0f172a !important; }
+.resume-sheet.swe-frontend { border-top: 6px solid #06b6d4 !important; }
+.resume-sheet.swe-frontend h1, .resume-sheet.swe-frontend h3 { color: #06b6d4 !important; }
+.resume-sheet.swe-frontend h3 { border-bottom: 2px solid #06b6d4 !important; }
+.resume-sheet.swe-cloud { border-top: 6px solid #0ea5e9 !important; }
+.resume-sheet.swe-cloud h1, .resume-sheet.swe-cloud h3 { color: #0ea5e9 !important; }
+.resume-sheet.swe-cloud h3 { border-bottom: 2px solid #0ea5e9 !important; }
+
+/* 8. AI/ML Styles Group */
+.resume-sheet.ai-tensor { border-top: 6px solid #f97316 !important; }
+.resume-sheet.ai-tensor h1, .resume-sheet.ai-tensor h3 { color: #f97316 !important; }
+.resume-sheet.ai-tensor h3 { border-bottom: 2px solid #f97316 !important; }
+.resume-sheet.ai-neural { border-top: 6px solid #8b5cf6 !important; }
+.resume-sheet.ai-neural h1, .resume-sheet.ai-neural h3 { color: #8b5cf6 !important; }
+.resume-sheet.ai-neural h3 { border-bottom: 2px solid #8b5cf6 !important; }
+.resume-sheet.ai-agent { border-top: 6px solid #6366f1 !important; }
+.resume-sheet.ai-agent h1, .resume-sheet.ai-agent h3 { color: #6366f1 !important; }
+.resume-sheet.ai-agent h3 { border-bottom: 2px solid #6366f1 !important; }
+.resume-sheet.ai-vision { border-top: 6px solid #3b82f6 !important; }
+.resume-sheet.ai-vision h1, .resume-sheet.ai-vision h3 { color: #3b82f6 !important; }
+.resume-sheet.ai-vision h3 { border-bottom: 2px solid #3b82f6 !important; }
+.resume-sheet.ai-prompt { border-top: 6px solid #14b8a6 !important; }
+.resume-sheet.ai-prompt h1, .resume-sheet.ai-prompt h3 { color: #14b8a6 !important; }
+.resume-sheet.ai-prompt h3 { border-bottom: 2px solid #14b8a6 !important; }
+
+/* 9. Minimal Styles Group */
+.resume-sheet.minimal-light { padding: 30px !important; }
+.resume-sheet.minimal-light h3 { border-bottom: none !important; color: #1f2937 !important; }
+.resume-sheet.minimal-dark { background-color: #f8fafc; color: #0f172a; }
+.resume-sheet.minimal-dark h1, .resume-sheet.minimal-dark h3 { color: #0f172a !important; border-bottom: 1.5px solid #cbd5e1 !important; }
+.resume-sheet.minimal-border { border: 1px solid #e2e8f0; padding: 25px !important; }
+.resume-sheet.minimal-border h3 { border-bottom: 1.5px solid #cbd5e1 !important; }
+.resume-sheet.minimal-compact { font-size: 10px !important; line-height: 1.35 !important; }
+.resume-sheet.minimal-compact .resume-render-section { margin-bottom: 8px !important; }
+.resume-sheet.minimal-swiss { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important; letter-spacing: -0.01em; }
+.resume-sheet.minimal-swiss h1 { font-weight: 900 !important; font-size: 24px !important; }
+.resume-sheet.minimal-swiss h3 { border-bottom: 3px solid #000 !important; font-weight: 800; color: #000 !important; }
+
+/* 10. Executive Styles Group */
+.resume-sheet.exec-director { border-top: 6px solid #b45309 !important; font-family: Garamond, serif !important; }
+.resume-sheet.exec-director h1, .resume-sheet.exec-director h3 { color: #b45309 !important; }
+.resume-sheet.exec-director h3 { border-bottom: 1.5px solid #b45309 !important; }
+.resume-sheet.exec-vp { border-top: 6px solid #1e293b !important; }
+.resume-sheet.exec-vp h1, .resume-sheet.exec-vp h3 { color: #1e293b !important; }
+.resume-sheet.exec-vp h3 { border-bottom: 2px solid #1e293b !important; }
+.resume-sheet.exec-board { font-family: Georgia, serif !important; text-align: center; }
+.resume-sheet.exec-board h1 { font-size: 24px !important; }
+.resume-sheet.exec-board h3 { text-align: center; border-bottom: 1.5px solid #000 !important; }
+.resume-sheet.exec-legal { font-family: 'Times New Roman', Times, serif !important; }
+.resume-sheet.exec-legal h3 { border-bottom: 2px double #000 !important; text-transform: uppercase; }
+.resume-sheet.exec-partner { border-top: 6px solid #1e3a8a !important; }
+.resume-sheet.exec-partner h1, .resume-sheet.exec-partner h3 { color: #1e3a8a !important; }
+.resume-sheet.exec-partner h3 { border-bottom: 2px solid #1e3a8a !important; }
+
+/* pdf-export-mode now applied inline via JS clone - no CSS override needed */
+.pdf-export-mode .resume-render-header {
+    margin-bottom: 4px !important;
+    padding-bottom: 3px !important;
+}
+.pdf-export-mode .resume-render-header h1 {
+    font-size: 15px !important;
+    margin-bottom: 1px !important;
+}
+.pdf-export-mode .resume-render-meta {
+    font-size: 8px !important;
+    line-height: 1.1 !important;
+}
+.pdf-export-mode .resume-render-section {
+    margin-bottom: 4px !important;
+}
+.pdf-export-mode .resume-render-section h3 {
+    font-size: 9px !important;
+    margin-bottom: 2px !important;
+    padding-bottom: 1px !important;
+    border-bottom-width: 1px !important;
+}
+.pdf-export-mode .resume-render-section div,
+.pdf-export-mode .resume-render-section span,
+.pdf-export-mode .resume-render-section p,
+.pdf-export-mode .resume-render-section li {
+    font-size: 7.5px !important;
+    line-height: 1.1 !important;
+}
+.pdf-export-mode .resume-render-section li {
+    margin-bottom: 1px !important;
+}
+.live-keyword-item {
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: var(--bg-tertiary);
+    color: var(--text-muted);
+}
+.live-keyword-item.matched {
+    background: var(--success-bg);
+    color: var(--success);
+    font-weight: 600;
+}
+.hover-scale {
+    transition: transform 0.15s ease;
+}
+.hover-scale:hover {
+    transform: scale(1.05);
+}
+
+@media print {
+    /* Hide everything except the A4 resume preview sheet */
+    body * {
+        visibility: hidden;
+    }
+    #resume-sheet-paper, #resume-sheet-paper * {
+        visibility: visible;
+    }
+    #resume-sheet-paper {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 210mm !important;
+        height: 297mm !important;
+        padding: 18mm !important;
+        margin: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+    }
+}
+</style>
+{% endblock %}
