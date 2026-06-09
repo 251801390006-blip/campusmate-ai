@@ -26,6 +26,73 @@
             </div>
         </div>
 
+        <!-- Profile Settings Card -->
+        <div class="flat-card shadow-sm border-light mb-4">
+            <h3 class="fw-bold text-dark mb-3" style="font-size:1.05rem;"><i class="fa-solid fa-user-gear text-primary me-2"></i> Student Profile Information</h3>
+            
+            <form method="POST" action="{{ url_for('dashboard.settings') }}" class="d-flex flex-column gap-3">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="action" value="profile">
+                
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="profile-name" class="fw-semibold text-secondary" style="font-size:0.8rem;">Full Name</label>
+                        <input type="text" id="profile-name" name="name" value="{{ current_user.name or '' }}" class="form-control shadow-sm" placeholder="Enter full name">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="profile-email" class="fw-semibold text-secondary" style="font-size:0.8rem;">Email Address</label>
+                        <input type="email" id="profile-email" name="email" value="{{ current_user.email or '' }}" class="form-control shadow-sm" placeholder="Enter email address" required>
+                    </div>
+                </div>
+
+                <div class="input-group d-flex flex-column gap-1 mb-3">
+                    <label for="profile-bio" class="fw-semibold text-secondary" style="font-size:0.8rem;">Bio Description</label>
+                    <textarea id="profile-bio" name="bio" rows="3" class="form-control shadow-sm" placeholder="Tell us about yourself" style="width:100%; border:1px solid var(--border-color); padding:8px; border-radius:4px; font-size:0.85rem;">{{ current_user.bio or '' }}</textarea>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="profile-branch" class="fw-semibold text-secondary" style="font-size:0.8rem;">Branch / Major</label>
+                        <input type="text" id="profile-branch" name="branch" value="{{ current_user.branch or '' }}" class="form-control shadow-sm" placeholder="e.g. Cyber Security">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="profile-year" class="fw-semibold text-secondary" style="font-size:0.8rem;">Year</label>
+                        <input type="text" id="profile-year" name="year" value="{{ current_user.year or '' }}" class="form-control shadow-sm" placeholder="e.g. 3rd Year">
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="profile-skills" class="fw-semibold text-secondary" style="font-size:0.8rem;">Technical Skills (comma-separated)</label>
+                        <input type="text" id="profile-skills" name="skills" value="{{ current_user.skills or '' }}" class="form-control shadow-sm" placeholder="e.g. Python, Git, Wireshark">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="profile-goals" class="fw-semibold text-secondary" style="font-size:0.8rem;">Career Goals</label>
+                        <input type="text" id="profile-goals" name="goals" value="{{ current_user.career_goal or '' }}" class="form-control shadow-sm" placeholder="e.g. Security Analyst">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary shadow-sm py-2 mt-2" style="background: linear-gradient(135deg, #0078d4, #00bcf2); border: none; font-size:0.9rem; font-weight:600; color:white;">
+                    Update Profile Details <i class="fa-solid fa-user-check ms-1"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- Theme & Appearance Settings Card -->
+        <div class="flat-card shadow-sm border-light mb-4">
+            <h3 class="fw-bold text-dark mb-3" style="font-size:1.05rem;"><i class="fa-solid fa-palette text-primary me-2"></i> Theme & Appearance</h3>
+            <div class="d-flex flex-column gap-3">
+                <div class="input-group d-flex flex-column gap-1 mb-0">
+                    <label for="theme-select" class="fw-semibold text-secondary" style="font-size:0.8rem;">Select Theme Mode</label>
+                    <select id="theme-select" class="form-select shadow-sm" style="width: 100%; padding:8px; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary); font-size:0.85rem;" onchange="changeThemePreference(this.value)">
+                        <option value="light">Light Mode</option>
+                        <option value="dark">Dark Mode</option>
+                        <option value="system">System Default</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
         <!-- Password Settings Card -->
         <div class="flat-card shadow-sm border-light mb-4">
             <h3 class="fw-bold text-dark mb-3" style="font-size:1.05rem;"><i class="fa-solid fa-key text-primary me-2"></i> Update Security Credentials</h3>
@@ -108,4 +175,27 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const savedTheme = localStorage.getItem("campusmate_theme") || "system";
+        const select = document.getElementById("theme-select");
+        if (select) {
+            select.value = savedTheme;
+        }
+    });
+
+    function changeThemePreference(val) {
+        localStorage.setItem("campusmate_theme", val);
+        if (val === "dark" || (val === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+            document.documentElement.classList.add("dark");
+            document.body.classList.add("dark");
+        } else {
+            document.documentElement.classList.remove("dark");
+            document.body.classList.remove("dark");
+        }
+    }
+</script>
 {% endblock %}

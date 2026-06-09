@@ -6,7 +6,8 @@
 
 {% block content %}
 <!-- Welcome Banner -->
-<div class="flat-card mb-4" style="background: linear-gradient(135deg, var(--neon-blue-dim), rgba(124, 58, 237, 0.08)); border-left: 4px solid var(--neon-blue); padding: 1.8rem 2rem;">
+<div class="flat-card mb-4" id="dashboard-welcome-banner" style="display: none; background: linear-gradient(135deg, var(--neon-blue-dim), rgba(124, 58, 237, 0.08)); border-left: 4px solid var(--neon-blue); padding: 1.8rem 2rem; position: relative;">
+    <button type="button" class="btn-close position-absolute" onclick="dismissWelcomeBanner()" style="top: 15px; right: 15px; font-size: 1.1rem; background:none; border:none; cursor:pointer; color: var(--text-muted);"><i class="fa-solid fa-xmark"></i></button>
     <div class="row align-items-center">
         <div class="col-md-8">
             <span class="badge badge-info mb-2 text-uppercase" style="font-size:0.68rem; letter-spacing:1px; background: rgba(124, 58, 237, 0.1); color: var(--neon-blue); font-weight:700;">Student Workspace</span>
@@ -30,6 +31,39 @@
         </div>
     </div>
 </div>
+
+<!-- Active Notifications Card (Visible only in Dashboard) -->
+{% if unread_notifications and unread_notifications|length > 0 %}
+<div class="flat-card mb-4" id="dashboard-notifications-card" style="border-left: 4px solid var(--neon-blue);">
+    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
+        <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-bell text-muted me-2"></i> Active Notifications</h3>
+        <button class="btn btn-sm btn-outline text-danger border-0" onclick="clearAllNotifications()" style="font-size: 0.75rem;"><i class="fa-solid fa-trash me-1"></i> Clear All</button>
+    </div>
+    <div class="d-flex flex-column gap-2" id="dashboard-notifications-list">
+        {% for notif in unread_notifications %}
+        <div class="p-3 border rounded bg-white d-flex justify-content-between align-items-start position-relative animate-fade-in" id="db-notif-{{ notif.id }}" style="border-color: var(--border-color) !important; padding-right: 2.5rem !important;">
+            <button class="btn-close position-absolute" onclick="dismissDbNotification({{ notif.id }})" style="top: 10px; right: 10px; font-size: 0.85rem; background:none; border:none; cursor:pointer; color: var(--text-muted);" title="Dismiss"><i class="fa-solid fa-xmark"></i></button>
+            <div class="d-flex gap-2.5">
+                <div class="notif-icon-circle {{ notif.category }} d-flex align-items-center justify-content-center" style="width: 30px; height: 30px; border-radius: 50%; background: var(--bg-tertiary); color: var(--neon-blue); flex-shrink:0;">
+                    <i class="fa-solid {% if notif.category == 'streak' %}fa-fire{% elif notif.category == 'milestone' %}fa-route{% else %}fa-envelope{% endif %}"></i>
+                </div>
+                <div>
+                    <h4 style="font-size: 0.85rem; font-weight:700;" class="mb-1 text-secondary">{{ notif.title }}</h4>
+                    <p class="text-muted mb-0" style="font-size: 0.78rem; line-height: 1.35;">{{ notif.content }}</p>
+                    <span class="text-muted d-block mt-1" style="font-size: 0.65rem;">{{ notif.created_at.strftime('%m-%d %H:%M') }}</span>
+                    <div class="d-flex gap-2 mt-2">
+                        <button class="btn btn-xs btn-light py-1 px-2" style="font-size: 0.65rem; background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); cursor: pointer;" onclick="dismissDbNotification({{ notif.id }})"><i class="fa-solid fa-check me-1 text-success"></i> Mark Read</button>
+                        <button class="btn btn-xs btn-light py-1 px-2" style="font-size: 0.65rem; background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); cursor: pointer;" onclick="dismissDbNotification({{ notif.id }})"><i class="fa-solid fa-eye-slash me-1"></i> Dismiss</button>
+                        <button class="btn btn-xs btn-light py-1 px-2 text-danger" style="font-size: 0.65rem; background: var(--bg-secondary); border: 1px solid var(--border-color); cursor: pointer;" onclick="deleteDbNotification({{ notif.id }})"><i class="fa-solid fa-trash me-1"></i> Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
 
 <!-- Primary control grid -->
 <div class="row g-4 mb-4">
@@ -287,4 +321,83 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        if (localStorage.getItem("dismissed_welcome_banner") !== "true") {
+            const banner = document.getElementById("dashboard-welcome-banner");
+            if (banner) banner.style.display = "block";
+        }
+    });
+
+    function dismissWelcomeBanner() {
+        const banner = document.getElementById("dashboard-welcome-banner");
+        if (banner) banner.style.display = "none";
+        localStorage.setItem("dismissed_welcome_banner", "true");
+    }
+
+    async function dismissDbNotification(notifId) {
+        try {
+            const response = await fetch(`/notifications/read/${notifId}`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token() }}"
+                }
+            });
+            if (response.ok) {
+                const el = document.getElementById(`db-notif-${notifId}`);
+                if (el) el.remove();
+                checkEmptyNotifications();
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    async function deleteDbNotification(notifId) {
+        try {
+            const response = await fetch(`/notifications/delete/${notifId}`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token() }}"
+                }
+            });
+            if (response.ok) {
+                const el = document.getElementById(`db-notif-${notifId}`);
+                if (el) el.remove();
+                checkEmptyNotifications();
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    async function clearAllNotifications() {
+        try {
+            const response = await fetch(`/notifications/delete-all`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token() }}"
+                }
+            });
+            if (response.ok) {
+                const list = document.getElementById("dashboard-notifications-list");
+                if (list) list.innerHTML = "";
+                checkEmptyNotifications();
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    function checkEmptyNotifications() {
+        const list = document.getElementById("dashboard-notifications-list");
+        if (!list || list.children.length === 0) {
+            const card = document.getElementById("dashboard-notifications-card");
+            if (card) card.remove();
+        }
+    }
+</script>
 {% endblock %}

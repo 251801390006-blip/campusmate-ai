@@ -88,9 +88,19 @@
 
                 </div>
 
-                <div class="canvas-instructions mb-2 text-muted" style="font-size: 0.75rem; display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-circle-info text-info"></i>
-                    <span>Drag/pan canvas to navigate. Click nodes to see details. Double-click or use controls to reset view.</span>
+                <!-- Dismissible Tips Banner -->
+                <div id="roadmap-tips-banner" class="flat-card mb-3 p-3 text-secondary d-flex justify-content-between align-items-center" style="background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.8rem; margin-bottom: 15px;">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-circle-info text-info" style="font-size: 1.1rem; flex-shrink:0;"></i>
+                        <div>
+                            <strong>Roadmap Navigation:</strong> Click nodes to see details. Drag/pan the canvas. Use zoom (+/-) and arrows to operate.
+                            <div class="form-check mt-1" style="font-size: 0.72rem; padding-left: 1.5em; margin-bottom: 0;">
+                                <input class="form-check-input" type="checkbox" id="never-show-tips-check">
+                                <label class="form-check-label text-muted" for="never-show-tips-check">Never show tips again</label>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-close border-0 bg-transparent text-secondary" onclick="dismissRoadmapTips()" style="cursor:pointer; font-size: 1.2rem; padding: 4px;"><i class="fa-solid fa-xmark"></i></button>
                 </div>
                 
                 <div class="canvas-viewport" id="canvas-viewport">
@@ -99,10 +109,14 @@
                         <div id="canvas-nodes"></div>
                     </div>
                     
-                    <!-- Floating Controls -->
+                    <!-- Floating Controls with Arrow Keys -->
                     <div class="canvas-controls">
                         <button class="btn btn-light shadow-sm" onclick="zoomIn()" title="Zoom In"><i class="fa-solid fa-plus"></i></button>
                         <button class="btn btn-light shadow-sm" onclick="zoomOut()" title="Zoom Out"><i class="fa-solid fa-minus"></i></button>
+                        <button class="btn btn-light shadow-sm" onclick="panCanvas('up')" title="Pan Up"><i class="fa-solid fa-arrow-up"></i></button>
+                        <button class="btn btn-light shadow-sm" onclick="panCanvas('down')" title="Pan Down"><i class="fa-solid fa-arrow-down"></i></button>
+                        <button class="btn btn-light shadow-sm" onclick="panCanvas('left')" title="Pan Left"><i class="fa-solid fa-arrow-left"></i></button>
+                        <button class="btn btn-light shadow-sm" onclick="panCanvas('right')" title="Pan Right"><i class="fa-solid fa-arrow-right"></i></button>
                         <button class="btn btn-light shadow-sm" onclick="resetZoom()" title="Reset Zoom"><i class="fa-solid fa-arrows-to-dot"></i></button>
                         <button class="btn btn-light shadow-sm" onclick="fitToScreen()" title="Fit to Screen"><i class="fa-solid fa-maximize"></i></button>
                         <button class="btn btn-light shadow-sm" onclick="toggleFullScreen()" title="Full Screen"><i class="fa-solid fa-display"></i></button>
@@ -184,9 +198,15 @@
             </div>
 
             <!-- Certifications Section -->
-            <div class="accordion-section mb-4">
+            <div class="accordion-section mb-3">
                 <h4 class="fw-bold mb-2 text-dark" style="font-size:0.85rem;"><i class="fa-solid fa-award text-primary me-2"></i> Targeted Industry Certificate</h4>
                 <div class="cert-info-box p-3 border rounded text-dark" id="node-modal-certs" style="font-size: 0.82rem; line-height: 1.5; background-color: #f0fdf4; border-color: #dcfce7; color: #15803d;"></div>
+            </div>
+
+            <!-- Interview Questions Section -->
+            <div class="accordion-section mb-4">
+                <h4 class="fw-bold mb-2 text-dark" style="font-size:0.85rem;"><i class="fa-solid fa-circle-question text-primary me-2"></i> Interview Q&A</h4>
+                <div class="p-3 border rounded text-dark" id="node-modal-questions" style="font-size: 0.82rem; line-height: 1.5; background-color: #f8fafc; border-color: #e2e8f0; max-height: 200px; overflow-y: auto;"></div>
             </div>
 
             <div class="node-action-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
@@ -345,6 +365,15 @@ function renderRoadmapTree() {
     });
 }
 
+function dismissRoadmapTips() {
+    const banner = document.getElementById("roadmap-tips-banner");
+    const checkbox = document.getElementById("never-show-tips-check");
+    if (checkbox && checkbox.checked) {
+        localStorage.setItem("never_show_roadmap_tips", "true");
+    }
+    if (banner) banner.style.display = "none";
+}
+
 function openNodeModal(node, stepIdx) {
     selectedNode = node;
     selectedStepIdx = stepIdx;
@@ -399,6 +428,21 @@ function openNodeModal(node, stepIdx) {
         certBox.innerHTML = "No matched certification guidelines mapped.";
     }
 
+    const qBox = document.getElementById("node-modal-questions");
+    qBox.innerHTML = "";
+    if (node.interview_questions && node.interview_questions.length > 0) {
+        node.interview_questions.forEach((q, idx) => {
+            qBox.innerHTML += `
+                <div class="mb-2.5 pb-2 border-bottom" style="border-color:#e2e8f0;">
+                    <div class="fw-bold text-dark mb-1">Q${idx + 1}: ${q.question}</div>
+                    <div class="text-secondary" style="font-size:0.78rem;"><strong>Answer:</strong> ${q.answer}</div>
+                </div>
+            `;
+        });
+    } else {
+        qBox.innerHTML = "No interview questions mapped to this checkpoint.";
+    }
+
     const actionBtn = document.getElementById("node-modal-action-btn");
     if (node.status === "COMPLETED") {
         actionBtn.innerText = "Completed!";
@@ -423,16 +467,23 @@ function closeNodeModal() {
     selectedStepIdx = -1;
 }
 
-// Show custom floating notification
-function showRewardToast(xpGained, currentStreak) {
+// Show premium clean toast notification
+function showToast(title, message, iconClass = "fa-trophy text-warning") {
     const toast = document.getElementById("gamification-toast");
+    const toastIcon = toast.querySelector(".toast-icon i");
+    const toastTitle = toast.querySelector("strong");
     const toastText = document.getElementById("toast-text");
-    toastText.innerHTML = `<strong>+${xpGained} XP</strong> Awarded! Study Streak: <strong>${currentStreak} Days</strong>`;
+    
+    if (toastIcon) toastIcon.className = "fa-solid " + iconClass;
+    if (toastTitle) toastTitle.innerText = title;
+    if (toastText) toastText.innerText = message;
     
     toast.classList.remove("hidden");
     toast.classList.add("animate-slide-in");
     
-    setTimeout(() => {
+    if (window.toastTimeout) clearTimeout(window.toastTimeout);
+    
+    window.toastTimeout = setTimeout(() => {
         toast.classList.remove("animate-slide-in");
         toast.classList.add("hidden");
     }, 4500);
@@ -484,20 +535,15 @@ async function triggerNodeCompletion() {
             if (xpDisplay) xpDisplay.innerText = `${data.xp} XP`;
             if (streakDisplay) streakDisplay.innerText = `${data.streak} Days`;
             
-            // Sync AI Mentor ribbon memory
-            if (window.loadMentorChatHistory) {
-                window.loadMentorChatHistory();
-            }
-            
             closeNodeModal();
         } else {
-            alert("Error updating milestone state: " + (data.error || "Unknown error"));
+            showToast("Sync Error", data.error || "Unknown error", "fa-triangle-exclamation text-danger");
             renderRoadmapTree();
             closeNodeModal();
         }
     } catch (e) {
         console.error(e);
-        alert("Connection error.");
+        showToast("Connection Error", "Network request failed.", "fa-triangle-exclamation text-danger");
         renderRoadmapTree();
         closeNodeModal();
     }
@@ -627,7 +673,7 @@ function toggleFullScreen() {
             el.style.height = "100vh";
             setTimeout(fitToScreen, 150);
         }).catch(err => {
-            alert(`Fullscreen error: ${err.message}`);
+            showToast("Fullscreen Error", err.message, "fa-triangle-exclamation text-danger");
         });
     } else {
         document.exitFullscreen().then(() => {
@@ -670,8 +716,8 @@ function jumpToActive() {
 
 async function bookmarkCurrentNode() {
     if (!selectedNode) return;
-    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
     try {
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
         const response = await fetch("/bookmarks/add", {
             method: "POST",
             headers: {
@@ -681,18 +727,22 @@ async function bookmarkCurrentNode() {
             body: `item_type=roadmap&title=${encodeURIComponent(selectedNode.title)}`
         });
         if (response.ok) {
-            alert(`Bookmarked checkpoint: ${selectedNode.title} successfully!`);
+            showToast("Bookmarked", `Checkpoint: ${selectedNode.title} saved!`, "fa-bookmark text-success");
         } else {
-            alert("Failed to bookmark checkpoint.");
+            showToast("Bookmark Error", "Failed to save checkpoint.", "fa-triangle-exclamation text-danger");
         }
     } catch(e) {
         console.error(e);
-        alert("Failed to send request.");
+        showToast("Connection Error", "Failed to send request.", "fa-triangle-exclamation text-danger");
     }
 }
 
 // Initialize layout
 document.addEventListener("DOMContentLoaded", () => {
+    if (localStorage.getItem("never_show_roadmap_tips") === "true") {
+        const banner = document.getElementById("roadmap-tips-banner");
+        if (banner) banner.style.display = "none";
+    }
     renderRoadmapTree();
     setTimeout(resetZoom, 200);
     

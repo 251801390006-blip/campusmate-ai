@@ -8,7 +8,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, current_app
 from flask_login import login_required, current_user
-from app.models import db, User, ChatMessage, ResumeAnalysis, RoadmapProgress, UserResume
+from app.models import db, User, ChatMessage, ResumeAnalysis, RoadmapProgress, UserResume, Internship, SavedItem
 from pypdf import PdfReader
 
 features_bp = Blueprint('features', __name__)
@@ -268,7 +268,20 @@ def parse_text_to_resume_fields(text: str) -> dict:
         "certC1": "",
         "certC2": "",
         "certC3": "",
-        "certC4": ""
+        "certC4": "",
+        
+        # New details sections default initializations
+        "profilePic": "",
+        "portfolio": "",
+        "achievements": "Dean's List 2025, First Place CodeQuest Hackathon",
+        "researchPapers": "Decentralized Threat Log Mapping (IEEE 2026)",
+        "hackathons": "Participated in DevFest 24, Smart India Hackathon 25",
+        "workshops": "Attended AWS Cloud Practitioner Immersion Day",
+        "volunteering": "Tech mentor at local high school coding club",
+        "languages": "English (Fluent), Spanish (Conversational)",
+        "interests": "Cryptography, Robotics, Open Source Contributing",
+        "references": "Available upon request",
+        "custom": ""
     }
     
     # Try to extract sections dynamically from text
@@ -682,12 +695,22 @@ def get_predefined_roadmap(role: str) -> list:
             "prerequisites": f"Step {i-1}" if i > 1 else "None",
             "xp_reward": reward,
             "resources": [
-                {"title": f"GeeksforGeeks: {theme} Developer Guide", "url": f"https://www.geeksforgeeks.org/search-results/?q={theme.lower().replace(' ', '+')}"},
-                {"title": f"Google Developers: {theme} Technical Docs", "url": "https://developers.google.com"},
-                {"title": f"YouTube: {theme} Video Crash Course", "url": "https://www.youtube.com/results?search_query=" + theme.lower().replace(' ', '+')},
-                {"title": f"Coursera & Udemy: Learn {theme} Specialization", "url": "https://www.coursera.org"}
+                {"title": f"GeeksforGeeks: {theme} Reference Guide", "url": f"https://www.geeksforgeeks.org/search-results/?q={theme.lower().replace(' ', '+')}"},
+                {"title": f"YouTube: {theme} Full Course Playlist", "url": f"https://www.youtube.com/results?search_query={theme.lower().replace(' ', '+')}+tutorial"},
+                {"title": f"W3Schools: Learn {theme} Interactive Tutorial", "url": "https://www.w3schools.com"},
+                {"title": f"freeCodeCamp: {theme} Complete Guide", "url": "https://www.freecodecamp.org"},
+                {"title": f"LeetCode: {theme} Programming Challenges", "url": "https://leetcode.com/problemset/all/"},
+                {"title": f"HackerRank: {theme} Skill Practice", "url": "https://www.hackerrank.com"},
+                {"title": f"Google Search: {theme} Best Practices", "url": f"https://www.google.com/search?q={theme.lower().replace(' ', '+')}+best+practices"},
+                {"title": f"Dev.to: {theme} Community Blogs & Articles", "url": f"https://dev.to/t/{theme.lower().replace(' ', '')}"},
+                {"title": f"Medium: {theme} Architectural Patterns", "url": "https://medium.com"},
+                {"title": f"Coursera: {theme} Specialization Courses", "url": "https://www.coursera.org"},
+                {"title": f"Udemy: {theme} Development Video Lectures", "url": "https://www.udemy.com"},
+                {"title": f"Khan Academy: {theme} Analytical Foundations", "url": "https://www.khanacademy.org"},
+                {"title": f"Tutorialspoint: {theme} Easy Tutorials", "url": "https://www.tutorialspoint.com"},
+                {"title": f"StackOverflow: {theme} Debugging FAQ", "url": f"https://stackoverflow.com/questions/tagged/{theme.lower().replace(' ', '-')}"},
+                {"title": f"GitHub Search: {theme} Open Source Repos", "url": f"https://github.com/search?q={theme.lower().replace(' ', '+')}"}
             ],
-
             "projects": [{
                 "title": f"Step {i} Practice Project: {proj}",
                 "description": f"Design and implement a structured module targeting {theme}.",
@@ -700,7 +723,14 @@ def get_predefined_roadmap(role: str) -> list:
                 "duration": "2 hours exam",
                 "difficulty": diff,
                 "career_impact": "High demand, unlocks recruiter screening filters."
-            }]
+            }],
+            "interview_questions": [
+                {"question": f"What is the primary role of {theme} in industry systems?", "answer": f"{theme} helps organize, build, and optimize backend or frontend systems by following modern software standards."},
+                {"question": f"Explain one common pitfall or vulnerability when dealing with {theme}.", "answer": "Misconfiguration, lack of sanitization, or unoptimized complexity can lead to severe bottlenecks and data risks."},
+                {"question": f"Name three tools commonly used to develop, test, or deploy {theme}.", "answer": "Typical developer workflows include Git, VS Code, and container tools like Docker."},
+                {"question": f"How does scaling impact {theme} architectures?", "answer": "Horizontal scaling, database sharding, and caching help reduce latency as user requests scale."},
+                {"question": f"What is a standard best practice for monitoring {theme}?", "answer": "Implement structured logs, index metrics in dashboards, and setup alert thresholds for anomalies."}
+            ]
         })
         
     return nodes
@@ -1328,19 +1358,7 @@ def internship_center():
     progress = RoadmapProgress.query.filter_by(user_id=current_user.id).first()
     user_track = progress.role if progress else "Full Stack Development"
     
-    # Predefined mock jobs with mode, deadline metrics
-    all_jobs = [
-        {"title": "Software Engineer Intern", "company": "Microsoft", "track": "Full Stack Development", "stipend": "$8,500/mo", "location": "Redmond, WA (Hybrid)", "skills": "Python, React, Data Structures", "mode": "Hybrid", "deadline": "2026-09-30"},
-        {"title": "AI Engineering Intern", "company": "Google DeepMind", "track": "AI Engineering", "stipend": "$9,200/mo", "location": "London, UK (On-site)", "skills": "PyTorch, Transformers, LLMs", "mode": "On-site", "deadline": "2026-10-15"},
-        {"title": "Machine Learning Intern", "company": "Meta", "track": "Machine Learning", "stipend": "$9,000/mo", "location": "Menlo Park, CA (Hybrid)", "skills": "Scikit-Learn, PyTorch, SQL", "mode": "Hybrid", "deadline": "2026-10-01"},
-        {"title": "Cyber Security Analyst Intern", "company": "CrowdStrike", "track": "Cyber Security", "stipend": "$7,500/mo", "location": "Austin, TX (Remote)", "skills": "Nmap, Wireshark, Linux Scripting", "mode": "Remote", "deadline": "2026-09-15"},
-        {"title": "DevOps Engineer Intern", "company": "HashiCorp", "track": "DevOps", "stipend": "$7,800/mo", "location": "San Francisco, CA (Hybrid)", "skills": "Docker, Kubernetes, Terraform", "mode": "Hybrid", "deadline": "2026-10-10"},
-        {"title": "Cloud Operations Intern", "company": "Amazon Web Services", "track": "Cloud Computing", "stipend": "$8,200/mo", "location": "Seattle, WA (On-site)", "skills": "AWS IAM, EC2, CloudFormation", "mode": "On-site", "deadline": "2026-09-25"},
-        {"title": "Blockchain Developer Intern", "company": "ConsenSys", "track": "Web3", "stipend": "$8,000/mo", "location": "Remote", "skills": "Solidity, Ethereum, Smart Contracts", "mode": "Remote", "deadline": "2026-11-01"},
-        {"title": "UI/UX Product Design Intern", "company": "Figma", "track": "UI/UX Design", "stipend": "$7,200/mo", "location": "San Francisco, CA (Hybrid)", "skills": "Figma, User Research, Wireframing", "mode": "Hybrid", "deadline": "2026-10-05"},
-        {"title": "QA Automation Engineer Intern", "company": "BrowserStack", "track": "QA Automation", "stipend": "$6,500/mo", "location": "Dublin, Ireland (Hybrid)", "skills": "Selenium, Playwright, Python", "mode": "Hybrid", "deadline": "2026-09-20"},
-        {"title": "Product Management Intern", "company": "Stripe", "track": "Product Management", "stipend": "$8,800/mo", "location": "New York, NY (Hybrid)", "skills": "Agile Scrum, Figma, Business Analytics", "mode": "Hybrid", "deadline": "2026-10-20"}
-    ]
+    db_internships = Internship.query.order_by(Internship.is_pinned.desc(), Internship.created_at.desc()).all()
     
     resume = ResumeAnalysis.query.filter_by(user_id=current_user.id).order_by(ResumeAnalysis.created_at.desc()).first()
     resume_score = resume.ats_score if resume else 0
@@ -1354,28 +1372,20 @@ def internship_center():
         completed_nodes_count = len([x for x in progress.completed_nodes.split(",") if x.strip()])
     tech_readiness = min(100, int((completed_nodes_count / 200) * 100)) if progress else 0
     
-    # Fetch admin reviews submitted by user to check current application states
-    from app.models import AdminReview
-    user_applications = AdminReview.query.filter_by(user_id=current_user.id).all()
-    applied_job_ids = {app.job_id: app.status for app in user_applications}
+    # Fetch bookmarked items
+    bookmarks = SavedItem.query.filter_by(user_id=current_user.id, item_type='internship').all()
+    bookmarked_ids = {b.item_id for b in bookmarks}
     
     jobs = []
-    for idx, job in enumerate(all_jobs):
-        job_id = idx + 1
-        
+    for job in db_internships:
         # Parse job required skills
-        req_skills = [s.strip() for s in job["skills"].split(",") if s.strip()]
+        req_skills = [s.strip() for s in (job.skills_required or "").split(",") if s.strip()]
         
         # Calculate matching & missing skills
         matched = [s for s in req_skills if s.lower() in user_skills_list]
         missing = [s for s in req_skills if s.lower() not in user_skills_list]
         
-        # Compatibility/Readiness Score calculation:
-        # 30% from track match
-        # 40% from matching skills fraction
-        # 20% from resume score
-        # 10% from tech roadmap progress
-        compatibility = 30 if user_track.lower() in job["track"].lower() or job["track"].lower() in user_track.lower() else 10
+        compatibility = 30 if user_track.lower() in job.role.lower() or job.role.lower() in user_track.lower() else 10
         if req_skills:
             compatibility += int((len(matched) / len(req_skills)) * 40)
         compatibility += int((resume_score / 100) * 20)
@@ -1383,19 +1393,22 @@ def internship_center():
         compatibility = min(98, max(25, compatibility))
         
         jobs.append({
-            "id": job_id,
-            "title": job["title"],
-            "company": job["company"],
-            "track": job["track"],
-            "stipend": job["stipend"],
-            "location": job["location"],
-            "skills": job["skills"],
-            "mode": job["mode"],
-            "deadline": job["deadline"],
+            "id": job.id,
+            "title": job.role,
+            "company": job.company_name,
+            "logo": job.company_logo or "fa-solid fa-briefcase",
+            "internship_type": job.internship_type,
+            "location_type": job.location_type,
+            "stipend": job.stipend,
+            "eligibility": job.eligibility,
+            "skills": job.skills_required,
+            "deadline": job.deadline,
+            "official_link": job.official_link,
+            "is_pinned": job.is_pinned,
             "compatibility": compatibility,
             "matched_skills": matched,
             "missing_skills": missing,
-            "application_status": applied_job_ids.get(job_id)
+            "is_bookmarked": str(job.id) in bookmarked_ids
         })
         
     return render_template('internship_center.html', jobs=jobs, user_track=user_track, resume_score=resume_score)

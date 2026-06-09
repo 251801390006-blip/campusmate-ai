@@ -18,6 +18,14 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body class="dashboard-body">
+    <script>
+        (function() {
+            const theme = localStorage.getItem("campusmate_theme") || "system";
+            if (theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+                document.body.classList.add("dark");
+            }
+        })();
+    </script>
     <!-- Sidebar Navigation -->
     <aside id="sidebar-drawer" class="sidebar">
         <div class="sidebar-header">
@@ -38,7 +46,7 @@
                 <i class="fa-solid fa-route"></i> Learning Roadmaps
             </a>
             <a href="{{ url_for('features.resume_analyzer') }}" class="sidebar-link {% if request.endpoint == 'features.resume_analyzer' %}active{% endif %}">
-                <i class="fa-solid fa-file-invoice"></i> Resume Builder 3.0
+                <i class="fa-solid fa-file-invoice"></i> Resume Builder 4.0
             </a>
             <a href="{{ url_for('features.interview_prep') }}" class="sidebar-link {% if request.endpoint == 'features.interview_prep' %}active{% endif %}">
                 <i class="fa-solid fa-microphone"></i> Interview Simulator
@@ -50,13 +58,17 @@
                 <i class="fa-solid fa-window-restore"></i> Portfolio Builder
             </a>
             <a href="{{ url_for('features.project_architect') }}" class="sidebar-link {% if request.endpoint == 'features.project_architect' %}active{% endif %}">
-                <i class="fa-solid fa-cubes"></i> Project Architect
+                <i class="fa-solid fa-circle-nodes"></i> Project Architect
             </a>
             <a href="{{ url_for('features.hackathon_assistant') }}" class="sidebar-link {% if request.endpoint == 'features.hackathon_assistant' %}active{% endif %}">
                 <i class="fa-solid fa-laptop-code"></i> Hackathon Assistant
             </a>
-            
-            <hr class="sidebar-divider">
+            <a href="{{ url_for('dashboard.bookmarks') }}" class="sidebar-link {% if request.endpoint == 'dashboard.bookmarks' %}active{% endif %}">
+                <i class="fa-solid fa-bookmark"></i> Saved Items
+            </a>
+            <a href="{{ url_for('dashboard.settings') }}" class="sidebar-link {% if request.endpoint == 'dashboard.settings' %}active{% endif %}">
+                <i class="fa-solid fa-gear"></i> Settings
+            </a>
             
             <div class="sidebar-section-label">Collaboration & Help</div>
             <a href="{{ url_for('feedback.list_feedback') }}" class="sidebar-link {% if request.blueprint == 'feedback' %}active{% endif %}">
@@ -70,13 +82,6 @@
                     <i class="fa-solid fa-shield-halved"></i> Admin Console
                 </a>
             {% endif %}
-            
-            <hr class="sidebar-divider">
-            <div class="sidebar-section-label">API Settings</div>
-            <div class="px-3 py-1">
-                <label for="sidebar-gemini-key" class="text-muted" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; display:block; margin-bottom:4px;">Gemini API Key</label>
-                <input type="password" id="sidebar-gemini-key" class="form-control" placeholder="Paste key here..." style="font-size:0.75rem; padding: 6px; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius:4px; width:100%; height:28px;" onchange="saveGeminiKey(this.value)">
-            </div>
         </div>
         
         <!-- Sidebar User Footer -->
@@ -120,59 +125,38 @@
             </div>
             
             <div class="header-right d-flex align-items-center gap-3">
-                <!-- Notification Bell Dropdown -->
-                <div class="notification-bell-wrapper position-relative">
-                    <button id="notification-bell-btn" class="header-icon-btn" onclick="toggleNotificationDropdown(event)">
-                        <i class="fa-solid fa-bell"></i>
-                        {% if unread_notifications_count > 0 %}
-                            <span class="notification-badge" id="notif-badge-count">{{ unread_notifications_count }}</span>
-                        {% endif %}
+                <!-- Day / Dark Mode Switcher -->
+                <div class="dropdown theme-mode-dropdown" style="position: relative;">
+                    <button type="button" class="header-icon-btn border-0 bg-transparent text-secondary" onclick="toggleThemeDropdown(event)" title="Choose Theme Mode" style="font-size: 1.15rem; cursor: pointer; color: var(--text-secondary) !important;">
+                        <i class="fa-solid fa-circle-half-stroke"></i>
                     </button>
-                    <div id="notification-dropdown" class="notification-dropdown-card hidden">
-                        <div class="notif-header d-flex justify-content-between align-items-center p-3 border-bottom">
-                            <span class="fw-bold" style="font-size: 0.85rem;"><a href="{{ url_for('dashboard.notifications') }}" class="text-dark text-decoration-none"><i class="fa-solid fa-inbox me-1"></i> Inbox</a></span>
-                            {% if unread_notifications_count > 0 %}
-                                <a href="javascript:void(0)" class="mark-all-read-btn text-decoration-none" onclick="markAllNotificationsRead(event)" style="font-size: 0.72rem; font-weight: 600; color: var(--neon-blue);">Mark all read</a>
-                            {% endif %}
-                        </div>
-                        <div class="notif-body" id="notif-dropdown-body" style="max-height: 300px; overflow-y: auto;">
-                            {% if unread_notifications and unread_notifications|length > 0 %}
-                                {% for notif in unread_notifications %}
-                                    <div class="notif-item d-flex gap-2 p-3 border-bottom position-relative" id="notif-item-{{ notif.id }}">
-                                        <div class="notif-icon-circle {{ notif.category }} d-flex align-items-center justify-content-center" style="width: 28px; height: 28px; border-radius: 50%; font-size: 0.75rem; background: var(--bg-tertiary); color: var(--neon-blue);">
-                                            <i class="fa-solid {% if notif.category == 'streak' %}fa-fire{% elif notif.category == 'milestone' %}fa-route{% else %}fa-star{% endif %}"></i>
-                                        </div>
-                                        <div class="notif-content-wrapper flex-grow-1" style="font-size: 0.75rem; padding-right: 15px;">
-                                            <strong class="notif-title d-block text-dark">{{ notif.title }}</strong>
-                                            <span class="notif-desc d-block text-secondary mt-0.5" style="line-height: 1.3;">{{ notif.content }}</span>
-                                            <span class="notif-time d-block text-muted mt-1" style="font-size: 0.65rem;">{{ notif.created_at.strftime('%m-%d %H:%M') }}</span>
-                                        </div>
-                                        <button class="notif-dismiss-btn border-0 bg-transparent text-secondary position-absolute" onclick="dismissNotification(event, {{ notif.id }})" style="top: 8px; right: 8px; cursor: pointer; padding: 2px; font-size: 0.8rem;">
-                                            <i class="fa-solid fa-xmark"></i>
-                                        </button>
-                                    </div>
-                                {% endfor %}
-                            {% else %}
-                                <div class="notif-empty text-center py-4 text-muted">
-                                    <i class="fa-regular fa-bell-slash mb-2 d-block" style="font-size: 1.5rem;"></i>
-                                    <p style="font-size: 0.75rem; margin-bottom: 0;">All caught up! No new notifications.</p>
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
+                    <ul id="theme-dropdown-menu" class="dropdown-menu dropdown-menu-end shadow hidden" style="position: absolute; right: 0; top: 38px; z-index: 100; min-width: 140px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 6px; list-style: none; padding: 4px 0; margin: 0;">
+                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeThemePreference('light')" style="display: block; padding: 6px 16px; font-size: 0.8rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-sun me-2 text-warning"></i> Light Mode</a></li>
+                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeThemePreference('dark')" style="display: block; padding: 6px 16px; font-size: 0.8rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-moon me-2 text-primary"></i> Dark Mode</a></li>
+                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeThemePreference('system')" style="display: block; padding: 6px 16px; font-size: 0.8rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-desktop me-2 text-muted"></i> System Mode</a></li>
+                    </ul>
                 </div>
 
-                <!-- Profile Avatar Link -->
-                <a href="{{ url_for('dashboard.profile') }}" class="header-profile-avatar d-flex align-items-center justify-content-center border" title="View Profile" style="width: 32px; height: 32px; border-radius: 50%; overflow: hidden; background: var(--bg-tertiary);">
-                    {% if current_user.profile_photo %}
-                        <img src="{{ url_for('static', filename=current_user.profile_photo) }}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
-                    {% elif current_user.avatar %}
-                        <img src="{{ url_for('static', filename='images/avatars/' + current_user.avatar) }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
-                        <i class="fa-solid fa-user text-secondary" style="display: none; font-size: 0.85rem;"></i>
-                    {% else %}
-                        <i class="fa-solid fa-user text-secondary" style="font-size: 0.85rem;"></i>
-                    {% endif %}
-                </a>
+                <!-- Profile Dropdown -->
+                <div class="dropdown profile-menu-dropdown" style="position: relative;">
+                    <a href="javascript:void(0)" onclick="toggleProfileDropdown(event)" class="header-profile-avatar d-flex align-items-center justify-content-center border" title="User Menu" style="width: 32px; height: 32px; border-radius: 50%; overflow: hidden; background: var(--bg-tertiary); cursor: pointer;">
+                        {% if current_user.profile_photo %}
+                            <img src="{{ url_for('static', filename=current_user.profile_photo) }}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                        {% elif current_user.avatar %}
+                            <img src="{{ url_for('static', filename='images/avatars/' + current_user.avatar) }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                            <i class="fa-solid fa-user text-secondary" style="display: none; font-size: 0.85rem;"></i>
+                        {% else %}
+                            <i class="fa-solid fa-user text-secondary" style="font-size: 0.85rem;"></i>
+                        {% endif %}
+                    </a>
+                    <ul id="profile-dropdown-menu" class="dropdown-menu dropdown-menu-end shadow hidden" style="position: absolute; right: 0; top: 38px; z-index: 100; min-width: 160px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 6px; list-style: none; padding: 4px 0; margin: 0;">
+                        <li><a class="dropdown-item" href="{{ url_for('dashboard.profile') }}" style="display: block; padding: 8px 16px; font-size: 0.8rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-user me-2 text-muted"></i> View Profile</a></li>
+                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="openProfileSettingsModal()" style="display: block; padding: 8px 16px; font-size: 0.8rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-user-gear me-2 text-muted"></i> Edit Profile</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('dashboard.settings') }}" style="display: block; padding: 8px 16px; font-size: 0.8rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-gear me-2 text-muted"></i> Settings</a></li>
+                        <li><hr style="margin: 4px 0; border-color: var(--border-color);"></li>
+                        <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}" style="display: block; padding: 8px 16px; font-size: 0.8rem; text-decoration: none;"><i class="fa-solid fa-right-from-bracket me-2"></i> Sign Out</a></li>
+                    </ul>
+                </div>
 
                 <span class="role-badge badge {% if current_user.role == 'admin' %}badge-warning{% else %}badge-info{% endif %}">
                     {{ current_user.role | upper }}
@@ -221,21 +205,153 @@
         </a>
     </nav>
 
-    <!-- Core Scripts -->
+    <!-- Profile Settings Modal -->
+    <div id="profile-settings-modal" class="custom-modal hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px;">
+        <div class="modal-card rounded shadow-lg p-4" style="width: 100%; max-width: 520px; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-color); max-height: 90vh; overflow-y: auto;">
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
+                <h3 class="fw-bold mb-0" style="font-size: 1.1rem; color: var(--text-primary);"><i class="fa-solid fa-user-gear text-primary me-2"></i> Profile Settings</h3>
+                <button type="button" class="btn-close border-0 bg-transparent text-secondary" onclick="closeProfileSettingsModal()" style="font-size: 1.1rem; cursor: pointer; color: var(--text-muted) !important;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="modal-profile-form" onsubmit="saveModalProfile(event)" class="d-flex flex-column gap-3">
+                <input type="hidden" name="action" value="profile">
+                <div class="row g-3">
+                    <div class="col-md-6" style="display:flex; flex-direction:column; gap:4px;">
+                        <label for="modal-profile-name" class="fw-semibold text-secondary" style="font-size:0.8rem;">Full Name</label>
+                        <input type="text" id="modal-profile-name" name="name" value="{{ current_user.name or '' }}" class="form-control" placeholder="Enter full name" style="width:100%; padding:6px 10px; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary); font-size:0.85rem;">
+                    </div>
+                    <div class="col-md-6" style="display:flex; flex-direction:column; gap:4px;">
+                        <label for="modal-profile-email" class="fw-semibold text-secondary" style="font-size:0.8rem;">Email Address</label>
+                        <input type="email" id="modal-profile-email" name="email" value="{{ current_user.email or '' }}" class="form-control" placeholder="Enter email address" required style="width:100%; padding:6px 10px; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary); font-size:0.85rem;">
+                    </div>
+                </div>
 
+                <div class="input-group d-flex flex-column gap-1 mb-2">
+                    <label for="modal-profile-bio" class="fw-semibold text-secondary" style="font-size:0.8rem;">Bio Description</label>
+                    <textarea id="modal-profile-bio" name="bio" rows="2" class="form-control" placeholder="Tell us about yourself" style="width:100%; border:1px solid var(--border-color); padding:6px 10px; border-radius:4px; font-size:0.85rem; background:var(--bg-primary); color:var(--text-primary);">{{ current_user.bio or '' }}</textarea>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6" style="display:flex; flex-direction:column; gap:4px;">
+                        <label for="modal-profile-branch" class="fw-semibold text-secondary" style="font-size:0.8rem;">Branch / Major</label>
+                        <input type="text" id="modal-profile-branch" name="branch" value="{{ current_user.branch or '' }}" class="form-control" placeholder="e.g. Cyber Security" style="width:100%; padding:6px 10px; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary); font-size:0.85rem;">
+                    </div>
+                    <div class="col-md-6" style="display:flex; flex-direction:column; gap:4px;">
+                        <label for="modal-profile-year" class="fw-semibold text-secondary" style="font-size:0.8rem;">Year</label>
+                        <input type="text" id="modal-profile-year" name="year" value="{{ current_user.year or '' }}" class="form-control" placeholder="e.g. 3rd Year" style="width:100%; padding:6px 10px; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary); font-size:0.85rem;">
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6" style="display:flex; flex-direction:column; gap:4px;">
+                        <label for="modal-profile-skills" class="fw-semibold text-secondary" style="font-size:0.8rem;">Technical Skills</label>
+                        <input type="text" id="modal-profile-skills" name="skills" value="{{ current_user.skills or '' }}" class="form-control" placeholder="e.g. Python, Git" style="width:100%; padding:6px 10px; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary); font-size:0.85rem;">
+                    </div>
+                    <div class="col-md-6" style="display:flex; flex-direction:column; gap:4px;">
+                        <label for="modal-profile-goals" class="fw-semibold text-secondary" style="font-size:0.8rem;">Career Goals</label>
+                        <input type="text" id="modal-profile-goals" name="goals" value="{{ current_user.career_goal or '' }}" class="form-control" placeholder="e.g. Security Analyst" style="width:100%; padding:6px 10px; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary); font-size:0.85rem;">
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-3 pt-2 border-top" style="border-color: var(--border-color);">
+                    <button type="button" class="btn btn-secondary py-1.5 px-3" onclick="closeProfileSettingsModal()" style="font-size:0.8rem; border:1px solid var(--border-color); background:var(--bg-secondary); color:var(--text-primary); border-radius:4px; cursor:pointer;">Cancel</button>
+                    <button type="submit" class="btn btn-primary py-1.5 px-3" style="font-size:0.8rem; background: linear-gradient(135deg, #0078d4, #00bcf2); border: none; border-radius:4px; color:white; cursor:pointer;">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Core Scripts -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script>
-        // Load Gemini API Key from localStorage
+        // Theme & Appearance management
         document.addEventListener("DOMContentLoaded", () => {
-            const savedKey = localStorage.getItem("campusmate_gemini_key");
-            const keyInput = document.getElementById("sidebar-gemini-key");
-            if (savedKey && keyInput) {
-                keyInput.value = savedKey;
-            }
+            const savedTheme = localStorage.getItem("campusmate_theme") || "system";
+            applyThemePreference(savedTheme);
         });
 
-        function saveGeminiKey(val) {
-            localStorage.setItem("campusmate_gemini_key", val.trim());
+        function applyThemePreference(val) {
+            if (val === "dark" || (val === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+                document.documentElement.classList.add("dark");
+                document.body.classList.add("dark");
+            } else {
+                document.documentElement.classList.remove("dark");
+                document.body.classList.remove("dark");
+            }
+        }
+
+        function changeThemePreference(val) {
+            localStorage.setItem("campusmate_theme", val);
+            applyThemePreference(val);
+            const selectEl = document.getElementById("theme-select");
+            if (selectEl) selectEl.value = val;
+        }
+
+        // Custom Dropdowns toggles
+        function toggleThemeDropdown(event) {
+            event.stopPropagation();
+            document.getElementById("theme-dropdown-menu").classList.toggle("hidden");
+            document.getElementById("profile-dropdown-menu").classList.add("hidden");
+        }
+
+        function toggleProfileDropdown(event) {
+            event.stopPropagation();
+            document.getElementById("profile-dropdown-menu").classList.toggle("hidden");
+            document.getElementById("theme-dropdown-menu").classList.add("hidden");
+        }
+
+        document.addEventListener("click", () => {
+            const themeMenu = document.getElementById("theme-dropdown-menu");
+            const profileMenu = document.getElementById("profile-dropdown-menu");
+            if (themeMenu) themeMenu.classList.add("hidden");
+            if (profileMenu) profileMenu.classList.add("hidden");
+        });
+
+        // Profile Settings Modal functions
+        function openProfileSettingsModal() {
+            const modal = document.getElementById("profile-settings-modal");
+            if (modal) {
+                modal.classList.remove("hidden");
+            }
+        }
+
+        function closeProfileSettingsModal() {
+            const modal = document.getElementById("profile-settings-modal");
+            if (modal) {
+                modal.classList.add("hidden");
+            }
+        }
+
+        async function saveModalProfile(event) {
+            event.preventDefault();
+            const form = document.getElementById("modal-profile-form");
+            const formData = new FormData(form);
+            const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
+            
+            try {
+                const response = await fetch("/settings", {
+                    method: "POST",
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest",
+                        "X-CSRFToken": csrfToken
+                    },
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    closeProfileSettingsModal();
+                    if (window.showToast) {
+                        showToast("Profile Saved", "Settings successfully updated!", "fa-circle-check text-success");
+                    } else {
+                        alert("Profile updated successfully!");
+                    }
+                    setTimeout(() => window.location.reload(), 800);
+                } else {
+                    alert("Failed to update profile settings.");
+                }
+            } catch(e) {
+                console.error(e);
+                alert("An error occurred while saving profile settings.");
+            }
         }
     </script>
     {% block extra_scripts %}{% endblock %}

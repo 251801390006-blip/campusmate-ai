@@ -28,6 +28,14 @@
 
             <!-- Scrollable Editor Sections Form -->
             <div class="resume-form-scroller flex-grow-1 pe-2" style="overflow-y: auto; display: flex; flex-direction: column; gap: 16px;">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <h4 class="fw-bold text-secondary mb-0" style="font-size:0.75rem; text-transform:uppercase;"><i class="fa-solid fa-file-invoice text-muted me-1"></i> Workspace Control</h4>
+                    <div class="d-flex gap-1">
+                        <button id="btn-undo" class="btn btn-sm btn-light p-1 px-2 border" style="font-size:0.65rem; background: var(--bg-secondary); color: var(--text-primary); cursor: pointer;" onclick="undo()" title="Undo" disabled><i class="fa-solid fa-rotate-left"></i> Undo</button>
+                        <button id="btn-redo" class="btn btn-sm btn-light p-1 px-2 border" style="font-size:0.65rem; background: var(--bg-secondary); color: var(--text-primary); cursor: pointer;" onclick="redo()" title="Redo" disabled><i class="fa-solid fa-rotate-right"></i> Redo</button>
+                    </div>
+                </div>
+
                 <!-- Version Title -->
                 <div class="input-group">
                     <label for="resume-title-field" class="fw-bold mb-1" style="font-size:0.72rem; text-transform:uppercase;">Version Title / Name</label>
@@ -206,6 +214,79 @@
                         </div>
                     </div>
                 </details>
+
+                <!-- Section: Social & Profile Visuals -->
+                <details class="accordion-section p-2 border rounded" style="border-color: var(--border-color); background-color: var(--bg-secondary);">
+                    <summary class="fw-bold text-secondary" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-user-check me-2 text-muted"></i> Profile Pic & Portfolio</summary>
+                    <div class="mt-2 d-flex flex-column gap-2">
+                        <div class="input-group">
+                            <label for="res-profile-pic" class="fw-semibold mb-1" style="font-size:0.7rem;">Profile Picture URL</label>
+                            <input type="text" id="res-profile-pic" value="" placeholder="https://e.g. avatar/photo.jpg" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="input-group">
+                            <label for="res-portfolio" class="fw-semibold mb-1" style="font-size:0.7rem;">Portfolio Link</label>
+                            <input type="text" id="res-portfolio" value="" placeholder="portfolio.smith" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Section: Academic & Extra Activities -->
+                <details class="accordion-section p-2 border rounded" style="border-color: var(--border-color); background-color: var(--bg-secondary);">
+                    <summary class="fw-bold text-secondary" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-trophy me-2 text-muted"></i> Extra Curriculars</summary>
+                    <div class="mt-2 d-flex flex-column gap-2">
+                        <div class="input-group">
+                            <label for="res-achievements" class="fw-semibold mb-1" style="font-size:0.7rem;">Achievements</label>
+                            <input type="text" id="res-achievements" value="Dean's List 2025, First Place CodeQuest Hackathon" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="input-group">
+                            <label for="res-research-papers" class="fw-semibold mb-1" style="font-size:0.7rem;">Research Papers</label>
+                            <input type="text" id="res-research-papers" value="Decentralized Threat Log Mapping (IEEE 2026)" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="input-group">
+                            <label for="res-hackathons" class="fw-semibold mb-1" style="font-size:0.7rem;">Hackathons</label>
+                            <input type="text" id="res-hackathons" value="Participated in DevFest 24, Smart India Hackathon 25" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="input-group">
+                            <label for="res-workshops" class="fw-semibold mb-1" style="font-size:0.7rem;">Workshops & Seminars</label>
+                            <input type="text" id="res-workshops" value="Attended AWS Cloud Practitioner Immersion Day" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="input-group">
+                            <label for="res-volunteering" class="fw-semibold mb-1" style="font-size:0.7rem;">Volunteering</label>
+                            <input type="text" id="res-volunteering" value="Tech mentor at local high school coding club" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Section: Personal Interests & References -->
+                <details class="accordion-section p-2 border rounded" style="border-color: var(--border-color); background-color: var(--bg-secondary);">
+                    <summary class="fw-bold text-secondary" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-address-book me-2 text-muted"></i> Personal Preference & Reference</summary>
+                    <div class="mt-2 d-flex flex-column gap-2">
+                        <div class="input-group">
+                            <label for="res-languages" class="fw-semibold mb-1" style="font-size:0.7rem;">Languages</label>
+                            <input type="text" id="res-languages" value="English (Fluent), Spanish (Conversational)" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="input-group">
+                            <label for="res-interests" class="fw-semibold mb-1" style="font-size:0.7rem;">Interests</label>
+                            <input type="text" id="res-interests" value="Cryptography, Robotics, Open Source Contributing" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="input-group">
+                            <label for="res-references" class="fw-semibold mb-1" style="font-size:0.7rem;">References</label>
+                            <input type="text" id="res-references" value="Available upon request" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                        <div class="input-group">
+                            <label for="res-custom" class="fw-semibold mb-1" style="font-size:0.7rem;">Custom Section Info</label>
+                            <input type="text" id="res-custom" value="" placeholder="Additional details..." oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Section: Reorder Drag Layout toolbar -->
+                <details class="accordion-section p-2 border rounded mb-3" style="border-color: var(--border-color); background-color: var(--bg-secondary);">
+                    <summary class="fw-bold text-secondary" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-arrows-up-down me-2 text-muted"></i> Arrange / Reorder Sections</summary>
+                    <div class="mt-2 d-flex flex-column gap-2" id="reorder-sections-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </details>
             </div>
 
             <!-- Editor Action Buttons Footer -->
@@ -223,21 +304,76 @@
             <div class="d-flex align-items-center gap-2" style="font-size:0.8rem;">
                 <label for="resume-theme-select" class="fw-bold text-secondary">A4 Template Style:</label>
                 <select id="resume-theme-select" onchange="changeResumeTheme()" style="padding:4px 8px; border-radius:4px; border:1px solid var(--border-color); font-size:0.78rem; background: var(--bg-primary); color: var(--text-primary);">
-                    <option value="modern-ats" selected>Modern ATS Professional</option>
-                    <option value="microsoft">Microsoft Learn Style</option>
-                    <option value="minimalist-executive">Minimalist Executive</option>
-                    <option value="student-internship">Student Internship Template</option>
-                    <option value="tech-mono">Tech Resume Template</option>
-                    <option value="bold-sidebar">Bold Accent Sidebar</option>
-                    <option value="creative-accent">Creative Coral Serif</option>
-                    <option value="crimson-executive">Crimson Executive</option>
-                    <option value="slate-minimal">Slate Minimalist</option>
-                    <option value="emerald-professional">Emerald Professional</option>
-                    <option value="classic-serif">Classic Serif Traditional</option>
-                    <option value="dual-column">Dual Column Clean</option>
-                    <option value="royal-blue">Royal Blue Elite</option>
-                    <option value="functional-grid">Functional Divider Grid</option>
-                    <option value="indigo-startup">Indigo Tech Startup</option>
+                    <optgroup label="ATS Professional">
+                        <option value="ats-classic">ATS Classic Executive</option>
+                        <option value="ats-modern" selected>ATS Modern Professional</option>
+                        <option value="ats-minimal">ATS Clean Minimalist</option>
+                        <option value="ats-compact">ATS Compact Standard</option>
+                        <option value="ats-formal">ATS Formal Traditional</option>
+                    </optgroup>
+                    <optgroup label="Modern">
+                        <option value="modern-teal">Modern Teal Accent</option>
+                        <option value="modern-slate">Modern Slate Clean</option>
+                        <option value="modern-indigo">Modern Indigo Startup</option>
+                        <option value="modern-coral">Modern Coral Serif</option>
+                        <option value="modern-glass">Modern Glassmorphism Accent</option>
+                    </optgroup>
+                    <optgroup label="Microsoft Style">
+                        <option value="ms-learn">MS Learn Blue</option>
+                        <option value="ms-docs">MS Technical Writer</option>
+                        <option value="ms-azure">Azure Cloud Engineer</option>
+                        <option value="ms-office">MS Classic Corporate</option>
+                        <option value="ms-team">MS Collaborative Lead</option>
+                    </optgroup>
+                    <optgroup label="Student">
+                        <option value="student-academic">Student Academic CV</option>
+                        <option value="student-entry">Student Entry Level</option>
+                        <option value="student-grad">Graduate Fellowship</option>
+                        <option value="student-campus">Campus Leader</option>
+                        <option value="student-scholar">Scholar Traditional</option>
+                    </optgroup>
+                    <optgroup label="Internship">
+                        <option value="intern-general">General Internship Entry</option>
+                        <option value="intern-tech">Tech Intern Prep</option>
+                        <option value="intern-business">Corporate Intern Clean</option>
+                        <option value="intern-creative">Creative Intern Portfolio</option>
+                        <option value="intern-research">Research Assistant</option>
+                    </optgroup>
+                    <optgroup label="Cyber Security">
+                        <option value="cyber-mono">Cyber Terminal Mono</option>
+                        <option value="cyber-dark">Cyber Dark Operations</option>
+                        <option value="cyber-shield">Cyber Shield Defensive</option>
+                        <option value="cyber-matrix">Cyber Matrix Green</option>
+                        <option value="cyber-audit">Cyber Compliance Auditor</option>
+                    </optgroup>
+                    <optgroup label="Software Engineering">
+                        <option value="swe-git">Git Committer Style</option>
+                        <option value="swe-fullstack">Full Stack Web Engineer</option>
+                        <option value="swe-backend">Backend System Architect</option>
+                        <option value="swe-frontend">Frontend UI/UX Developer</option>
+                        <option value="swe-cloud">Cloud Infrastructure Engineer</option>
+                    </optgroup>
+                    <optgroup label="AI/ML">
+                        <option value="ai-tensor">Tensor Graph ML Engineer</option>
+                        <option value="ai-neural">Neural Network Scientist</option>
+                        <option value="ai-agent">Agentic AI Engineer</option>
+                        <option value="ai-vision">CV/NLP Specialist</option>
+                        <option value="ai-prompt">Prompt Engineer & Analyst</option>
+                    </optgroup>
+                    <optgroup label="Minimal">
+                        <option value="minimal-light">Minimalist Light Standard</option>
+                        <option value="minimal-dark">Minimalist Dark Elegant</option>
+                        <option value="minimal-border">Minimal Border Accent</option>
+                        <option value="minimal-compact">Minimal Compact Line</option>
+                        <option value="minimal-swiss">Swiss Design Editorial</option>
+                    </optgroup>
+                    <optgroup label="Executive">
+                        <option value="exec-director">Executive Director Gold</option>
+                        <option value="exec-vp">VP Operations Slate</option>
+                        <option value="exec-board">Board Member Classic</option>
+                        <option value="exec-legal">Legal Counsel Formal</option>
+                        <option value="exec-partner">Managing Partner Royal</option>
+                    </optgroup>
                 </select>
 
             </div>
@@ -275,90 +411,151 @@
         <div class="resume-preview-sheet-wrapper border shadow-sm mb-4" style="background:#fff; padding: 20px; min-height:842px;">
             <!-- A4 Sheet Paper -->
             <div class="resume-sheet modern-ats" id="resume-sheet-paper" style="font-family: 'Outfit', sans-serif;">
-                <div class="resume-render-header" style="border-bottom: 2px solid #2563eb; padding-bottom: 8px; margin-bottom: 15px;">
-                    <h1 id="res-render-name" style="font-size: 22px; font-weight:800; color: #1e3a8a; margin-bottom: 4px; text-transform: uppercase;">Alex Smith</h1>
-                    <div class="resume-render-meta" style="font-size: 11px; color: #4b5563; line-height: 1.4;">
-                        <span id="res-render-address"><i class="fa-solid fa-location-dot me-1 text-muted"></i> San Francisco, California, USA</span> | 
-                        <span id="res-render-email"><i class="fa-solid fa-envelope me-1 text-muted"></i> alex.smith@example.edu</span><br>
-                        <span id="res-render-phone"><i class="fa-solid fa-phone me-1 text-muted"></i> +1 (555) 019-2834</span> | 
-                        <span id="res-render-linkedin"><i class="fa-brands fa-linkedin me-1 text-muted"></i> linkedin.com/in/alexsmith</span> | 
-                        <span id="res-render-links"><i class="fa-brands fa-github me-1 text-muted"></i> github.com/alexsmith</span>
-                    </div>
-                </div>
-
-                <!-- Section: Education -->
-                <div class="resume-render-section" style="margin-bottom:14px;">
-                    <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Education</h3>
-                    <div>
-                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
-                            <span id="res-render-edu1-inst">State Tech University</span>
-                            <span id="res-render-edu1-degree" style="font-weight:normal;">B.S. in Computer Science</span>
-                        </div>
-                        <div style="display:flex; justify-content:space-between; font-size:10px; color:#6b7280; margin-top:1px;">
-                            <span id="res-render-edu1-dates">2024 – 2028</span>
-                            <span>GPA: <strong id="res-render-edu1-gpa">3.8/4.0</strong></span>
-                        </div>
-                        <div style="font-size:10px; margin-top:2px; color:#4b5563;" id="res-render-edu1-coursework">
-                            Relevant Coursework: Data Structures, Cryptography, Database Systems, Computer Networks
+                <div class="resume-render-header" style="border-bottom: 2px solid #2563eb; padding-bottom: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px;">
+                    <img id="res-render-profile-pic" src="" style="width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 1.5px solid #1e3a8a; display: none;">
+                    <div style="flex-grow: 1;">
+                        <h1 id="res-render-name" style="font-size: 22px; font-weight:800; color: #1e3a8a; margin-bottom: 4px; text-transform: uppercase;">Alex Smith</h1>
+                        <div class="resume-render-meta" style="font-size: 11px; color: #4b5563; line-height: 1.4;">
+                            <span id="res-render-address"><i class="fa-solid fa-location-dot me-1 text-muted"></i> San Francisco, California, USA</span> | 
+                            <span id="res-render-email"><i class="fa-solid fa-envelope me-1 text-muted"></i> alex.smith@example.edu</span><br>
+                            <span id="res-render-phone"><i class="fa-solid fa-phone me-1 text-muted"></i> +1 (555) 019-2834</span> | 
+                            <span id="res-render-linkedin"><i class="fa-brands fa-linkedin me-1 text-muted"></i> linkedin.com/in/alexsmith</span> | 
+                            <span id="res-render-links"><i class="fa-brands fa-github me-1 text-muted"></i> github.com/alexsmith</span>
+                            <span id="res-render-portfolio-wrapper" style="display: none;"> | <i class="fa-solid fa-globe me-1 text-muted"></i> <span id="res-render-portfolio"></span></span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Section: Skills -->
-                <div class="resume-render-section" style="margin-bottom:14px;">
-                    <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Technical Skills</h3>
-                    <div style="font-size:10.5px; line-height:1.4; color:#374151;">
-                        <div><strong>Languages:</strong> <span id="res-render-skills-prog">Python, Java, Go</span></div>
-                        <div><strong>Cybersecurity:</strong> <span id="res-render-skills-cyber">Vulnerability Scanning, Web Security Basics, OWASP Top 10</span></div>
-                        <div><strong>Tools & Cloud:</strong> <span id="res-render-skills-tools">Git, Docker, VS Code, Command Line</span></div>
-                        <div><strong>Frameworks:</strong> <span id="res-render-skills-web">HTML, CSS, Flask, React</span></div>
-                    </div>
-                </div>
-
-                <!-- Section: Experience -->
-                <div class="resume-render-section" style="margin-bottom:14px;">
-                    <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Experience</h3>
-                    <div>
-                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
-                            <span id="res-render-exp-role">Software Engineering Intern</span>
-                            <span id="res-render-exp-dates">June 2025 – August 2025</span>
+                <div id="resume-sections-container">
+                    <!-- Section: Education -->
+                    <div class="resume-render-section" data-section="education" style="margin-bottom:14px;">
+                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Education</h3>
+                        <div>
+                            <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
+                                <span id="res-render-edu1-inst">State Tech University</span>
+                                <span id="res-render-edu1-degree" style="font-weight:normal;">B.S. in Computer Science</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:10px; color:#6b7280; margin-top:1px;">
+                                <span id="res-render-edu1-dates">2024 – 2028</span>
+                                <span>GPA: <strong id="res-render-edu1-gpa">3.8/4.0</strong></span>
+                            </div>
+                            <div style="font-size:10px; margin-top:2px; color:#4b5563;" id="res-render-edu1-coursework">
+                                Relevant Coursework: Data Structures, Cryptography, Database Systems, Computer Networks
+                            </div>
                         </div>
-                        <div style="font-size:10.5px; font-style:italic; color:#6b7280; margin-bottom:2px;" id="res-render-exp-comp">Global Tech Solutions</div>
+                    </div>
+
+                    <!-- Section: Skills -->
+                    <div class="resume-render-section" data-section="skills" style="margin-bottom:14px;">
+                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Technical Skills</h3>
+                        <div style="font-size:10.5px; line-height:1.4; color:#374151;">
+                            <div><strong>Languages:</strong> <span id="res-render-skills-prog">Python, Java, Go</span></div>
+                            <div><strong>Cybersecurity:</strong> <span id="res-render-skills-cyber">Vulnerability Scanning, Web Security Basics, OWASP Top 10</span></div>
+                            <div><strong>Tools & Cloud:</strong> <span id="res-render-skills-tools">Git, Docker, VS Code, Command Line</span></div>
+                            <div><strong>Frameworks:</strong> <span id="res-render-skills-web">HTML, CSS, Flask, React</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Section: Experience -->
+                    <div class="resume-render-section" data-section="experience" style="margin-bottom:14px;">
+                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Experience</h3>
+                        <div>
+                            <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
+                                <span id="res-render-exp-role">Software Engineering Intern</span>
+                                <span id="res-render-exp-dates">June 2025 – August 2025</span>
+                            </div>
+                            <div style="font-size:10.5px; font-style:italic; color:#6b7280; margin-bottom:2px;" id="res-render-exp-comp">Global Tech Solutions</div>
+                            <ul class="bullet-list" style="font-size:10px; margin-left:14px; margin-top:2px; line-height:1.4; color:#374151;">
+                                <li id="res-render-exp-b1">Contributed to the design and development of automated data analysis pipelines.</li>
+                                <li id="res-render-exp-b2">Implemented secure coding practices using Python and Flask for backend APIs.</li>
+                                <li id="res-render-exp-b3">Supported data migration and JWT authentication modules to improve security.</li>
+                                <li id="res-render-exp-b4">Collaborated with engineers to test and refine code architectures for improved reliability.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Section: Projects -->
+                    <div class="resume-render-section" data-section="projects" style="margin-bottom:14px;">
+                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Projects</h3>
+                        <div>
+                            <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
+                                <span id="res-render-proj-title">AegisShield AI – Cyber Crime Detection Platform</span>
+                                <span id="res-render-proj-link" style="font-weight:normal; font-size:10px; color:#4b5563;">github.com/alexsmith/aegisshield-ai</span>
+                            </div>
+                            <ul class="bullet-list" style="font-size:10px; margin-left:14px; margin-top:2px; line-height:1.4; color:#374151;">
+                                <li id="res-render-proj-b1">Developed a web-based platform using Python, Flask, HTML, and CSS to support cybercrime reporting.</li>
+                                <li id="res-render-proj-b2">Implemented user authentication, routing, and activity logging to ensure secure data handling.</li>
+                                <li id="res-render-proj-b3">Focused on applying secure web development principles and structured threat analysis workflows.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Section: Certifications -->
+                    <div class="resume-render-section" data-section="certifications" style="margin-bottom:14px;">
+                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Certifications</h3>
                         <ul class="bullet-list" style="font-size:10px; margin-left:14px; margin-top:2px; line-height:1.4; color:#374151;">
-                            <li id="res-render-exp-b1">Contributed to the design and development of automated data analysis pipelines.</li>
-                            <li id="res-render-exp-b2">Implemented secure coding practices using Python and Flask for backend APIs.</li>
-                            <li id="res-render-exp-b3">Supported data migration and JWT authentication modules to improve security.</li>
-                            <li id="res-render-exp-b4">Collaborated with engineers to test and refine code architectures for improved reliability.</li>
+                            <li id="res-render-cert-c1">Deloitte Australia Cyber Job Simulation (Forage)</li>
+                            <li id="res-render-cert-c2">Cyber Security & Ethical Hacking Workshop (DV Analytics)</li>
+                            <li id="res-render-cert-c3">Python Tutorial Module Certificate of Excellence (Scaler)</li>
+                            <li id="res-render-cert-c4">Python Course for Beginners: Mastering the Essentials (Scaler)</li>
                         </ul>
                     </div>
-                </div>
 
-                <!-- Section: Projects -->
-                <div class="resume-render-section" style="margin-bottom:14px;">
-                    <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Projects</h3>
-                    <div>
-                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
-                            <span id="res-render-proj-title">AegisShield AI – Cyber Crime Detection Platform</span>
-                            <span id="res-render-proj-link" style="font-weight:normal; font-size:10px; color:#4b5563;">github.com/alexsmith/aegisshield-ai</span>
-                        </div>
-                        <ul class="bullet-list" style="font-size:10px; margin-left:14px; margin-top:2px; line-height:1.4; color:#374151;">
-                            <li id="res-render-proj-b1">Developed a web-based platform using Python, Flask, HTML, and CSS to support cybercrime reporting.</li>
-                            <li id="res-render-proj-b2">Implemented user authentication, routing, and activity logging to ensure secure data handling.</li>
-                            <li id="res-render-proj-b3">Focused on applying secure web development principles and structured threat analysis workflows.</li>
-                        </ul>
+                    <!-- Section: Achievements -->
+                    <div class="resume-render-section" data-section="achievements" style="margin-bottom:14px; display:none;">
+                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Achievements</h3>
+                        <div id="res-render-achievements" style="font-size:10px; color:#374151;"></div>
+                    </div>
+
+                    <!-- Section: Research Papers -->
+                    <div class="resume-render-section" data-section="research" style="margin-bottom:14px; display:none;">
+                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Research Papers</h3>
+                        <div id="res-render-research" style="font-size:10px; color:#374151;"></div>
+                    </div>
+
+                    <!-- Section: Hackathons -->
+                    <div class="resume-render-section" data-section="hackathons" style="margin-bottom:14px; display:none;">
+                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Hackathons</h3>
+                        <div id="res-render-hackathons" style="font-size:10px; color:#374151;"></div>
+                    </div>
+
+                    <!-- Section: Workshops -->
+                    <div class="resume-render-section" data-section="workshops" style="margin-bottom:14px; display:none;">
+                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Workshops</h3>
+                        <div id="res-render-workshops" style="font-size:10px; color:#374151;"></div>
+                    </div>
+
+                    <!-- Section: Volunteering -->
+                    <div class="resume-render-section" data-section="volunteering" style="margin-bottom:14px; display:none;">
+                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Volunteering</h3>
+                        <div id="res-render-volunteering" style="font-size:10px; color:#374151;"></div>
+                    </div>
+
+                    <!-- Section: Languages -->
+                    <div class="resume-render-section" data-section="languages" style="margin-bottom:14px; display:none;">
+                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Languages</h3>
+                        <div id="res-render-languages" style="font-size:10px; color:#374151;"></div>
+                    </div>
+
+                    <!-- Section: Interests -->
+                    <div class="resume-render-section" data-section="interests" style="margin-bottom:14px; display:none;">
+                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Interests</h3>
+                        <div id="res-render-interests" style="font-size:10px; color:#374151;"></div>
+                    </div>
+
+                    <!-- Section: References -->
+                    <div class="resume-render-section" data-section="references" style="margin-bottom:14px; display:none;">
+                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">References</h3>
+                        <div id="res-render-references" style="font-size:10px; color:#374151;"></div>
+                    </div>
+
+                    <!-- Section: Custom Section -->
+                    <div class="resume-render-section" data-section="custom" style="margin-bottom:14px; display:none;">
+                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Custom Section</h3>
+                        <div id="res-render-custom" style="font-size:10px; color:#374151;"></div>
                     </div>
                 </div>
-
-                <!-- Section: Certifications -->
-                <div class="resume-render-section">
-                    <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Certifications</h3>
-                    <ul class="bullet-list" style="font-size:10px; margin-left:14px; margin-top:2px; line-height:1.4; color:#374151;">
-                        <li id="res-render-cert-c1">Deloitte Australia Cyber Job Simulation (Forage)</li>
-                        <li id="res-render-cert-c2">Cyber Security & Ethical Hacking Workshop (DV Analytics)</li>
-                        <li id="res-render-cert-c3">Python Tutorial Module Certificate of Excellence (Scaler)</li>
-                        <li id="res-render-cert-c4">Python Course for Beginners: Mastering the Essentials (Scaler)</li>
-                    </ul>
-                </div>
+            </div>
             </div>
         </div>
 
@@ -453,6 +650,13 @@
 <script>
 let activeBulletInput = null;
 let savedVersions = [];
+let lastATSFeedback = null;
+let sectionOrder = ["education", "skills", "experience", "projects", "certifications", "achievements", "research", "hackathons", "workshops", "volunteering", "languages", "interests", "references", "custom"];
+let undoStack = [];
+let redoStack = [];
+let isApplyingState = false;
+let autoSaveTimeout = null;
+let saveStateDebounce = null;
 
 document.addEventListener("DOMContentLoaded", () => {
     // Register bullet points inputs
@@ -464,8 +668,78 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setupUploadDragAndDrop();
     loadVersionsFromCloud();
+    renderReorderUI();
     syncResumeFields();
+    setupChangeTracking();
+
+    // Push base state on load
+    setTimeout(() => {
+        pushToUndoStack();
+    }, 200);
 });
+
+function setupChangeTracking() {
+    const formScroller = document.querySelector(".resume-form-scroller");
+    if (!formScroller) return;
+    
+    formScroller.addEventListener("input", (e) => {
+        if (isApplyingState) return;
+        
+        // Debounce undo stack pushes (500ms)
+        clearTimeout(saveStateDebounce);
+        saveStateDebounce = setTimeout(() => {
+            pushToUndoStack();
+        }, 500);
+        
+        // Debounce auto save to cloud (1s debounce)
+        clearTimeout(autoSaveTimeout);
+        autoSaveTimeout = setTimeout(() => {
+            saveResumeCloud();
+        }, 1000);
+    });
+}
+
+function pushToUndoStack() {
+    const currentState = JSON.stringify(getFormContent());
+    if (undoStack.length === 0 || undoStack[undoStack.length - 1] !== currentState) {
+        undoStack.push(currentState);
+        if (undoStack.length > 50) undoStack.shift();
+        redoStack = [];
+        updateUndoRedoButtons();
+    }
+}
+
+function updateUndoRedoButtons() {
+    const undoBtn = document.getElementById("btn-undo");
+    const redoBtn = document.getElementById("btn-redo");
+    if (undoBtn) undoBtn.disabled = undoStack.length <= 1;
+    if (redoBtn) redoBtn.disabled = redoStack.length === 0;
+}
+
+function undo() {
+    if (undoStack.length <= 1) return;
+    isApplyingState = true;
+    const currentState = undoStack.pop();
+    redoStack.push(currentState);
+    const previousState = undoStack[undoStack.length - 1];
+    populateForm(JSON.parse(previousState));
+    syncResumeFields();
+    isApplyingState = false;
+    updateUndoRedoButtons();
+    saveResumeCloud();
+}
+
+function redo() {
+    if (redoStack.length === 0) return;
+    isApplyingState = true;
+    const nextState = redoStack.pop();
+    undoStack.push(nextState);
+    populateForm(JSON.parse(nextState));
+    syncResumeFields();
+    isApplyingState = false;
+    updateUndoRedoButtons();
+    saveResumeCloud();
+}
 
 function insertActionVerb(verb) {
     if (!activeBulletInput) {
@@ -506,6 +780,26 @@ function syncResumeFields() {
     document.getElementById("res-render-linkedin").innerHTML = `<i class="fa-brands fa-linkedin me-1 text-muted"></i> ` + (document.getElementById("res-linkedin").value || "linkedin.com/in/username");
     document.getElementById("res-render-links").innerHTML = `<i class="fa-brands fa-github me-1 text-muted"></i> ` + (document.getElementById("res-github").value || "github.com/username");
     
+    // Profile Picture
+    const profilePicVal = document.getElementById("res-profile-pic").value;
+    const profilePicImg = document.getElementById("res-render-profile-pic");
+    if (profilePicVal && profilePicImg) {
+        profilePicImg.src = profilePicVal;
+        profilePicImg.style.display = "block";
+    } else if (profilePicImg) {
+        profilePicImg.style.display = "none";
+    }
+
+    // Portfolio
+    const portfolioVal = document.getElementById("res-portfolio").value;
+    const portfolioWrap = document.getElementById("res-render-portfolio-wrapper");
+    if (portfolioVal && portfolioWrap) {
+        document.getElementById("res-render-portfolio").innerText = portfolioVal;
+        portfolioWrap.style.display = "inline";
+    } else if (portfolioWrap) {
+        portfolioWrap.style.display = "none";
+    }
+
     // Education
     document.getElementById("res-render-edu1-inst").innerText = document.getElementById("res-edu1-inst").value || "";
     document.getElementById("res-render-edu1-degree").innerText = document.getElementById("res-edu1-degree").value || "";
@@ -549,7 +843,33 @@ function syncResumeFields() {
     document.getElementById("res-render-cert-c2").innerText = document.getElementById("res-cert-c2").value || "";
     document.getElementById("res-render-cert-c3").innerText = document.getElementById("res-cert-c3").value || "";
     document.getElementById("res-render-cert-c4").innerText = document.getElementById("res-cert-c4").value || "";
-    
+
+    // Helper function to sync extra text-block section
+    function syncTextBlockSection(inputId, renderId, sectionName) {
+        const val = document.getElementById(inputId).value.trim();
+        const renderEl = document.getElementById(renderId);
+        const sectionEl = document.querySelector(`[data-section="${sectionName}"]`);
+        if (renderEl && sectionEl) {
+            if (val) {
+                renderEl.innerText = val;
+                sectionEl.style.display = "block";
+            } else {
+                sectionEl.style.display = "none";
+            }
+        }
+    }
+
+    // Sync other extra sections
+    syncTextBlockSection("res-achievements", "res-render-achievements", "achievements");
+    syncTextBlockSection("res-research-papers", "res-render-research", "research");
+    syncTextBlockSection("res-hackathons", "res-render-hackathons", "hackathons");
+    syncTextBlockSection("res-workshops", "res-render-workshops", "workshops");
+    syncTextBlockSection("res-volunteering", "res-render-volunteering", "volunteering");
+    syncTextBlockSection("res-languages", "res-render-languages", "languages");
+    syncTextBlockSection("res-interests", "res-render-interests", "interests");
+    syncTextBlockSection("res-references", "res-render-references", "references");
+    syncTextBlockSection("res-custom", "res-render-custom", "custom");
+
     // Scan keyword list
     scanKeywordsInline();
 }
@@ -651,6 +971,25 @@ function populateForm(c) {
     document.getElementById("res-cert-c2").value = c.certC2 || "";
     document.getElementById("res-cert-c3").value = c.certC3 || "";
     document.getElementById("res-cert-c4").value = c.certC4 || "";
+
+    // Extra details sections
+    document.getElementById("res-profile-pic").value = c.profilePic || "";
+    document.getElementById("res-portfolio").value = c.portfolio || "";
+    document.getElementById("res-achievements").value = c.achievements || "";
+    document.getElementById("res-research-papers").value = c.researchPapers || "";
+    document.getElementById("res-hackathons").value = c.hackathons || "";
+    document.getElementById("res-workshops").value = c.workshops || "";
+    document.getElementById("res-volunteering").value = c.volunteering || "";
+    document.getElementById("res-languages").value = c.languages || "";
+    document.getElementById("res-interests").value = c.interests || "";
+    document.getElementById("res-references").value = c.references || "";
+    document.getElementById("res-custom").value = c.custom || "";
+
+    if (c.sectionOrder) {
+        sectionOrder = c.sectionOrder;
+        renderReorderUI();
+        reorderDOM();
+    }
 }
 
 function getFormContent() {
@@ -690,14 +1029,75 @@ function getFormContent() {
         certC1: document.getElementById("res-cert-c1").value,
         certC2: document.getElementById("res-cert-c2").value,
         certC3: document.getElementById("res-cert-c3").value,
-        certC4: document.getElementById("res-cert-c4").value
+        certC4: document.getElementById("res-cert-c4").value,
+
+        // New Fields
+        profilePic: document.getElementById("res-profile-pic").value,
+        portfolio: document.getElementById("res-portfolio").value,
+        achievements: document.getElementById("res-achievements").value,
+        researchPapers: document.getElementById("res-research-papers").value,
+        hackathons: document.getElementById("res-hackathons").value,
+        workshops: document.getElementById("res-workshops").value,
+        volunteering: document.getElementById("res-volunteering").value,
+        languages: document.getElementById("res-languages").value,
+        interests: document.getElementById("res-interests").value,
+        references: document.getElementById("res-references").value,
+        custom: document.getElementById("res-custom").value,
+        sectionOrder: sectionOrder
     };
+}
+
+function renderReorderUI() {
+    const list = document.getElementById("reorder-sections-list");
+    if (!list) return;
+    list.innerHTML = "";
+    sectionOrder.forEach((sec, idx) => {
+        const displayName = sec.charAt(0).toUpperCase() + sec.slice(1).replace("-", " ");
+        const row = document.createElement("div");
+        row.className = "d-flex justify-content-between align-items-center p-1 px-2 border rounded bg-white text-secondary";
+        row.style.fontSize = "0.75rem";
+        row.style.borderColor = "var(--border-color)";
+        
+        row.innerHTML = `
+            <span><i class="fa-solid fa-bars me-2 text-muted" style="cursor:grab;"></i> ${displayName}</span>
+            <div class="d-flex gap-1">
+                <button type="button" class="btn btn-xs btn-light p-0 px-1 border-0" onclick="moveSection(${idx}, -1)" ${idx === 0 ? 'disabled' : ''} style="cursor:pointer; background:none;"><i class="fa-solid fa-arrow-up text-muted" style="font-size:10px;"></i></button>
+                <button type="button" class="btn btn-xs btn-light p-0 px-1 border-0" onclick="moveSection(${idx}, 1)" ${idx === sectionOrder.length - 1 ? 'disabled' : ''} style="cursor:pointer; background:none;"><i class="fa-solid fa-arrow-down text-muted" style="font-size:10px;"></i></button>
+            </div>
+        `;
+        list.appendChild(row);
+    });
+}
+
+function moveSection(index, direction) {
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= sectionOrder.length) return;
+    const temp = sectionOrder[index];
+    sectionOrder[index] = sectionOrder[newIndex];
+    sectionOrder[newIndex] = temp;
+    
+    renderReorderUI();
+    reorderDOM();
+    triggerAutoSave();
+}
+
+function reorderDOM() {
+    const container = document.getElementById("resume-sections-container");
+    if (!container) return;
+    sectionOrder.forEach(secName => {
+        const secEl = container.querySelector(`[data-section="${secName}"]`);
+        if (secEl) {
+            container.appendChild(secEl);
+        }
+    });
 }
 
 async function saveResumeCloud() {
     const badge = document.getElementById("save-status-badge");
-    badge.innerText = "Saving...";
-    badge.className = "badge badge-warning mt-1";
+    if (badge) {
+        badge.innerText = "Saving...";
+        badge.className = "badge badge-warning mt-1";
+    }
     
     const content = getFormContent();
     const title = document.getElementById("resume-title-field").value;
@@ -721,17 +1121,23 @@ async function saveResumeCloud() {
         });
         const data = await response.json();
         if (response.ok && data.success) {
-            badge.innerText = "Saved to Cloud";
-            badge.className = "badge badge-success mt-1";
+            if (badge) {
+                badge.innerText = "Saved to Cloud";
+                badge.className = "badge badge-success mt-1";
+            }
             loadVersionsFromCloud();
         } else {
-            badge.innerText = "Save Failed";
-            badge.className = "badge badge-danger mt-1";
+            if (badge) {
+                badge.innerText = "Save Failed";
+                badge.className = "badge badge-danger mt-1";
+            }
         }
     } catch(e) {
         console.error(e);
-        badge.innerText = "Offline Error";
-        badge.className = "badge badge-danger mt-1";
+        if (badge) {
+            badge.innerText = "Offline Error";
+            badge.className = "badge badge-danger mt-1";
+        }
     }
 }
 
@@ -782,6 +1188,7 @@ async function triggerResumeATSAnalysis() {
             document.getElementById("bar-project").style.width = `${Math.max(0, data.score - 2)}%`;
 
             
+            lastATSFeedback = data.feedback;
             renderATSFeedback(data.feedback);
         } else {
             atsBox.innerHTML = `<p class="text-danger text-center mb-0">Check failed: ${data.error || "Unknown"}</p>`;
@@ -792,17 +1199,51 @@ async function triggerResumeATSAnalysis() {
     }
 }
 
+function applySuggestion(index) {
+    if (!lastATSFeedback || !lastATSFeedback.improvements) return;
+    const imp = lastATSFeedback.improvements[index];
+    if (!imp) return;
+    
+    // Find where the original text is in the form inputs and replace it
+    const inputs = document.querySelectorAll("input[type='text'], textarea");
+    let found = false;
+    inputs.forEach(input => {
+        const val = input.value;
+        if (val.includes(imp.originalText)) {
+            input.value = val.replace(imp.originalText, imp.suggestedText);
+            found = true;
+        }
+    });
+    
+    if (found) {
+        syncResumeFields();
+        if (window.showToast) {
+            showToast("Suggestion Applied", "Successfully replaced text in resume!", "fa-circle-check text-success");
+        } else {
+            alert("Suggestion applied successfully!");
+        }
+        triggerAutoSave();
+    } else {
+        if (window.showToast) {
+            showToast("Apply Failed", "Could not locate original text in input fields.", "fa-circle-exclamation text-danger");
+        } else {
+            alert("Could not locate original text in input fields.");
+        }
+    }
+}
+
 function renderATSFeedback(feedback) {
     const atsBox = document.getElementById("ats-analysis-body");
     
     let missingBadges = feedback.missingKeywords.map(k => `<span class="badge badge-info me-1 mb-1" style="font-size:10px;">${k}</span>`).join("");
     if (!missingBadges) missingBadges = `<span class="text-muted">None flagged.</span>`;
     
-    let improvementsHtml = feedback.improvements.map(imp => `
+    let improvementsHtml = feedback.improvements.map((imp, idx) => `
         <div class="p-2 border rounded mb-2" style="font-size:0.75rem; background-color: var(--bg-primary);">
             <div class="mb-1"><strong class="text-danger">Original:</strong> "${imp.originalText}"</div>
             <div class="mb-1"><strong class="text-success">Suggested:</strong> "${imp.suggestedText}"</div>
-            <div style="font-size:0.7rem;"><strong class="text-muted">Reason:</strong> ${imp.reason}</div>
+            <div style="font-size:0.7rem;" class="mb-2"><strong class="text-muted">Reason:</strong> ${imp.reason}</div>
+            <button type="button" class="btn btn-xs btn-outline py-0.5 px-2" onclick="applySuggestion(${idx})" style="font-size:0.65rem; cursor:pointer; background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px;"><i class="fa-solid fa-wand-magic-sparkles me-1 text-primary"></i> Apply to Resume</button>
         </div>
     `).join("");
     
@@ -983,197 +1424,180 @@ function downloadImprovementReportPDF() {
 }
 </script>
 <style>
-/* 5 Professional templates styling rules */
+/* 50 Premium templates styling rules */
 .resume-sheet {
     background: #fff;
-    padding: 15px;
+    padding: 20px;
     font-size: 11px;
     line-height: 1.5;
     color: #374151;
+    min-height: 297mm;
 }
 
-/* 1. Modern ATS style */
-.resume-sheet.modern-ats .resume-render-header h1 {
-    color: #2563eb !important;
+/* 1. ATS Professional Styles Group */
+.resume-sheet.ats-classic, .resume-sheet.ats-modern, .resume-sheet.ats-minimal, .resume-sheet.ats-compact, .resume-sheet.ats-formal {
+    font-family: 'Inter', Arial, sans-serif !important;
+    color: #1f2937;
 }
-.resume-sheet.modern-ats .resume-render-section h3 {
-    border-bottom: 2px solid #2563eb !important;
-    color: #2563eb !important;
-}
-
-/* 2. Microsoft Style */
-.resume-sheet.microsoft {
-    border-top: 6px solid #00a4ef !important;
-}
-.resume-sheet.microsoft .resume-render-header h1 {
-    color: #0078d4 !important;
-}
-.resume-sheet.microsoft .resume-render-section h3 {
-    border-bottom: 1.5px dashed #0078d4 !important;
-    color: #0078d4 !important;
-}
-
-/* 3. Minimalist Executive style */
-.resume-sheet.minimalist-executive {
-    text-align: center;
-}
-.resume-sheet.minimalist-executive .resume-render-header {
-    text-align: center !important;
-    border-bottom: 1px solid #9ca3af !important;
-}
-.resume-sheet.minimalist-executive .resume-render-section h3 {
-    border-bottom: 1px solid #9ca3af !important;
-    color: #111827 !important;
-    text-align: center;
-}
-.resume-sheet.minimalist-executive .bullet-list {
-    text-align: left;
-}
-
-/* 4. Student Internship style */
-.resume-sheet.student-internship {
-    background: #fbfbfb;
-}
-.resume-sheet.student-internship .resume-render-header h1 {
-    color: #059669 !important;
-}
-.resume-sheet.student-internship .resume-render-section h3 {
-    border-bottom: 2px solid #059669 !important;
-    color: #059669 !important;
-}
-
-/* 5. Tech Resume style */
-.resume-sheet.tech-mono {
-    font-family: 'Courier New', Courier, monospace !important;
-}
-.resume-sheet.tech-mono .resume-render-header h1 {
+.resume-sheet.ats-classic h1, .resume-sheet.ats-modern h1, .resume-sheet.ats-minimal h1, .resume-sheet.ats-compact h1, .resume-sheet.ats-formal h1 {
     color: #111827 !important;
 }
-.resume-sheet.tech-mono .resume-render-section h3 {
-    border-bottom: 1px solid #111827 !important;
-    color: #111827 !important;
-}
-
-/* 6. Bold Accent Sidebar style */
-.resume-sheet.bold-sidebar {
-    border-left: 8px solid #0078d4 !important;
-    padding-left: 20px !important;
-}
-.resume-sheet.bold-sidebar .resume-render-header h1 {
-    color: #0078d4 !important;
-}
-.resume-sheet.bold-sidebar .resume-render-section h3 {
-    border-bottom: 2px solid #e2e8f0 !important;
-    color: #0f172a !important;
-}
-
-/* 7. Creative Coral Serif style */
-.resume-sheet.creative-accent {
-    font-family: Georgia, serif !important;
-}
-.resume-sheet.creative-accent .resume-render-header h1 {
-    color: #ff6b6b !important;
-}
-.resume-sheet.creative-accent .resume-render-section h3 {
-    border-bottom: 1.5px solid #ff6b6b !important;
-    color: #ff6b6b !important;
-}
-
-/* 8. Crimson Executive style */
-.resume-sheet.crimson-executive .resume-render-header h1 {
-    color: #991b1b !important;
-}
-.resume-sheet.crimson-executive .resume-render-section h3 {
-    border-bottom: 2px solid #991b1b !important;
-    color: #991b1b !important;
-}
-
-/* 9. Slate Minimalist style */
-.resume-sheet.slate-minimal {
-    background: #f8fafc;
-}
-.resume-sheet.slate-minimal .resume-render-header h1 {
-    color: #475569 !important;
-}
-.resume-sheet.slate-minimal .resume-render-section h3 {
-    border-bottom: 1px solid #94a3b8 !important;
-    color: #475569 !important;
-}
-
-/* 10. Emerald Professional style */
-.resume-sheet.emerald-professional .resume-render-header h1 {
-    color: #059669 !important;
-}
-.resume-sheet.emerald-professional .resume-render-section h3 {
-    border-bottom: 2px solid #059669 !important;
-    color: #059669 !important;
-}
-
-/* 11. Classic Serif Traditional style */
-.resume-sheet.classic-serif {
-    font-family: 'Times New Roman', Times, serif !important;
-    text-align: justify;
-}
-.resume-sheet.classic-serif .resume-render-header h1 {
-    color: #111827 !important;
-    text-align: center;
-}
-.resume-sheet.classic-serif .resume-render-section h3 {
-    border-bottom: 1px double #111827 !important;
+.resume-sheet.ats-classic .resume-render-section h3, .resume-sheet.ats-modern .resume-render-section h3, .resume-sheet.ats-minimal .resume-render-section h3, .resume-sheet.ats-compact .resume-render-section h3, .resume-sheet.ats-formal .resume-render-section h3 {
+    border-bottom: 1.5px solid #111827 !important;
     color: #111827 !important;
     text-transform: uppercase;
 }
+.resume-sheet.ats-classic { font-family: Georgia, serif !important; }
+.resume-sheet.ats-classic .resume-render-header { text-align: center !important; }
+.resume-sheet.ats-minimal { padding: 30px !important; }
+.resume-sheet.ats-minimal .resume-render-section h3 { border-bottom: none !important; margin-bottom: 2px !important; }
+.resume-sheet.ats-compact { font-size: 10px !important; line-height: 1.35 !important; }
+.resume-sheet.ats-compact .resume-render-section { margin-bottom: 8px !important; }
+.resume-sheet.ats-formal { border: 1px double #374151; padding: 25px !important; }
 
-/* 12. Dual Column Clean style */
-.resume-sheet.dual-column {
-    border-top: 4px solid #4f46e5 !important;
-}
-.resume-sheet.dual-column .resume-render-header h1 {
-    color: #4f46e5 !important;
-}
-.resume-sheet.dual-column .resume-render-section h3 {
-    border-bottom: 1.5px solid #e2e8f0 !important;
-    color: #4f46e5 !important;
-}
+/* 2. Modern Styles Group */
+.resume-sheet.modern-teal { border-top: 6px solid #0d9488 !important; }
+.resume-sheet.modern-teal h1, .resume-sheet.modern-teal h3 { color: #0d9488 !important; }
+.resume-sheet.modern-teal h3 { border-bottom: 2px solid #0d9488 !important; }
+.resume-sheet.modern-slate { border-top: 6px solid #475569 !important; }
+.resume-sheet.modern-slate h1, .resume-sheet.modern-slate h3 { color: #475569 !important; }
+.resume-sheet.modern-slate h3 { border-bottom: 2px solid #475569 !important; }
+.resume-sheet.modern-indigo { border-top: 6px solid #4f46e5 !important; }
+.resume-sheet.modern-indigo h1, .resume-sheet.modern-indigo h3 { color: #4f46e5 !important; }
+.resume-sheet.modern-indigo h3 { border-bottom: 2px solid #4f46e5 !important; }
+.resume-sheet.modern-coral { border-top: 6px solid #f43f5e !important; }
+.resume-sheet.modern-coral h1, .resume-sheet.modern-coral h3 { color: #f43f5e !important; }
+.resume-sheet.modern-coral h3 { border-bottom: 2px solid #f43f5e !important; }
+.resume-sheet.modern-glass { background: rgba(255, 255, 255, 0.95) !important; border-top: 6px solid #0078d4 !important; }
+.resume-sheet.modern-glass h1, .resume-sheet.modern-glass h3 { color: #0078d4 !important; }
+.resume-sheet.modern-glass h3 { border-bottom: 2px solid #0078d4 !important; }
 
-/* 13. Royal Blue Elite style */
-.resume-sheet.royal-blue .resume-render-header h1 {
-    color: #1e3a8a !important;
-}
-.resume-sheet.royal-blue .resume-render-section h3 {
-    border-bottom: 2px solid #1e3a8a !important;
-    color: #1e3a8a !important;
-}
+/* 3. Microsoft Styles Group */
+.resume-sheet.ms-learn { border-top: 6px solid #0078d4 !important; }
+.resume-sheet.ms-learn h1, .resume-sheet.ms-learn h3 { color: #0078d4 !important; }
+.resume-sheet.ms-learn h3 { border-bottom: 2px solid #0078d4 !important; }
+.resume-sheet.ms-docs { border-left: 6px solid #475569 !important; padding-left: 18px !important; }
+.resume-sheet.ms-docs h1 { color: #1e293b !important; }
+.resume-sheet.ms-docs h3 { color: #475569 !important; border-bottom: 1.5px solid #cbd5e1 !important; }
+.resume-sheet.ms-azure { border-top: 6px solid #008ad7 !important; }
+.resume-sheet.ms-azure h1, .resume-sheet.ms-azure h3 { color: #008ad7 !important; }
+.resume-sheet.ms-azure h3 { border-bottom: 2px solid #008ad7 !important; }
+.resume-sheet.ms-office { font-family: 'Segoe UI', sans-serif !important; }
+.resume-sheet.ms-office h1, .resume-sheet.ms-office h3 { color: #004b87 !important; }
+.resume-sheet.ms-office h3 { border-bottom: 2px solid #004b87 !important; }
+.resume-sheet.ms-team { border-top: 6px solid #7f3d8a !important; }
+.resume-sheet.ms-team h1, .resume-sheet.ms-team h3 { color: #7f3d8a !important; }
+.resume-sheet.ms-team h3 { border-bottom: 2px solid #7f3d8a !important; }
 
-/* 14. Functional Divider Grid style */
-.resume-sheet.functional-grid {
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    padding: 20px !important;
-}
-.resume-sheet.functional-grid .resume-render-header h1 {
-    color: #334155 !important;
-}
-.resume-sheet.functional-grid .resume-render-section h3 {
-    background: #f1f5f9;
-    padding: 4px 8px;
-    border-radius: 4px;
-    color: #334155 !important;
-}
+/* 4. Student Styles Group */
+.resume-sheet.student-academic { font-family: Georgia, serif !important; text-align: justify; }
+.resume-sheet.student-academic h1 { text-align: center !important; font-size: 20px !important; }
+.resume-sheet.student-academic h3 { text-align: center; border-bottom: 1.5px solid #000 !important; }
+.resume-sheet.student-entry { background-color: #fafbfc; }
+.resume-sheet.student-entry h3 { color: #0f766e !important; border-bottom: 2px solid #0f766e !important; }
+.resume-sheet.student-grad { font-family: Garamond, serif !important; }
+.resume-sheet.student-grad h3 { border-bottom: 1.5px double #374151 !important; }
+.resume-sheet.student-campus { border-top: 6px solid #059669 !important; }
+.resume-sheet.student-campus h1, .resume-sheet.student-campus h3 { color: #059669 !important; }
+.resume-sheet.student-campus h3 { border-bottom: 2px solid #059669 !important; }
+.resume-sheet.student-scholar { font-family: 'Times New Roman', serif !important; }
+.resume-sheet.student-scholar h3 { border-bottom: 1.5px solid #111827 !important; text-transform: uppercase; }
 
-/* 15. Indigo Tech Startup style */
-.resume-sheet.indigo-startup {
-    border-top: 8px solid #4f46e5 !important;
-}
-.resume-sheet.indigo-startup .resume-render-header h1 {
-    color: #4f46e5 !important;
-    font-weight: 800;
-}
-.resume-sheet.indigo-startup .resume-render-section h3 {
-    border-bottom: 1px solid #4f46e5 !important;
-    color: #4f46e5 !important;
-}
+/* 5. Internship Styles Group */
+.resume-sheet.intern-general { border-top: 6px solid #10b981 !important; }
+.resume-sheet.intern-general h1, .resume-sheet.intern-general h3 { color: #10b981 !important; }
+.resume-sheet.intern-general h3 { border-bottom: 2px solid #10b981 !important; }
+.resume-sheet.intern-tech { border-top: 6px solid #0f172a !important; font-family: 'Courier New', Courier, monospace !important; }
+.resume-sheet.intern-tech h3 { border-bottom: 2px solid #0f172a !important; }
+.resume-sheet.intern-business { border-top: 6px solid #1e3b8b !important; }
+.resume-sheet.intern-business h1, .resume-sheet.intern-business h3 { color: #1e3b8b !important; }
+.resume-sheet.intern-business h3 { border-bottom: 2px solid #1e3b8b !important; }
+.resume-sheet.intern-creative { border-top: 6px solid #ec4899 !important; }
+.resume-sheet.intern-creative h1, .resume-sheet.intern-creative h3 { color: #ec4899 !important; }
+.resume-sheet.intern-creative h3 { border-bottom: 2px solid #ec4899 !important; }
+.resume-sheet.intern-research { border-top: 6px solid #b45309 !important; }
+.resume-sheet.intern-research h1, .resume-sheet.intern-research h3 { color: #b45309 !important; }
+.resume-sheet.intern-research h3 { border-bottom: 2px solid #b45309 !important; }
 
+/* 6. Cyber Security Styles Group */
+.resume-sheet.cyber-mono { font-family: 'Courier New', monospace !important; color: #16a34a !important; }
+.resume-sheet.cyber-mono h1, .resume-sheet.cyber-mono h3 { color: #16a34a !important; }
+.resume-sheet.cyber-mono h3 { border-bottom: 1.5px solid #16a34a !important; }
+.resume-sheet.cyber-dark { border-top: 6px solid #020617 !important; background-color: #f8fafc; }
+.resume-sheet.cyber-dark h1, .resume-sheet.cyber-dark h3 { color: #020617 !important; }
+.resume-sheet.cyber-dark h3 { border-bottom: 2px solid #020617 !important; }
+.resume-sheet.cyber-shield { border-top: 6px solid #1e3a8a !important; }
+.resume-sheet.cyber-shield h1, .resume-sheet.cyber-shield h3 { color: #1e3a8a !important; }
+.resume-sheet.cyber-shield h3 { border-bottom: 2px solid #1e3a8a !important; }
+.resume-sheet.cyber-matrix { font-family: monospace !important; border-top: 6px solid #22c55e !important; }
+.resume-sheet.cyber-matrix h1, .resume-sheet.cyber-matrix h3 { color: #22c55e !important; }
+.resume-sheet.cyber-matrix h3 { border-bottom: 1.5px solid #22c55e !important; }
+.resume-sheet.cyber-audit { border-top: 6px solid #475569 !important; }
+.resume-sheet.cyber-audit h1, .resume-sheet.cyber-audit h3 { color: #475569 !important; }
+.resume-sheet.cyber-audit h3 { border-bottom: 2px solid #475569 !important; }
+
+/* 7. Software Engineering Styles Group */
+.resume-sheet.swe-git { border-top: 6px solid #24292f !important; }
+.resume-sheet.swe-git h1, .resume-sheet.swe-git h3 { color: #24292f !important; }
+.resume-sheet.swe-git h3 { border-bottom: 2px solid #24292f !important; }
+.resume-sheet.swe-fullstack { border-top: 6px solid #6366f1 !important; }
+.resume-sheet.swe-fullstack h1, .resume-sheet.swe-fullstack h3 { color: #6366f1 !important; }
+.resume-sheet.swe-fullstack h3 { border-bottom: 2px solid #6366f1 !important; }
+.resume-sheet.swe-backend { border-top: 6px solid #0f172a !important; }
+.resume-sheet.swe-backend h1, .resume-sheet.swe-backend h3 { color: #0f172a !important; }
+.resume-sheet.swe-backend h3 { border-bottom: 2px solid #0f172a !important; }
+.resume-sheet.swe-frontend { border-top: 6px solid #06b6d4 !important; }
+.resume-sheet.swe-frontend h1, .resume-sheet.swe-frontend h3 { color: #06b6d4 !important; }
+.resume-sheet.swe-frontend h3 { border-bottom: 2px solid #06b6d4 !important; }
+.resume-sheet.swe-cloud { border-top: 6px solid #0ea5e9 !important; }
+.resume-sheet.swe-cloud h1, .resume-sheet.swe-cloud h3 { color: #0ea5e9 !important; }
+.resume-sheet.swe-cloud h3 { border-bottom: 2px solid #0ea5e9 !important; }
+
+/* 8. AI/ML Styles Group */
+.resume-sheet.ai-tensor { border-top: 6px solid #f97316 !important; }
+.resume-sheet.ai-tensor h1, .resume-sheet.ai-tensor h3 { color: #f97316 !important; }
+.resume-sheet.ai-tensor h3 { border-bottom: 2px solid #f97316 !important; }
+.resume-sheet.ai-neural { border-top: 6px solid #8b5cf6 !important; }
+.resume-sheet.ai-neural h1, .resume-sheet.ai-neural h3 { color: #8b5cf6 !important; }
+.resume-sheet.ai-neural h3 { border-bottom: 2px solid #8b5cf6 !important; }
+.resume-sheet.ai-agent { border-top: 6px solid #6366f1 !important; }
+.resume-sheet.ai-agent h1, .resume-sheet.ai-agent h3 { color: #6366f1 !important; }
+.resume-sheet.ai-agent h3 { border-bottom: 2px solid #6366f1 !important; }
+.resume-sheet.ai-vision { border-top: 6px solid #3b82f6 !important; }
+.resume-sheet.ai-vision h1, .resume-sheet.ai-vision h3 { color: #3b82f6 !important; }
+.resume-sheet.ai-vision h3 { border-bottom: 2px solid #3b82f6 !important; }
+.resume-sheet.ai-prompt { border-top: 6px solid #14b8a6 !important; }
+.resume-sheet.ai-prompt h1, .resume-sheet.ai-prompt h3 { color: #14b8a6 !important; }
+.resume-sheet.ai-prompt h3 { border-bottom: 2px solid #14b8a6 !important; }
+
+/* 9. Minimal Styles Group */
+.resume-sheet.minimal-light { padding: 30px !important; }
+.resume-sheet.minimal-light h3 { border-bottom: none !important; color: #1f2937 !important; }
+.resume-sheet.minimal-dark { background-color: #f8fafc; color: #0f172a; }
+.resume-sheet.minimal-dark h1, .resume-sheet.minimal-dark h3 { color: #0f172a !important; border-bottom: 1.5px solid #cbd5e1 !important; }
+.resume-sheet.minimal-border { border: 1px solid #e2e8f0; padding: 25px !important; }
+.resume-sheet.minimal-border h3 { border-bottom: 1.5px solid #cbd5e1 !important; }
+.resume-sheet.minimal-compact { font-size: 10px !important; line-height: 1.35 !important; }
+.resume-sheet.minimal-compact .resume-render-section { margin-bottom: 8px !important; }
+.resume-sheet.minimal-swiss { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important; letter-spacing: -0.01em; }
+.resume-sheet.minimal-swiss h1 { font-weight: 900 !important; font-size: 24px !important; }
+.resume-sheet.minimal-swiss h3 { border-bottom: 3px solid #000 !important; font-weight: 800; color: #000 !important; }
+
+/* 10. Executive Styles Group */
+.resume-sheet.exec-director { border-top: 6px solid #b45309 !important; font-family: Garamond, serif !important; }
+.resume-sheet.exec-director h1, .resume-sheet.exec-director h3 { color: #b45309 !important; }
+.resume-sheet.exec-director h3 { border-bottom: 1.5px solid #b45309 !important; }
+.resume-sheet.exec-vp { border-top: 6px solid #1e293b !important; }
+.resume-sheet.exec-vp h1, .resume-sheet.exec-vp h3 { color: #1e293b !important; }
+.resume-sheet.exec-vp h3 { border-bottom: 2px solid #1e293b !important; }
+.resume-sheet.exec-board { font-family: Georgia, serif !important; text-align: center; }
+.resume-sheet.exec-board h1 { font-size: 24px !important; }
+.resume-sheet.exec-board h3 { text-align: center; border-bottom: 1.5px solid #000 !important; }
+.resume-sheet.exec-legal { font-family: 'Times New Roman', Times, serif !important; }
+.resume-sheet.exec-legal h3 { border-bottom: 2px double #000 !important; text-transform: uppercase; }
+.resume-sheet.exec-partner { border-top: 6px solid #1e3a8a !important; }
+.resume-sheet.exec-partner h1, .resume-sheet.exec-partner h3 { color: #1e3a8a !important; }
+.resume-sheet.exec-partner h3 { border-bottom: 2px solid #1e3a8a !important; }
 
 .pdf-export-mode {
     width: 210mm !important;

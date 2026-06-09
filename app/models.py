@@ -194,4 +194,23 @@ class AdminReview(db.Model):
     resume = db.relationship('UserResume', backref=db.backref('reviews', lazy=True, cascade="all, delete-orphan"))
 
 
+class Internship(db.Model):
+    __tablename__ = 'internships'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    company_name = db.Column(db.String(100), nullable=False)
+    company_logo = db.Column(db.String(100), nullable=True, default='fa-solid fa-briefcase')
+    role = db.Column(db.String(100), nullable=False)
+    internship_type = db.Column(db.String(50), default='Summer') # Summer, Winter, Semester
+    location_type = db.Column(db.String(50), default='Remote') # Remote, Hybrid, Onsite
+    skills_required = db.Column(db.Text, nullable=True) # Comma-separated skills
+    eligibility = db.Column(db.String(200), nullable=True)
+    stipend = db.Column(db.String(50), nullable=True)
+    deadline = db.Column(db.String(50), nullable=True)
+    official_link = db.Column(db.String(255), nullable=True)
+    is_pinned = db.Column(db.Boolean, default=False, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+
+
 

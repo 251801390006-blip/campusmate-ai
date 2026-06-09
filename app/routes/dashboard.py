@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash
+from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify
 from flask_login import login_required, current_user
 from app.models import db, User, FeedbackItem, ResumeAnalysis, RoadmapProgress, UserBadge, UserResume
 from app.routes.features import get_predefined_roadmap
@@ -196,9 +196,36 @@ def settings():
                 flash("Password updated successfully!", "success")
             else:
                 flash("Invalid current password entered.", "danger")
+        elif action == 'profile':
+            name = request.form.get('name')
+            bio = request.form.get('bio')
+            branch = request.form.get('branch')
+            year = request.form.get('year')
+            skills = request.form.get('skills')
+            goals = request.form.get('goals')
+            email = request.form.get('email')
+            
+            if email:
+                existing = User.query.filter(User.email == email, User.id != current_user.id).first()
+                if existing:
+                    flash("Email address is already in use by another student.", "danger")
+                    return redirect(url_for('dashboard.settings'))
+                current_user.email = email
+                
+            current_user.name = name
+            current_user.bio = bio
+            current_user.branch = branch
+            current_user.year = year
+            current_user.skills = skills
+            current_user.career_goal = goals
+            db.session.commit()
+            flash("Profile settings updated successfully!", "success")
         else:
             flash("Preferences saved successfully!", "success")
             
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.is_json:
+            from flask import jsonify
+            return jsonify({"success": True, "message": "Settings updated successfully!"})
         return redirect(url_for('dashboard.settings'))
         
     return render_template('settings.html')
@@ -226,12 +253,23 @@ def bookmarks():
 def add_bookmark():
     from app.models import SavedItem
     item_type = request.form.get('item_type', 'general')
+    item_id = request.form.get('item_id')
     title = request.form.get('title', 'Saved Workspace')
     
-    new_item = SavedItem(user_id=current_user.id, item_type=item_type, title=title)
-    db.session.add(new_item)
-    db.session.commit()
-    flash(f"Bookmarked: {title} successfully!", "success")
+    existing = SavedItem.query.filter_by(user_id=current_user.id, item_type=item_type, item_id=item_id).first()
+    if existing:
+        db.session.delete(existing)
+        db.session.commit()
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.is_json or request.args.get('ajax') == '1':
+            return jsonify({"success": True, "status": "removed"})
+        flash(f"Removed Bookmark: {title}", "info")
+    else:
+        new_item = SavedItem(user_id=current_user.id, item_type=item_type, item_id=item_id, title=title)
+        db.session.add(new_item)
+        db.session.commit()
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.is_json or request.args.get('ajax') == '1':
+            return jsonify({"success": True, "status": "added"})
+        flash(f"Bookmarked: {title} successfully!", "success")
     return redirect(request.referrer or url_for('dashboard.bookmarks'))
 
 

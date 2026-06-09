@@ -83,6 +83,8 @@ def dashboard():
     }
     
     reviews = AdminReview.query.order_by(AdminReview.created_at.desc()).all()
+    from app.models import Internship
+    internships = Internship.query.order_by(Internship.is_pinned.desc(), Internship.created_at.desc()).all()
     
     return render_template(
         'admin.html',
@@ -97,7 +99,8 @@ def dashboard():
         total_resumes=total_resumes,
         total_chat_messages=total_chat_messages,
         daily_signups=daily_signups,
-        reviews=reviews
+        reviews=reviews,
+        internships=internships
     )
 
 @admin_bp.route('/users/<int:user_id>/toggle-status', methods=['POST'])
@@ -289,4 +292,88 @@ def broadcast_announcement():
             flash("Invalid target user selected.", "danger")
             
     return redirect(url_for('admin.dashboard'))
+
+
+@admin_bp.route('/internships/add', methods=['POST'])
+@login_required
+@role_required('admin')
+def add_internship():
+    from app.models import Internship
+    company_name = request.form.get('company_name')
+    company_logo = request.form.get('company_logo', 'fa-solid fa-briefcase')
+    role = request.form.get('role')
+    internship_type = request.form.get('internship_type', 'Summer')
+    location_type = request.form.get('location_type', 'Remote')
+    skills_required = request.form.get('skills_required', '')
+    eligibility = request.form.get('eligibility', '')
+    stipend = request.form.get('stipend', '')
+    deadline = request.form.get('deadline', '')
+    official_link = request.form.get('official_link', '')
+    is_pinned = 'is_pinned' in request.form
+    
+    new_job = Internship(
+        company_name=company_name,
+        company_logo=company_logo,
+        role=role,
+        internship_type=internship_type,
+        location_type=location_type,
+        skills_required=skills_required,
+        eligibility=eligibility,
+        stipend=stipend,
+        deadline=deadline,
+        official_link=official_link,
+        is_pinned=is_pinned
+    )
+    db.session.add(new_job)
+    db.session.commit()
+    flash("New internship listing added successfully!", "success")
+    return redirect(url_for('admin.dashboard'))
+
+
+@admin_bp.route('/internships/edit/<int:job_id>', methods=['POST'])
+@login_required
+@role_required('admin')
+def edit_internship(job_id):
+    from app.models import Internship
+    job = Internship.query.get_or_404(job_id)
+    job.company_name = request.form.get('company_name')
+    job.company_logo = request.form.get('company_logo', 'fa-solid fa-briefcase')
+    job.role = request.form.get('role')
+    job.internship_type = request.form.get('internship_type', 'Summer')
+    job.location_type = request.form.get('location_type', 'Remote')
+    job.skills_required = request.form.get('skills_required', '')
+    job.eligibility = request.form.get('eligibility', '')
+    job.stipend = request.form.get('stipend', '')
+    job.deadline = request.form.get('deadline', '')
+    job.official_link = request.form.get('official_link', '')
+    job.is_pinned = 'is_pinned' in request.form
+    
+    db.session.commit()
+    flash("Internship listing updated successfully!", "success")
+    return redirect(url_for('admin.dashboard'))
+
+
+@admin_bp.route('/internships/delete/<int:job_id>', methods=['POST'])
+@login_required
+@role_required('admin')
+def delete_internship(job_id):
+    from app.models import Internship
+    job = Internship.query.get_or_404(job_id)
+    db.session.delete(job)
+    db.session.commit()
+    flash("Internship listing deleted.", "info")
+    return redirect(url_for('admin.dashboard'))
+
+
+@admin_bp.route('/internships/pin/<int:job_id>', methods=['POST'])
+@login_required
+@role_required('admin')
+def pin_internship(job_id):
+    from app.models import Internship
+    job = Internship.query.get_or_404(job_id)
+    job.is_pinned = not job.is_pinned
+    db.session.commit()
+    flash(f"Internship pin {'enabled' if job.is_pinned else 'disabled'}.", "success")
+    return redirect(url_for('admin.dashboard'))
+
 

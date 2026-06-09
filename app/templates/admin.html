@@ -242,6 +242,83 @@
     </div>
 </div>
 
+<!-- Internship Management Panel -->
+<div class="flat-card shadow-sm border-light mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom flex-wrap gap-2" style="border-color:#dee2e6;">
+        <h3 style="font-size: 1.05rem;" class="mb-0 text-dark fw-bold"><i class="fa-solid fa-briefcase text-primary me-2"></i> Manage Internship Listings</h3>
+        <button class="btn btn-sm btn-primary shadow-sm" onclick="openAddInternshipModal()">
+            <i class="fa-solid fa-plus me-1"></i> Add Internship
+        </button>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Company</th>
+                    <th>Role</th>
+                    <th>Type / Location</th>
+                    <th>Stipend / Deadline</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job in internships %}
+                    <tr>
+                        <td>
+                            <span class="d-flex align-items-center gap-2">
+                                <span class="d-flex align-items-center justify-content-center border rounded bg-light" style="width:30px; height:30px; font-size: 0.95rem; color: #0078d4;">
+                                    <i class="{{ job.company_logo or 'fa-solid fa-briefcase' }}"></i>
+                                </span>
+                                <strong>{{ job.company_name }}</strong>
+                            </span>
+                        </td>
+                        <td class="fw-bold text-dark">{{ job.role }}</td>
+                        <td>
+                            <span class="badge bg-secondary-subtle text-secondary" style="font-size:0.68rem;">{{ job.internship_type }}</span>
+                            <span class="badge bg-info-subtle text-info" style="font-size:0.68rem;">{{ job.location_type }}</span>
+                        </td>
+                        <td>
+                            <span class="d-block fw-semibold" style="font-size:0.8rem;">{{ job.stipend or 'Unpaid' }}</span>
+                            <small class="text-muted" style="font-size:0.7rem;">Until: {{ job.deadline or 'N/A' }}</small>
+                        </td>
+                        <td>
+                            {% if job.is_pinned %}
+                                <span class="badge bg-warning text-dark"><i class="fa-solid fa-thumbtack me-1"></i> PINNED</span>
+                            {% else %}
+                                <span class="badge bg-light text-muted">Standard</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1.5">
+                                <form method="POST" action="{{ url_for('admin.pin_internship', job_id=job.id) }}" style="display:inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary" title="Toggle Pin" style="font-size:0.7rem; padding: 2px 6px;">
+                                        <i class="fa-solid fa-thumbtack"></i>
+                                    </button>
+                                </form>
+                                <button type="button" class="btn btn-sm btn-outline-primary" style="font-size:0.7rem; padding: 2px 6px;" 
+                                    onclick="openEditInternshipModal({{ job.id }}, '{{ job.company_name|e }}', '{{ job.company_logo|e }}', '{{ job.role|e }}', '{{ job.internship_type|e }}', '{{ job.location_type|e }}', '{{ job.skills_required|e }}', '{{ job.eligibility|e }}', '{{ job.stipend|e }}', '{{ job.deadline|e }}', '{{ job.official_link|e }}', {{ 'true' if job.is_pinned else 'false' }})">
+                                    <i class="fa-solid fa-pencil"></i>
+                                </button>
+                                <form method="POST" action="{{ url_for('admin.delete_internship', job_id=job.id) }}" style="display:inline;" onsubmit="return confirm('Delete internship {{ job.role }} permanently?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-danger" style="font-size:0.7rem; padding: 2px 6px;"><i class="fa-solid fa-trash"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">No internships listed in the catalog.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
 <!-- Announcement Broadcaster Panel -->
 <div class="flat-card shadow-sm border-light mb-4">
     <h3 style="font-size: 1.05rem;" class="mb-3 text-dark fw-bold"><i class="fa-solid fa-bullhorn text-primary me-2"></i> Announcement Broadcaster</h3>
@@ -318,6 +395,91 @@
         </form>
     </div>
 </div>
+
+<!-- Modal for Adding/Editing Internship -->
+<div id="internship-modal" class="modal-overlay hidden" onclick="if(event.target === this) closeInternshipModal()">
+    <div class="glass-card animate-pop bg-white p-4 shadow-lg border" style="max-width: 600px; width: 95%; border-radius: 12px; position: relative; z-index: 10500; max-height: 90vh; overflow-y: auto;">
+        <h3 class="fw-bold mb-3 text-dark" id="internship-modal-title" style="font-size: 1.15rem;"><i class="fa-solid fa-briefcase text-primary me-2"></i> Add Internship Listing</h3>
+        <form id="internship-form" method="POST" action="">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="fw-semibold text-secondary mb-1 d-block" style="font-size: 0.8rem;">Company Name</label>
+                    <input type="text" name="company_name" id="job-company" required class="form-control" placeholder="e.g. Microsoft">
+                </div>
+                <div class="col-md-6">
+                    <label class="fw-semibold text-secondary mb-1 d-block" style="font-size: 0.8rem;">Company Logo Icon Class</label>
+                    <input type="text" name="company_logo" id="job-logo" class="form-control" placeholder="e.g. fa-brands fa-microsoft">
+                </div>
+            </div>
+            
+            <div class="row g-3 mt-1">
+                <div class="col-md-6">
+                    <label class="fw-semibold text-secondary mb-1 d-block" style="font-size: 0.8rem;">Role / Title</label>
+                    <input type="text" name="role" id="job-role" required class="form-control" placeholder="e.g. Software Engineer Intern">
+                </div>
+                <div class="col-md-3">
+                    <label class="fw-semibold text-secondary mb-1 d-block" style="font-size: 0.8rem;">Type</label>
+                    <select name="internship_type" id="job-type" class="form-select">
+                        <option value="Summer">Summer</option>
+                        <option value="Winter">Winter</option>
+                        <option value="Part-time">Part-time</option>
+                        <option value="Full-time">Full-time</option>
+                        <option value="Co-op">Co-op</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="fw-semibold text-secondary mb-1 d-block" style="font-size: 0.8rem;">Location</label>
+                    <select name="location_type" id="job-location" class="form-select">
+                        <option value="Remote">Remote</option>
+                        <option value="Hybrid">Hybrid</option>
+                        <option value="Onsite">Onsite</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mb-3 mt-3">
+                <label class="fw-semibold text-secondary mb-1 d-block" style="font-size: 0.8rem;">Skills Required (Comma separated)</label>
+                <input type="text" name="skills_required" id="job-skills" class="form-control" placeholder="e.g. Python, React, Data Structures">
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="fw-semibold text-secondary mb-1 d-block" style="font-size: 0.8rem;">Eligibility Criteria</label>
+                    <input type="text" name="eligibility" id="job-eligibility" class="form-control" placeholder="e.g. B.Tech 3rd/4th Year (CS/IT)">
+                </div>
+                <div class="col-md-6">
+                    <label class="fw-semibold text-secondary mb-1 d-block" style="font-size: 0.8rem;">Stipend Rate</label>
+                    <input type="text" name="stipend" id="job-stipend" class="form-control" placeholder="e.g. $8,500/mo or Unpaid">
+                </div>
+            </div>
+
+            <div class="row g-3 mt-1">
+                <div class="col-md-6">
+                    <label class="fw-semibold text-secondary mb-1 d-block" style="font-size: 0.8rem;">Application Deadline</label>
+                    <input type="date" name="deadline" id="job-deadline" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="fw-semibold text-secondary mb-1 d-block" style="font-size: 0.8rem;">Official Link</label>
+                    <input type="url" name="official_link" id="job-link" class="form-control" placeholder="https://careers.microsoft.com">
+                </div>
+            </div>
+
+            <div class="form-check mt-3">
+                <input class="form-check-input" type="checkbox" name="is_pinned" id="job-pinned" value="y">
+                <label class="form-check-label text-dark" for="job-pinned" style="font-size: 0.85rem;">
+                    Pin this listing at the top of the internship list
+                </label>
+            </div>
+            
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <button type="button" class="btn btn-outline-secondary" onclick="closeInternshipModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary px-4">Save Listing</button>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_scripts %}
@@ -357,6 +519,50 @@ function openReviewModal(reviewId, status, feedback, improvements) {
 
 function closeReferralModal() {
     document.getElementById("referral-modal").classList.add("hidden");
+}
+
+function openAddInternshipModal() {
+    const form = document.getElementById("internship-form");
+    form.action = "{{ url_for('admin.add_internship') }}";
+    document.getElementById("internship-modal-title").innerHTML = `<i class="fa-solid fa-briefcase text-primary me-2"></i> Add Internship Listing`;
+    
+    document.getElementById("job-company").value = "";
+    document.getElementById("job-logo").value = "fa-solid fa-briefcase";
+    document.getElementById("job-role").value = "";
+    document.getElementById("job-type").value = "Summer";
+    document.getElementById("job-location").value = "Remote";
+    document.getElementById("job-skills").value = "";
+    document.getElementById("job-eligibility").value = "";
+    document.getElementById("job-stipend").value = "";
+    document.getElementById("job-deadline").value = "";
+    document.getElementById("job-link").value = "";
+    document.getElementById("job-pinned").checked = false;
+    
+    document.getElementById("internship-modal").classList.remove("hidden");
+}
+
+function openEditInternshipModal(id, company, logo, role, type, location, skills, eligibility, stipend, deadline, link, pinned) {
+    const form = document.getElementById("internship-form");
+    form.action = `/admin/internships/edit/${id}`;
+    document.getElementById("internship-modal-title").innerHTML = `<i class="fa-solid fa-briefcase text-primary me-2"></i> Edit Internship Listing`;
+    
+    document.getElementById("job-company").value = company;
+    document.getElementById("job-logo").value = logo;
+    document.getElementById("job-role").value = role;
+    document.getElementById("job-type").value = type;
+    document.getElementById("job-location").value = location;
+    document.getElementById("job-skills").value = skills;
+    document.getElementById("job-eligibility").value = eligibility;
+    document.getElementById("job-stipend").value = stipend;
+    document.getElementById("job-deadline").value = deadline;
+    document.getElementById("job-link").value = link;
+    document.getElementById("job-pinned").checked = pinned;
+    
+    document.getElementById("internship-modal").classList.remove("hidden");
+}
+
+function closeInternshipModal() {
+    document.getElementById("internship-modal").classList.add("hidden");
 }
 </script>
 {% endblock %}

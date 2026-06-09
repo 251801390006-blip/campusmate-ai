@@ -50,6 +50,105 @@
     --slate-card: #ffffff;
 }
 
+/* --- DARK MODE DESIGN SYSTEM --- */
+body.dark {
+    --bg-primary: #0f172a;       /* Dark slate blue background */
+    --bg-secondary: #1e293b;     /* Card/sidebar background */
+    --bg-tertiary: #334155;      /* Subtle dark gray active highlight */
+    
+    --neon-blue: #3b82f6;        /* Modern blue accent */
+    --neon-blue-dim: rgba(59, 130, 246, 0.15); /* Light blue tint */
+    --neon-blue-hover: #60a5fa;
+    
+    --border-color: #334155;     /* Darker border color */
+    
+    /* Typography colors */
+    --text-primary: #f8fafc;     /* Off-white */
+    --text-secondary: #cbd5e1;   /* Muted gray-blue */
+    --text-muted: #94a3b8;       /* Darker muted gray-blue */
+    
+    --slate-card: #1e293b;
+    --border-glass: #334155;
+}
+
+/* Global Dark Mode Overrides */
+body.dark .bg-white {
+    background-color: var(--bg-secondary) !important;
+}
+body.dark .text-dark {
+    color: var(--text-primary) !important;
+}
+body.dark .text-secondary {
+    color: var(--text-secondary) !important;
+}
+body.dark .border, body.dark .border-light {
+    border-color: var(--border-color) !important;
+}
+body.dark input, body.dark select, body.dark textarea {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+}
+body.dark .form-control {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+}
+body.dark .form-select {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+}
+body.dark .card {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+body.dark .list-group-item {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+}
+body.dark .table {
+    color: var(--text-primary) !important;
+}
+body.dark .table th, body.dark .table td {
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+body.dark .table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(255, 255, 255, 0.02) !important;
+}
+body.dark .modal-content {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+}
+body.dark .modal-header, body.dark .modal-footer {
+    border-color: var(--border-color) !important;
+}
+body.dark .accordion-button {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+body.dark .accordion-item {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+body.dark .nav-tabs .nav-link {
+    color: var(--text-secondary) !important;
+}
+body.dark .nav-tabs .nav-link.active {
+    background-color: var(--bg-secondary) !important;
+    color: var(--neon-blue) !important;
+    border-color: var(--border-color) var(--border-color) var(--bg-secondary) !important;
+}
+
+/* Helper Class to Hide Elements */
+.hidden {
+    display: none !important;
+}
+
+
 /* Base resets */
 * {
     margin: 0;

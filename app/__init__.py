@@ -101,6 +101,7 @@ def create_app():
             except Exception:
                 db.session.rollback()
         seed_default_users(db, User)
+        seed_default_internships(db)
 
         
     # Global context processor for notifications
@@ -172,3 +173,69 @@ def seed_default_users(db, User):
         demo.set_password('demo1234')
         
     db.session.commit()
+
+
+def seed_default_internships(db):
+    from app.models import Internship
+    try:
+        if Internship.query.count() == 0:
+            mock_internships = [
+                Internship(
+                    company_name="Microsoft",
+                    company_logo="fa-brands fa-microsoft",
+                    role="Software Engineer Intern",
+                    internship_type="Summer",
+                    location_type="Hybrid",
+                    skills_required="Python, React, Data Structures",
+                    eligibility="B.Tech 3rd/4th Year (CS/IT)",
+                    stipend="$8,500/mo",
+                    deadline="2026-09-30",
+                    official_link="https://careers.microsoft.com",
+                    is_pinned=True
+                ),
+                Internship(
+                    company_name="Google DeepMind",
+                    company_logo="fa-brands fa-google",
+                    role="AI Engineering Intern",
+                    internship_type="Summer",
+                    location_type="Onsite",
+                    skills_required="PyTorch, Transformers, LLMs",
+                    eligibility="M.Tech or PhD (AI/ML)",
+                    stipend="$9,200/mo",
+                    deadline="2026-10-15",
+                    official_link="https://careers.google.com",
+                    is_pinned=True
+                ),
+                Internship(
+                    company_name="Meta",
+                    company_logo="fa-brands fa-meta",
+                    role="Machine Learning Intern",
+                    internship_type="Summer",
+                    location_type="Hybrid",
+                    skills_required="Scikit-Learn, PyTorch, SQL",
+                    eligibility="B.Tech/M.Tech (CS/AI)",
+                    stipend="$9,000/mo",
+                    deadline="2026-10-01",
+                    official_link="https://careers.meta.com",
+                    is_pinned=False
+                ),
+                Internship(
+                    company_name="CrowdStrike",
+                    company_logo="fa-solid fa-shield-halved",
+                    role="Cyber Security Analyst Intern",
+                    internship_type="Summer",
+                    location_type="Remote",
+                    skills_required="Nmap, Wireshark, Linux Scripting",
+                    eligibility="B.Tech/B.Sc (Cyber Security/CS)",
+                    stipend="$7,500/mo",
+                    deadline="2026-09-15",
+                    official_link="https://www.crowdstrike.com/careers/",
+                    is_pinned=False
+                )
+            ]
+            db.session.add_all(mock_internships)
+            db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error seeding internships: {e}")
+
