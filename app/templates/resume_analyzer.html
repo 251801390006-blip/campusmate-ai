@@ -1,8 +1,8 @@
 {% extends "dashboard_base.html" %}
 
-{% block title %}Resume Builder 3.0 - CampusMate AI{% endblock %}
+{% block title %}Resume Builder - CampusMate AI{% endblock %}
 
-{% block header_title %}ATS Resume Builder 3.0{% endblock %}
+{% block header_title %}ATS Resume Builder{% endblock %}
 
 {% block content %}
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -83,6 +83,10 @@
                                 <label for="res-github" class="fw-semibold mb-1" style="font-size:0.7rem;">GitHub Link</label>
                                 <input type="text" id="res-github" value="github.com/alexsmith" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
                             </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="res-portfolio" class="fw-semibold mb-1" style="font-size:0.7rem;">Portfolio Link</label>
+                            <input type="text" id="res-portfolio" value="" placeholder="portfolio.smith" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
                         </div>
                     </div>
                 </details>
@@ -203,7 +207,7 @@
 
                 <!-- Section: Certifications -->
                 <details class="accordion-section p-2 border rounded" style="border-color: var(--border-color); background-color: var(--bg-secondary);">
-                    <summary class="fw-bold text-secondary" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-award me-2 text-muted"></i> Certifications & Achievements</summary>
+                    <summary class="fw-bold text-secondary" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-award me-2 text-muted"></i> Certifications</summary>
                     <div class="mt-2 d-flex flex-column gap-2">
                         <div class="input-group">
                             <label class="fw-semibold mb-1" style="font-size:0.7rem;">List Certifications</label>
@@ -211,71 +215,6 @@
                             <input type="text" id="res-cert-c2" class="form-control mb-1" value="Cyber Security & Ethical Hacking Workshop (DV Analytics)" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
                             <input type="text" id="res-cert-c3" class="form-control mb-1" value="Python Tutorial Module Certificate of Excellence (Scaler)" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
                             <input type="text" id="res-cert-c4" class="form-control" value="Python Course for Beginners: Mastering the Essentials (Scaler)" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
-                        </div>
-                    </div>
-                </details>
-
-                <!-- Section: Social & Profile Visuals -->
-                <details class="accordion-section p-2 border rounded" style="border-color: var(--border-color); background-color: var(--bg-secondary);">
-                    <summary class="fw-bold text-secondary" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-user-check me-2 text-muted"></i> Profile Pic & Portfolio</summary>
-                    <div class="mt-2 d-flex flex-column gap-2">
-                        <div class="input-group">
-                            <label for="res-profile-pic" class="fw-semibold mb-1" style="font-size:0.7rem;">Profile Picture URL</label>
-                            <input type="text" id="res-profile-pic" value="" placeholder="https://e.g. avatar/photo.jpg" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
-                        </div>
-                        <div class="input-group">
-                            <label for="res-portfolio" class="fw-semibold mb-1" style="font-size:0.7rem;">Portfolio Link</label>
-                            <input type="text" id="res-portfolio" value="" placeholder="portfolio.smith" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
-                        </div>
-                    </div>
-                </details>
-
-                <!-- Section: Academic & Extra Activities -->
-                <details class="accordion-section p-2 border rounded" style="border-color: var(--border-color); background-color: var(--bg-secondary);">
-                    <summary class="fw-bold text-secondary" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-trophy me-2 text-muted"></i> Extra Curriculars</summary>
-                    <div class="mt-2 d-flex flex-column gap-2">
-                        <div class="input-group">
-                            <label for="res-achievements" class="fw-semibold mb-1" style="font-size:0.7rem;">Achievements</label>
-                            <input type="text" id="res-achievements" value="Dean's List 2025, First Place CodeQuest Hackathon" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
-                        </div>
-                        <div class="input-group">
-                            <label for="res-research-papers" class="fw-semibold mb-1" style="font-size:0.7rem;">Research Papers</label>
-                            <input type="text" id="res-research-papers" value="Decentralized Threat Log Mapping (IEEE 2026)" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
-                        </div>
-                        <div class="input-group">
-                            <label for="res-hackathons" class="fw-semibold mb-1" style="font-size:0.7rem;">Hackathons</label>
-                            <input type="text" id="res-hackathons" value="Participated in DevFest 24, Smart India Hackathon 25" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
-                        </div>
-                        <div class="input-group">
-                            <label for="res-workshops" class="fw-semibold mb-1" style="font-size:0.7rem;">Workshops & Seminars</label>
-                            <input type="text" id="res-workshops" value="Attended AWS Cloud Practitioner Immersion Day" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
-                        </div>
-                        <div class="input-group">
-                            <label for="res-volunteering" class="fw-semibold mb-1" style="font-size:0.7rem;">Volunteering</label>
-                            <input type="text" id="res-volunteering" value="Tech mentor at local high school coding club" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
-                        </div>
-                    </div>
-                </details>
-
-                <!-- Section: Personal Interests & References -->
-                <details class="accordion-section p-2 border rounded" style="border-color: var(--border-color); background-color: var(--bg-secondary);">
-                    <summary class="fw-bold text-secondary" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-address-book me-2 text-muted"></i> Personal Preference & Reference</summary>
-                    <div class="mt-2 d-flex flex-column gap-2">
-                        <div class="input-group">
-                            <label for="res-languages" class="fw-semibold mb-1" style="font-size:0.7rem;">Languages</label>
-                            <input type="text" id="res-languages" value="English (Fluent), Spanish (Conversational)" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
-                        </div>
-                        <div class="input-group">
-                            <label for="res-interests" class="fw-semibold mb-1" style="font-size:0.7rem;">Interests</label>
-                            <input type="text" id="res-interests" value="Cryptography, Robotics, Open Source Contributing" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
-                        </div>
-                        <div class="input-group">
-                            <label for="res-references" class="fw-semibold mb-1" style="font-size:0.7rem;">References</label>
-                            <input type="text" id="res-references" value="Available upon request" oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
-                        </div>
-                        <div class="input-group">
-                            <label for="res-custom" class="fw-semibold mb-1" style="font-size:0.7rem;">Custom Section Info</label>
-                            <input type="text" id="res-custom" value="" placeholder="Additional details..." oninput="syncResumeFields()" style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--border-color); font-size:0.75rem; background: var(--bg-primary); color: var(--text-primary);">
                         </div>
                     </div>
                 </details>
@@ -412,7 +351,6 @@
             <!-- A4 Sheet Paper -->
             <div class="resume-sheet modern-ats" id="resume-sheet-paper" style="font-family: 'Outfit', sans-serif;">
                 <div class="resume-render-header" style="border-bottom: 2px solid #2563eb; padding-bottom: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px;">
-                    <img id="res-render-profile-pic" src="" style="width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 1.5px solid #1e3a8a; display: none;">
                     <div style="flex-grow: 1;">
                         <h1 id="res-render-name" style="font-size: 22px; font-weight:800; color: #1e3a8a; margin-bottom: 4px; text-transform: uppercase;">Alex Smith</h1>
                         <div class="resume-render-meta" style="font-size: 11px; color: #4b5563; line-height: 1.4;">
@@ -499,60 +437,6 @@
                             <li id="res-render-cert-c3">Python Tutorial Module Certificate of Excellence (Scaler)</li>
                             <li id="res-render-cert-c4">Python Course for Beginners: Mastering the Essentials (Scaler)</li>
                         </ul>
-                    </div>
-
-                    <!-- Section: Achievements -->
-                    <div class="resume-render-section" data-section="achievements" style="margin-bottom:14px; display:none;">
-                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Achievements</h3>
-                        <div id="res-render-achievements" style="font-size:10px; color:#374151;"></div>
-                    </div>
-
-                    <!-- Section: Research Papers -->
-                    <div class="resume-render-section" data-section="research" style="margin-bottom:14px; display:none;">
-                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Research Papers</h3>
-                        <div id="res-render-research" style="font-size:10px; color:#374151;"></div>
-                    </div>
-
-                    <!-- Section: Hackathons -->
-                    <div class="resume-render-section" data-section="hackathons" style="margin-bottom:14px; display:none;">
-                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Hackathons</h3>
-                        <div id="res-render-hackathons" style="font-size:10px; color:#374151;"></div>
-                    </div>
-
-                    <!-- Section: Workshops -->
-                    <div class="resume-render-section" data-section="workshops" style="margin-bottom:14px; display:none;">
-                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Workshops</h3>
-                        <div id="res-render-workshops" style="font-size:10px; color:#374151;"></div>
-                    </div>
-
-                    <!-- Section: Volunteering -->
-                    <div class="resume-render-section" data-section="volunteering" style="margin-bottom:14px; display:none;">
-                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Volunteering</h3>
-                        <div id="res-render-volunteering" style="font-size:10px; color:#374151;"></div>
-                    </div>
-
-                    <!-- Section: Languages -->
-                    <div class="resume-render-section" data-section="languages" style="margin-bottom:14px; display:none;">
-                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Languages</h3>
-                        <div id="res-render-languages" style="font-size:10px; color:#374151;"></div>
-                    </div>
-
-                    <!-- Section: Interests -->
-                    <div class="resume-render-section" data-section="interests" style="margin-bottom:14px; display:none;">
-                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Interests</h3>
-                        <div id="res-render-interests" style="font-size:10px; color:#374151;"></div>
-                    </div>
-
-                    <!-- Section: References -->
-                    <div class="resume-render-section" data-section="references" style="margin-bottom:14px; display:none;">
-                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">References</h3>
-                        <div id="res-render-references" style="font-size:10px; color:#374151;"></div>
-                    </div>
-
-                    <!-- Section: Custom Section -->
-                    <div class="resume-render-section" data-section="custom" style="margin-bottom:14px; display:none;">
-                        <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Custom Section</h3>
-                        <div id="res-render-custom" style="font-size:10px; color:#374151;"></div>
                     </div>
                 </div>
             </div>
@@ -651,7 +535,7 @@
 let activeBulletInput = null;
 let savedVersions = [];
 let lastATSFeedback = null;
-let sectionOrder = ["education", "skills", "experience", "projects", "certifications", "achievements", "research", "hackathons", "workshops", "volunteering", "languages", "interests", "references", "custom"];
+let sectionOrder = ["education", "skills", "experience", "projects", "certifications"];
 let undoStack = [];
 let redoStack = [];
 let isApplyingState = false;
@@ -780,16 +664,6 @@ function syncResumeFields() {
     document.getElementById("res-render-linkedin").innerHTML = `<i class="fa-brands fa-linkedin me-1 text-muted"></i> ` + (document.getElementById("res-linkedin").value || "linkedin.com/in/username");
     document.getElementById("res-render-links").innerHTML = `<i class="fa-brands fa-github me-1 text-muted"></i> ` + (document.getElementById("res-github").value || "github.com/username");
     
-    // Profile Picture
-    const profilePicVal = document.getElementById("res-profile-pic").value;
-    const profilePicImg = document.getElementById("res-render-profile-pic");
-    if (profilePicVal && profilePicImg) {
-        profilePicImg.src = profilePicVal;
-        profilePicImg.style.display = "block";
-    } else if (profilePicImg) {
-        profilePicImg.style.display = "none";
-    }
-
     // Portfolio
     const portfolioVal = document.getElementById("res-portfolio").value;
     const portfolioWrap = document.getElementById("res-render-portfolio-wrapper");
@@ -843,32 +717,6 @@ function syncResumeFields() {
     document.getElementById("res-render-cert-c2").innerText = document.getElementById("res-cert-c2").value || "";
     document.getElementById("res-render-cert-c3").innerText = document.getElementById("res-cert-c3").value || "";
     document.getElementById("res-render-cert-c4").innerText = document.getElementById("res-cert-c4").value || "";
-
-    // Helper function to sync extra text-block section
-    function syncTextBlockSection(inputId, renderId, sectionName) {
-        const val = document.getElementById(inputId).value.trim();
-        const renderEl = document.getElementById(renderId);
-        const sectionEl = document.querySelector(`[data-section="${sectionName}"]`);
-        if (renderEl && sectionEl) {
-            if (val) {
-                renderEl.innerText = val;
-                sectionEl.style.display = "block";
-            } else {
-                sectionEl.style.display = "none";
-            }
-        }
-    }
-
-    // Sync other extra sections
-    syncTextBlockSection("res-achievements", "res-render-achievements", "achievements");
-    syncTextBlockSection("res-research-papers", "res-render-research", "research");
-    syncTextBlockSection("res-hackathons", "res-render-hackathons", "hackathons");
-    syncTextBlockSection("res-workshops", "res-render-workshops", "workshops");
-    syncTextBlockSection("res-volunteering", "res-render-volunteering", "volunteering");
-    syncTextBlockSection("res-languages", "res-render-languages", "languages");
-    syncTextBlockSection("res-interests", "res-render-interests", "interests");
-    syncTextBlockSection("res-references", "res-render-references", "references");
-    syncTextBlockSection("res-custom", "res-render-custom", "custom");
 
     // Scan keyword list
     scanKeywordsInline();
@@ -933,60 +781,69 @@ function handleVersionChange() {
     }
 }
 
+function getValSafe(id) {
+    const el = document.getElementById(id);
+    return el ? el.value : "";
+}
+function setValSafe(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.value = val || "";
+}
+
 function populateForm(c) {
     if (!c) return;
-    document.getElementById("res-name").value = c.name || "";
-    document.getElementById("res-address").value = c.address || "";
-    document.getElementById("res-email").value = c.email || "";
-    document.getElementById("res-phone").value = c.phone || "";
-    document.getElementById("res-linkedin").value = c.linkedin || "";
-    document.getElementById("res-github").value = c.github || "";
+    setValSafe("res-name", c.name);
+    setValSafe("res-address", c.address);
+    setValSafe("res-email", c.email);
+    setValSafe("res-phone", c.phone);
+    setValSafe("res-linkedin", c.linkedin);
+    setValSafe("res-github", c.github);
     
-    document.getElementById("res-edu1-inst").value = c.edu1Inst || "";
-    document.getElementById("res-edu1-degree").value = c.edu1Degree || "";
-    document.getElementById("res-edu1-dates").value = c.edu1Dates || "";
-    document.getElementById("res-edu1-gpa").value = c.edu1Gpa || "";
-    document.getElementById("res-edu1-coursework").value = c.edu1Coursework || "";
+    setValSafe("res-edu1-inst", c.edu1Inst);
+    setValSafe("res-edu1-degree", c.edu1Degree);
+    setValSafe("res-edu1-dates", c.edu1Dates);
+    setValSafe("res-edu1-gpa", c.edu1Gpa);
+    setValSafe("res-edu1-coursework", c.edu1Coursework);
     
-    document.getElementById("res-skills-prog").value = c.skillsProg || "";
-    document.getElementById("res-skills-cyber").value = c.skillsCyber || "";
-    document.getElementById("res-skills-tools").value = c.skillsTools || "";
-    document.getElementById("res-skills-web").value = c.skillsWeb || "";
+    setValSafe("res-skills-prog", c.skillsProg);
+    setValSafe("res-skills-cyber", c.skillsCyber);
+    setValSafe("res-skills-tools", c.skillsTools);
+    setValSafe("res-skills-web", c.skillsWeb);
     
-    document.getElementById("res-exp-role").value = c.experienceRole || "";
-    document.getElementById("res-exp-comp").value = c.experienceComp || "";
-    document.getElementById("res-exp-dates").value = c.experienceDates || "";
-    document.getElementById("res-exp-b1").value = c.experienceB1 || "";
-    document.getElementById("res-exp-b2").value = c.experienceB2 || "";
-    document.getElementById("res-exp-b3").value = c.experienceB3 || "";
-    document.getElementById("res-exp-b4").value = c.experienceB4 || "";
+    setValSafe("res-exp-role", c.experienceRole);
+    setValSafe("res-exp-comp", c.experienceComp);
+    setValSafe("res-exp-dates", c.experienceDates);
+    setValSafe("res-exp-b1", c.experienceB1);
+    setValSafe("res-exp-b2", c.experienceB2);
+    setValSafe("res-exp-b3", c.experienceB3);
+    setValSafe("res-exp-b4", c.experienceB4);
     
-    document.getElementById("res-proj-title").value = c.projectTitle || "";
-    document.getElementById("res-proj-link").value = c.projectLink || "";
-    document.getElementById("res-proj-b1").value = c.projectB1 || "";
-    document.getElementById("res-proj-b2").value = c.projectB2 || "";
-    document.getElementById("res-proj-b3").value = c.projectB3 || "";
+    setValSafe("res-proj-title", c.projectTitle);
+    setValSafe("res-proj-link", c.projectLink);
+    setValSafe("res-proj-b1", c.projectB1);
+    setValSafe("res-proj-b2", c.projectB2);
+    setValSafe("res-proj-b3", c.projectB3);
     
-    document.getElementById("res-cert-c1").value = c.certC1 || "";
-    document.getElementById("res-cert-c2").value = c.certC2 || "";
-    document.getElementById("res-cert-c3").value = c.certC3 || "";
-    document.getElementById("res-cert-c4").value = c.certC4 || "";
+    setValSafe("res-cert-c1", c.certC1);
+    setValSafe("res-cert-c2", c.certC2);
+    setValSafe("res-cert-c3", c.certC3);
+    setValSafe("res-cert-c4", c.certC4);
 
     // Extra details sections
-    document.getElementById("res-profile-pic").value = c.profilePic || "";
-    document.getElementById("res-portfolio").value = c.portfolio || "";
-    document.getElementById("res-achievements").value = c.achievements || "";
-    document.getElementById("res-research-papers").value = c.researchPapers || "";
-    document.getElementById("res-hackathons").value = c.hackathons || "";
-    document.getElementById("res-workshops").value = c.workshops || "";
-    document.getElementById("res-volunteering").value = c.volunteering || "";
-    document.getElementById("res-languages").value = c.languages || "";
-    document.getElementById("res-interests").value = c.interests || "";
-    document.getElementById("res-references").value = c.references || "";
-    document.getElementById("res-custom").value = c.custom || "";
+    setValSafe("res-profile-pic", c.profilePic);
+    setValSafe("res-portfolio", c.portfolio);
+    setValSafe("res-achievements", c.achievements);
+    setValSafe("res-research-papers", c.researchPapers);
+    setValSafe("res-hackathons", c.hackathons);
+    setValSafe("res-workshops", c.workshops);
+    setValSafe("res-volunteering", c.volunteering);
+    setValSafe("res-languages", c.languages);
+    setValSafe("res-interests", c.interests);
+    setValSafe("res-references", c.references);
+    setValSafe("res-custom", c.custom);
 
     if (c.sectionOrder) {
-        sectionOrder = c.sectionOrder;
+        sectionOrder = c.sectionOrder.filter(sec => ["education", "skills", "experience", "projects", "certifications"].includes(sec));
         renderReorderUI();
         reorderDOM();
     }
@@ -994,55 +851,55 @@ function populateForm(c) {
 
 function getFormContent() {
     return {
-        name: document.getElementById("res-name").value,
-        address: document.getElementById("res-address").value,
-        email: document.getElementById("res-email").value,
-        phone: document.getElementById("res-phone").value,
-        linkedin: document.getElementById("res-linkedin").value,
-        github: document.getElementById("res-github").value,
+        name: getValSafe("res-name"),
+        address: getValSafe("res-address"),
+        email: getValSafe("res-email"),
+        phone: getValSafe("res-phone"),
+        linkedin: getValSafe("res-linkedin"),
+        github: getValSafe("res-github"),
         
-        edu1Inst: document.getElementById("res-edu1-inst").value,
-        edu1Degree: document.getElementById("res-edu1-degree").value,
-        edu1Dates: document.getElementById("res-edu1-dates").value,
-        edu1Gpa: document.getElementById("res-edu1-gpa").value,
-        edu1Coursework: document.getElementById("res-edu1-coursework").value,
+        edu1Inst: getValSafe("res-edu1-inst"),
+        edu1Degree: getValSafe("res-edu1-degree"),
+        edu1Dates: getValSafe("res-edu1-dates"),
+        edu1Gpa: getValSafe("res-edu1-gpa"),
+        edu1Coursework: getValSafe("res-edu1-coursework"),
         
-        skillsProg: document.getElementById("res-skills-prog").value,
-        skillsCyber: document.getElementById("res-skills-cyber").value,
-        skillsTools: document.getElementById("res-skills-tools").value,
-        skillsWeb: document.getElementById("res-skills-web").value,
+        skillsProg: getValSafe("res-skills-prog"),
+        skillsCyber: getValSafe("res-skills-cyber"),
+        skillsTools: getValSafe("res-skills-tools"),
+        skillsWeb: getValSafe("res-skills-web"),
         
-        experienceRole: document.getElementById("res-exp-role").value,
-        experienceComp: document.getElementById("res-exp-comp").value,
-        experienceDates: document.getElementById("res-exp-dates").value,
-        experienceB1: document.getElementById("res-exp-b1").value,
-        experienceB2: document.getElementById("res-exp-b2").value,
-        experienceB3: document.getElementById("res-exp-b3").value,
-        experienceB4: document.getElementById("res-exp-b4").value,
+        experienceRole: getValSafe("res-exp-role"),
+        experienceComp: getValSafe("res-exp-comp"),
+        experienceDates: getValSafe("res-exp-dates"),
+        experienceB1: getValSafe("res-exp-b1"),
+        experienceB2: getValSafe("res-exp-b2"),
+        experienceB3: getValSafe("res-exp-b3"),
+        experienceB4: getValSafe("res-exp-b4"),
         
-        projectTitle: document.getElementById("res-proj-title").value,
-        projectLink: document.getElementById("res-proj-link").value,
-        projectB1: document.getElementById("res-proj-b1").value,
-        projectB2: document.getElementById("res-proj-b2").value,
-        projectB3: document.getElementById("res-proj-b3").value,
+        projectTitle: getValSafe("res-proj-title"),
+        projectLink: getValSafe("res-proj-link"),
+        projectB1: getValSafe("res-proj-b1"),
+        projectB2: getValSafe("res-proj-b2"),
+        projectB3: getValSafe("res-proj-b3"),
         
-        certC1: document.getElementById("res-cert-c1").value,
-        certC2: document.getElementById("res-cert-c2").value,
-        certC3: document.getElementById("res-cert-c3").value,
-        certC4: document.getElementById("res-cert-c4").value,
+        certC1: getValSafe("res-cert-c1"),
+        certC2: getValSafe("res-cert-c2"),
+        certC3: getValSafe("res-cert-c3"),
+        certC4: getValSafe("res-cert-c4"),
 
         // New Fields
-        profilePic: document.getElementById("res-profile-pic").value,
-        portfolio: document.getElementById("res-portfolio").value,
-        achievements: document.getElementById("res-achievements").value,
-        researchPapers: document.getElementById("res-research-papers").value,
-        hackathons: document.getElementById("res-hackathons").value,
-        workshops: document.getElementById("res-workshops").value,
-        volunteering: document.getElementById("res-volunteering").value,
-        languages: document.getElementById("res-languages").value,
-        interests: document.getElementById("res-interests").value,
-        references: document.getElementById("res-references").value,
-        custom: document.getElementById("res-custom").value,
+        profilePic: getValSafe("res-profile-pic"),
+        portfolio: getValSafe("res-portfolio"),
+        achievements: getValSafe("res-achievements"),
+        researchPapers: getValSafe("res-research-papers"),
+        hackathons: getValSafe("res-hackathons"),
+        workshops: getValSafe("res-workshops"),
+        volunteering: getValSafe("res-volunteering"),
+        languages: getValSafe("res-languages"),
+        interests: getValSafe("res-interests"),
+        references: getValSafe("res-references"),
+        custom: getValSafe("res-custom"),
         sectionOrder: sectionOrder
     };
 }
@@ -1340,36 +1197,56 @@ function downloadResumePDF() {
     const element = document.getElementById('resume-sheet-paper');
     if (!element) return;
     
+    const btn = document.querySelector('button[onclick="downloadResumePDF()"]');
+    let originalHtml = "";
+    if (btn) {
+        btn.disabled = true;
+        originalHtml = btn.innerHTML;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Downloading...`;
+    }
+    
     element.classList.add('pdf-export-mode');
     
-    const nameVal = document.getElementById('res-name').value || 'Resume';
-    const opt = {
-        margin:       0,
-        filename:     `${nameVal.trim().replace(/\s+/g, '_')}_Resume.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { 
-            scale: 2.5, 
-            useCORS: true, 
-            letterRendering: true,
-            scrollY: 0
-        },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-    
-    html2pdf().set(opt).from(element).save().then(() => {
-        element.classList.remove('pdf-export-mode');
-    }).catch(err => {
-        console.error(err);
-        element.classList.remove('pdf-export-mode');
-        alert("Failed to export PDF: " + err.message);
-    });
+    // Tiny timeout to let the class take visual effect in DOM
+    setTimeout(() => {
+        const nameVal = document.getElementById('res-name').value || 'Resume';
+        const opt = {
+            margin:       0,
+            filename:     `${nameVal.trim().replace(/\s+/g, '_')}_Resume.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { 
+                scale: 2.5, 
+                useCORS: true, 
+                letterRendering: true,
+                scrollY: 0
+            },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak:    { mode: 'avoid-all' }
+        };
+        
+        html2pdf().set(opt).from(element).save().then(() => {
+            element.classList.remove('pdf-export-mode');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }).catch(err => {
+            console.error(err);
+            element.classList.remove('pdf-export-mode');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+            alert("Failed to export PDF: " + err.message);
+        });
+    }, 150);
 }
 
 function downloadATSReportPDF() {
     const reportHtml = `
         <div style="font-family:'Outfit',sans-serif; padding:40px; color:#1f2937;">
             <h1 style="color:#1e3a8a; border-bottom:2px solid #2563eb; padding-bottom:10px;">ATS Audit & Diagnostics Report</h1>
-            <p style="font-size:12px; color:#4b5563;">CampusMate AI Resume Analyzer 3.0 Audit for <strong>${document.getElementById("res-name").value}</strong></p>
+            <p style="font-size:12px; color:#4b5563;">CampusMate AI Resume Analyzer Audit for <strong>${document.getElementById("res-name").value}</strong></p>
             <div style="margin-top:20px; font-size:14px; background:#f3f4f6; padding:15px; border-radius:6px;">
                 Overall ATS Compatibility Score: <strong style="font-size:18px; color:#7c3aed;">${document.getElementById("score-text-main").innerText}</strong>
             </div>
@@ -1601,11 +1478,46 @@ function downloadImprovementReportPDF() {
 
 .pdf-export-mode {
     width: 210mm !important;
+    height: 297mm !important;
+    max-height: 297mm !important;
     min-height: 297mm !important;
-    padding: 20mm !important;
+    padding: 8mm 10mm !important;
     margin: 0 !important;
     border: none !important;
     box-shadow: none !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+}
+.pdf-export-mode .resume-render-header {
+    margin-bottom: 4px !important;
+    padding-bottom: 3px !important;
+}
+.pdf-export-mode .resume-render-header h1 {
+    font-size: 15px !important;
+    margin-bottom: 1px !important;
+}
+.pdf-export-mode .resume-render-meta {
+    font-size: 8px !important;
+    line-height: 1.1 !important;
+}
+.pdf-export-mode .resume-render-section {
+    margin-bottom: 4px !important;
+}
+.pdf-export-mode .resume-render-section h3 {
+    font-size: 9px !important;
+    margin-bottom: 2px !important;
+    padding-bottom: 1px !important;
+    border-bottom-width: 1px !important;
+}
+.pdf-export-mode .resume-render-section div,
+.pdf-export-mode .resume-render-section span,
+.pdf-export-mode .resume-render-section p,
+.pdf-export-mode .resume-render-section li {
+    font-size: 7.5px !important;
+    line-height: 1.1 !important;
+}
+.pdf-export-mode .resume-render-section li {
+    margin-bottom: 1px !important;
 }
 .live-keyword-item {
     padding: 4px 8px;

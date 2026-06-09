@@ -1,4 +1,4 @@
-// CampusMate AI Floating AI Mentor Drawer Controller - Upgraded 5.0
+// CampusMate AI Floating AI Mentor Drawer Controller
 
 function toggleMentorDrawer() {
     const drawer = document.getElementById("mentor-drawer");
@@ -58,10 +58,9 @@ function parseMarkdown(text) {
 // Extract any system navigation URLs from the response to append rich component cards
 function renderRichComponentCards(containerEl, markdownText) {
     const cardData = [
-        { url: "/roadmaps", icon: "fa-circle-nodes", title: "Roadmap Engine 3.0", desc: "Access your 200-node visual career tree." },
-        { url: "/resume-analyzer", icon: "fa-id-card", title: "Resume Builder 3.0", desc: "Upload and analyze ATS keywords checklist." },
+        { url: "/roadmaps", icon: "fa-circle-nodes", title: "Roadmap Engine", desc: "Access your 200-node visual career tree." },
+        { url: "/resume-analyzer", icon: "fa-id-card", title: "Resume Builder", desc: "Upload and analyze ATS keywords checklist." },
         { url: "/interview-simulator", icon: "fa-microphone", title: "AI Interview Simulator", desc: "Practice technical cards with local text-to-speech." },
-        { url: "/portfolio-builder", icon: "fa-laptop-code", title: "AI Portfolio Builder", desc: "Generate your responsive personal site." },
         { url: "/project-architect", icon: "fa-sitemap", title: "AI Project Architect", desc: "Design database schemas and file trees." },
         { url: "/internship-center", icon: "fa-briefcase", title: "Internship Command Center", desc: "Check matched openings and eligibility ratings." }
     ];

@@ -6,7 +6,7 @@ import uuid
 import zipfile
 import xml.etree.ElementTree as ET
 from datetime import datetime
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, current_app
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, current_app, abort
 from flask_login import login_required, current_user
 from app.models import db, User, ChatMessage, ResumeAnalysis, RoadmapProgress, UserResume, Internship, SavedItem
 from pypdf import PdfReader
@@ -1058,7 +1058,7 @@ def chat():
             f"📝 **Command Center Triggered: Resume Analysis**\n\n"
             f"I have loaded the resume analyzer module settings.\n\n"
             f"You can upload your PDF or DOCX file, check real-time ATS scores, compare before/after modifications, and get keywords checklist suggestions.\n\n"
-            f"👉 [Click here to access Resume Builder 3.0](/resume-analyzer)"
+            f"👉 [Click here to access Resume Builder](/resume-analyzer)"
         )
         
     elif "mock interview" in message_lower or "practice interview" in message_lower or "interview simulator" in message_lower:
@@ -1067,14 +1067,6 @@ def chat():
             f"I have prepared the technical and HR interview simulator.\n\n"
             f"Test your real-time responses with local Web Speech API text-to-speech feedback, score metrics, and FAANG level questions.\n\n"
             f"👉 [Click here to start the AI Interview Simulator](/interview-simulator)"
-        )
-        
-    elif "portfolio builder" in message_lower or "generate portfolio" in message_lower or "create website" in message_lower:
-        command_response = (
-            f"🌐 **Command Center Triggered: Portfolio Generator**\n\n"
-            f"Let's build a stunning responsive HTML portfolio website based on your profile details.\n\n"
-            f"Click the link below to generate, preview, and download your personal website code with one click.\n\n"
-            f"👉 [Click here to access AI Portfolio Builder](/portfolio-builder)"
         )
         
     elif "project architect" in message_lower or "design database" in message_lower or "folders structure" in message_lower:
@@ -1100,7 +1092,6 @@ def chat():
             f"- `create roadmap for [Track]` (e.g. `create roadmap for Web3`)\n"
             f"- `improve resume` or `analyze resume`\n"
             f"- `mock interview` or `practice interview`\n"
-            f"- `portfolio builder` or `generate portfolio`\n"
             f"- `project architect` or `design database`\n"
             f"- `internship center` or `apply internships`"
         )
@@ -1414,17 +1405,16 @@ def internship_center():
     return render_template('internship_center.html', jobs=jobs, user_track=user_track, resume_score=resume_score)
 
 
-# 8. Portfolio Builder
+# 8. Portfolio Builder (Disabled)
 @features_bp.route('/portfolio-builder', methods=['GET'])
 @login_required
 def portfolio_builder():
-    return render_template('portfolio_builder.html')
+    abort(404)
 
 @features_bp.route('/portfolio-builder/generate', methods=['POST'])
 @login_required
 def portfolio_builder_generate():
-    data = request.get_json() or {}
-    theme = data.get('theme', 'modern')
+    abort(404)
     
     name = current_user.username.title()
     email = current_user.email
@@ -1622,37 +1612,10 @@ def apply_internship():
 @features_bp.route('/portfolio-builder/publish', methods=['POST'])
 @login_required
 def portfolio_builder_publish():
-    data = request.get_json() or {}
-    html_content = data.get('html')
-    if not html_content:
-        return jsonify({"success": False, "error": "No HTML content provided."}), 400
-        
-    current_user.published_portfolio_html = html_content
-    db.session.commit()
-    
-    public_url = url_for('features.public_portfolio', username=current_user.username, _external=True)
-    return jsonify({"success": True, "public_url": public_url})
+    abort(404)
 
 
 @features_bp.route('/published-portfolio/<username>', methods=['GET'])
 def public_portfolio(username):
-    user = User.query.filter_by(username=username).first_or_404()
-    if not user.public_profile:
-        abort(403, description="This portfolio has been set to private by the user.")
-        
-    if not user.published_portfolio_html:
-        # Return a simple fallback HTML page
-        fallback_html = f"""<!DOCTYPE html>
-<html>
-<head>
-    <title>{user.username.title()} - CampusMate Portfolio</title>
-</head>
-<body style="font-family: sans-serif; text-align: center; padding: 50px;">
-    <h2>Portfolio not published yet</h2>
-    <p>The user {user.username} has not published their portfolio yet.</p>
-</body>
-</html>"""
-        return fallback_html
-        
-    return user.published_portfolio_html
+    abort(404)
 
