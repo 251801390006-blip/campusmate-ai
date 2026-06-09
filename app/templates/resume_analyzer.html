@@ -424,23 +424,38 @@
             </div>
 
             <!-- Preview wrapper parent (A4 Resume render container) -->
-            <div id="resume-preview-sheet-wrapper-parent">
-                <div class="resume-preview-sheet-wrapper border shadow-sm" style="padding: 15px; position: relative;">
-                    <!-- A4 Sheet Paper -->
-                    <div class="resume-sheet classic" id="resume-sheet-paper" style="font-family: 'Outfit', sans-serif;">
-                        <div class="resume-render-header" style="border-bottom: 2px solid #2563eb; padding-bottom: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px;">
-                            <div style="flex-grow: 1;">
-                                <h1 id="res-render-name" style="font-size: 20px; font-weight:800; color: #1e3a8a; margin-bottom: 4px; text-transform: uppercase;">Alex Smith</h1>
-                                <div class="resume-render-meta" style="font-size: 10px; color: #4b5563; line-height: 1.4;">
-                                    <!-- Built dynamically in syncResumeFields -->
+            <div id="resume-preview-sheet-wrapper-parent" style="position: relative;">
+                <div class="resume-preview-sheet-wrapper border shadow-sm">
+                    <div id="resume-sheet-scaler">
+                        <!-- A4 Sheet Paper -->
+                        <div class="resume-sheet classic" id="resume-sheet-paper" style="font-family: 'Outfit', sans-serif;">
+                            <div class="resume-render-header" style="border-bottom: 2px solid #2563eb; padding-bottom: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px;">
+                                <div style="flex-grow: 1;">
+                                    <h1 id="res-render-name" style="font-size: 20px; font-weight:800; color: #1e3a8a; margin-bottom: 4px; text-transform: uppercase;">Alex Smith</h1>
+                                    <div class="resume-render-meta" style="font-size: 10px; color: #4b5563; line-height: 1.4;">
+                                        <!-- Built dynamically in syncResumeFields -->
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div id="resume-sections-container">
-                            <!-- Reordered dynamically -->
+                            <div id="resume-sections-container">
+                                <!-- Reordered dynamically -->
+                            </div>
                         </div>
                     </div>
+                </div>
+                
+                <!-- Premium Floating Zoom & Fit Controls Toolbar -->
+                <div class="resume-canvas-toolbar shadow-sm">
+                    <button class="btn-canvas-ctrl" onclick="zoomOutResume()" title="Zoom Out"><i class="fa-solid fa-minus"></i></button>
+                    <input type="range" id="resume-zoom-slider" min="30" max="250" value="100" class="canvas-zoom-slider" oninput="onZoomSliderChange(this.value)">
+                    <button class="btn-canvas-ctrl" onclick="zoomInResume()" title="Zoom In"><i class="fa-solid fa-plus"></i></button>
+                    <span id="resume-zoom-percent">100%</span>
+                    <div class="canvas-ctrl-divider"></div>
+                    <button class="btn-canvas-ctrl" onclick="fitResumeToWidth()" title="Fit to Width"><i class="fa-solid fa-arrows-left-right"></i> Fit Width</button>
+                    <button class="btn-canvas-ctrl" onclick="fitResumeToPage()" title="Fit to Page"><i class="fa-solid fa-arrows-up-down"></i> Fit Page</button>
+                    <button class="btn-canvas-ctrl" onclick="resetResumeZoom()" title="Reset Zoom"><i class="fa-solid fa-arrows-to-dot"></i></button>
+                    <button class="btn-canvas-ctrl" onclick="toggleFullScreenResume()" title="Full Screen"><i class="fa-solid fa-expand"></i></button>
                 </div>
             </div>
 
@@ -2489,10 +2504,13 @@ function applySuggestion(index) {
     }
 }
 
+let resumeZoomMultiplier = 1.0;
+
 function scaleResumePreview() {
     const paper = document.getElementById("resume-sheet-paper");
+    const scaler = document.getElementById("resume-sheet-scaler");
     const wrapper = document.querySelector(".resume-preview-sheet-wrapper");
-    if (!paper || !wrapper) return;
+    if (!paper || !scaler || !wrapper) return;
     
     // Return early if the wrapper is currently hidden (e.g. display: none)
     if (wrapper.offsetWidth === 0) {
@@ -2500,25 +2518,106 @@ function scaleResumePreview() {
     }
     
     paper.style.transform = "none";
-    wrapper.style.height = "auto";
     
-    const paperWidth = paper.offsetWidth || 794;
+    const paperWidth = 794; // Fixed A4 width on screen
     const paperHeight = paper.offsetHeight || 1123;
     
-    const containerWidth = wrapper.clientWidth - 30; // subtract padding
+    const containerWidth = wrapper.clientWidth - 40; // subtract padding
     if (containerWidth <= 0) return;
     
-    let scale = containerWidth / paperWidth;
-    if (scale > 1) scale = 1;
+    let baseScale = containerWidth / paperWidth;
+    if (baseScale > 1) baseScale = 1; // don't upscale beyond 100% on desktop by default
     
-    paper.style.transform = `scale(${scale})`;
+    let finalScale = baseScale * resumeZoomMultiplier;
     
-    const scaledHeight = paperHeight * scale;
-    wrapper.style.height = `${scaledHeight + 30}px`;
+    // Apply scale to the paper
+    paper.style.transform = `scale(${finalScale})`;
+    
+    // Set the scaler dimensions to the scaled dimensions
+    scaler.style.width = `${paperWidth * finalScale}px`;
+    scaler.style.height = `${paperHeight * finalScale}px`;
+    
+    // Update zoom percent indicator in UI
+    const percentLabel = document.getElementById("resume-zoom-percent");
+    if (percentLabel) {
+        percentLabel.innerText = `${Math.round(finalScale * 100)}%`;
+    }
+    
+    // Update zoom range slider value in UI
+    const slider = document.getElementById("resume-zoom-slider");
+    if (slider) {
+        slider.value = Math.round(finalScale * 100);
+    }
+}
+
+function onZoomSliderChange(value) {
+    const wrapper = document.querySelector(".resume-preview-sheet-wrapper");
+    if (!wrapper) return;
+    
+    const paperWidth = 794;
+    const containerWidth = wrapper.clientWidth - 40;
+    let baseScale = containerWidth / paperWidth;
+    if (baseScale <= 0) baseScale = 0.5;
+    
+    const targetScale = value / 100;
+    resumeZoomMultiplier = targetScale / baseScale;
+    scaleResumePreview();
+}
+
+function zoomInResume() {
+    resumeZoomMultiplier = Math.min(2.5, resumeZoomMultiplier + 0.1);
+    scaleResumePreview();
+}
+
+function zoomOutResume() {
+    resumeZoomMultiplier = Math.max(0.3, resumeZoomMultiplier - 0.1);
+    scaleResumePreview();
+}
+
+function resetResumeZoom() {
+    resumeZoomMultiplier = 1.0;
+    scaleResumePreview();
+}
+
+function fitResumeToWidth() {
+    resumeZoomMultiplier = 1.0;
+    scaleResumePreview();
+}
+
+function fitResumeToPage() {
+    const wrapper = document.querySelector(".resume-preview-sheet-wrapper");
+    if (!wrapper) return;
+    
+    const paperHeight = 1123;
+    const containerHeight = wrapper.clientHeight - 40;
+    const paperWidth = 794;
+    const containerWidth = wrapper.clientWidth - 40;
+    
+    const baseScale = containerWidth / paperWidth;
+    const heightScale = containerHeight / paperHeight;
+    
+    resumeZoomMultiplier = heightScale / baseScale;
+    scaleResumePreview();
+}
+
+function toggleFullScreenResume() {
+    const el = document.getElementById("resume-preview-sheet-wrapper-parent");
+    if (!document.fullscreenElement) {
+        el.requestFullscreen().then(() => {
+            setTimeout(scaleResumePreview, 150);
+        }).catch(err => {
+            alert("Fullscreen error: " + err.message);
+        });
+    } else {
+        document.exitFullscreen().then(() => {
+            setTimeout(scaleResumePreview, 150);
+        });
+    }
 }
 
 window.addEventListener("resize", scaleResumePreview);
 window.addEventListener("load", scaleResumePreview);
+
 document.addEventListener("DOMContentLoaded", () => {
     setTimeout(scaleResumePreview, 200);
 });
@@ -2602,13 +2701,131 @@ document.addEventListener("DOMContentLoaded", () => {
 }
 
 .resume-preview-sheet-wrapper {
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-    border-radius: 6px;
-    overflow: hidden;
-    background-color: #eaeaea;
+    position: relative;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    overflow: auto !important;
+    background-color: #fafbfc;
+    background-image: radial-gradient(#dee2e6 1.2px, transparent 1.2px);
+    background-size: 20px 20px;
+    display: block;
+    box-sizing: border-box;
+    padding: 20px;
+    height: calc(100vh - 240px);
+    min-height: 450px;
+    scrollbar-width: thin;
+}
+.resume-preview-sheet-wrapper::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+.resume-preview-sheet-wrapper::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 4px;
+}
+#resume-sheet-scaler {
+    margin: 0 auto;
+    position: relative;
+    display: block;
+}
+#resume-sheet-paper {
+    width: 794px !important;
+    min-height: 1123px !important;
+    box-sizing: border-box !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform-origin: top left;
+    margin: 0 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    transition: none !important;
+}
+/* Toolbar pill floating at bottom center of viewport parent */
+.resume-canvas-toolbar {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 30px;
+    padding: 6px 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.btn-canvas-ctrl {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-primary);
+    font-size: 0.82rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background-color 0.15s, color 0.15s;
+}
+.btn-canvas-ctrl:hover {
+    background-color: var(--bg-primary);
+    color: var(--accent-color);
+}
+#resume-zoom-percent {
+    font-size: 0.78rem;
+    font-weight: 600;
+    min-width: 42px;
+    text-align: center;
+    color: var(--text-primary);
+}
+.canvas-ctrl-divider {
+    width: 1px;
+    height: 16px;
+    background-color: var(--border-color);
+    margin: 0 4px;
+}
+.canvas-zoom-slider {
+    width: 100px;
+    height: 4px;
+    accent-color: var(--accent-color);
+    cursor: pointer;
+    background: var(--border-color);
+    border-radius: 2px;
+    outline: none;
+}
+#resume-preview-sheet-wrapper-parent:fullscreen {
+    background-color: var(--bg-primary) !important;
+    padding: 30px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+}
+#resume-preview-sheet-wrapper-parent:fullscreen .resume-preview-sheet-wrapper {
+    width: 100% !important;
+    max-width: 1000px !important;
+    height: calc(100vh - 100px) !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+@media (max-width: 767px) {
+    .resume-preview-sheet-wrapper {
+        height: calc(100vh - 180px) !important;
+        min-height: 380px !important;
+    }
+    .resume-canvas-toolbar {
+        padding: 4px 10px;
+        gap: 6px;
+        bottom: 10px;
+        width: 90%;
+        justify-content: space-between;
+    }
+    .resume-canvas-toolbar span, .resume-canvas-toolbar .canvas-ctrl-divider, .resume-canvas-toolbar button[title="Fit to Page"], .resume-canvas-toolbar button[title="Fit to Width"] {
+        display: none !important;
+    }
 }
 
 /* Template card list thumbnails */
