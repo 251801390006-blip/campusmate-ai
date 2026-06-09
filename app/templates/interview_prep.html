@@ -22,7 +22,244 @@
                 
                 <div class="mb-3">
                     <label for="mock-role-input" class="fw-semibold text-secondary d-block mb-1" style="font-size: 0.82rem;">Target Career Role</label>
-                    <input type="text" id="mock-role-input" class="form-control shadow-sm" placeholder="e.g. Backend Engineer, SOC Analyst" value="{{ user_track }}" style="font-size:0.9rem;">
+                    <input type="text" id="mock-role-input" list="role-datalist" class="form-control shadow-sm" placeholder="e.g. Backend Engineer, SOC Analyst" value="{{ user_track }}" style="font-size:0.9rem;" autocomplete="off">
+                    <datalist id="role-datalist">
+                        <!-- Software Engineering & Development -->
+                        <option value="Software Engineer">
+                        <option value="Senior Software Engineer">
+                        <option value="Staff Software Engineer">
+                        <option value="Principal Engineer">
+                        <option value="Full Stack Developer">
+                        <option value="Frontend Developer">
+                        <option value="Backend Developer">
+                        <option value="Web Developer">
+                        <option value="Mobile App Developer">
+                        <option value="iOS Developer">
+                        <option value="Android Developer">
+                        <option value="React Developer">
+                        <option value="Angular Developer">
+                        <option value="Vue.js Developer">
+                        <option value="Node.js Developer">
+                        <option value="Python Developer">
+                        <option value="Java Developer">
+                        <option value="C++ Developer">
+                        <option value="Rust Developer">
+                        <option value="Go Developer">
+                        <option value="Ruby on Rails Developer">
+                        <option value="PHP Developer">
+                        <option value="Swift Developer">
+                        <option value="Kotlin Developer">
+                        <option value="TypeScript Developer">
+                        <option value="Embedded Systems Engineer">
+                        <option value="Firmware Engineer">
+                        <option value="Game Developer">
+                        <option value="Graphics Programmer">
+                        <option value="Low-Level Systems Programmer">
+                        <!-- Data Science & AI/ML -->
+                        <option value="Data Scientist">
+                        <option value="Senior Data Scientist">
+                        <option value="Machine Learning Engineer">
+                        <option value="Deep Learning Engineer">
+                        <option value="AI Research Scientist">
+                        <option value="NLP Engineer">
+                        <option value="Computer Vision Engineer">
+                        <option value="MLOps Engineer">
+                        <option value="Data Engineer">
+                        <option value="Data Analyst">
+                        <option value="Business Intelligence Analyst">
+                        <option value="Quantitative Analyst">
+                        <option value="Statistician">
+                        <option value="AI Product Manager">
+                        <option value="Prompt Engineer">
+                        <option value="LLM Engineer">
+                        <option value="Reinforcement Learning Engineer">
+                        <option value="Robotics Engineer">
+                        <option value="Research Engineer">
+                        <option value="Applied Scientist">
+                        <!-- Cybersecurity -->
+                        <option value="Cybersecurity Analyst">
+                        <option value="SOC Analyst">
+                        <option value="Security Engineer">
+                        <option value="Penetration Tester">
+                        <option value="Ethical Hacker">
+                        <option value="Information Security Manager">
+                        <option value="Threat Intelligence Analyst">
+                        <option value="Incident Response Analyst">
+                        <option value="Digital Forensics Analyst">
+                        <option value="Malware Analyst">
+                        <option value="Application Security Engineer">
+                        <option value="Cloud Security Engineer">
+                        <option value="Network Security Engineer">
+                        <option value="Cryptography Engineer">
+                        <option value="Security Architect">
+                        <option value="Compliance Analyst">
+                        <option value="GRC Analyst">
+                        <option value="Red Team Operator">
+                        <option value="Blue Team Analyst">
+                        <option value="Bug Bounty Hunter">
+                        <!-- Cloud & DevOps -->
+                        <option value="Cloud Engineer">
+                        <option value="Cloud Architect">
+                        <option value="AWS Solutions Architect">
+                        <option value="Azure Cloud Engineer">
+                        <option value="GCP Cloud Engineer">
+                        <option value="DevOps Engineer">
+                        <option value="Site Reliability Engineer (SRE)">
+                        <option value="Platform Engineer">
+                        <option value="Infrastructure Engineer">
+                        <option value="Kubernetes Engineer">
+                        <option value="Docker Engineer">
+                        <option value="CI/CD Engineer">
+                        <option value="Systems Administrator">
+                        <option value="Linux Administrator">
+                        <option value="Network Engineer">
+                        <option value="Release Engineer">
+                        <option value="Build Engineer">
+                        <option value="Configuration Manager">
+                        <option value="Terraform Engineer">
+                        <option value="Ansible Automation Engineer">
+                        <!-- Product & Design -->
+                        <option value="Product Manager">
+                        <option value="Senior Product Manager">
+                        <option value="Technical Product Manager">
+                        <option value="Product Designer">
+                        <option value="UX Designer">
+                        <option value="UI Designer">
+                        <option value="UX Researcher">
+                        <option value="Interaction Designer">
+                        <option value="Visual Designer">
+                        <option value="Design Systems Engineer">
+                        <option value="Motion Designer">
+                        <option value="Creative Director">
+                        <option value="Art Director">
+                        <option value="Brand Designer">
+                        <option value="Graphic Designer">
+                        <!-- QA & Testing -->
+                        <option value="QA Engineer">
+                        <option value="SDET (Software Dev Engineer in Test)">
+                        <option value="Automation Test Engineer">
+                        <option value="Performance Test Engineer">
+                        <option value="Manual Tester">
+                        <option value="Quality Assurance Lead">
+                        <!-- Database & Storage -->
+                        <option value="Database Administrator">
+                        <option value="Database Developer">
+                        <option value="Data Warehouse Engineer">
+                        <option value="ETL Developer">
+                        <option value="Big Data Engineer">
+                        <option value="Hadoop Developer">
+                        <option value="Spark Developer">
+                        <option value="Kafka Engineer">
+                        <!-- Blockchain & Web3 -->
+                        <option value="Blockchain Developer">
+                        <option value="Smart Contract Developer">
+                        <option value="Web3 Engineer">
+                        <option value="Solidity Developer">
+                        <option value="DeFi Engineer">
+                        <!-- Management & Leadership -->
+                        <option value="Engineering Manager">
+                        <option value="VP of Engineering">
+                        <option value="CTO">
+                        <option value="Technical Lead">
+                        <option value="Team Lead">
+                        <option value="Scrum Master">
+                        <option value="Agile Coach">
+                        <option value="Project Manager">
+                        <option value="Program Manager">
+                        <option value="Delivery Manager">
+                        <!-- Business & Finance -->
+                        <option value="Business Analyst">
+                        <option value="Management Consultant">
+                        <option value="Strategy Analyst">
+                        <option value="Financial Analyst">
+                        <option value="Investment Banking Analyst">
+                        <option value="Risk Analyst">
+                        <option value="Operations Manager">
+                        <option value="Supply Chain Analyst">
+                        <option value="Procurement Analyst">
+                        <option value="Logistics Coordinator">
+                        <!-- Marketing & Sales -->
+                        <option value="Digital Marketing Manager">
+                        <option value="SEO Specialist">
+                        <option value="Content Marketing Manager">
+                        <option value="Social Media Manager">
+                        <option value="Growth Hacker">
+                        <option value="Performance Marketing Analyst">
+                        <option value="Sales Engineer">
+                        <option value="Account Executive">
+                        <option value="Customer Success Manager">
+                        <option value="Technical Account Manager">
+                        <!-- Healthcare & Life Sciences -->
+                        <option value="Biomedical Engineer">
+                        <option value="Clinical Data Analyst">
+                        <option value="Health Informatics Specialist">
+                        <option value="Bioinformatics Engineer">
+                        <option value="Pharmaceutical Scientist">
+                        <option value="Healthcare IT Specialist">
+                        <option value="Medical Device Engineer">
+                        <option value="Genomics Data Scientist">
+                        <!-- Education & Research -->
+                        <option value="EdTech Developer">
+                        <option value="Instructional Designer">
+                        <option value="Research Scientist">
+                        <option value="Academic Researcher">
+                        <option value="Curriculum Developer">
+                        <option value="Teaching Assistant">
+                        <!-- Legal & Compliance -->
+                        <option value="Legal Analyst">
+                        <option value="Compliance Officer">
+                        <option value="Privacy Engineer">
+                        <option value="Intellectual Property Analyst">
+                        <option value="Contract Manager">
+                        <!-- Media & Entertainment -->
+                        <option value="Video Producer">
+                        <option value="Sound Engineer">
+                        <option value="3D Artist">
+                        <option value="Animation Engineer">
+                        <option value="VR/AR Developer">
+                        <option value="Technical Writer">
+                        <option value="Content Strategist">
+                        <!-- Telecom & Networking -->
+                        <option value="Telecom Engineer">
+                        <option value="RF Engineer">
+                        <option value="5G Network Engineer">
+                        <option value="VoIP Engineer">
+                        <option value="Optical Network Engineer">
+                        <!-- Aerospace & Automotive -->
+                        <option value="Aerospace Engineer">
+                        <option value="Avionics Engineer">
+                        <option value="Automotive Software Engineer">
+                        <option value="ADAS Engineer">
+                        <option value="Autonomous Vehicle Engineer">
+                        <!-- Energy & Environment -->
+                        <option value="Renewable Energy Engineer">
+                        <option value="Environmental Data Analyst">
+                        <option value="Power Systems Engineer">
+                        <option value="Smart Grid Engineer">
+                        <!-- Hardware & Electronics -->
+                        <option value="Hardware Engineer">
+                        <option value="VLSI Design Engineer">
+                        <option value="FPGA Engineer">
+                        <option value="PCB Design Engineer">
+                        <option value="Chip Architect">
+                        <option value="Semiconductor Process Engineer">
+                        <option value="IoT Engineer">
+                        <option value="Sensor Engineer">
+                        <!-- Other Technical Roles -->
+                        <option value="Solutions Architect">
+                        <option value="Enterprise Architect">
+                        <option value="Integration Engineer">
+                        <option value="API Developer">
+                        <option value="Microservices Architect">
+                        <option value="ERP Consultant">
+                        <option value="SAP Consultant">
+                        <option value="Salesforce Developer">
+                        <option value="ServiceNow Developer">
+                        <option value="SharePoint Developer">
+                        <option value="Technical Support Engineer">
+                        <option value="IT Help Desk Specialist">
+                        <option value="IT Auditor">
+                    </datalist>
                 </div>
 
                 <div class="mb-4">
@@ -48,7 +285,7 @@
                     <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2.5 py-1" style="font-size:0.75rem; font-weight:700;"><i class="fa-solid fa-circle-dot text-danger animate-pulse me-1"></i> Active Simulation</span>
                     <span class="badge bg-light text-primary border border-primary ms-2 px-2.5 py-1" style="font-size:0.75rem; font-weight:600;" id="mock-role-badge">Software Engineer</span>
                 </div>
-                <span id="mock-question-counter" class="fw-bold text-secondary" style="font-size: 0.85rem;">Question 1 of 3</span>
+                <span id="mock-question-counter" class="fw-bold text-secondary" style="font-size: 0.85rem;">Question 1 of 18</span>
             </div>
 
             <div class="mock-question-display p-3.5 border rounded mb-4 shadow-sm" style="background-color: #fafbfc; border-color: #dee2e6;">
@@ -104,6 +341,202 @@
                 </div>
             </div>
         </div>
+
+        <!-- Recommended Practice Platforms -->
+        <div class="flat-card shadow-sm border-light mt-4" id="platforms-panel">
+            <h3 class="fw-bold text-dark mb-1" style="font-size: 1.15rem;"><i class="fa-solid fa-bullseye text-primary me-2"></i> Recommended Practice Platforms</h3>
+            <p class="text-secondary mb-4" style="font-size: 0.82rem;">Level up your interview skills with these curated platforms.</p>
+            <div class="row g-3">
+                <div class="col-md-4 col-sm-6">
+                    <a href="https://leetcode.com" target="_blank" rel="noopener" class="platform-card d-block text-decoration-none p-3 border rounded bg-white shadow-sm h-100">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div class="platform-icon" style="background:#FFA116;"><i class="fa-solid fa-code"></i></div>
+                            <strong class="text-dark" style="font-size:0.88rem;">LeetCode</strong>
+                        </div>
+                        <p class="text-secondary mb-0" style="font-size:0.75rem; line-height:1.4;">2000+ coding problems with company tags. The #1 platform for DSA interview prep.</p>
+                    </a>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <a href="https://hackerrank.com" target="_blank" rel="noopener" class="platform-card d-block text-decoration-none p-3 border rounded bg-white shadow-sm h-100">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div class="platform-icon" style="background:#1BA94C;"><i class="fa-brands fa-hackerrank"></i></div>
+                            <strong class="text-dark" style="font-size:0.88rem;">HackerRank</strong>
+                        </div>
+                        <p class="text-secondary mb-0" style="font-size:0.75rem; line-height:1.4;">Skill certification tests and coding challenges used by 2000+ companies worldwide.</p>
+                    </a>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <a href="https://www.geeksforgeeks.org" target="_blank" rel="noopener" class="platform-card d-block text-decoration-none p-3 border rounded bg-white shadow-sm h-100">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div class="platform-icon" style="background:#2F8D46;"><i class="fa-solid fa-laptop-code"></i></div>
+                            <strong class="text-dark" style="font-size:0.88rem;">GeeksforGeeks</strong>
+                        </div>
+                        <p class="text-secondary mb-0" style="font-size:0.75rem; line-height:1.4;">Extensive DSA tutorials, company-specific archives, and practice problems.</p>
+                    </a>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <a href="https://www.pramp.com" target="_blank" rel="noopener" class="platform-card d-block text-decoration-none p-3 border rounded bg-white shadow-sm h-100">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div class="platform-icon" style="background:#6C63FF;"><i class="fa-solid fa-users"></i></div>
+                            <strong class="text-dark" style="font-size:0.88rem;">Pramp</strong>
+                        </div>
+                        <p class="text-secondary mb-0" style="font-size:0.75rem; line-height:1.4;">Free peer-to-peer mock interviews with real engineers from top companies.</p>
+                    </a>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <a href="https://interviewing.io" target="_blank" rel="noopener" class="platform-card d-block text-decoration-none p-3 border rounded bg-white shadow-sm h-100">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div class="platform-icon" style="background:#E74C3C;"><i class="fa-solid fa-headset"></i></div>
+                            <strong class="text-dark" style="font-size:0.88rem;">Interviewing.io</strong>
+                        </div>
+                        <p class="text-secondary mb-0" style="font-size:0.75rem; line-height:1.4;">Anonymous mock interviews with FAANG engineers. Get real feedback on your performance.</p>
+                    </a>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <a href="https://codesignal.com" target="_blank" rel="noopener" class="platform-card d-block text-decoration-none p-3 border rounded bg-white shadow-sm h-100">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div class="platform-icon" style="background:#1062FE;"><i class="fa-solid fa-signal"></i></div>
+                            <strong class="text-dark" style="font-size:0.88rem;">CodeSignal</strong>
+                        </div>
+                        <p class="text-secondary mb-0" style="font-size:0.75rem; line-height:1.4;">Pre-screen assessments used by Uber, Brex, and 100+ tech companies for hiring.</p>
+                    </a>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <a href="https://www.interviewbit.com" target="_blank" rel="noopener" class="platform-card d-block text-decoration-none p-3 border rounded bg-white shadow-sm h-100">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div class="platform-icon" style="background:#5B8FF9;"><i class="fa-solid fa-chalkboard-user"></i></div>
+                            <strong class="text-dark" style="font-size:0.88rem;">InterviewBit</strong>
+                        </div>
+                        <p class="text-secondary mb-0" style="font-size:0.75rem; line-height:1.4;">Structured coding tracks with guided learning paths to crack top tech interviews.</p>
+                    </a>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <a href="https://www.glassdoor.com/Interview/index.htm" target="_blank" rel="noopener" class="platform-card d-block text-decoration-none p-3 border rounded bg-white shadow-sm h-100">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div class="platform-icon" style="background:#0CAA41;"><i class="fa-solid fa-magnifying-glass"></i></div>
+                            <strong class="text-dark" style="font-size:0.88rem;">Glassdoor</strong>
+                        </div>
+                        <p class="text-secondary mb-0" style="font-size:0.75rem; line-height:1.4;">Real interview questions and experiences shared by candidates at specific companies.</p>
+                    </a>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <a href="https://www.educative.io" target="_blank" rel="noopener" class="platform-card d-block text-decoration-none p-3 border rounded bg-white shadow-sm h-100">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div class="platform-icon" style="background:#6440FA;"><i class="fa-solid fa-graduation-cap"></i></div>
+                            <strong class="text-dark" style="font-size:0.88rem;">Educative.io</strong>
+                        </div>
+                        <p class="text-secondary mb-0" style="font-size:0.75rem; line-height:1.4;">Text-based interactive courses. Grokking the System Design Interview is legendary.</p>
+                    </a>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <a href="https://www.algoexpert.io" target="_blank" rel="noopener" class="platform-card d-block text-decoration-none p-3 border rounded bg-white shadow-sm h-100">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div class="platform-icon" style="background:#626EE3;"><i class="fa-solid fa-diagram-project"></i></div>
+                            <strong class="text-dark" style="font-size:0.88rem;">AlgoExpert</strong>
+                        </div>
+                        <p class="text-secondary mb-0" style="font-size:0.75rem; line-height:1.4;">160 hand-picked questions with video explanations. Also covers System Design Expert.</p>
+                    </a>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <a href="https://neetcode.io" target="_blank" rel="noopener" class="platform-card d-block text-decoration-none p-3 border rounded bg-white shadow-sm h-100">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div class="platform-icon" style="background:#FF6B6B;"><i class="fa-solid fa-fire"></i></div>
+                            <strong class="text-dark" style="font-size:0.88rem;">NeetCode</strong>
+                        </div>
+                        <p class="text-secondary mb-0" style="font-size:0.75rem; line-height:1.4;">Curated Blind 75 & NeetCode 150 lists with video solutions. Perfect for targeted prep.</p>
+                    </a>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <a href="https://github.com/donnemartin/system-design-primer" target="_blank" rel="noopener" class="platform-card d-block text-decoration-none p-3 border rounded bg-white shadow-sm h-100">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div class="platform-icon" style="background:#333;"><i class="fa-brands fa-github"></i></div>
+                            <strong class="text-dark" style="font-size:0.88rem;">System Design Primer</strong>
+                        </div>
+                        <p class="text-secondary mb-0" style="font-size:0.75rem; line-height:1.4;">Open-source guide with 250k+ stars. Master scalability, caching, load balancing concepts.</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interview Preparation Checklist -->
+        <div class="flat-card shadow-sm border-light mt-4" id="prep-checklist-panel">
+            <h3 class="fw-bold text-dark mb-1" style="font-size: 1.15rem;"><i class="fa-solid fa-clipboard-check text-success me-2"></i> Interview Preparation Checklist</h3>
+            <p class="text-secondary mb-4" style="font-size: 0.82rem;">Follow this checklist to maximize your chances of landing the offer.</p>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="checklist-item d-flex align-items-start gap-2 p-2 rounded">
+                        <div class="check-icon"><i class="fa-regular fa-square-check text-success"></i></div>
+                        <div><strong style="font-size:0.82rem;">Master the STAR Technique</strong><p class="text-secondary mb-0" style="font-size:0.72rem;">Situation, Task, Action, Result — structure all behavioral answers this way.</p></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="checklist-item d-flex align-items-start gap-2 p-2 rounded">
+                        <div class="check-icon"><i class="fa-regular fa-square-check text-success"></i></div>
+                        <div><strong style="font-size:0.82rem;">Review Top 50 DSA Patterns</strong><p class="text-secondary mb-0" style="font-size:0.72rem;">Arrays, Trees, Graphs, Dynamic Programming, Sliding Window, Two Pointers.</p></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="checklist-item d-flex align-items-start gap-2 p-2 rounded">
+                        <div class="check-icon"><i class="fa-regular fa-square-check text-success"></i></div>
+                        <div><strong style="font-size:0.82rem;">Practice System Design</strong><p class="text-secondary mb-0" style="font-size:0.72rem;">Load Balancers, Caching, Database Sharding, Message Queues, CDNs.</p></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="checklist-item d-flex align-items-start gap-2 p-2 rounded">
+                        <div class="check-icon"><i class="fa-regular fa-square-check text-success"></i></div>
+                        <div><strong style="font-size:0.82rem;">Prepare 2-Minute Self-Intro</strong><p class="text-secondary mb-0" style="font-size:0.72rem;">Craft a concise elevator pitch: background, skills, why you're a fit.</p></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="checklist-item d-flex align-items-start gap-2 p-2 rounded">
+                        <div class="check-icon"><i class="fa-regular fa-square-check text-success"></i></div>
+                        <div><strong style="font-size:0.82rem;">Research the Company</strong><p class="text-secondary mb-0" style="font-size:0.72rem;">Study recent products, culture, values, leadership, and news articles.</p></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="checklist-item d-flex align-items-start gap-2 p-2 rounded">
+                        <div class="check-icon"><i class="fa-regular fa-square-check text-success"></i></div>
+                        <div><strong style="font-size:0.82rem;">Do a Mock Interview</strong><p class="text-secondary mb-0" style="font-size:0.72rem;">Use Pramp, Interviewing.io, or practice with a peer for real feedback.</p></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="checklist-item d-flex align-items-start gap-2 p-2 rounded">
+                        <div class="check-icon"><i class="fa-regular fa-square-check text-success"></i></div>
+                        <div><strong style="font-size:0.82rem;">Review SQL & Database Concepts</strong><p class="text-secondary mb-0" style="font-size:0.72rem;">JOINs, GROUP BY, window functions, indexing, normalization.</p></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="checklist-item d-flex align-items-start gap-2 p-2 rounded">
+                        <div class="check-icon"><i class="fa-regular fa-square-check text-success"></i></div>
+                        <div><strong style="font-size:0.82rem;">Prepare Questions for Interviewer</strong><p class="text-secondary mb-0" style="font-size:0.72rem;">Ask about team culture, tech stack, growth paths, day-to-day responsibilities.</p></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="checklist-item d-flex align-items-start gap-2 p-2 rounded">
+                        <div class="check-icon"><i class="fa-regular fa-square-check text-success"></i></div>
+                        <div><strong style="font-size:0.82rem;">Test Your Virtual Setup</strong><p class="text-secondary mb-0" style="font-size:0.72rem;">Camera, microphone, internet stability, background, lighting for video calls.</p></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="checklist-item d-flex align-items-start gap-2 p-2 rounded">
+                        <div class="check-icon"><i class="fa-regular fa-square-check text-success"></i></div>
+                        <div><strong style="font-size:0.82rem;">Know Your Resume Inside Out</strong><p class="text-secondary mb-0" style="font-size:0.72rem;">Be ready to discuss every project, skill, and experience on your resume.</p></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="checklist-item d-flex align-items-start gap-2 p-2 rounded">
+                        <div class="check-icon"><i class="fa-regular fa-square-check text-success"></i></div>
+                        <div><strong style="font-size:0.82rem;">Practice Time Management</strong><p class="text-secondary mb-0" style="font-size:0.72rem;">Solve medium problems in 20-25 min. Use a timer during practice sessions.</p></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="checklist-item d-flex align-items-start gap-2 p-2 rounded">
+                        <div class="check-icon"><i class="fa-regular fa-square-check text-success"></i></div>
+                        <div><strong style="font-size:0.82rem;">Review OOP & Design Patterns</strong><p class="text-secondary mb-0" style="font-size:0.72rem;">SOLID principles, Factory, Observer, Strategy, Singleton patterns.</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -127,27 +560,126 @@ let mockInterviewState = {
     questionIndex: 0,
     questions: [],
     answers: [],
-    // Category mappings based on track queries
     trackDatabase: {
-        "security": [
-            "How does WPA3 protect wireless connections differently from WPA2, and what are the main security benefits?",
-            "Explain the difference between Symmetric and Asymmetric encryption, and how TLS uses both to secure connections.",
-            "What is an SQL injection, and how do parameterized queries prevent it on an database architecture level?"
+        "frontend": [
+            "Explain the difference between the Virtual DOM and the real DOM. How does React use the Virtual DOM to optimize rendering?",
+            "What is the CSS Box Model? Explain content, padding, border, and margin with a practical layout example.",
+            "How does JavaScript event delegation work, and why is it more efficient than attaching listeners to individual elements?",
+            "Explain the concept of closures in JavaScript. Provide a real-world use case where closures are essential.",
+            "What are React Hooks? Compare useState, useEffect, useRef, and useMemo with practical examples.",
+            "Describe the Critical Rendering Path in a browser. How do CSS and JavaScript loading strategies affect page performance?",
+            "What is Cross-Origin Resource Sharing (CORS)? How do you configure a server to handle CORS preflight requests?",
+            "Explain the difference between CSS Grid and Flexbox. When would you choose one over the other?",
+            "What is tree shaking in webpack? How does it help reduce bundle size in production builds?",
+            "Describe the component lifecycle in React (class-based and functional). How does useEffect replicate lifecycle methods?",
+            "What is Server-Side Rendering (SSR) vs Client-Side Rendering (CSR)? Compare their SEO and performance trade-offs.",
+            "How do you implement lazy loading of images and components in a React application? What APIs and patterns do you use?",
+            "Explain the concept of Web Accessibility (a11y). What ARIA attributes would you use for a custom dropdown component?",
+            "What are Web Workers? How can you use them to offload CPU-intensive tasks from the main UI thread?",
+            "Describe how you would implement infinite scrolling with virtualized lists. What libraries or techniques would you use?",
+            "What is a Service Worker? How does it enable offline-first Progressive Web Apps (PWAs)?",
+            "Explain the difference between controlled and uncontrolled components in React. When would you use each?",
+            "How do you handle state management in a large-scale React application? Compare Redux, Zustand, and React Context."
+        ],
+        "backend_systems": [
+            "Design a URL shortener service like bit.ly. Discuss the database schema, hashing strategy, and read/write optimization.",
+            "What is the CAP theorem? Explain with examples of systems that prioritize CP vs AP.",
+            "Describe the differences between monolithic and microservices architectures. What are the trade-offs of each approach?",
+            "How does database indexing work internally (B-tree vs Hash Index)? When would you choose one over the other?",
+            "Design a rate limiter for an API. Discuss Token Bucket, Leaky Bucket, and Sliding Window algorithms.",
+            "Explain the difference between SQL and NoSQL databases. When would you choose MongoDB over PostgreSQL?",
+            "What is database sharding? Describe horizontal vs vertical partitioning and their consistency challenges.",
+            "Design a notification system that handles email, SMS, and push notifications for millions of users.",
+            "Explain eventual consistency vs strong consistency. How does a distributed system achieve each?",
+            "What are message queues (Kafka, RabbitMQ, SQS)? How do they enable asynchronous processing and decoupling?",
+            "Design a real-time chat application like Slack. Discuss WebSocket connections, message storage, and presence indicators.",
+            "What is the difference between REST and GraphQL? Discuss over-fetching, under-fetching, and N+1 query problems.",
+            "Explain how connection pooling works in database systems. Why is it important for high-throughput applications?",
+            "Design a distributed caching layer using Redis. How do you handle cache invalidation, eviction policies, and cache stampede?",
+            "What are ACID properties in databases? How do distributed transactions maintain these properties across microservices?",
+            "Explain the concept of API versioning. What strategies (URI path, header, query param) would you use and why?",
+            "Design a file storage service like Google Drive. Discuss chunked uploads, deduplication, and CDN distribution.",
+            "What is the Circuit Breaker pattern? How does it prevent cascading failures in microservice architectures?"
         ],
         "data_ai": [
-            "Explain the difference between L1 and L2 regularization, and how they impact model weights during optimization.",
-            "What is the vanishing gradient problem in deep neural networks, and how do ResNets or LSTMs mitigate it?",
-            "Describe the core architecture of a Transformer model, and how Self-Attention differs from standard recurrence."
+            "Explain the bias-variance tradeoff. How does regularization (L1 vs L2) help control model complexity?",
+            "What is the vanishing gradient problem? How do ResNets and LSTMs architecturally solve this issue?",
+            "Describe the Transformer architecture. How does multi-head self-attention differ from recurrent processing?",
+            "What is transfer learning? Explain how fine-tuning a pre-trained model like BERT works for downstream NLP tasks.",
+            "Explain the difference between bagging and boosting. Compare Random Forest with XGBoost in terms of bias and variance.",
+            "What is a Generative Adversarial Network (GAN)? Describe the training dynamics between the generator and discriminator.",
+            "How do you handle class imbalance in a classification problem? Discuss SMOTE, class weights, and evaluation metrics.",
+            "Explain the difference between precision, recall, F1-score, and AUC-ROC. When would you prioritize recall over precision?",
+            "What is dimensionality reduction? Compare PCA with t-SNE and explain when to use each.",
+            "Describe how backpropagation works in a neural network. Walk through the chain rule for computing gradients.",
+            "What is the attention mechanism? Explain how dot-product attention computes query, key, and value matrices.",
+            "How do you evaluate and prevent overfitting in deep learning? Discuss dropout, early stopping, and data augmentation.",
+            "What is Retrieval-Augmented Generation (RAG)? How does it combine a retriever with a language model for factual responses?",
+            "Explain the difference between batch, mini-batch, and stochastic gradient descent. What are their convergence properties?",
+            "What is reinforcement learning? Explain the policy gradient method and the explore-exploit tradeoff.",
+            "How do you design a recommendation system? Compare collaborative filtering, content-based filtering, and hybrid approaches.",
+            "What are embedding vectors? How are they used in NLP (Word2Vec, GloVe) and recommendation systems?",
+            "Explain the concept of model interpretability. Compare SHAP values, LIME, and attention visualization techniques."
         ],
-        "cloud_ops": [
-            "What is the difference between virtualization and containerization, and when would you choose VMs over containers?",
-            "Explain how Kubernetes handles service discovery and load balancing between isolated pods.",
-            "Describe a standard CI/CD deployment pipeline for a production application utilizing GitOps workflows."
+        "cybersecurity": [
+            "Explain the OWASP Top 10 vulnerabilities. How would you defend against SQL Injection and Cross-Site Scripting (XSS)?",
+            "What is the difference between symmetric and asymmetric encryption? How does TLS use both to establish a secure connection?",
+            "Describe a typical incident response plan. What are the 6 phases of the NIST Incident Response Framework?",
+            "How does a firewall differ from an Intrusion Detection System (IDS) vs Intrusion Prevention System (IPS)?",
+            "What is a zero-day vulnerability? How do threat intelligence feeds help organizations prepare for zero-day attacks?",
+            "Explain the concept of defense in depth. How do you layer security controls across network, application, and data layers?",
+            "What is a man-in-the-middle (MITM) attack? How do certificate pinning and HSTS prevent it?",
+            "Describe how you would perform a penetration test on a web application. What tools and methodology would you follow?",
+            "What is Social Engineering? Describe phishing, spear phishing, and vishing attack vectors with prevention strategies.",
+            "Explain how SIEM (Security Information and Event Management) systems work. How do you write correlation rules?",
+            "What is privilege escalation? Describe both horizontal and vertical privilege escalation with real-world attack scenarios.",
+            "How does Multi-Factor Authentication (MFA) work? Compare TOTP, FIDO2/WebAuthn, and SMS-based 2FA security levels.",
+            "What is a DDoS attack? Explain volumetric, protocol, and application layer attacks with mitigation strategies.",
+            "Describe the kill chain model (Lockheed Martin Cyber Kill Chain). How do you detect and disrupt each stage?",
+            "What is container security? How do you scan Docker images for vulnerabilities and enforce runtime security policies?",
+            "Explain the concept of least privilege access. How does Role-Based Access Control (RBAC) differ from ABAC?",
+            "What is a buffer overflow attack? How do ASLR, DEP, and stack canaries protect against it?",
+            "Describe how digital forensics investigators analyze a compromised system. What artifacts do you collect and preserve?"
         ],
-        "general": [
-            "How does Event Delegation work in JavaScript, and what are its memory optimization benefits?",
-            "What are React Hooks, and how does the Virtual DOM optimize rendering cycles in web pages?",
-            "Explain JWT-based authentication, where to store tokens securely, and how to mitigate XSS risks."
+        "cloud_devops": [
+            "Explain the difference between IaaS, PaaS, and SaaS. Give examples of when you would choose each service model.",
+            "What is Infrastructure as Code (IaC)? Compare Terraform, AWS CloudFormation, and Pulumi in terms of capabilities.",
+            "Describe a CI/CD pipeline you would design for a microservices application. Include build, test, deploy, and rollback stages.",
+            "What is Kubernetes? Explain pods, deployments, services, and ingress controllers with a real deployment scenario.",
+            "How do you implement blue-green deployment vs canary deployment? What are the advantages of each strategy?",
+            "What is a container orchestration platform? Compare Docker Swarm vs Kubernetes for production workloads.",
+            "Explain how auto-scaling works in AWS (EC2 Auto Scaling Groups). What metrics trigger scale-out vs scale-in events?",
+            "What is GitOps? How do tools like ArgoCD and Flux implement declarative infrastructure management?",
+            "Describe how you would monitor a production system. Compare Prometheus + Grafana, Datadog, and CloudWatch.",
+            "What is a service mesh (Istio, Linkerd)? How does it handle traffic management, security, and observability?",
+            "Explain the concept of immutable infrastructure. How do AMI baking and container images enforce immutability?",
+            "What is serverless computing? Compare AWS Lambda, Google Cloud Functions, and Azure Functions for event-driven architectures.",
+            "How do you manage secrets in a cloud environment? Compare HashiCorp Vault, AWS Secrets Manager, and environment variables.",
+            "What is a load balancer? Explain the differences between L4 (TCP) and L7 (HTTP) load balancing.",
+            "Describe how you would design a disaster recovery plan for a multi-region cloud architecture.",
+            "What is observability? Explain the three pillars: logs, metrics, and traces with tools for each.",
+            "How do you implement zero-downtime database migrations in a production environment?",
+            "What is a CDN? Explain how CloudFront or Cloudflare accelerates content delivery and reduces origin server load."
+        ],
+        "behavioral_hr": [
+            "Tell me about a time you had to work under a tight deadline. How did you prioritize tasks and manage stress?",
+            "Describe a situation where you disagreed with a team member's technical approach. How did you resolve the conflict?",
+            "Give an example of a project that failed or didn't meet expectations. What did you learn from the experience?",
+            "Tell me about a time you had to learn a new technology or framework quickly. How did you approach the learning process?",
+            "Describe a situation where you had to communicate a complex technical concept to a non-technical stakeholder.",
+            "Tell me about a time you took ownership of a task beyond your job description. What was the outcome?",
+            "Give an example of how you handled constructive criticism from a manager or peer. How did it change your approach?",
+            "Describe a situation where you had to make a decision with incomplete information. What was your thought process?",
+            "Tell me about your most significant technical achievement. What made it challenging and how did you overcome obstacles?",
+            "How do you handle multiple competing priorities? Give a specific example from a previous role or academic project.",
+            "Describe a time when you mentored someone or helped a teammate grow. What approach did you take?",
+            "Tell me about a time you identified a problem before anyone else noticed it. How did you bring it to attention?",
+            "Give an example of how you contributed to improving a team's process or workflow efficiency.",
+            "Describe a situation where you had to adapt quickly to a major change (new requirements, team restructuring, etc.).",
+            "Tell me about a time you received vague or ambiguous requirements. How did you clarify and move forward?",
+            "How do you stay up-to-date with new technologies and industry trends? Give specific examples.",
+            "Describe a cross-functional collaboration experience. How did you ensure alignment between different teams?",
+            "Where do you see yourself in 3-5 years? How does this role align with your long-term career goals?"
         ]
     }
 };
@@ -265,19 +797,31 @@ function startMockInterview() {
     mockInterviewState.questionIndex = 0;
     mockInterviewState.answers = [];
 
-    // Map role keywords to categories
+    // Map role keywords to categories with expanded keyword matching
     const roleLower = role.toLowerCase();
-    if (roleLower.includes("security") || roleLower.includes("cyber") || roleLower.includes("hacking") || roleLower.includes("soc") || roleLower.includes("network")) {
-        mockInterviewState.questions = mockInterviewState.trackDatabase["security"];
-    } else if (roleLower.includes("ai") || roleLower.includes("machine") || roleLower.includes("deep") || roleLower.includes("learning") || roleLower.includes("data")) {
-        mockInterviewState.questions = mockInterviewState.trackDatabase["data_ai"];
-    } else if (roleLower.includes("cloud") || roleLower.includes("ops") || roleLower.includes("devops") || roleLower.includes("sre") || roleLower.includes("kubernetes")) {
-        mockInterviewState.questions = mockInterviewState.trackDatabase["cloud_ops"];
-    } else {
-        mockInterviewState.questions = mockInterviewState.trackDatabase["general"];
+    
+    const trackKeywords = {
+        frontend: ['frontend', 'front-end', 'front end', 'ui ', 'ui/', 'ux', 'react', 'angular', 'vue', 'web developer', 'web dev', 'css', 'javascript', 'typescript', 'html', 'next.js', 'nuxt', 'svelte', 'tailwind'],
+        backend_systems: ['backend', 'back-end', 'back end', 'server', 'api ', 'api/', 'java ', 'java/', 'golang', 'go ', 'microservice', 'system design', 'node.js', 'node ', 'django', 'flask', 'spring', 'express', 'graphql', 'rest ', 'database', 'sql', 'distributed'],
+        data_ai: ['data sci', 'machine learning', 'ml ', 'ml/', 'artificial intelligence', 'ai ', 'ai/', 'deep learning', 'nlp', 'natural language', 'analytics', 'scientist', 'neural', 'pytorch', 'tensorflow', 'llm', 'computer vision', 'cv ', 'recommendation', 'mlops'],
+        cybersecurity: ['security', 'cyber', 'soc ', 'soc/', 'penetration', 'pentest', 'network sec', 'hacking', 'hacker', 'forensic', 'malware', 'threat', 'incident', 'compliance', 'grc', 'vulnerability', 'encryption', 'firewall', 'ids', 'ips', 'siem'],
+        cloud_devops: ['cloud', 'devops', 'dev ops', 'sre', 'aws', 'azure', 'gcp', 'kubernetes', 'k8s', 'docker', 'terraform', 'ansible', 'jenkins', 'ci/cd', 'cicd', 'infrastructure', 'platform eng', 'reliability', 'serverless', 'lambda'],
+        behavioral_hr: ['hr ', 'hr/', 'human resource', 'behavioral', 'behaviour', 'manager', 'management', 'leadership', 'communication', 'product manager', 'project manager', 'scrum', 'agile', 'people', 'recruiter', 'general']
+    };
+
+    let selectedTrack = 'behavioral_hr'; // fallback
+    for (const [track, keywords] of Object.entries(trackKeywords)) {
+        if (keywords.some(kw => roleLower.includes(kw))) {
+            selectedTrack = track;
+            break;
+        }
     }
 
+    mockInterviewState.questions = mockInterviewState.trackDatabase[selectedTrack];
+
     document.getElementById("mock-setup-window").classList.add("hidden");
+    document.getElementById("platforms-panel").classList.add("hidden");
+    document.getElementById("prep-checklist-panel").classList.add("hidden");
     document.getElementById("mock-active-window").classList.remove("hidden");
     document.getElementById("mock-role-badge").innerText = role;
     
@@ -467,6 +1011,43 @@ window.addEventListener("beforeunload", () => {
         transform: translateY(0);
         opacity: 1;
     }
+}
+
+/* Platform Cards */
+.platform-card {
+    transition: all 0.2s ease;
+    border-color: #e9ecef !important;
+}
+.platform-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08) !important;
+    border-color: #0078d4 !important;
+}
+.platform-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+/* Checklist Items */
+.checklist-item {
+    transition: background 0.15s ease;
+    border: 1px solid transparent;
+}
+.checklist-item:hover {
+    background: #f8f9fa;
+    border-color: #e9ecef;
+}
+.check-icon {
+    font-size: 1.1rem;
+    margin-top: 2px;
+    flex-shrink: 0;
 }
 </style>
 {% endblock %}

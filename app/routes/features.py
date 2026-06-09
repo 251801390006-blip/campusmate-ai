@@ -2048,14 +2048,30 @@ def render_resume_pdf_html(content, theme):
         if c3: cert_entries.append({"name": c3})
         if c4: cert_entries.append({"name": c4})
 
-    order = content.get('sectionOrder', ["education", "skills", "experience", "projects", "certifications", "achievements", "hackathons", "languages"])
+    order = content.get('sectionOrder', ["education", "schoolcollege", "skills", "experience", "projects", "certifications", "customSection", "achievements", "hackathons", "languages"])
     
+    school_list = content.get('schoolCollege', [])
+    if not isinstance(school_list, list):
+        school_list = []
+        
+    cust_sec = content.get('customSection', {})
+    if not isinstance(cust_sec, dict):
+        cust_sec = {}
+    cust_sec_title = cust_sec.get('title', '').strip()
+    cust_sec_bullets = cust_sec.get('bullets', [])
+    if not isinstance(cust_sec_bullets, list):
+        cust_sec_bullets = []
+        
     addr = content.get('address', '').strip()
     email = content.get('email', '').strip()
     phone = content.get('phone', '').strip()
     linkedin = content.get('linkedin', '').strip()
     github = content.get('github', '').strip()
     portfolio = content.get('portfolio', '').strip()
+    leetcode = content.get('leetcode', '').strip()
+    hackerrank = content.get('hackerrank', '').strip()
+    codeforces = content.get('codeforces', '').strip()
+    headline = content.get('headline', '').strip()
     
     meta_parts = []
     if addr: meta_parts.append(addr)
@@ -2064,6 +2080,9 @@ def render_resume_pdf_html(content, theme):
     if linkedin: meta_parts.append(linkedin)
     if github: meta_parts.append(github)
     if portfolio: meta_parts.append(portfolio)
+    if leetcode: meta_parts.append(f"LeetCode: {leetcode}")
+    if hackerrank: meta_parts.append(f"HackerRank: {hackerrank}")
+    if codeforces: meta_parts.append(f"Codeforces: {codeforces}")
 
     # TWO-COLUMN CANVA TEMPLATES (canva-sidebar and canva-split)
     if theme in ["canva-sidebar", "canva-split"]:
@@ -2089,6 +2108,9 @@ def render_resume_pdf_html(content, theme):
         if linkedin: left_html += f'<div style="margin-bottom: 2px;">🔗 {linkedin}</div>'
         if github: left_html += f'<div style="margin-bottom: 2px;">🐙 {github}</div>'
         if portfolio: left_html += f'<div style="margin-bottom: 2px;">🌐 {portfolio}</div>'
+        if leetcode: left_html += f'<div style="margin-bottom: 2px;">💻 LC: {leetcode}</div>'
+        if hackerrank: left_html += f'<div style="margin-bottom: 2px;">💻 HR: {hackerrank}</div>'
+        if codeforces: left_html += f'<div style="margin-bottom: 2px;">💻 CF: {codeforces}</div>'
         left_html += '</div></div>'
         
         # Skills
@@ -2123,7 +2145,7 @@ def render_resume_pdf_html(content, theme):
         summary_val = content.get('custom', '').strip()
         
         right_html += f'<h1 style="font-size: 18px; font-weight: bold; color: {primary}; margin-bottom: 2px; text-transform: uppercase;">{name_val}</h1>'
-        right_html += '<div style="font-size: 8px; font-weight: bold; color: #64748b; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Resume Portfolio</div>'
+        right_html += f'<div style="font-size: 8px; font-weight: bold; color: #64748b; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">{headline if headline else "Resume Portfolio"}</div>'
         
         if summary_val:
             right_html += f'<div style="font-size: 8px; line-height: 1.3; color: #4b5563; margin-bottom: 10px; border-left: 2px solid {primary}; padding-left: 6px;">{summary_val}</div>'
@@ -2204,6 +2226,15 @@ def render_resume_pdf_html(content, theme):
                             right_html += f'<div style="font-size: 7px; color: #64748b; margin-top: 1px; margin-bottom: 2px;">Relevant Coursework: {cw}</div>'
                 right_html += '</div>'
                 
+            elif sec == "schoolcollege" and school_list:
+                right_html += f'<div style="margin-bottom: 10px;"><h4 style="font-size: 9px; font-weight: bold; color: {primary}; border-bottom: 1px solid #cbd5e1; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase;">School & College List</h4>'
+                right_html += '<ul style="margin: 0; padding-left: 10px; font-size: 7.5px; line-height: 1.25; color: #4b5563;">'
+                for item in school_list:
+                    name = item.get('name', '').strip()
+                    if name:
+                        right_html += f'<li style="margin-bottom: 1px;">{name}</li>'
+                right_html += '</ul></div>'
+
             elif sec == "certifications" and cert_entries:
                 right_html += f'<div style="margin-bottom: 10px;"><h4 style="font-size: 9px; font-weight: bold; color: {primary}; border-bottom: 1px solid #cbd5e1; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase;">Certifications</h4>'
                 right_html += '<ul style="margin: 0; padding-left: 10px; font-size: 7.5px; line-height: 1.25; color: #4b5563;">'
@@ -2213,6 +2244,16 @@ def render_resume_pdf_html(content, theme):
                         right_html += f'<li style="margin-bottom: 1px;">{name}</li>'
                 right_html += '</ul></div>'
                 
+            elif sec == "customSection" and cust_sec_title:
+                right_html += f'<div style="margin-bottom: 10px;"><h4 style="font-size: 9px; font-weight: bold; color: {primary}; border-bottom: 1px solid #cbd5e1; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase;">{cust_sec_title}</h4>'
+                if cust_sec_bullets:
+                    right_html += '<ul style="margin: 0; padding-left: 10px; font-size: 7.5px; line-height: 1.25; color: #4b5563;">'
+                    for b in cust_sec_bullets:
+                        if b.strip():
+                            right_html += f'<li style="margin-bottom: 1px;">{b.strip()}</li>'
+                    right_html += '</ul>'
+                right_html += '</div>'
+
             elif sec == "achievements" and content.get('achievements', '').strip():
                 ach = content.get('achievements', '').strip()
                 right_html += f'<div style="margin-bottom: 10px;"><h4 style="font-size: 9px; font-weight: bold; color: {primary}; border-bottom: 1px solid #cbd5e1; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase;">Achievements</h4><div style="font-size: 7.5px; line-height: 1.25; color: #4b5563;">{ach}</div></div>'

@@ -58,14 +58,8 @@
             <a href="{{ url_for('features.internship_center') }}" class="sidebar-link {% if request.endpoint == 'features.internship_center' %}active{% endif %}">
                 <i class="fa-solid fa-briefcase"></i> Internship Center
             </a>
-            <a href="{{ url_for('features.project_architect') }}" class="sidebar-link {% if request.endpoint == 'features.project_architect' %}active{% endif %}">
-                <i class="fa-solid fa-circle-nodes"></i> Project Architect
-            </a>
             <a href="{{ url_for('features.hackathon_assistant') }}" class="sidebar-link {% if request.endpoint == 'features.hackathon_assistant' %}active{% endif %}">
                 <i class="fa-solid fa-laptop-code"></i> Hackathon Assistant
-            </a>
-            <a href="{{ url_for('dashboard.bookmarks') }}" class="sidebar-link {% if request.endpoint == 'dashboard.bookmarks' %}active{% endif %}">
-                <i class="fa-solid fa-bookmark"></i> Saved Items
             </a>
             <a href="{{ url_for('dashboard.settings') }}" class="sidebar-link {% if request.endpoint == 'dashboard.settings' %}active{% endif %}">
                 <i class="fa-solid fa-gear"></i> Settings

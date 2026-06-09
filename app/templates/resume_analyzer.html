@@ -206,6 +206,22 @@
                             <input type="text" id="res-profile-pic" class="form-input" value="" placeholder="https://example.com/avatar.jpg" oninput="syncResumeFields()">
                         </div>
                         <div class="col-12">
+                            <label class="form-label" style="font-size:0.65rem;">Custom Headline</label>
+                            <input type="text" id="res-headline" class="form-input" value="" placeholder="Computer Science Student | Software Developer" oninput="syncResumeFields()">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" style="font-size:0.65rem;">LeetCode URL / User</label>
+                            <input type="text" id="res-leetcode" class="form-input" placeholder="leetcode.com/username" oninput="syncResumeFields()">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" style="font-size:0.65rem;">HackerRank URL / User</label>
+                            <input type="text" id="res-hackerrank" class="form-input" placeholder="hackerrank.com/username" oninput="syncResumeFields()">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" style="font-size:0.65rem;">Codeforces URL / User</label>
+                            <input type="text" id="res-codeforces" class="form-input" placeholder="codeforces.com/profile/username" oninput="syncResumeFields()">
+                        </div>
+                        <div class="col-12">
                             <label class="form-label" style="font-size:0.65rem;">Professional Summary</label>
                             <textarea id="res-custom" class="form-input" rows="3" placeholder="Brief elevator pitch..." oninput="syncResumeFields()"></textarea>
                         </div>
@@ -218,6 +234,15 @@
                     <div class="mt-2">
                         <div id="education-items-list"></div>
                         <button type="button" class="btn btn-sm btn-outline w-100 py-1.5" onclick="addEducationItem()"><i class="fa-solid fa-plus me-1"></i> Add Education Entry</button>
+                    </div>
+                </details>
+
+                <!-- 2b. School & College Accordion -->
+                <details class="accordion-section p-2 border rounded bg-primary-card" id="accordion-schoolcollege">
+                    <summary class="fw-bold text-secondary-text" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-school me-2 text-muted"></i> School & College List</summary>
+                    <div class="mt-2">
+                        <div id="schoolcollege-items-list"></div>
+                        <button type="button" class="btn btn-sm btn-outline w-100 py-1.5" onclick="addSchoolCollegeItem()"><i class="fa-solid fa-plus me-1"></i> Add School/College Entry</button>
                     </div>
                 </details>
 
@@ -324,6 +349,22 @@
                         <div class="col-12">
                             <label class="form-label" style="font-size:0.65rem;">References</label>
                             <input type="text" id="res-references" class="form-input" value="Available upon request" oninput="syncResumeFields()">
+                        </div>
+                    </div>
+                </details>
+
+                <!-- 9b. Custom Section Accordion -->
+                <details class="accordion-section p-2 border rounded bg-primary-card" id="accordion-customsection">
+                    <summary class="fw-bold text-secondary-text" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-asterisk me-2 text-muted"></i> Custom Section</summary>
+                    <div class="row g-2 mt-2">
+                        <div class="col-12">
+                            <label class="form-label" style="font-size:0.65rem;">Custom Section Title</label>
+                            <input type="text" id="res-custom-sec-title" class="form-input" placeholder="e.g. Volunteer Experience" oninput="updateCustomSectionTitle(this.value)">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" style="font-size:0.65rem;">Bullets (one per line)</label>
+                            <textarea id="res-custom-sec-bullets" class="form-input res-bullet-input" rows="4" placeholder="Description of your custom work..." onfocus="setActiveBullet(this)" oninput="updateCustomSectionBullets(this.value)"></textarea>
+                            <button type="button" class="btn btn-xs btn-outline mt-1 btn-ai-optimize" onclick="optimizeBullets(this, 'custom', null)" style="font-size: 0.65rem; border-color: var(--accent-color) !important; color: var(--accent-color) !important; cursor:pointer;"><i class="fa-solid fa-wand-magic-sparkles me-1"></i> AI Optimize Bullets</button>
                         </div>
                     </div>
                 </details>
@@ -568,14 +609,16 @@
 <script src="{{ url_for('static', filename='js/html2pdf.bundle.min.js') }}"></script>
 <script>
 let educationList = [];
+let schoolCollegeList = [];
 let experienceList = [];
 let projectsList = [];
 let certificationsList = [];
+let customSection = { title: "", bullets: [] };
 
 let activeBulletInput = null;
 let savedVersions = [];
 let lastATSFeedback = null;
-let sectionOrder = ["education", "skills", "experience", "projects", "certifications", "achievements", "hackathons", "languages"];
+let sectionOrder = ["education", "schoolcollege", "skills", "experience", "projects", "certifications", "customSection", "achievements", "hackathons", "languages"];
 
 let undoStack = [];
 let redoStack = [];
@@ -729,11 +772,27 @@ document.addEventListener("DOMContentLoaded", () => {
         certificationsList.push({ name: "Meta Front-End Developer Professional Certificate" });
         certificationsList.push({ name: "Python Course for Beginners: Mastering the Essentials (Scaler)" });
     }
+    if (schoolCollegeList.length === 0) {
+        schoolCollegeList.push({ name: "DAV Public School, Schooling (CBSE) - 10th & 12th Grade" });
+    }
+    if (!customSection.title) {
+        customSection.title = "Volunteer Experience";
+        customSection.bullets = [
+            "Organized local code-camp workshops, introducing Web Development basics to 50+ high school pupils.",
+            "Maintained and updated open-source community documentation on basic cryptography protocols."
+        ];
+    }
 
     renderEducationListForm();
+    renderSchoolCollegeListForm();
     renderExperienceListForm();
     renderProjectsListForm();
     renderCertificationsListForm();
+
+    const customTitleEl = document.getElementById("res-custom-sec-title");
+    if (customTitleEl) customTitleEl.value = customSection.title;
+    const customBulletsEl = document.getElementById("res-custom-sec-bullets");
+    if (customBulletsEl) customBulletsEl.value = customSection.bullets.join("\n");
 
     syncResumeFields();
     
@@ -1029,6 +1088,7 @@ function renderExperienceListForm() {
                 <div class="col-12">
                     <label class="form-label" style="font-size:0.65rem;">Bullet points (one per line)</label>
                     <textarea class="form-input res-bullet-input" rows="3" onfocus="setActiveBullet(this)" oninput="updateExperienceBullets(${idx}, this.value)">${(item.bullets || []).join('\n')}</textarea>
+                    <button type="button" class="btn btn-xs btn-outline mt-1 btn-ai-optimize" onclick="optimizeBullets(this, 'experience', ${idx})" style="font-size: 0.65rem; border-color: var(--accent-color) !important; color: var(--accent-color) !important; cursor:pointer;"><i class="fa-solid fa-wand-magic-sparkles me-1"></i> AI Optimize Bullets</button>
                 </div>
             </div>
         `;
@@ -1089,6 +1149,7 @@ function renderProjectsListForm() {
                 <div class="col-12">
                     <label class="form-label" style="font-size:0.65rem;">Project Details (one per line)</label>
                     <textarea class="form-input res-bullet-input" rows="3" onfocus="setActiveBullet(this)" oninput="updateProjectBullets(${idx}, this.value)">${(item.bullets || []).join('\n')}</textarea>
+                    <button type="button" class="btn btn-xs btn-outline mt-1 btn-ai-optimize" onclick="optimizeBullets(this, 'project', ${idx})" style="font-size: 0.65rem; border-color: var(--accent-color) !important; color: var(--accent-color) !important; cursor:pointer;"><i class="fa-solid fa-wand-magic-sparkles me-1"></i> AI Optimize Bullets</button>
                 </div>
             </div>
         `;
@@ -1172,6 +1233,115 @@ function moveCertificationItem(idx, dir) {
     syncResumeFields();
 }
 
+function renderSchoolCollegeListForm() {
+    const container = document.getElementById("schoolcollege-items-list");
+    if (!container) return;
+    container.innerHTML = "";
+    schoolCollegeList.forEach((item, idx) => {
+        const div = document.createElement("div");
+        div.className = "p-2 border rounded mb-2 bg-primary-card position-relative";
+        div.innerHTML = `
+            <div class="position-absolute top-2 right-2 d-flex gap-1" style="z-index: 10;">
+                <button type="button" class="btn btn-xs btn-outline p-0 px-1" onclick="moveSchoolCollegeItem(${idx}, -1)" ${idx === 0 ? 'disabled' : ''} style="cursor:pointer; background:none; border:none;"><i class="fa-solid fa-arrow-up text-muted" style="font-size:10px;"></i></button>
+                <button type="button" class="btn btn-xs btn-outline p-0 px-1" onclick="moveSchoolCollegeItem(${idx}, 1)" ${idx === schoolCollegeList.length - 1 ? 'disabled' : ''} style="cursor:pointer; background:none; border:none;"><i class="fa-solid fa-arrow-down text-muted" style="font-size:10px;"></i></button>
+                <button type="button" class="btn btn-xs btn-danger p-0 px-1" onclick="removeSchoolCollegeItem(${idx})" style="cursor:pointer; background:none; border:none;"><i class="fa-solid fa-trash text-danger" style="font-size:10px;"></i></button>
+            </div>
+            <div class="row g-2">
+                <div class="col-12">
+                    <label class="form-label" style="font-size:0.65rem;">School / College Name & Degree Details</label>
+                    <input type="text" class="form-input" value="${item.name || ''}" oninput="updateSchoolCollegeField(${idx}, this.value)">
+                </div>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function addSchoolCollegeItem() {
+    schoolCollegeList.push({ name: "" });
+    renderSchoolCollegeListForm();
+    syncResumeFields();
+}
+function updateSchoolCollegeField(idx, val) {
+    schoolCollegeList[idx].name = val;
+    syncResumeFields();
+}
+function removeSchoolCollegeItem(idx) {
+    schoolCollegeList.splice(idx, 1);
+    renderSchoolCollegeListForm();
+    syncResumeFields();
+}
+function moveSchoolCollegeItem(idx, dir) {
+    const targetIdx = idx + dir;
+    if (targetIdx < 0 || targetIdx >= schoolCollegeList.length) return;
+    const temp = schoolCollegeList[idx];
+    schoolCollegeList[idx] = schoolCollegeList[targetIdx];
+    schoolCollegeList[targetIdx] = temp;
+    renderSchoolCollegeListForm();
+    syncResumeFields();
+}
+
+function updateCustomSectionTitle(val) {
+    customSection.title = val;
+    syncResumeFields();
+}
+function updateCustomSectionBullets(val) {
+    customSection.bullets = val.split('\n');
+    syncResumeFields();
+}
+
+async function optimizeBullets(btn, type, idx) {
+    let textarea = null;
+    if (type === 'experience') {
+        const parent = btn.closest('.col-12');
+        textarea = parent ? parent.querySelector('textarea') : null;
+    } else if (type === 'project') {
+        const parent = btn.closest('.col-12');
+        textarea = parent ? parent.querySelector('textarea') : null;
+    } else if (type === 'custom') {
+        textarea = document.getElementById("res-custom-sec-bullets");
+    }
+    if (!textarea) return;
+    const val = textarea.value.trim();
+    if (!val) {
+        alert("Please enter some bullet points first.");
+        return;
+    }
+    const origHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Optimizing...`;
+    try {
+        const response = await fetch('/resume-analyzer/optimize-bullets', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ bullets: val })
+        });
+        if (response.ok) {
+            const data = await response.json();
+            if (data.optimized) {
+                textarea.value = data.optimized;
+                if (type === 'experience') {
+                    updateExperienceBullets(idx, data.optimized);
+                } else if (type === 'project') {
+                    updateProjectBullets(idx, data.optimized);
+                } else if (type === 'custom') {
+                    updateCustomSectionBullets(data.optimized);
+                }
+            } else {
+                alert("Could not optimize bullet points.");
+            }
+        } else {
+            alert("Error calling optimizer API.");
+        }
+    } catch(e) {
+        console.error(e);
+        alert("Network error calling optimizer API.");
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = origHtml;
+    }
+}
+
 // Live Resume Preview Fields syncing
 function syncResumeFields() {
     const nameVal = document.getElementById("res-name").value || "Alex Smith";
@@ -1190,6 +1360,10 @@ function syncResumeFields() {
     const linkedinVal = document.getElementById("res-linkedin").value.trim();
     const githubVal = document.getElementById("res-github").value.trim();
     const portfolioVal = document.getElementById("res-portfolio").value.trim();
+    const leetcodeVal = document.getElementById("res-leetcode") ? document.getElementById("res-leetcode").value.trim() : "";
+    const hackerrankVal = document.getElementById("res-hackerrank") ? document.getElementById("res-hackerrank").value.trim() : "";
+    const codeforcesVal = document.getElementById("res-codeforces") ? document.getElementById("res-codeforces").value.trim() : "";
+    const headlineVal = document.getElementById("res-headline") ? document.getElementById("res-headline").value.trim() : "";
     
     const metaParts = [];
     if (addressVal) metaParts.push(`<i class="fa-solid fa-location-dot me-1 text-muted"></i> ${addressVal}`);
@@ -1198,6 +1372,9 @@ function syncResumeFields() {
     if (linkedinVal) metaParts.push(`<i class="fa-brands fa-linkedin me-1 text-muted"></i> ${linkedinVal}`);
     if (githubVal) metaParts.push(`<i class="fa-brands fa-github me-1 text-muted"></i> ${githubVal}`);
     if (portfolioVal) metaParts.push(`<i class="fa-solid fa-globe me-1 text-muted"></i> ${portfolioVal}`);
+    if (leetcodeVal) metaParts.push(`<i class="fa-solid fa-code me-1 text-muted"></i> LC: ${leetcodeVal}`);
+    if (hackerrankVal) metaParts.push(`<i class="fa-solid fa-code me-1 text-muted"></i> HR: ${hackerrankVal}`);
+    if (codeforcesVal) metaParts.push(`<i class="fa-solid fa-code me-1 text-muted"></i> CF: ${codeforcesVal}`);
 
     if (themeId === "canva-sidebar" || themeId === "canva-split") {
         // TWO-COLUMN CANVAS LAYOUT
@@ -1224,6 +1401,9 @@ function syncResumeFields() {
         if (linkedinVal) leftSideHtml += `<div style="margin-bottom:2px;"><i class="fa-brands fa-linkedin me-1"></i> ${linkedinVal}</div>`;
         if (githubVal) leftSideHtml += `<div style="margin-bottom:2px;"><i class="fa-brands fa-github me-1"></i> ${githubVal}</div>`;
         if (portfolioVal) leftSideHtml += `<div style="margin-bottom:2px;"><i class="fa-solid fa-globe me-1"></i> ${portfolioVal}</div>`;
+        if (leetcodeVal) leftSideHtml += `<div style="margin-bottom:2px;"><i class="fa-solid fa-code me-1"></i> LC: ${leetcodeVal}</div>`;
+        if (hackerrankVal) leftSideHtml += `<div style="margin-bottom:2px;"><i class="fa-solid fa-code me-1"></i> HR: ${hackerrankVal}</div>`;
+        if (codeforcesVal) leftSideHtml += `<div style="margin-bottom:2px;"><i class="fa-solid fa-code me-1"></i> CF: ${codeforcesVal}</div>`;
         leftSideHtml += `</div></div>`;
         
         // Technical Skills
@@ -1256,7 +1436,7 @@ function syncResumeFields() {
         
         // Right Panel: Name & Summary
         rightSideHtml += `<h1 style="font-size:20px; font-weight:800; color:${accentColor}; margin-bottom:2px; text-transform:uppercase;">${nameVal}</h1>`;
-        rightSideHtml += `<div style="font-size:9.5px; font-weight:700; color:#64748b; text-transform:uppercase; margin-bottom:10px; letter-spacing:0.5px;">Resume Portfolio</div>`;
+        rightSideHtml += `<div style="font-size:9.5px; font-weight:700; color:#64748b; text-transform:uppercase; margin-bottom:10px; letter-spacing:0.5px;">${headlineVal || 'Resume Portfolio'}</div>`;
         
         const summaryVal = document.getElementById("res-custom").value.trim();
         if (summaryVal) {
@@ -1332,6 +1512,14 @@ function syncResumeFields() {
                 });
                 rightSideHtml += `</div>`;
             }
+            else if (sec === "schoolcollege" && schoolCollegeList.length > 0) {
+                rightSideHtml += `<div style="margin-bottom:12px;"><h3 style="font-size:10.5px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; border-bottom:1px solid #cbd5e1; padding-bottom:1px;">School & College List</h3>`;
+                rightSideHtml += `<ul class="bullet-list" style="font-size:8.5px; margin-left:12px; margin-top:2px; line-height:1.3; color:#374151;">`;
+                schoolCollegeList.forEach(item => {
+                    if (item.name && item.name.trim()) rightSideHtml += `<li style="margin-bottom:2px;">${item.name.trim()}</li>`;
+                });
+                rightSideHtml += `</ul></div>`;
+            }
             else if (sec === "certifications" && certificationsList.length > 0) {
                 rightSideHtml += `<div style="margin-bottom:12px;"><h3 style="font-size:10.5px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; border-bottom:1px solid #cbd5e1; padding-bottom:1px;">Certifications</h3>`;
                 rightSideHtml += `<ul class="bullet-list" style="font-size:8.5px; margin-left:12px; margin-top:2px; line-height:1.3; color:#374151;">`;
@@ -1339,6 +1527,20 @@ function syncResumeFields() {
                     if (item.name.trim()) rightSideHtml += `<li style="margin-bottom:2px;">${item.name.trim()}</li>`;
                 });
                 rightSideHtml += `</ul></div>`;
+            }
+            else if (sec === "customSection" && customSection && customSection.title && customSection.title.trim()) {
+                const title = customSection.title.trim();
+                let bulletsHtml = "";
+                if (customSection.bullets && Array.isArray(customSection.bullets)) {
+                    customSection.bullets.forEach(b => {
+                        if (b.trim()) bulletsHtml += `<li style="margin-bottom:2px;">${b.trim()}</li>`;
+                    });
+                }
+                rightSideHtml += `<div style="margin-bottom:12px;"><h3 style="font-size:10.5px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; border-bottom:1px solid #cbd5e1; padding-bottom:1px;">${title}</h3>`;
+                if (bulletsHtml) {
+                    rightSideHtml += `<ul class="bullet-list" style="font-size:8.5px; margin-left:12px; margin-top:2px; line-height:1.3; color:#374151;">${bulletsHtml}</ul>`;
+                }
+                rightSideHtml += `</div>`;
             }
             else if (sec === "achievements") {
                 const achievementsVal = document.getElementById("res-achievements").value.trim();
@@ -1376,6 +1578,7 @@ function syncResumeFields() {
         headerHtml = `
             <div style="text-align: center; margin-bottom: 15px; border-bottom: 2px solid ${accentColor}; padding-bottom: 8px;">
                 <h1 style="font-size: 22px; font-weight:800; color: ${accentColor}; margin-bottom: 4px; text-transform: uppercase; letter-spacing:1px;">${nameVal}</h1>
+                ${headlineVal ? `<div style="font-size: 11px; font-weight:700; color:#475569; margin-bottom:4px; text-transform:uppercase;">${headlineVal}</div>` : ''}
                 <div style="font-size: 9px; color: #4b5563; line-height: 1.4; word-spacing: 2px;">
                     ${metaParts.join(" &bull; ")}
                 </div>
@@ -1386,6 +1589,7 @@ function syncResumeFields() {
             <div class="resume-render-header" style="border-bottom: 2px solid ${accentColor}; padding-bottom: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px;">
                 <div style="flex-grow: 1; text-align:left;">
                     <h1 id="res-render-name" style="font-size: 20px; font-weight:800; color: ${accentColor}; margin-bottom: 4px; text-transform: uppercase;">${nameVal}</h1>
+                    ${headlineVal ? `<div style="font-size: 10px; font-weight:700; color:#475569; margin-bottom:3px; text-transform:uppercase; text-align:left;">${headlineVal}</div>` : ''}
                     <div class="resume-render-meta" style="font-size: 10px; color: #4b5563; line-height: 1.4; text-align:left;">
                         ${metaParts.join(" | ")}
                     </div>
@@ -1501,6 +1705,17 @@ function syncResumeFields() {
             container.insertAdjacentHTML('beforeend', html);
         }
         
+        else if (sec === "schoolcollege" && schoolCollegeList.length > 0) {
+            let html = `<div class="resume-render-section" data-section="schoolcollege">`;
+            html += `<h3 style="font-size:11px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; letter-spacing:0.5px; border-bottom: 1.5px solid ${accentColor}; padding-bottom: 1px; text-align: ${isElegant ? 'center' : 'left'}">School & College List</h3>`;
+            html += `<ul class="bullet-list" style="font-size:9.5px; margin-left:14px; margin-top:2px; line-height:1.4; color:#374151; text-align:left;">`;
+            schoolCollegeList.forEach(item => {
+                if (item.name && item.name.trim()) html += `<li style="margin-bottom:2px;">${item.name.trim()}</li>`;
+            });
+            html += `</ul></div>`;
+            container.insertAdjacentHTML('beforeend', html);
+        }
+        
         else if (sec === "certifications" && certificationsList.length > 0) {
             let html = `<div class="resume-render-section" data-section="certifications">`;
             html += `<h3 style="font-size:11px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; letter-spacing:0.5px; border-bottom: 1.5px solid ${accentColor}; padding-bottom: 1px; text-align: ${isElegant ? 'center' : 'left'}">Certifications</h3>`;
@@ -1509,6 +1724,23 @@ function syncResumeFields() {
                 if (item.name.trim()) html += `<li style="margin-bottom:2px;">${item.name.trim()}</li>`;
             });
             html += `</ul></div>`;
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        else if (sec === "customSection" && customSection && customSection.title && customSection.title.trim()) {
+            const title = customSection.title.trim();
+            let bulletsHtml = "";
+            if (customSection.bullets && Array.isArray(customSection.bullets)) {
+                customSection.bullets.forEach(b => {
+                    if (b.trim()) bulletsHtml += `<li style="margin-bottom:2px;">${b.trim()}</li>`;
+                });
+            }
+            let html = `<div class="resume-render-section" data-section="customSection">`;
+            html += `<h3 style="font-size:11px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; letter-spacing:0.5px; border-bottom: 1.5px solid ${accentColor}; padding-bottom: 1px; text-align: ${isElegant ? 'center' : 'left'}">${title}</h3>`;
+            if (bulletsHtml) {
+                html += `<ul class="bullet-list" style="font-size:9.5px; margin-left:14px; margin-top:2px; line-height:1.4; color:#374151; text-align:left;">${bulletsHtml}</ul>`;
+            }
+            html += `</div>`;
             container.insertAdjacentHTML('beforeend', html);
         }
         
@@ -1617,11 +1849,17 @@ function getFormContent() {
         github: getValSafe("res-github"),
         portfolio: getValSafe("res-portfolio"),
         profilePic: getValSafe("res-profile-pic"),
+        leetcode: getValSafe("res-leetcode"),
+        hackerrank: getValSafe("res-hackerrank"),
+        codeforces: getValSafe("res-codeforces"),
+        headline: getValSafe("res-headline"),
         
         education: educationList,
+        schoolCollege: schoolCollegeList,
         experience: experienceList,
         projects: projectsList,
         certifications: certificationsList,
+        customSection: customSection,
         
         // Legacy flat backup keys just to prevent any database mismatches
         edu1Inst: educationList[0]?.inst || "",
@@ -1689,6 +1927,10 @@ function populateForm(c) {
     setValSafe("res-github", c.github);
     setValSafe("res-portfolio", c.portfolio);
     setValSafe("res-profile-pic", c.profilePic);
+    setValSafe("res-leetcode", c.leetcode);
+    setValSafe("res-hackerrank", c.hackerrank);
+    setValSafe("res-codeforces", c.codeforces);
+    setValSafe("res-headline", c.headline);
     setValSafe("res-custom", c.custom);
 
     // Read Dynamic lists (with backwards fallback checks)
@@ -1716,6 +1958,9 @@ function populateForm(c) {
         }
     }
     renderEducationListForm();
+
+    schoolCollegeList = c.schoolCollege || [];
+    renderSchoolCollegeListForm();
 
     experienceList = [];
     if (c.experience && Array.isArray(c.experience)) {
@@ -1756,6 +2001,10 @@ function populateForm(c) {
         });
     }
     renderCertificationsListForm();
+    
+    customSection = c.customSection || { title: "", bullets: [] };
+    setValSafe("res-custom-sec-title", customSection.title);
+    setValSafe("res-custom-sec-bullets", (customSection.bullets || []).join("\n"));
     
     setValSafe("res-skills-prog", c.skillsProg);
     setValSafe("res-skills-cyber", c.skillsCyber);
@@ -2700,7 +2949,9 @@ html, body, .main-with-sidebar, .dashboard-inner-container, .resume-workspace-wr
     }
     .form-scroller {
         overflow-y: auto !important;
-        height: auto !important;
+        height: 0 !important;
+        flex-grow: 1 !important;
+        min-height: 0 !important;
     }
 }
 

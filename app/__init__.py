@@ -186,64 +186,69 @@ def seed_default_users(db, User):
 def seed_default_internships(db):
     from app.models import Internship
     try:
-        if Internship.query.count() == 0:
-            mock_internships = [
-                Internship(
-                    company_name="Microsoft",
-                    company_logo="fa-brands fa-microsoft",
-                    role="Software Engineer Intern",
-                    internship_type="Summer",
-                    location_type="Hybrid",
-                    skills_required="Python, React, Data Structures",
-                    eligibility="B.Tech 3rd/4th Year (CS/IT)",
-                    stipend="$8,500/mo",
-                    deadline="2026-09-30",
-                    official_link="https://careers.microsoft.com",
-                    is_pinned=True
-                ),
-                Internship(
-                    company_name="Google DeepMind",
-                    company_logo="fa-brands fa-google",
-                    role="AI Engineering Intern",
-                    internship_type="Summer",
-                    location_type="Onsite",
-                    skills_required="PyTorch, Transformers, LLMs",
-                    eligibility="M.Tech or PhD (AI/ML)",
-                    stipend="$9,200/mo",
-                    deadline="2026-10-15",
-                    official_link="https://careers.google.com",
-                    is_pinned=True
-                ),
-                Internship(
-                    company_name="Meta",
-                    company_logo="fa-brands fa-meta",
-                    role="Machine Learning Intern",
-                    internship_type="Summer",
-                    location_type="Hybrid",
-                    skills_required="Scikit-Learn, PyTorch, SQL",
-                    eligibility="B.Tech/M.Tech (CS/AI)",
-                    stipend="$9,000/mo",
-                    deadline="2026-10-01",
-                    official_link="https://careers.meta.com",
-                    is_pinned=False
-                ),
-                Internship(
-                    company_name="CrowdStrike",
-                    company_logo="fa-solid fa-shield-halved",
-                    role="Cyber Security Analyst Intern",
-                    internship_type="Summer",
-                    location_type="Remote",
-                    skills_required="Nmap, Wireshark, Linux Scripting",
-                    eligibility="B.Tech/B.Sc (Cyber Security/CS)",
-                    stipend="$7,500/mo",
-                    deadline="2026-09-15",
-                    official_link="https://www.crowdstrike.com/careers/",
-                    is_pinned=False
-                )
+        if Internship.query.count() < 100:
+            # Wipe existing records and re-seed with the full 105-entry set
+            Internship.query.delete()
+            db.session.commit()
+
+            # --- 15 companies -------------------------------------------------
+            companies = [
+                {"name": "Google",      "logo": "fa-brands fa-google",              "link": "https://careers.google.com",                              "stipend": "$9,000/mo",  "pinned": True},
+                {"name": "Microsoft",   "logo": "fa-brands fa-microsoft",           "link": "https://careers.microsoft.com",                           "stipend": "$8,500/mo",  "pinned": True},
+                {"name": "Meta",        "logo": "fa-brands fa-meta",                "link": "https://www.metacareers.com",                             "stipend": "$9,200/mo",  "pinned": False},
+                {"name": "Amazon",      "logo": "fa-brands fa-amazon",              "link": "https://www.amazon.jobs",                                 "stipend": "$8,800/mo",  "pinned": False},
+                {"name": "Apple",       "logo": "fa-brands fa-apple",               "link": "https://jobs.apple.com",                                  "stipend": "$9,000/mo",  "pinned": False},
+                {"name": "NVIDIA",      "logo": "fa-solid fa-microchip",            "link": "https://www.nvidia.com/en-us/about-nvidia/careers/",      "stipend": "$8,200/mo",  "pinned": False},
+                {"name": "Netflix",     "logo": "fa-solid fa-film",                 "link": "https://jobs.netflix.com",                                "stipend": "$8,000/mo",  "pinned": False},
+                {"name": "OpenAI",      "logo": "fa-solid fa-brain",                "link": "https://openai.com/careers",                              "stipend": "$10,000/mo", "pinned": False},
+                {"name": "Stripe",      "logo": "fa-brands fa-stripe",              "link": "https://stripe.com/jobs",                                 "stipend": "$8,500/mo",  "pinned": False},
+                {"name": "CrowdStrike", "logo": "fa-solid fa-shield-halved",        "link": "https://www.crowdstrike.com/careers/",                    "stipend": "$7,500/mo",  "pinned": False},
+                {"name": "Adobe",       "logo": "fa-solid fa-wand-magic-sparkles",  "link": "https://www.adobe.com/careers.html",                      "stipend": "$7,800/mo",  "pinned": False},
+                {"name": "Salesforce",  "logo": "fa-brands fa-salesforce",          "link": "https://www.salesforce.com/company/careers/",             "stipend": "$7,600/mo",  "pinned": False},
+                {"name": "Intel",       "logo": "fa-solid fa-memory",               "link": "https://jobs.intel.com",                                  "stipend": "$7,200/mo",  "pinned": False},
+                {"name": "IBM",         "logo": "fa-solid fa-server",               "link": "https://www.ibm.com/careers",                             "stipend": "$6,800/mo",  "pinned": False},
+                {"name": "Cisco",       "logo": "fa-solid fa-network-wired",        "link": "https://jobs.cisco.com",                                  "stipend": "$7,000/mo",  "pinned": False},
             ]
-            db.session.add_all(mock_internships)
+
+            # --- 7 roles ------------------------------------------------------
+            roles = [
+                {"role": "Software Engineer Intern",    "type": "Summer",   "location": "Hybrid",  "skills": "Python, Java, Data Structures, Algorithms",        "eligibility": "B.Tech 3rd/4th Year (CS/IT)"},
+                {"role": "Frontend Developer Intern",    "type": "Summer",   "location": "Remote",  "skills": "React, TypeScript, CSS, Figma",                    "eligibility": "B.Tech/BCA (CS/IT/Design)"},
+                {"role": "Data Science Intern",          "type": "Summer",   "location": "Onsite",  "skills": "Python, Pandas, SQL, Tableau",                     "eligibility": "B.Tech/M.Tech (CS/Stats/Math)"},
+                {"role": "Machine Learning Intern",      "type": "Research", "location": "Hybrid",  "skills": "PyTorch, TensorFlow, NLP, Computer Vision",        "eligibility": "M.Tech/PhD (AI/ML/CS)"},
+                {"role": "DevOps/Cloud Intern",          "type": "Summer",   "location": "Remote",  "skills": "AWS/GCP, Docker, Kubernetes, CI/CD",               "eligibility": "B.Tech 3rd/4th Year (CS/IT)"},
+                {"role": "Cybersecurity Intern",         "type": "Summer",   "location": "Onsite",  "skills": "Nmap, Wireshark, Linux, SIEM",                     "eligibility": "B.Tech/B.Sc (Cyber Security/CS)"},
+                {"role": "Product Management Intern",    "type": "Summer",   "location": "Hybrid",  "skills": "Analytics, Jira, A/B Testing, SQL",                "eligibility": "MBA/B.Tech (Any Branch)"},
+            ]
+
+            # Stagger deadlines across Aug-Dec 2026 (months 8-12)
+            deadline_months = [8, 9, 10, 11, 12]
+
+            internships = []
+            entry_index = 0
+            for company in companies:
+                for role_info in roles:
+                    month = deadline_months[entry_index % len(deadline_months)]
+                    day = 1 + (entry_index % 28)  # days 1-28 to stay valid
+                    deadline = f"2026-{month:02d}-{day:02d}"
+
+                    internships.append(Internship(
+                        company_name=company["name"],
+                        company_logo=company["logo"],
+                        role=role_info["role"],
+                        internship_type=role_info["type"],
+                        location_type=role_info["location"],
+                        skills_required=role_info["skills"],
+                        eligibility=role_info["eligibility"],
+                        stipend=company["stipend"],
+                        deadline=deadline,
+                        official_link=company["link"],
+                        is_pinned=company["pinned"],
+                    ))
+                    entry_index += 1
+
+            db.session.add_all(internships)
             db.session.commit()
     except Exception as e:
         db.session.rollback()
         print(f"Error seeding internships: {e}")
-

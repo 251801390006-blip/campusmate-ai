@@ -304,43 +304,9 @@
     </div>
 </div>
 
-<div class="row g-4 mt-1">
-    <!-- Row 3 Left: Featured Projects Card -->
-    <div class="col-md-6 col-lg-4" id="card-projects">
-        <div class="flat-card h-100 bg-white border d-flex flex-column justify-content-between">
-            <div>
-                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
-                    <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-laptop-code text-muted me-2"></i> Showcase Projects</h3>
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="dropdown card-dismiss-dropdown" style="position: relative;">
-                            <button class="btn btn-xs btn-link p-0 text-muted border-0 bg-transparent" onclick="toggleCardDropdown(event, 'card-projects')" style="font-size: 0.85rem; cursor: pointer;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-                            <ul id="card-dropdown-card-projects" class="dropdown-menu dropdown-menu-end shadow hidden" style="position: absolute; right: 0; top: 20px; z-index: 110; min-width: 130px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; list-style: none; padding: 4px 0; margin: 0;">
-                                <li><a class="dropdown-item" href="javascript:void(0)" onclick="dismissCard('card-projects', 'session')" style="display: block; padding: 4px 12px; font-size: 0.72rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-eye-slash me-2"></i> Hide temporarily</a></li>
-                                <li><a class="dropdown-item" href="javascript:void(0)" onclick="dismissCard('card-projects', 'permanent')" style="display: block; padding: 4px 12px; font-size: 0.72rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-trash me-2 text-danger"></i> Never show again</a></li>
-                            </ul>
-                        </div>
-                        <button class="btn btn-xs btn-link p-0 text-muted border-0 bg-transparent" onclick="dismissCard('card-projects', 'session')" style="font-size: 0.9rem; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
-                    </div>
-                </div>
-
-                <div class="d-flex flex-column gap-2 mb-3" style="font-size:0.78rem;">
-                    <div class="p-2 border rounded bg-light" style="border-color:var(--border-color) !important; background: var(--bg-primary) !important;">
-                        <strong class="text-dark">1. CampusMate OS Dashboard</strong>
-                        <p class="text-muted mb-0 mt-0.5">Full-stack student tracking dashboard built with Flask and SQLite database schema structures.</p>
-                    </div>
-                    <div class="p-2 border rounded bg-light" style="border-color:var(--border-color) !important; background: var(--bg-primary) !important;">
-                        <strong class="text-dark">2. Custom Shell Script Scheduler</strong>
-                        <p class="text-muted mb-0 mt-0.5">Automated script pipeline that checks server configs and uploads backups to S3 storage buckets.</p>
-                    </div>
-                </div>
-            </div>
-
-            <a href="{{ url_for('features.project_architect') }}" class="btn btn-outline w-100 py-2" style="font-size:0.8rem; border-color: var(--border-color); color: var(--text-primary); background: transparent;"><i class="fa-solid fa-cubes me-1"></i> AI Project Architect</a>
-        </div>
-    </div>
-
-    <!-- Row 3 Middle: Certifications Plan Card -->
-    <div class="col-md-6 col-lg-4" id="card-certs">
+<<div class="row g-4 mt-1">
+    <!-- Row 3 Left: Certifications Plan Card -->
+    <div class="col-md-6 col-lg-6" id="card-certs">
         <div class="flat-card h-100 bg-white border d-flex flex-column justify-content-between">
             <div>
                 <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
@@ -372,7 +338,7 @@
     </div>
 
     <!-- Row 3 Right: AI Career Digital Twin Card -->
-    <div class="col-md-12 col-lg-4" id="card-timeline">
+    <div class="col-md-6 col-lg-6" id="card-timeline">
         <div class="flat-card h-100 bg-white border d-flex flex-column justify-content-between">
             <div>
                 <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
