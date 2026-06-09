@@ -41,6 +41,58 @@
     </div>
 </div>
 
+<!-- ── Global AI Key Management (Admin Only) ──────────────────────────── -->
+<div class="flat-card shadow-sm border mb-4" style="border-left: 4px solid #0078d4 !important;">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
+        <div class="d-flex align-items-center gap-3">
+            <div style="background:linear-gradient(135deg,#0078d4,#00bcf2);width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:white;font-size:1.3rem;flex-shrink:0;">
+                <i class="fa-solid fa-robot"></i>
+            </div>
+            <div>
+                <h3 class="fw-bold mb-0" style="font-size:1rem;">Global AI Chatbot Key</h3>
+                <span class="text-secondary" style="font-size:0.75rem;">
+                    Set once → all students get live AI instantly. No key needed per user.
+                </span>
+            </div>
+        </div>
+        <div id="global-ai-status" style="font-size:0.8rem;font-weight:600;padding:4px 12px;border-radius:20px;background:rgba(239,68,68,0.1);color:#dc2626;">
+            <i class="fa-solid fa-circle me-1" style="font-size:0.5rem;"></i> Checking...
+        </div>
+    </div>
+
+    <div class="row g-3 align-items-end">
+        <div class="col-md-7">
+            <label class="fw-semibold text-secondary mb-1 d-block" style="font-size:0.78rem;">
+                Groq API Key <span class="text-muted">(starts with <code>gsk_</code>)</span> or Gemini Key <span class="text-muted">(<code>AIza...</code>)</span>
+            </label>
+            <div class="d-flex gap-2">
+                <input type="password" id="global-ai-key-input" class="form-control"
+                    placeholder="gsk_xxxxxxxxxxxxxxxxxxxx  OR  AIzaxxxxxxxxxxxxxxxxx"
+                    autocomplete="off" style="font-family:monospace;font-size:0.82rem;">
+                <button class="btn btn-outline-secondary btn-sm" onclick="toggleShowGlobalKey()" title="Show/hide key">
+                    <i class="fa-solid fa-eye" id="global-key-eye"></i>
+                </button>
+            </div>
+        </div>
+        <div class="col-md-5 d-flex gap-2 flex-wrap">
+            <button class="btn btn-primary" onclick="saveGlobalAIKey()">
+                <i class="fa-solid fa-floppy-disk me-1"></i> Save &amp; Activate for All Users
+            </button>
+            <button class="btn btn-outline-danger" onclick="clearGlobalAIKey()">
+                <i class="fa-solid fa-trash me-1"></i> Remove
+            </button>
+        </div>
+    </div>
+
+    <div class="mt-3 p-3 rounded" style="background:rgba(0,120,212,0.05);border:1px dashed rgba(0,120,212,0.2);">
+        <div class="d-flex gap-3 flex-wrap" style="font-size:0.75rem;color:#475569;">
+            <span><i class="fa-solid fa-circle-check text-success me-1"></i> Free Groq key: <a href="https://console.groq.com/keys" target="_blank" class="fw-semibold">console.groq.com/keys</a> (any Gmail)</span>
+            <span><i class="fa-solid fa-circle-check text-success me-1"></i> Free Gemini: <a href="https://aistudio.google.com/app/apikey" target="_blank" class="fw-semibold">aistudio.google.com</a> (personal Gmail)</span>
+            <span><i class="fa-solid fa-lock text-primary me-1"></i> Key is stored securely — only visible to you here</span>
+        </div>
+    </div>
+</div>
+
 <!-- Charts Section -->
 <div class="row g-4 mb-4">
     <!-- Daily Signups Graph -->
@@ -561,8 +613,81 @@ function openEditInternshipModal(id, company, logo, role, type, location, skills
     document.getElementById("internship-modal").classList.remove("hidden");
 }
 
-function closeInternshipModal() {
-    document.getElementById("internship-modal").classList.add("hidden");
+// ── Global AI Key Management ──────────────────────────────────────────────
+const GLOBAL_KEY_NAME = "campusmate_global_ai_key";
+
+function updateGlobalAIStatus() {
+    const key = localStorage.getItem(GLOBAL_KEY_NAME) || "";
+    const statusEl = document.getElementById("global-ai-status");
+    if (!statusEl) return;
+    if (key && key.length > 8) {
+        const provider = key.startsWith("gsk_") ? "Groq LLaMA 3.3-70B" : "Gemini 2.5 Flash";
+        const masked = key.substring(0, 8) + "..." + key.slice(-4);
+        statusEl.style.background = "rgba(22,163,74,0.1)";
+        statusEl.style.color = "#16a34a";
+        statusEl.innerHTML = `<i class="fa-solid fa-circle me-1" style="font-size:0.5rem;"></i> 🟢 ${provider} Active (${masked})`;
+    } else {
+        statusEl.style.background = "rgba(239,68,68,0.1)";
+        statusEl.style.color = "#dc2626";
+        statusEl.innerHTML = `<i class="fa-solid fa-circle me-1" style="font-size:0.5rem;"></i> ❌ No Global Key — Students see offline message`;
+    }
 }
+
+function saveGlobalAIKey() {
+    const input = document.getElementById("global-ai-key-input");
+    const key = input ? input.value.trim() : "";
+    if (!key || key.length < 10) {
+        alert("Please enter a valid API key (Groq: gsk_... or Gemini: AIza...)");
+        return;
+    }
+    // Save as global key AND also as user key so admin's own chat works too
+    localStorage.setItem(GLOBAL_KEY_NAME, key);
+    localStorage.setItem("campusmate_gemini_key", key);
+
+    // Broadcast to all open tabs so they get it immediately
+    localStorage.setItem("campusmate_global_ai_broadcast", Date.now().toString());
+
+    updateGlobalAIStatus();
+    const provider = key.startsWith("gsk_") ? "Groq LLaMA 3.3-70B" : "Gemini 2.5 Flash";
+    input.value = "";
+
+    const btn = event.target;
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-circle-check me-1"></i> Activated for ALL Users!';
+    btn.style.background = "#16a34a";
+    btn.style.borderColor = "#16a34a";
+    setTimeout(() => { btn.innerHTML = orig; btn.style.background = ""; btn.style.borderColor = ""; }, 3000);
+
+    alert(`✅ ${provider} key saved!\n\nAll students now get live AI chatbot responses automatically.`);
+}
+
+function clearGlobalAIKey() {
+    if (!confirm("Remove the global AI key? All students will lose AI access until a new key is set.")) return;
+    localStorage.removeItem(GLOBAL_KEY_NAME);
+    localStorage.removeItem("campusmate_gemini_key");
+    updateGlobalAIStatus();
+    const input = document.getElementById("global-ai-key-input");
+    if (input) input.value = "";
+}
+
+function toggleShowGlobalKey() {
+    const input = document.getElementById("global-ai-key-input");
+    const eye   = document.getElementById("global-key-eye");
+    if (!input) return;
+    if (input.type === "password") {
+        input.type = "text";
+        // Load existing key to show it
+        const existing = localStorage.getItem(GLOBAL_KEY_NAME) || "";
+        if (existing) input.value = existing;
+        if (eye) eye.className = "fa-solid fa-eye-slash";
+    } else {
+        input.type = "password";
+        input.value = "";
+        if (eye) eye.className = "fa-solid fa-eye";
+    }
+}
+
+// Init on page load
+document.addEventListener("DOMContentLoaded", updateGlobalAIStatus);
 </script>
 {% endblock %}

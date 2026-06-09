@@ -10,3 +10,7 @@ database.db-journal
 # Logs and system generation folders
 .system_generated/
 *.log
+
+# Environment variables (API keys — never commit!)
+.env
+.env.local

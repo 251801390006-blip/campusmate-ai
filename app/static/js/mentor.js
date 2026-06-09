@@ -207,7 +207,11 @@ async function executeMentorQuery(msg) {
     const csrfInput = document.querySelector('input[name="csrf_token"]');
     const csrf = (csrfMeta ? csrfMeta.content : null) || (csrfInput ? csrfInput.value : "") || "";
 
-    const apiKey = localStorage.getItem("campusmate_gemini_key") || "";
+    // Get API key: global admin key takes priority, then personal user key
+    const apiKey = localStorage.getItem("campusmate_global_ai_key") 
+                || localStorage.getItem("campusmate_gemini_key") 
+                || "";
+
 
     try {
         const resp = await fetch("/ai-mentor/chat", {
@@ -282,17 +286,21 @@ function showToast(message, type = "info") {
 
 // ── API Key Management ────────────────────────────────────────────────────
 function updateApiKeyStatus() {
-    const key = localStorage.getItem("campusmate_gemini_key") || "";
+    const globalKey = localStorage.getItem("campusmate_global_ai_key") || "";
+    const userKey   = localStorage.getItem("campusmate_gemini_key") || "";
+    const key = globalKey || userKey;
     const statusEl = document.getElementById("mentor-api-status");
     if (!statusEl) return;
     if (key) {
         const provider = key.startsWith("gsk_") ? "Groq" : "Gemini";
-        const masked = key.substring(0, 8) + "..." + key.slice(-4);
-        statusEl.innerHTML = `<i class="fa-solid fa-circle" style="font-size:0.4rem;color:#22c55e;margin-right:4px;"></i>🟢 ${provider} AI Online (${masked})`;
+        const source   = globalKey ? "Admin" : "Personal";
+        const masked   = key.substring(0, 8) + "..." + key.slice(-4);
+        statusEl.innerHTML = `<i class="fa-solid fa-circle" style="font-size:0.4rem;color:#22c55e;margin-right:4px;"></i>🟢 ${provider} AI Online (${source} Key)`;
     } else {
-        statusEl.innerHTML = `<i class="fa-solid fa-circle" style="font-size:0.4rem;color:#ef4444;margin-right:4px;"></i>No API Key — Add key to activate AI`;
+        statusEl.innerHTML = `<i class="fa-solid fa-circle" style="font-size:0.4rem;color:#ef4444;margin-right:4px;"></i>No API Key — Add key in Settings to activate AI`;
     }
 }
+
 
 function toggleMentorApiKey() {
     const form = document.getElementById("mentor-api-key-form");

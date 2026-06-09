@@ -4,6 +4,14 @@ from flask import Flask
 from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager
 
+# Load .env file for local development (ignored in production where env vars are set directly)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
+
 # Initialize extensions
 csrf = CSRFProtect()
 login_manager = LoginManager()
