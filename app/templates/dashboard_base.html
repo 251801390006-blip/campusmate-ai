@@ -58,9 +58,6 @@
             <a href="{{ url_for('features.internship_center') }}" class="sidebar-link {% if request.endpoint == 'features.internship_center' %}active{% endif %}">
                 <span class="sidebar-icon">💼</span> Internship Center
             </a>
-            <a href="{{ url_for('features.hackathon_assistant') }}" class="sidebar-link {% if request.endpoint == 'features.hackathon_assistant' %}active{% endif %}">
-                <span class="sidebar-icon">💻</span> Hackathon Assistant
-            </a>
             <a href="{{ url_for('dashboard.settings') }}" class="sidebar-link {% if request.endpoint == 'dashboard.settings' %}active{% endif %}">
                 <span class="sidebar-icon">⚙️</span> Settings
             </a>
@@ -229,10 +226,6 @@
         <a href="{{ url_for('features.internship_center') }}" class="mobile-bottom-link {% if request.endpoint == 'features.internship_center' %}active{% endif %}">
             <span class="mobile-bottom-icon">💼</span>
             <span>Internships</span>
-        </a>
-        <a href="{{ url_for('features.hackathon_assistant') }}" class="mobile-bottom-link {% if request.endpoint == 'features.hackathon_assistant' %}active{% endif %}">
-            <span class="mobile-bottom-icon">💻</span>
-            <span>Hackathons</span>
         </a>
     </nav>
 

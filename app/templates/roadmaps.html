@@ -109,37 +109,7 @@
                         <div id="canvas-nodes"></div>
                     </div>
                     
-                    <!-- Floating Controls with Arrow Keys -->
-                    <div class="canvas-controls">
-                        <button class="btn btn-light shadow-sm" onclick="zoomIn()" title="Zoom In"><i class="fa-solid fa-plus"></i></button>
-                        <button class="btn btn-light shadow-sm" onclick="zoomOut()" title="Zoom Out"><i class="fa-solid fa-minus"></i></button>
-                        <button class="btn btn-light shadow-sm" onclick="panCanvas('up')" title="Pan Up"><i class="fa-solid fa-arrow-up"></i></button>
-                        <button class="btn btn-light shadow-sm" onclick="panCanvas('down')" title="Pan Down"><i class="fa-solid fa-arrow-down"></i></button>
-                        <button class="btn btn-light shadow-sm" onclick="panCanvas('left')" title="Pan Left"><i class="fa-solid fa-arrow-left"></i></button>
-                        <button class="btn btn-light shadow-sm" onclick="panCanvas('right')" title="Pan Right"><i class="fa-solid fa-arrow-right"></i></button>
-                        <button class="btn btn-light shadow-sm" onclick="resetZoom()" title="Reset Zoom"><i class="fa-solid fa-arrows-to-dot"></i></button>
-                        <button class="btn btn-light shadow-sm" onclick="fitToScreen()" title="Fit to Screen"><i class="fa-solid fa-maximize"></i></button>
-                        <button class="btn btn-light shadow-sm" onclick="toggleFullScreen()" title="Full Screen"><i class="fa-solid fa-display"></i></button>
-                        <button class="btn btn-primary shadow-sm" onclick="jumpToActive()" title="Center on Active Step" style="background: #0078d4; border: none;"><i class="fa-solid fa-location-crosshairs"></i></button>
-                    </div>
 
-                    <!-- Navigator Compass (Interactive Minimap) -->
-                    <div class="roadmap-minimap-navigation shadow-sm border bg-white p-2" id="roadmap-minimap" style="position: absolute; bottom: 15px; right: 15px; z-index: 95; border-radius: 8px; width: 110px; height: 110px; opacity: 0.85; transition: opacity 0.2s ease;">
-                        <span style="font-size: 8px; font-weight:700; display:block; text-align:center; color:var(--text-muted); text-transform:uppercase;">Navigator</span>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; width: 80px; height: 80px; margin: 2px auto;">
-                            <div></div>
-                            <button class="btn btn-sm p-1 border-0" onclick="panCanvas('up')" style="background:none; cursor:pointer;"><i class="fa-solid fa-chevron-up text-primary" style="font-size:10px;"></i></button>
-                            <div></div>
-                            
-                            <button class="btn btn-sm p-1 border-0" onclick="panCanvas('left')" style="background:none; cursor:pointer;"><i class="fa-solid fa-chevron-left text-primary" style="font-size:10px;"></i></button>
-                            <button class="btn btn-sm p-1 border-0" onclick="resetZoom()" style="background:none; font-size:8px; cursor:pointer;"><i class="fa-solid fa-circle text-primary"></i></button>
-                            <button class="btn btn-sm p-1 border-0" onclick="panCanvas('right')" style="background:none; cursor:pointer;"><i class="fa-solid fa-chevron-right text-primary" style="font-size:10px;"></i></button>
-                            
-                            <div></div>
-                            <button class="btn btn-sm p-1 border-0" onclick="panCanvas('down')" style="background:none; cursor:pointer;"><i class="fa-solid fa-chevron-down text-primary" style="font-size:10px;"></i></button>
-                            <div></div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -185,31 +155,31 @@
         
         <!-- Resources Section -->
         <div class="accordion-section mb-3">
-            <h4 class="fw-bold mb-2 text-dark" style="font-size:0.85rem;"><i class="fa-solid fa-graduation-cap text-primary me-2"></i> Learning Resources</h4>
+            <h4 class="fw-bold mb-2 text-dark" style="font-size:0.85rem;"><svg class="me-2 text-primary" style="vertical-align: middle;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"></path></svg> Learning Resources</h4>
             <ul id="node-modal-resources" class="resource-list ps-3 mb-0" style="font-size: 0.82rem; line-height: 1.7; color: var(--text-secondary);"></ul>
         </div>
         
         <!-- Project Section -->
         <div class="accordion-section mb-3">
-            <h4 class="fw-bold mb-2 text-dark" style="font-size:0.85rem;"><i class="fa-solid fa-flask text-primary me-2"></i> Mini Project</h4>
+            <h4 class="fw-bold mb-2 text-dark" style="font-size:0.85rem;"><svg class="me-2 text-primary" style="vertical-align: middle;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12M14 2v6.2c0 .4.2.8.5 1.1l4.9 5.4c.7.8.2 2.3-1 2.3H5.6c-1.2 0-1.7-1.5-1-2.3l4.9-5.4c.3-.3.5-.7.5-1.1V2"></path><path d="M8.5 11h7"></path></svg> Mini Project</h4>
             <div class="project-info-box p-3 border rounded text-dark" id="node-modal-project" style="font-size: 0.82rem; line-height: 1.5; background-color: #f8f9fa; border-color: #e9ecef;"></div>
         </div>
 
         <!-- Certifications Section -->
         <div class="accordion-section mb-3">
-            <h4 class="fw-bold mb-2 text-dark" style="font-size:0.85rem;"><i class="fa-solid fa-award text-primary me-2"></i> Industry Certificate</h4>
+            <h4 class="fw-bold mb-2 text-dark" style="font-size:0.85rem;"><svg class="me-2 text-primary" style="vertical-align: middle;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34M12 2a7 7 0 0 1 7 7c0 2.22-1 4.2-2.56 5.5A7.003 7.003 0 0 1 12 16a7.003 7.003 0 0 1-4.44-1.5A7 7 0 0 1 12 2z"></path></svg> Industry Certificate</h4>
             <div class="cert-info-box p-3 border rounded text-dark" id="node-modal-certs" style="font-size: 0.82rem; line-height: 1.5; background-color: #f0fdf4; border-color: #dcfce7; color: #15803d;"></div>
         </div>
 
         <!-- Interview Questions Section -->
         <div class="accordion-section mb-4">
-            <h4 class="fw-bold mb-2 text-dark" style="font-size:0.85rem;"><i class="fa-solid fa-circle-question text-primary me-2"></i> Interview Q&A</h4>
+            <h4 class="fw-bold mb-2 text-dark" style="font-size:0.85rem;"><svg class="me-2 text-primary" style="vertical-align: middle;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"></path></svg> Interview Q&A</h4>
             <div class="p-3 border rounded text-dark" id="node-modal-questions" style="font-size: 0.82rem; line-height: 1.5; background-color: #f8fafc; border-color: #e2e8f0; max-height: 200px; overflow-y: auto;"></div>
         </div>
 
         <div class="node-action-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
-            <button id="node-modal-bookmark-btn" class="btn btn-sm btn-outline-secondary" onclick="bookmarkCurrentNode()" style="font-size: 0.78rem; padding: 6px 12px; border-radius: 4px; border: 1px solid var(--border-color); color: var(--text-secondary); background: transparent; cursor: pointer;"><i class="fa-regular fa-bookmark me-1"></i> Bookmark</button>
-            <button id="node-modal-action-btn" class="btn btn-primary py-2 px-4 shadow-sm" onclick="triggerNodeCompletion()" style="background: linear-gradient(135deg, #0078d4, #00bcf2); border: none; font-size: 0.82rem; font-weight:600; border-radius:4px;">Mark Complete <i class="fa-solid fa-check ms-1"></i></button>
+            <button id="node-modal-bookmark-btn" class="btn btn-sm btn-outline-secondary" onclick="bookmarkCurrentNode()" style="font-size: 0.78rem; padding: 6px 12px; border-radius: 4px; border: 1px solid var(--border-color); color: var(--text-secondary); background: transparent; cursor: pointer;"><svg class="me-1" style="vertical-align: middle;" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg> Bookmark</button>
+            <button id="node-modal-action-btn" class="btn btn-primary py-2 px-4 shadow-sm" onclick="triggerNodeCompletion()" style="background: linear-gradient(135deg, #0078d4, #00bcf2); border: none; font-size: 0.82rem; font-weight:600; border-radius:4px;">Mark Complete <svg class="ms-1" style="vertical-align: middle;" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></button>
         </div>
     </div>
 </div>
@@ -217,7 +187,7 @@
 <!-- Gamification Success Floating Notification -->
 <div id="gamification-toast" class="gamification-toast hidden">
     <div class="toast-content d-flex align-items-center gap-3">
-        <div class="toast-icon"><i class="fa-solid fa-trophy text-warning"></i></div>
+        <div id="toast-emoji-container" class="toast-icon" style="background: #fffbeb; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34M12 2a7 7 0 0 1 7 7c0 2.22-1 4.2-2.56 5.5A7.003 7.003 0 0 1 12 16a7.003 7.003 0 0 1-4.44-1.5A7 7 0 0 1 12 2z"></path></svg></div>
         <div>
             <strong class="d-block text-dark" style="font-size:0.9rem;">Milestone Completed!</strong>
             <span id="toast-text" class="text-secondary" style="font-size:0.8rem;">+25 XP Awarded</span>
@@ -369,12 +339,15 @@ function renderRoadmapTree() {
         div.style.left = `${pt.x - 100}px`;
         div.style.top = `${pt.y - 45}px`;
         
-        let statusIcon = "lock";
-        if (node.status === "COMPLETED") statusIcon = "check";
-        else if (node.status === "IN_PROGRESS") statusIcon = "circle-play";
+        let statusSvg = `<svg class="status-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
+        if (node.status === "COMPLETED") {
+            statusSvg = `<svg class="status-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+        } else if (node.status === "IN_PROGRESS") {
+            statusSvg = `<svg class="status-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>`;
+        }
 
         div.innerHTML = `
-            <div class="node-status-indicator"><i class="fa-solid fa-${statusIcon}"></i></div>
+            <div class="node-status-indicator" style="display: flex; align-items: center; justify-content: center;">${statusSvg}</div>
             <div class="node-content-details">
                 <span class="step-label">Step ${index + 1}</span>
                 <h4>${node.title.replace(`Step ${index + 1}: `, "")}</h4>
@@ -420,7 +393,7 @@ function openNodeModal(node, stepIdx) {
     resList.innerHTML = "";
     if (node.resources && node.resources.length > 0) {
         node.resources.forEach(r => {
-            resList.innerHTML += `<li><a href="${r.url}" target="_blank" class="fw-semibold text-primary"><i class="fa-solid fa-arrow-up-right-from-square me-1" style="font-size:0.75rem;"></i> ${r.title}</a></li>`;
+            resList.innerHTML += `<li><a href="${r.url}" target="_blank" class="fw-semibold text-primary"><svg class="me-1" style="vertical-align: middle;" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg> ${r.title}</a></li>`;
         });
     } else {
         resList.innerHTML = "<li>No specific resources listed.</li>";
@@ -446,7 +419,7 @@ function openNodeModal(node, stepIdx) {
     if (node.certifications && node.certifications.length > 0) {
         const c = node.certifications[0];
         certBox.innerHTML = `
-            <strong><i class="fa-solid fa-certificate me-1"></i> ${c.name}</strong>
+            <strong><svg class="me-1 text-success" style="vertical-align: middle;" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg> ${c.name}</strong>
             <div style="font-size:0.75rem; color:#166534; margin-top:4px;">
                 <span>Provider: ${c.provider}</span> • <span>Cost: ${c.cost}</span>
             </div>
@@ -481,7 +454,7 @@ function openNodeModal(node, stepIdx) {
         actionBtn.style.color = "#64748b";
         actionBtn.className = "btn";
     } else {
-        actionBtn.innerHTML = `Mark Complete <i class="fa-solid fa-check ms-1"></i>`;
+        actionBtn.innerHTML = `Mark Complete <svg class="ms-1" style="vertical-align: middle;" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
         actionBtn.disabled = false;
         actionBtn.style.background = "linear-gradient(135deg, #0078d4, #00bcf2)";
         actionBtn.style.color = "#ffffff";
@@ -498,13 +471,17 @@ function closeNodeModal() {
 }
 
 // Show premium clean toast notification
-function showToast(title, message, iconClass = "fa-trophy text-warning") {
+function showRewardToast(xpGained, streak) {
+    showToast("Milestone Completed!", `+${xpGained} XP Awarded! Current Streak: ${streak} Days`, `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34M12 2a7 7 0 0 1 7 7c0 2.22-1 4.2-2.56 5.5A7.003 7.003 0 0 1 12 16a7.003 7.003 0 0 1-4.44-1.5A7 7 0 0 1 12 2z"></path></svg>`);
+}
+
+function showToast(title, message, emoji = "") {
     const toast = document.getElementById("gamification-toast");
-    const toastIcon = toast.querySelector(".toast-icon i");
+    const emojiContainer = document.getElementById("toast-emoji-container");
     const toastTitle = toast.querySelector("strong");
     const toastText = document.getElementById("toast-text");
     
-    if (toastIcon) toastIcon.className = "fa-solid " + iconClass;
+    if (emojiContainer) emojiContainer.innerHTML = emoji;
     if (toastTitle) toastTitle.innerText = title;
     if (toastText) toastText.innerText = message;
     
@@ -523,7 +500,7 @@ async function triggerNodeCompletion() {
     if (selectedStepIdx === -1) return;
     
     const actionBtn = document.getElementById("node-modal-action-btn");
-    actionBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Syncing...`;
+    actionBtn.innerHTML = `<span>⏳</span> Syncing...`;
     
     try {
         const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
@@ -615,6 +592,8 @@ let startX, startY;
 let translateX = 0;
 let translateY = 0;
 let scale = 0.85; // slightly zoomed out by default to see tree shape
+let touchStartDist = 0;
+let initialScale = 1;
 
 const viewport = document.getElementById("canvas-viewport");
 const container = document.getElementById("canvas-container");
@@ -659,21 +638,93 @@ window.addEventListener("mouseup", () => {
     viewport.style.cursor = "grab";
 });
 
+// Mouse Wheel Zoom
+viewport.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    const zoomFactor = 1.05;
+    const prevScale = scale;
+    
+    const rect = viewport.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    if (e.deltaY < 0) {
+        scale = Math.min(1.8, scale * zoomFactor);
+    } else {
+        scale = Math.max(0.3, scale / zoomFactor);
+    }
+    
+    translateX = mouseX - (mouseX - translateX) * (scale / prevScale);
+    translateY = mouseY - (mouseY - translateY) * (scale / prevScale);
+    
+    // Bounds boundaries
+    const totalHeight = activeNodes.length * 150 + 200;
+    const minTranslateY = -totalHeight * scale + viewport.clientHeight - 50;
+    translateY = Math.min(150, Math.max(minTranslateY, translateY));
+    translateX = Math.min(300, Math.max(-900 * scale + viewport.clientWidth - 100, translateX));
+    
+    updateTransform();
+}, { passive: false });
+
+// Touch Drag and Pinch Zoom
 viewport.addEventListener("touchstart", (e) => {
     if (e.target.closest(".roadmap-node-badge") || e.target.closest("button") || e.target.closest("input")) return;
+    
     isDragging = true;
-    startX = e.touches[0].clientX - translateX;
-    startY = e.touches[0].clientY - translateY;
-});
+    if (e.touches.length === 1) {
+        startX = e.touches[0].clientX - translateX;
+        startY = e.touches[0].clientY - translateY;
+        touchStartDist = 0;
+    } else if (e.touches.length === 2) {
+        touchStartDist = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+        );
+        initialScale = scale;
+        startX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - translateX;
+        startY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - translateY;
+    }
+}, { passive: true });
 
 viewport.addEventListener("touchmove", (e) => {
     if (!isDragging) return;
-    translateX = e.touches[0].clientX - startX;
-    translateY = e.touches[0].clientY - startY;
+    if (e.cancelable) {
+        e.preventDefault();
+    }
+    
+    if (e.touches.length === 1) {
+        translateX = e.touches[0].clientX - startX;
+        translateY = e.touches[0].clientY - startY;
+    } else if (e.touches.length === 2 && touchStartDist > 0) {
+        const dist = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+        );
+        const factor = dist / touchStartDist;
+        const prevScale = scale;
+        scale = Math.min(1.8, Math.max(0.3, initialScale * factor));
+        
+        const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+        
+        translateX = midX - startX * (scale / initialScale);
+        translateY = midY - startY * (scale / initialScale);
+    }
+    
+    // Bounds boundaries
+    const totalHeight = activeNodes.length * 150 + 200;
+    const minTranslateY = -totalHeight * scale + viewport.clientHeight - 50;
+    translateY = Math.min(150, Math.max(minTranslateY, translateY));
+    translateX = Math.min(300, Math.max(-900 * scale + viewport.clientWidth - 100, translateX));
+    
     updateTransform();
-});
+}, { passive: false });
 
 viewport.addEventListener("touchend", () => {
+    isDragging = false;
+});
+
+viewport.addEventListener("touchcancel", () => {
     isDragging = false;
 });
 
@@ -866,6 +917,7 @@ document.addEventListener("DOMContentLoaded", () => {
     cursor: grab;
     user-select: none;
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    touch-action: none;
 }
 .canvas-container {
     position: absolute;

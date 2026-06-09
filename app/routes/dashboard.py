@@ -321,7 +321,6 @@ def global_search():
         {"title": "AI Interview Simulator", "category": "Tool", "url": url_for('features.interview_prep')},
         {"title": "Internship Command Center", "category": "Tool", "url": url_for('features.internship_center')},
         {"title": "AI Project Architect", "category": "Tool", "url": url_for('features.project_architect')},
-        {"title": "Hackathon Assistant", "category": "Tool", "url": url_for('features.hackathon_assistant')},
         {"title": "Bookmarks & Saved Items Dashboard", "category": "Profile", "url": url_for('dashboard.bookmarks')},
         {"title": "Chronological Activity Timeline", "category": "Profile", "url": url_for('dashboard.activity_history')},
         {"title": "Account Settings & Privacy", "category": "Profile", "url": url_for('dashboard.settings')},

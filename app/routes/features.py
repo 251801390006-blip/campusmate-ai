@@ -1458,61 +1458,6 @@ def interview_prep_evaluate():
         "feedback": feedback
     })
 
-# 6. Hackathon Assistant
-@features_bp.route('/hackathon-assistant', methods=['GET'])
-@login_required
-def hackathon_assistant():
-    return render_template('hackathon.html')
-
-@features_bp.route('/hackathon-assistant/generate', methods=['POST'])
-@login_required
-def hackathon_generate():
-    data = request.get_json() or {}
-    theme = data.get('theme', '')
-    custom_key = data.get('custom_key', '').strip()
-    
-    if not theme:
-        return jsonify({"success": False, "error": "Theme is required"}), 400
-        
-    system_prompt = (
-        "You are a Hackathon Mentor. Draft a comprehensive project MVP blueprint concept for the theme provided. "
-        "Format your response in structured HTML matching the expected outline: "
-        "1. MVP Architecture Overview (wrap architecture diagrams in <pre><code>...</code></pre>), "
-        "2. Tech Stack & Configurations (as a list), "
-        "3. Presentation Pitch Outline (Slide outline list), "
-        "4. Step-by-Step implementation milestones."
-    )
-    user_prompt = f"Hackathon Theme: {theme}"
-    
-    ai_res = call_gemini(system_prompt, user_prompt, user_key=custom_key)
-    if not ai_res:
-        ai_res = (
-            f"<h2>Hackathon Project Blueprint: {theme}</h2>"
-            f"<h3>1. MVP Architecture Overview</h3>"
-            f"<pre><code>[Frontend: HTML5/JS] ---> [Flask App Server] ---> [SQLite Database]</code></pre>"
-            f"<h3>2. Tech Stack & Library Configurations</h3>"
-            f"<ul>"
-            f"<li><strong>Language:</strong> Python 3.12, Javascript ES6</li>"
-            f"<li><strong>Backend:</strong> Flask, SQLAlchemy (ORM)</li>"
-            f"<li><strong>Styling:</strong> Vanilla CSS with layout variables</li>"
-            f"</ul>"
-            f"<h3>3. Presentation Pitch Outline</h3>"
-            f"<ul>"
-            f"<li><strong>Slide 1:</strong> Problem statement & current inefficiencies.</li>"
-            f"<li><strong>Slide 2:</strong> Solution architecture & demo overview.</li>"
-            f"<li><strong>Slide 3:</strong> Future roadmap & API expandability layers.</li>"
-            f"</ul>"
-            f"<h3>4. Implementation milestones</h3>"
-            f"<p>Define schemas, configure Flask factory app, package inside Docker, and push deployments to Railway.</p>"
-        )
-    else:
-        ai_res = ai_res.replace("### ", "<h3>").replace("## ", "<h2>").replace("\n", "<br>")
-        
-    return jsonify({
-        "success": True,
-        "response": ai_res
-    })
-
 
 # 7. Internship Center
 @features_bp.route('/internship-center', methods=['GET'])

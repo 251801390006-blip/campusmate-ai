@@ -2436,7 +2436,10 @@ animation: fadeIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 @media (max-width: 991.98px) {
     .main-with-sidebar {
         margin-left: 0 !important;
-        margin-bottom: 64px !important;
+        margin-bottom: 68px !important;
+    }
+    .dashboard-inner-container {
+        padding-bottom: 80px !important;
     }
 }
 
