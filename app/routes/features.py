@@ -779,46 +779,51 @@ def get_predefined_roadmap(role: str) -> list:
 @features_bp.route('/roadmaps', methods=['GET'])
 @login_required
 def list_roadmaps():
-    # Load user active track
-    progress = RoadmapProgress.query.filter_by(user_id=current_user.id).first()
-    
-    tracks = [
-        "Cyber Security", "Ethical Hacking", "SOC Analyst", "Digital Forensics",
-        "AI Engineering", "Machine Learning", "Deep Learning", "Generative AI", "Prompt Engineering", "Agentic AI",
-        "Data Science", "Data Analytics", "Python Developer", "Java Developer", "C++ Developer",
-        "Full Stack Development", "Frontend Development", "Backend Development", "React Developer", "Node.js Developer",
-        "Mobile App Development", "Android Development", "Flutter Development",
-        "Cloud Computing", "AWS", "Azure", "Google Cloud",
-        "DevOps", "Kubernetes", "Docker", "Linux Engineering", "Network Engineering",
-        "Blockchain", "Web3", "UI/UX Design", "Product Design", "Product Management",
-        "Software Testing", "QA Automation", "Game Development", "AR/VR Development",
-        "Robotics", "IoT", "Embedded Systems", "Database Engineering",
-        "Site Reliability Engineering", "Business Analysis", "SAP", "Salesforce", "Competitive Programming"
-    ]
-    
-    selected_role = None
-    nodes = []
-    completed_set = set()
-    percent = 0
-    
-    if progress:
-        selected_role = progress.role
-        nodes = get_predefined_roadmap(selected_role)
-        if progress.completed_nodes:
-            completed_set = {int(x) for x in progress.completed_nodes.split(",") if x.strip()}
+    try:
+        # Load user active track
+        progress = RoadmapProgress.query.filter_by(user_id=current_user.id).first()
         
-        completed_count = len([n for i, n in enumerate(nodes) if (i+1) in completed_set])
-        if nodes:
-            percent = int((completed_count / len(nodes)) * 100)
+        tracks = [
+            "Cyber Security", "Ethical Hacking", "SOC Analyst", "Digital Forensics",
+            "AI Engineering", "Machine Learning", "Deep Learning", "Generative AI", "Prompt Engineering", "Agentic AI",
+            "Data Science", "Data Analytics", "Python Developer", "Java Developer", "C++ Developer",
+            "Full Stack Development", "Frontend Development", "Backend Development", "React Developer", "Node.js Developer",
+            "Mobile App Development", "Android Development", "Flutter Development",
+            "Cloud Computing", "AWS", "Azure", "Google Cloud",
+            "DevOps", "Kubernetes", "Docker", "Linux Engineering", "Network Engineering",
+            "Blockchain", "Web3", "UI/UX Design", "Product Design", "Product Management",
+            "Software Testing", "QA Automation", "Game Development", "AR/VR Development",
+            "Robotics", "IoT", "Embedded Systems", "Database Engineering",
+            "Site Reliability Engineering", "Business Analysis", "SAP", "Salesforce", "Competitive Programming"
+        ]
+        
+        selected_role = None
+        nodes = []
+        completed_set = set()
+        percent = 0
+        
+        if progress:
+            selected_role = progress.role
+            nodes = get_predefined_roadmap(selected_role)
+            if progress.completed_nodes:
+                completed_set = {int(x) for x in progress.completed_nodes.split(",") if x.strip()}
             
-    return render_template(
-        'roadmaps.html', 
-        tracks=tracks, 
-        selected_role=selected_role,
-        nodes=nodes, 
-        completed_set=completed_set,
-        percent=percent
-    )
+            completed_count = len([n for i, n in enumerate(nodes) if (i+1) in completed_set])
+            if nodes:
+                percent = int((completed_count / len(nodes)) * 100)
+                
+        return render_template(
+            'roadmaps.html', 
+            tracks=tracks, 
+            selected_role=selected_role,
+            nodes=nodes, 
+            completed_set=completed_set,
+            percent=percent
+        )
+    except Exception as e:
+        print(f"Error in list_roadmaps: {e}")
+        flash("An error occurred loading your roadmap. Please try again.", "danger")
+        return render_template('roadmaps.html', tracks=[], selected_role=None, nodes=[], completed_set=set(), percent=0)
 
 @features_bp.route('/roadmaps/select-track', methods=['POST'])
 @login_required
@@ -1020,28 +1025,36 @@ def list_resume_versions():
 @features_bp.route('/ai-mentor', methods=['GET'])
 @login_required
 def ai_mentor():
-    history = ChatMessage.query.filter_by(user_id=current_user.id).order_by(ChatMessage.created_at.asc()).all()
+    try:
+        history = ChatMessage.query.filter_by(user_id=current_user.id).order_by(ChatMessage.created_at.asc()).all()
+    except Exception as e:
+        print(f"Error loading AI mentor history: {e}")
+        history = []
     return render_template('ai_mentor.html', history=history)
 
 @features_bp.route('/ai-mentor/chat', methods=['POST'])
 @login_required
 def chat():
-    data = request.get_json() or {}
-    message_content = data.get('message', '').strip()
-    custom_key = data.get('custom_key', '').strip()
-    
-    if not message_content:
-        return jsonify({"success": False, "error": "Message is required"}), 400
+    try:
+        data = request.get_json() or {}
+        message_content = data.get('message', '').strip()
+        custom_key = data.get('custom_key', '').strip()
         
-    # Rate limiting check: enforce 3 seconds delay between messages
-    last_msg = ChatMessage.query.filter_by(user_id=current_user.id).order_by(ChatMessage.created_at.desc()).first()
-    if last_msg:
-        delta = datetime.utcnow() - last_msg.created_at
-        if delta.total_seconds() < 3.0:
-            return jsonify({
-                "success": False, 
-                "error": "Rate limit exceeded. Please wait 3 seconds between messages."
-            }), 429
+        if not message_content:
+            return jsonify({"success": False, "error": "Message is required"}), 400
+            
+        # Rate limiting check: enforce 3 seconds delay between messages
+        last_msg = ChatMessage.query.filter_by(user_id=current_user.id).order_by(ChatMessage.created_at.desc()).first()
+        if last_msg:
+            delta = datetime.utcnow() - last_msg.created_at
+            if delta.total_seconds() < 3.0:
+                return jsonify({
+                    "success": False, 
+                    "error": "Rate limit exceeded. Please wait 3 seconds between messages."
+                }), 429
+    except Exception as e:
+        print(f"Error in chat init: {e}")
+        return jsonify({"success": False, "error": "Server error. Please try again."}), 500
 
         
     # 1. Command Center Keywords Interceptor
@@ -1171,16 +1184,13 @@ def chat():
     # Call Gemini API
     ai_response_content = call_gemini(system_prompt, message_content, user_key=custom_key)
     
-    # Fallback to intelligent mock response if Gemini fails or API key is not configured
+    # Fallback if Gemini/Groq API key is not configured or call failed
     if not ai_response_content:
+        short_q = message_content[:80] + ("..." if len(message_content) > 80 else "")
         ai_response_content = (
-            f"🤖 *[Mode: Sandbox Offline Mode / API Key Not Found]*\n\n"
-            f"Hello {current_user.username}! I am operating in Sandbox mode since no valid `GEMINI_API_KEY` was found in the environment variables, "
-            f"and no user key was entered in your sidebar settings.\n\n"
-            f"**Here is your advice regarding '{message_content}':**\n"
-            f"- For **{role}** tracks, make sure you complete your milestones sequentially and practice the Capstone projects.\n"
-            f"- Make sure to verify your Resume Analyzer checklist to fix any formatting errors and missing keywords.\n"
-            f"- Focus on learning modern tools like Docker, Git, and REST API frameworks to build dynamic SaaS applications."
+            f"⚠️ **No AI key configured** — I can't answer: *\"{short_q}\"*\n\n"
+            f"To get real AI responses, please add your **Gemini** or **Groq** API key in [⚙️ Settings](/settings).\n\n"
+            f"Groq is **free** — get your key in 60 seconds at [console.groq.com](https://console.groq.com)."
         )
         
     # Save AI response to database

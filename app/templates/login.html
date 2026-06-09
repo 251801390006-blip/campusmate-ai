@@ -2,166 +2,519 @@
 
 {% block title %}Sign In - CampusMate AI{% endblock %}
 
+{% block extra_head %}
+<style>
+/* Override base layout for auth pages */
+.landing-layout {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 40%, #0078d4 100%);
+}
+.landing-header {
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.landing-header .logo,
+.landing-header .landing-nav a {
+    color: rgba(255,255,255,0.9) !important;
+}
+.landing-header .landing-nav a.btn-outline {
+    border-color: rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.85) !important;
+}
+.landing-header .landing-nav a.btn-primary {
+    background: #0078d4;
+    border-color: #0078d4;
+    color: white !important;
+}
+.landing-footer {
+    background: rgba(0,0,0,0.2);
+    color: rgba(255,255,255,0.5);
+}
+.auth-page-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 130px);
+    padding: 2rem 1rem;
+}
+.auth-split {
+    display: flex;
+    gap: 3rem;
+    align-items: center;
+    max-width: 1000px;
+    width: 100%;
+}
+/* Left side hero */
+.auth-hero {
+    flex: 1;
+    color: white;
+    display: none;
+}
+@media (min-width: 900px) {
+    .auth-hero { display: block; }
+}
+.auth-hero h1 {
+    font-size: 2.4rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    background: linear-gradient(90deg, #ffffff, #90d0ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.auth-hero p {
+    color: rgba(255,255,255,0.72);
+    font-size: 1rem;
+    line-height: 1.65;
+    margin-bottom: 2rem;
+}
+.feature-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.7rem 1rem;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+    transition: background 0.2s;
+}
+.feature-pill:hover {
+    background: rgba(255,255,255,0.12);
+}
+.feature-pill .icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+.feature-pill .text strong {
+    display: block;
+    color: white;
+    font-size: 0.88rem;
+    margin-bottom: 0.1rem;
+}
+.feature-pill .text span {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.78rem;
+}
+.testimonial-box {
+    margin-top: 2rem;
+    padding: 1.2rem 1.4rem;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-left: 3px solid #00bcf2;
+    border-radius: 12px;
+}
+.testimonial-box p {
+    color: rgba(255,255,255,0.8);
+    font-size: 0.87rem;
+    font-style: italic;
+    line-height: 1.55;
+    margin-bottom: 0.75rem;
+}
+.testimonial-box .author {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+.testimonial-box .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0078d4, #00bcf2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: white;
+}
+.testimonial-box .author-info strong {
+    display: block;
+    color: white;
+    font-size: 0.8rem;
+}
+.testimonial-box .author-info span {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.72rem;
+}
+/* Auth card */
+.auth-card-wrapper {
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 420px;
+}
+.auth-glass-card {
+    background: rgba(255,255,255,0.97);
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.15);
+    position: relative;
+    overflow: hidden;
+}
+.auth-glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #0078d4, #00bcf2, #10b981);
+}
+.auth-logo-badge {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #0078d4, #00bcf2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    margin: 0 auto 1rem;
+    box-shadow: 0 4px 15px rgba(0,120,212,0.35);
+}
+.auth-glass-card h2 {
+    color: #0f172a;
+    font-size: 1.5rem;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 0.3rem;
+    letter-spacing: -0.02em;
+}
+.auth-glass-card .subtitle {
+    color: #64748b;
+    font-size: 0.83rem;
+    text-align: center;
+    margin-bottom: 1.75rem;
+}
+.social-row {
+    display: flex;
+    gap: 0.6rem;
+    margin-bottom: 1.2rem;
+}
+.social-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    background: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #334155;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+.social-btn:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #0f172a;
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+.divider {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1rem 0;
+}
+.divider hr {
+    flex: 1;
+    border: none;
+    border-top: 1px solid #e2e8f0;
+    margin: 0;
+}
+.divider span {
+    color: #94a3b8;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+.auth-field {
+    margin-bottom: 1rem;
+}
+.auth-field label {
+    display: block;
+    color: #374151;
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+}
+.auth-field .field-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.35rem;
+}
+.auth-field input {
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    color: #0f172a;
+    background: white;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    font-family: inherit;
+}
+.auth-field input:focus {
+    border-color: #0078d4;
+    box-shadow: 0 0 0 3px rgba(0,120,212,0.12);
+}
+.auth-field .pw-wrap {
+    position: relative;
+}
+.auth-field .pw-wrap input {
+    padding-right: 2.75rem;
+}
+.auth-field .pw-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 0.2rem;
+    font-size: 0.9rem;
+    line-height: 1;
+}
+.auth-field .pw-toggle:hover { color: #475569; }
+.auth-field .field-error {
+    display: block;
+    color: #ef4444;
+    font-size: 0.74rem;
+    margin-top: 0.3rem;
+}
+.auth-field .forgot-link {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #0078d4;
+    text-decoration: none;
+}
+.auth-field .forgot-link:hover { text-decoration: underline; }
+.remember-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+}
+.remember-row input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    accent-color: #0078d4;
+}
+.remember-row label {
+    font-size: 0.82rem;
+    color: #64748b;
+    cursor: pointer;
+    margin: 0;
+}
+.auth-submit-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background: linear-gradient(135deg, #0078d4, #0095e8);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    letter-spacing: 0.01em;
+}
+.auth-submit-btn:hover {
+    background: linear-gradient(135deg, #006ab8, #0085d0);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0,120,212,0.35);
+}
+.auth-submit-btn:active { transform: translateY(0); }
+.auth-footer-link {
+    text-align: center;
+    margin-top: 1.25rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid #f1f5f9;
+    font-size: 0.82rem;
+    color: #64748b;
+}
+.auth-footer-link a {
+    color: #0078d4;
+    font-weight: 700;
+    text-decoration: none;
+}
+.auth-footer-link a:hover { text-decoration: underline; }
+/* Flash alerts inside card */
+.auth-flash {
+    padding: 0.65rem 0.85rem;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+.auth-flash.danger { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+.auth-flash.success { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+.auth-flash.info { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container py-4">
-    <div class="row g-5 align-items-center">
-        <!-- Left Side: Product Hero, Benefits & Testimonials -->
-        <div class="col-lg-6 d-none d-lg-block">
-            <div class="pe-xl-5">
-                <!-- Hero Panel -->
-                <div class="hero-showcase mb-5 p-4 rounded shadow-sm" style="background: linear-gradient(135deg, rgba(0, 120, 212, 0.08), rgba(0, 188, 242, 0.08)); border: 1.5px solid rgba(0, 120, 212, 0.15);">
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                        <div style="background:#0078d4; color:white; width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">
-                            <i class="fa-solid fa-graduation-cap"></i>
-                        </div>
-                        <div>
-                            <h3 class="fw-bold text-dark mb-0" style="font-size:1.35rem;">CampusMate Growth OS</h3>
-                            <span class="text-secondary" style="font-size:0.8rem;">Empowering 2026–2029 placement readiness</span>
-                        </div>
-                    </div>
-                    
-                    <!-- SVG Mockup of Student Twin Timeline -->
-                    <svg viewBox="0 0 400 120" style="width: 100%; height: auto; border-radius: 6px; background: white; border: 1px solid #dee2e6; padding: 15px;">
-                        <circle cx="50" cy="60" r="20" fill="#f0f9ff" stroke="#0078d4" stroke-width="2"></circle>
-                        <text x="50" y="65" font-family="sans-serif" font-size="10" text-anchor="middle" font-weight="bold" fill="#0078d4">2026</text>
-                        <line x1="70" y1="60" x2="130" y2="60" stroke="#0078d4" stroke-dasharray="4,4" stroke-width="2"></line>
-                        
-                        <circle cx="150" cy="60" r="20" fill="#f0f9ff" stroke="#00bcf2" stroke-width="2"></circle>
-                        <text x="150" y="65" font-family="sans-serif" font-size="10" text-anchor="middle" font-weight="bold" fill="#00bcf2">2027</text>
-                        <line x1="170" y1="60" x2="230" y2="60" stroke="#cbd5e1" stroke-width="2"></line>
-                        
-                        <circle cx="250" cy="60" r="20" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"></circle>
-                        <text x="250" y="65" font-family="sans-serif" font-size="10" text-anchor="middle" font-weight="bold" fill="#64748b">2028</text>
-                        <line x1="270" y1="60" x2="330" y2="60" stroke="#cbd5e1" stroke-width="2"></line>
-                        
-                        <circle cx="350" cy="60" r="20" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"></circle>
-                        <text x="350" y="65" font-family="sans-serif" font-size="10" text-anchor="middle" font-weight="bold" fill="#64748b">2029</text>
-                    </svg>
+<div class="auth-page-wrapper">
+    <div class="auth-split">
+        <!-- LEFT: Hero -->
+        <div class="auth-hero">
+            <h1>Your Campus Career OS, Powered by AI</h1>
+            <p>Join students who are building structured learning paths, practising real interviews, and landing internships faster with CampusMate AI.</p>
+
+            <div class="feature-pill">
+                <div class="icon" style="background:rgba(0,120,212,0.15); color:#0078d4;">
+                    <i class="fa-solid fa-route"></i>
                 </div>
+                <div class="text">
+                    <strong>50+ Career Track Roadmaps</strong>
+                    <span>200+ visual milestones with certifications & projects</span>
+                </div>
+            </div>
+            <div class="feature-pill">
+                <div class="icon" style="background:rgba(16,185,129,0.15); color:#10b981;">
+                    <i class="fa-solid fa-file-invoice"></i>
+                </div>
+                <div class="text">
+                    <strong>AI Resume Builder & ATS Scorer</strong>
+                    <span>Real-time keyword matching & PDF downloads</span>
+                </div>
+            </div>
+            <div class="feature-pill">
+                <div class="icon" style="background:rgba(219,39,119,0.15); color:#db2777;">
+                    <i class="fa-solid fa-microphone"></i>
+                </div>
+                <div class="text">
+                    <strong>Live Interview Simulator</strong>
+                    <span>Voice-enabled FAANG-level mock interviews</span>
+                </div>
+            </div>
+            <div class="feature-pill">
+                <div class="icon" style="background:rgba(245,158,11,0.15); color:#f59e0b;">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <div class="text">
+                    <strong>AI Mentor Chatbot</strong>
+                    <span>Ask anything: coding, resume, career, interview</span>
+                </div>
+            </div>
 
-                <!-- Product Benefits -->
-                <h3 class="fw-bold text-dark mb-3" style="font-size: 1.15rem;">Complete Platform Benefits</h3>
-                <ul class="d-flex flex-column gap-3 ps-0 mb-5" style="list-style: none;">
-                    <li class="d-flex align-items-start gap-3">
-                        <div style="background:#f0f9ff; color:#0078d4; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                            <i class="fa-solid fa-route" style="font-size:0.85rem;"></i>
-                        </div>
-                        <div>
-                            <strong class="text-dark d-block" style="font-size:0.9rem;">50+ Career Track Roadmaps</strong>
-                            <p class="text-secondary mb-0" style="font-size:0.8rem;">200+ visual milestones, practice projects, and targeted certifications.</p>
-                        </div>
-                    </li>
-                    <li class="d-flex align-items-start gap-3">
-                        <div style="background:#f0fdf4; color:#10b981; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                            <i class="fa-solid fa-file-invoice" style="font-size:0.85rem;"></i>
-                        </div>
-                        <div>
-                            <strong class="text-dark d-block" style="font-size:0.9rem;">AI Resume Builder</strong>
-                            <p class="text-secondary mb-0" style="font-size:0.8rem;">Real-time ATS keyword matching, sub-scores, and local PDF downloads.</p>
-                        </div>
-                    </li>
-                    <li class="d-flex align-items-start gap-3">
-                        <div style="background:#fdf2f8; color:#db2777; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                            <i class="fa-solid fa-microphone" style="font-size:0.85rem;"></i>
-                        </div>
-                        <div>
-                            <strong class="text-dark d-block" style="font-size:0.9rem;">Interactive Interview simulator</strong>
-                            <p class="text-secondary mb-0" style="font-size:0.8rem;">Vocal query readings via browser audio and real-time voice transcription.</p>
-                        </div>
-                    </li>
-                </ul>
-
-                <!-- Testimonial quote card -->
-                <div class="testimonial-card border p-3.5 rounded bg-white shadow-sm position-relative">
-                    <span class="position-absolute text-muted" style="top:10px; right:20px; font-size:3rem; font-family:serif; line-height:1; opacity:0.15;">“</span>
-                    <p class="text-dark mb-3" style="font-style:italic; font-size:0.88rem; line-height:1.6;">
-                        "The interactive roadmaps helped me structure my learning from scratch. The AI Mentor provided docker configurations in seconds, and my placement readiness score went from 50 to 92!"
-                    </p>
-                    <div class="d-flex align-items-center gap-2">
-                        <div style="background:#e2e8f0; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:bold; color:#0078d4;">
-                            VS
-                        </div>
-                        <div>
-                            <strong class="text-dark d-block" style="font-size:0.8rem;">Vanjith Kumar S</strong>
-                            <span class="text-secondary" style="font-size:0.7rem;">3rd Year, Computer Science Student</span>
-                        </div>
+            <div class="testimonial-box">
+                <p>"The roadmaps helped me structure learning from scratch. The AI Mentor gave me Docker configs in seconds — my placement score jumped from 50 to 92!"</p>
+                <div class="author">
+                    <div class="avatar">VS</div>
+                    <div class="author-info">
+                        <strong>Vanjith Kumar S</strong>
+                        <span>3rd Year, Computer Science</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Right Side: Login Form -->
-        <div class="col-lg-6">
-            <div class="flat-card auth-card shadow-lg mx-auto" style="width: 100%; max-width: 440px; padding: 2.5rem 2rem 2rem;">
-                <div class="text-center mb-4">
-                    <div class="auth-logo-icon" style="background: rgba(0, 120, 212, 0.08); color: #0078d4; border: 1px solid rgba(0, 120, 212, 0.15);">
-                        <i class="fa-solid fa-graduation-cap"></i>
-                    </div>
-                    <h2 class="h4 mb-1 text-dark" style="font-weight: 700; letter-spacing: -0.02em;">Welcome Back</h2>
-                    <p class="text-secondary" style="font-size: 0.82rem;">Sign in to your university placement dashboard</p>
+        <!-- RIGHT: Login Card -->
+        <div class="auth-card-wrapper">
+            <div class="auth-glass-card">
+                <div class="auth-logo-badge">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <h2>Welcome Back</h2>
+                <p class="subtitle">Sign in to your placement dashboard</p>
+
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="auth-flash {{ category }}">
+                                <i class="fa-solid {% if category == 'success' %}fa-circle-check{% elif category == 'danger' %}fa-triangle-exclamation{% else %}fa-circle-info{% endif %}"></i>
+                                <span>{{ message }}</span>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Social Login -->
+                <div class="social-row">
+                    <a href="{{ url_for('auth.oauth_login', provider='google') }}" class="social-btn">
+                        <i class="fa-brands fa-google" style="color:#ea4335;"></i> Google
+                    </a>
+                    <a href="{{ url_for('auth.oauth_login', provider='github') }}" class="social-btn">
+                        <i class="fa-brands fa-github" style="color:#24292f;"></i> GitHub
+                    </a>
                 </div>
 
-                <!-- Social Logins -->
-                <div class="d-flex gap-2 mb-4">
-                    <a href="{{ url_for('auth.oauth_login', provider='google') }}" class="btn btn-outline border w-100 py-2 d-flex align-items-center justify-content-center gap-2 shadow-sm" style="font-size: 0.8rem; font-weight:600; color:var(--text-primary);">
-                        <i class="fa-brands fa-google text-danger"></i> Google
-                    </a>
-                    <a href="{{ url_for('auth.oauth_login', provider='github') }}" class="btn btn-outline border w-100 py-2 d-flex align-items-center justify-content-center gap-2 shadow-sm" style="font-size: 0.8rem; font-weight:600; color:var(--text-primary);">
-                        <i class="fa-brands fa-github text-dark"></i> GitHub
-                    </a>
-                </div>
-
-                <div class="d-flex align-items-center gap-2 mb-4">
-                    <hr class="flex-grow-1" style="border-color:#dee2e6;">
-                    <span class="text-muted" style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Or Login via Email</span>
-                    <hr class="flex-grow-1" style="border-color:#dee2e6;">
+                <div class="divider">
+                    <hr>
+                    <span>Or login via email</span>
+                    <hr>
                 </div>
 
                 <form method="POST" action="{{ url_for('auth.login') }}">
                     {{ form.csrf_token }}
-                    
-                    <!-- Email Input -->
-                    <div class="input-group mb-3 d-flex flex-column gap-1">
-                        {{ form.email.label(class="fw-semibold text-secondary", style="font-size: 0.82rem;") }}
-                        {{ form.email(class="form-control shadow-sm", placeholder="name@university.edu") }}
+
+                    <!-- Email -->
+                    <div class="auth-field">
+                        {{ form.email.label(class="") }}
+                        {{ form.email(placeholder="name@university.edu", autocomplete="email") }}
                         {% if form.email.errors %}
                             {% for error in form.email.errors %}
-                                <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
+                                <span class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</span>
                             {% endfor %}
                         {% endif %}
                     </div>
 
-                    <!-- Password Input -->
-                    <div class="input-group mb-3 d-flex flex-column gap-1">
-                        <div class="d-flex justify-content-between align-items-center">
-                            {{ form.password.label(class="fw-semibold text-secondary", style="font-size: 0.82rem;") }}
-                            <a href="{{ url_for('auth.forgot_password') }}" class="text-primary fw-semibold" style="font-size: 0.78rem;">Forgot Password?</a>
+                    <!-- Password -->
+                    <div class="auth-field">
+                        <div class="field-row">
+                            {{ form.password.label() }}
+                            <a href="{{ url_for('auth.forgot_password') }}" class="forgot-link">Forgot Password?</a>
                         </div>
-                        <div class="password-container position-relative">
-                            {{ form.password(class="form-control shadow-sm", placeholder="Enter password", id="login-password-field") }}
-                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('login-password-field', this)" style="border:none; background:none; position:absolute; right:12px; top:50%; transform:translateY(-50%); color:#64748b;">
+                        <div class="pw-wrap">
+                            {{ form.password(placeholder="Enter your password", id="login-pw", autocomplete="current-password") }}
+                            <button type="button" class="pw-toggle" onclick="togglePw('login-pw', this)">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
                         </div>
                         {% if form.password.errors %}
                             {% for error in form.password.errors %}
-                                <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
+                                <span class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</span>
                             {% endfor %}
                         {% endif %}
                     </div>
 
                     <!-- Remember Me -->
-                    <div class="checkbox-group mb-4 d-flex align-items-center gap-2">
-                        {{ form.remember_me(id="remember-me-check", style="cursor:pointer;") }}
-                        {{ form.remember_me.label(for="remember-me-check", style="font-size:0.82rem; cursor:pointer; color:var(--text-secondary);") }}
+                    <div class="remember-row">
+                        {{ form.remember_me(id="remember-me") }}
+                        {{ form.remember_me.label(for="remember-me") }}
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-block py-2.5 fw-bold shadow-sm" style="background: linear-gradient(135deg, #0078d4, #00bcf2); border: none; font-size: 0.95rem;">Sign In <i class="fa-solid fa-arrow-right-to-bracket ms-1"></i></button>
+                    <button type="submit" class="auth-submit-btn">
+                        Sign In &nbsp;<i class="fa-solid fa-arrow-right"></i>
+                    </button>
                 </form>
-                
-                <div class="text-center mt-4 pt-3 border-top" style="font-size:0.82rem; border-color: #dee2e6;">
-                    <span class="text-secondary">New to CampusMate?</span> 
-                    <a href="{{ url_for('auth.register') }}" class="fw-bold text-primary">Create Account</a>
+
+                <div class="auth-footer-link">
+                    New to CampusMate? <a href="{{ url_for('auth.register') }}">Create Account</a>
                 </div>
             </div>
         </div>
@@ -169,16 +522,16 @@
 </div>
 
 <script>
-function togglePasswordVisibility(fieldId, btn) {
-    const field = document.getElementById(fieldId);
-    if (!field) return;
-    const icon = btn.querySelector("i");
-    if (field.type === "password") {
-        field.type = "text";
-        icon.className = "fa-solid fa-eye-slash";
+function togglePw(id, btn) {
+    const f = document.getElementById(id);
+    if (!f) return;
+    const icon = btn.querySelector('i');
+    if (f.type === 'password') {
+        f.type = 'text';
+        icon.className = 'fa-solid fa-eye-slash';
     } else {
-        field.type = "password";
-        icon.className = "fa-solid fa-eye";
+        f.type = 'password';
+        icon.className = 'fa-solid fa-eye';
     }
 }
 </script>

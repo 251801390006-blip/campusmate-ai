@@ -2414,3 +2414,291 @@ animation: fadeIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         margin-bottom: 64px !important;
     }
 }
+
+/* ============================================================
+   PREMIUM UI/UX UPGRADE — CampusMate AI v2.0
+   Smooth animations, micro-interactions, polished components
+   ============================================================ */
+
+/* --- Page Entry Animations --- */
+@keyframes slideUpFade {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.95); }
+    to   { opacity: 1; transform: scale(1); }
+}
+@keyframes shimmer {
+    0%   { background-position: -400px 0; }
+    100% { background-position: 400px 0; }
+}
+@keyframes bounceIn {
+    0%   { transform: scale(0.88) translateY(6px); opacity: 0; }
+    60%  { transform: scale(1.03) translateY(0); opacity: 1; }
+    100% { transform: scale(1); }
+}
+@keyframes animate-fade-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+    animation: animate-fade-in 0.35s ease forwards;
+}
+
+/* Dashboard inner content entrance */
+.dashboard-inner-container {
+    animation: slideUpFade 0.3s ease;
+}
+
+/* Staggered card entry */
+.flat-card:nth-child(1) { animation: slideUpFade 0.4s 0.04s ease both; }
+.flat-card:nth-child(2) { animation: slideUpFade 0.4s 0.08s ease both; }
+.flat-card:nth-child(3) { animation: slideUpFade 0.4s 0.12s ease both; }
+.flat-card:nth-child(4) { animation: slideUpFade 0.4s 0.16s ease both; }
+
+/* --- Enhanced Stat Cards --- */
+.stat-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
+}
+.stat-card:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+    border-color: var(--neon-blue) !important;
+}
+.stat-card .icon-box {
+    transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease;
+}
+.stat-card:hover .icon-box {
+    transform: scale(1.1) rotate(-5deg);
+    background: var(--neon-blue);
+    color: #fff;
+}
+.stat-card .value {
+    background: linear-gradient(135deg, var(--neon-blue), #00bcf2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* --- Premium Button Effects --- */
+.btn-primary {
+    background: linear-gradient(135deg, #0078d4, #00bcf2) !important;
+    border: none !important;
+    box-shadow: 0 2px 8px rgba(0, 120, 212, 0.25) !important;
+    transition: all 0.2s ease !important;
+}
+.btn-primary:hover {
+    background: linear-gradient(135deg, #0066b8, #009fcc) !important;
+    box-shadow: 0 5px 18px rgba(0, 120, 212, 0.38) !important;
+    transform: translateY(-1px) !important;
+}
+.btn-primary:active {
+    transform: translateY(0) scale(0.98) !important;
+    box-shadow: 0 2px 6px rgba(0, 120, 212, 0.2) !important;
+}
+.btn:active {
+    transform: scale(0.98) !important;
+}
+
+/* --- Sidebar Link Animations --- */
+.sidebar-link {
+    position: relative;
+    transition: all 0.15s ease !important;
+    border-right: 3px solid transparent;
+}
+.sidebar-link i {
+    transition: transform 0.2s ease, color 0.15s ease;
+}
+.sidebar-link:hover i {
+    transform: scale(1.12);
+    color: var(--neon-blue);
+}
+.sidebar-link.active {
+    background: linear-gradient(to right, var(--neon-blue-dim), transparent) !important;
+}
+
+/* --- Progress Bar Shimmer --- */
+.progress-bar-fill {
+    position: relative;
+    overflow: hidden;
+    border-radius: 3px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.progress-bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%; right: 0; bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: shimmer 2.5s infinite;
+    background-size: 400px 100%;
+}
+
+/* --- Dashboard Header Glassmorphism --- */
+.dashboard-header {
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    background: rgba(250, 251, 252, 0.96) !important;
+    box-shadow: 0 1px 0 var(--border-color), 0 4px 16px rgba(0, 0, 0, 0.03) !important;
+}
+body.dark .dashboard-header {
+    background: rgba(30, 41, 59, 0.96) !important;
+}
+
+/* --- Flat Card hover glow --- */
+.flat-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
+}
+.flat-card:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    border-color: rgba(0, 120, 212, 0.2) !important;
+}
+
+/* --- Chatbot Message Bubbles --- */
+.message {
+    animation: bounceIn 0.3s ease both;
+    border-radius: 14px !important;
+    line-height: 1.55;
+}
+.message.user {
+    background: linear-gradient(135deg, rgba(0, 120, 212, 0.1), rgba(0, 188, 242, 0.07)) !important;
+    border: 1px solid rgba(0, 120, 212, 0.18) !important;
+    border-bottom-right-radius: 4px !important;
+    color: var(--text-primary) !important;
+}
+.message.mentor {
+    background: var(--bg-secondary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-bottom-left-radius: 4px !important;
+    color: var(--text-primary) !important;
+}
+
+/* --- Mentor drawer shadow --- */
+.mentor-drawer {
+    box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.12), 0 -1px 4px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* --- Auth card polish --- */
+.auth-card {
+    border-top: 4px solid var(--neon-blue) !important;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08), 0 0 0 1px var(--border-color) !important;
+    transition: box-shadow 0.3s ease !important;
+}
+.auth-card:hover {
+    box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0,120,212,0.2) !important;
+}
+
+/* --- Table rows --- */
+.data-table tr {
+    transition: background 0.15s ease;
+}
+.data-table tr:hover td {
+    background: var(--neon-blue-dim) !important;
+}
+
+/* --- Form focus ring --- */
+.form-control:focus, input:focus, select:focus, textarea:focus {
+    border-color: var(--neon-blue) !important;
+    box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.12) !important;
+    outline: none !important;
+}
+
+/* --- Flash alerts entrance --- */
+.flash-alert {
+    animation: slideUpFade 0.3s ease;
+    border-radius: 8px !important;
+}
+
+/* --- Toast notification system --- */
+.toast-container-custom {
+    position: fixed;
+    bottom: 80px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+.toast-custom {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--neon-blue);
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    animation: slideUpFade 0.35s ease;
+    pointer-events: all;
+    max-width: 320px;
+    color: var(--text-primary);
+}
+.toast-custom.success { border-left-color: var(--success); }
+.toast-custom.danger  { border-left-color: var(--danger); }
+.toast-custom.warning { border-left-color: var(--warning); }
+
+/* --- Skeleton loader --- */
+.skeleton {
+    background: linear-gradient(90deg, var(--bg-tertiary) 25%, rgba(255,255,255,0.6) 50%, var(--bg-tertiary) 75%);
+    background-size: 400px 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+    display: inline-block;
+}
+body.dark .skeleton {
+    background: linear-gradient(90deg, var(--bg-tertiary) 25%, rgba(255,255,255,0.05) 50%, var(--bg-tertiary) 75%);
+    background-size: 400px 100%;
+}
+
+/* --- Scrollbar polish --- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* --- Accessible focus ring --- */
+:focus-visible {
+    outline: 2px solid var(--neon-blue);
+    outline-offset: 2px;
+    border-radius: var(--radius-md);
+}
+
+/* --- Roadmap nodes hover polish --- */
+.roadmap-node-badge {
+    transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+/* --- Dark mode improvements --- */
+body.dark .flat-card {
+    background: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+body.dark .stat-card {
+    background: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+body.dark .badge-info {
+    background: rgba(59, 130, 246, 0.15) !important;
+    border-color: rgba(59, 130, 246, 0.25) !important;
+    color: #93c5fd !important;
+}
+body.dark .message.user {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(0, 188, 242, 0.08)) !important;
+    border-color: rgba(59, 130, 246, 0.25) !important;
+}
+body.dark .message.mentor {
+    background: var(--bg-primary) !important;
+}
+body.dark .search-results-dropdown,
+body.dark .notification-dropdown-card {
+    background: rgba(30, 41, 59, 0.98) !important;
+}
+
+/* ============================================================
+   END PREMIUM UI/UX UPGRADE
+   ============================================================ */
