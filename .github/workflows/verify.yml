@@ -25,4 +25,4 @@ jobs:
         
     - name: Compile check
       run: |
-        python -m py_compile main.py models.py database.py
+        python -c "import py_compile, glob; [py_compile.compile(f) for f in ['main.py', 'app/__init__.py', 'app/models.py'] + glob.glob('app/routes/*.py')]"

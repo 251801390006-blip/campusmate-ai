@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Dashboard - CampusMate AI{% endblock %}</title>
     <!-- Google Fonts: Outfit -->
@@ -260,8 +261,39 @@
         </div>
     </div>
 
+    <!-- Floating AI Career Mentor Drawer -->
+    <div id="mentor-drawer" class="mentor-drawer glassmorphic" style="background: var(--bg-secondary); border-color: var(--border-color); color: var(--text-primary);">
+        <div class="mentor-header d-flex align-items-center gap-3 px-3 py-2.5" onclick="toggleMentorDrawer()" style="background: rgba(255, 255, 255, 0.02); border-bottom: 1px solid var(--border-color); cursor: pointer;">
+            <div class="mentor-avatar d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 50%; background: var(--neon-blue-dim); color: var(--neon-blue); border: 1px solid var(--neon-blue); flex-shrink: 0;">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <div class="mentor-title">
+                <h4 style="font-size: 13.5px; font-weight: 600; margin: 0; color: var(--text-primary);">AI Career Mentor</h4>
+                <span style="font-size: 10.5px; color: var(--text-secondary);" id="mentor-memory-text">Advisor online</span>
+            </div>
+            <button class="mentor-toggle-btn ms-auto" id="mentor-arrow-btn" style="background:none; border:none; color: var(--text-secondary); cursor: pointer;">
+                <i class="fa-solid fa-chevron-up" id="mentor-arrow-icon"></i>
+            </button>
+        </div>
+        <div class="mentor-body d-flex flex-column" style="height: calc(480px - 50px); background: var(--bg-secondary);">
+            <div class="mentor-messages p-3 d-flex flex-column gap-3 overflow-auto" id="mentor-chat-messages" style="flex-grow: 1;">
+                <!-- Messages will be loaded here -->
+            </div>
+            <!-- Suggestion Chips -->
+            <div class="px-3 py-2 d-flex flex-wrap gap-1.5" id="mentor-chat-chips" style="background: rgba(0,0,0,0.08); border-top:1px solid var(--border-color); font-size:0.75rem;">
+                <!-- Loaded dynamically in mentor.js -->
+            </div>
+            <!-- Input Area -->
+            <form class="mentor-input-area d-flex p-3 gap-2" onsubmit="sendMentorMessage(event)" style="border-top: 1px solid var(--border-color); background: rgba(0, 0, 0, 0.1);">
+                <input type="text" id="mentor-user-input" placeholder="Ask anything about roadmaps, resume, etc..." autocomplete="off" style="flex-grow: 1; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-size: 0.8rem; outline: none;">
+                <button type="submit" class="mentor-send-btn d-flex align-items-center justify-content-center" style="background: var(--neon-blue); color: white; border: none; width: 34px; height: 34px; border-radius: 6px; cursor: pointer;"><i class="fa-solid fa-paper-plane"></i></button>
+            </form>
+        </div>
+    </div>
+
     <!-- Core Scripts -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/mentor.js') }}"></script>
     <script>
         // Theme & Appearance management
         document.addEventListener("DOMContentLoaded", () => {
