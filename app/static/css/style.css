@@ -869,6 +869,17 @@ a:hover {
     transform: scale(1.05);
 }
 
+/* Header icon buttons (bell, theme, chat) */
+.header-icon-btn:hover {
+    background-color: var(--bg-tertiary) !important;
+    border-color: var(--text-muted) !important;
+    color: var(--text-primary) !important;
+    transform: scale(1.05);
+}
+.dropdown-item:hover {
+    background-color: var(--bg-tertiary);
+}
+
 /* Auth Cards visual enhancement */
 .flat-card {
     transition: box-shadow 0.25s ease, border-color 0.25s ease;

@@ -119,16 +119,44 @@
                 <div id="global-search-results" class="search-results-dropdown hidden"></div>
             </div>
             
-            <div class="header-right d-flex align-items-center gap-3">
+            <div class="header-right d-flex align-items-center gap-2">
+                <!-- Notification Bell -->
+                <div class="dropdown" style="position: relative;">
+                    <button type="button" class="header-icon-btn" onclick="toggleNotifDropdown(event)" title="Notifications" style="font-size: 1.1rem; cursor: pointer; color: var(--text-secondary); background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; position: relative; transition: all 0.2s ease;">
+                        <i class="fa-solid fa-bell"></i>
+                        {% if unread_notifications_count > 0 %}
+                        <span style="position:absolute; top:4px; right:4px; width:8px; height:8px; background:#ef4444; border-radius:50%; border:1.5px solid var(--bg-secondary);"></span>
+                        {% endif %}
+                    </button>
+                    <div id="notif-dropdown-menu" class="hidden" style="position: absolute; right: 0; top: 42px; z-index: 100; min-width: 280px; max-height: 320px; overflow-y: auto; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 0;">
+                        <div style="padding: 10px 14px; border-bottom: 1px solid var(--border-color); font-size: 0.78rem; font-weight: 700; color: var(--text-primary);"><i class="fa-solid fa-bell me-1 text-primary"></i> Notifications</div>
+                        {% if unread_notifications %}
+                            {% for notif in unread_notifications[:5] %}
+                            <div style="padding: 10px 14px; border-bottom: 1px solid var(--border-color); font-size: 0.78rem;">
+                                <strong style="color: var(--text-primary); display: block; margin-bottom: 2px;">{{ notif.title }}</strong>
+                                <span style="color: var(--text-muted); font-size: 0.72rem;">{{ notif.content[:80] }}{% if notif.content|length > 80 %}...{% endif %}</span>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div style="padding: 16px 14px; text-align: center; color: var(--text-muted); font-size: 0.78rem;"><i class="fa-regular fa-bell-slash me-1"></i> No new notifications</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Settings Quick Access -->
+                <a href="{{ url_for('dashboard.settings') }}" class="header-icon-btn" title="Settings" style="font-size: 1.1rem; cursor: pointer; color: var(--text-secondary); background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; text-decoration: none; transition: all 0.2s ease;">
+                    <i class="fa-solid fa-gear"></i>
+                </a>
+
                 <!-- Day / Dark Mode Switcher -->
                 <div class="dropdown theme-mode-dropdown" style="position: relative;">
-                    <button type="button" class="header-icon-btn border-0 bg-transparent text-secondary" onclick="toggleThemeDropdown(event)" title="Choose Theme Mode" style="font-size: 1.15rem; cursor: pointer; color: var(--text-secondary) !important;">
-                        <i class="fa-solid fa-circle-half-stroke"></i>
+                    <button type="button" id="theme-toggle-btn" class="header-icon-btn" onclick="toggleThemeDropdown(event)" title="Choose Theme Mode" style="font-size: 1.1rem; cursor: pointer; color: var(--text-secondary); background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;">
+                        <i id="theme-toggle-icon" class="fa-solid fa-sun"></i>
                     </button>
-                    <ul id="theme-dropdown-menu" class="dropdown-menu dropdown-menu-end shadow hidden" style="position: absolute; right: 0; top: 38px; z-index: 100; min-width: 140px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 6px; list-style: none; padding: 4px 0; margin: 0;">
-                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeThemePreference('light')" style="display: block; padding: 6px 16px; font-size: 0.8rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-sun me-2 text-warning"></i> Light Mode</a></li>
-                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeThemePreference('dark')" style="display: block; padding: 6px 16px; font-size: 0.8rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-moon me-2 text-primary"></i> Dark Mode</a></li>
-                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeThemePreference('system')" style="display: block; padding: 6px 16px; font-size: 0.8rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-desktop me-2 text-muted"></i> System Mode</a></li>
+                    <ul id="theme-dropdown-menu" class="dropdown-menu dropdown-menu-end shadow hidden" style="position: absolute; right: 0; top: 42px; z-index: 100; min-width: 150px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; list-style: none; padding: 4px 0; margin: 0; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeThemePreference('light')" style="display: flex; align-items: center; gap: 8px; padding: 8px 14px; font-size: 0.8rem; color: var(--text-primary); text-decoration: none; transition: background 0.15s;"><i class="fa-solid fa-sun text-warning" style="width:16px;"></i> Light Mode</a></li>
+                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeThemePreference('dark')" style="display: flex; align-items: center; gap: 8px; padding: 8px 14px; font-size: 0.8rem; color: var(--text-primary); text-decoration: none; transition: background 0.15s;"><i class="fa-solid fa-moon text-primary" style="width:16px;"></i> Dark Mode</a></li>
+                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeThemePreference('system')" style="display: flex; align-items: center; gap: 8px; padding: 8px 14px; font-size: 0.8rem; color: var(--text-primary); text-decoration: none; transition: background 0.15s;"><i class="fa-solid fa-desktop text-muted" style="width:16px;"></i> System</a></li>
                     </ul>
                 </div>
 
@@ -264,6 +292,13 @@
             applyThemePreference(savedTheme);
         });
 
+        function updateThemeIcon() {
+            const icon = document.getElementById("theme-toggle-icon");
+            if (!icon) return;
+            const isDark = document.body.classList.contains("dark");
+            icon.className = isDark ? "fa-solid fa-moon" : "fa-solid fa-sun";
+        }
+
         function applyThemePreference(val) {
             if (val === "dark" || (val === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
                 document.documentElement.classList.add("dark");
@@ -272,6 +307,7 @@
                 document.documentElement.classList.remove("dark");
                 document.body.classList.remove("dark");
             }
+            updateThemeIcon();
         }
 
         function changeThemePreference(val) {
@@ -279,6 +315,14 @@
             applyThemePreference(val);
             const selectEl = document.getElementById("theme-select");
             if (selectEl) selectEl.value = val;
+        }
+
+        // Notification dropdown toggle
+        function toggleNotifDropdown(event) {
+            event.stopPropagation();
+            document.getElementById("notif-dropdown-menu").classList.toggle("hidden");
+            document.getElementById("theme-dropdown-menu").classList.add("hidden");
+            document.getElementById("profile-dropdown-menu").classList.add("hidden");
         }
 
         // Custom Dropdowns toggles
@@ -297,8 +341,10 @@
         document.addEventListener("click", () => {
             const themeMenu = document.getElementById("theme-dropdown-menu");
             const profileMenu = document.getElementById("profile-dropdown-menu");
+            const notifMenu = document.getElementById("notif-dropdown-menu");
             if (themeMenu) themeMenu.classList.add("hidden");
             if (profileMenu) profileMenu.classList.add("hidden");
+            if (notifMenu) notifMenu.classList.add("hidden");
         });
 
         // Profile Settings Modal functions
