@@ -1,175 +1,434 @@
 {% extends "base.html" %}
 
-{% block title %}Sign Up - CampusMate AI{% endblock %}
+{% block title %}Create Account — CampusMate AI{% endblock %}
+
 {% block extra_head %}
 <style>
-    @media (max-width: 480px) {
-        .auth-card {
-            padding: 1.5rem 1rem 1.5rem !important;
-        }
-    }
+/* ─── Auth Page Root ─── */
+.landing-layout { min-height:100vh; background:#050a18; overflow-x:hidden; }
+.landing-header { background:rgba(10,15,30,0.7); backdrop-filter:blur(18px); border-bottom:1px solid rgba(255,255,255,0.06); }
+.landing-header .logo,
+.landing-header .landing-nav a { color:rgba(255,255,255,0.88) !important; }
+.landing-header .landing-nav a.btn-outline { border-color:rgba(255,255,255,0.18); color:rgba(255,255,255,0.8) !important; }
+.landing-header .landing-nav a.btn-primary { background:linear-gradient(135deg,#6366f1,#8b5cf6); border:none; color:#fff !important; }
+.landing-footer { background:rgba(0,0,0,0.25); color:rgba(255,255,255,0.35); }
+
+/* Animated mesh background */
+.auth-bg { position:fixed; inset:0; z-index:0; overflow:hidden; }
+.auth-bg .orb {
+    position:absolute; border-radius:50%; filter:blur(90px); opacity:0.45;
+    animation: orbFloat 12s ease-in-out infinite alternate;
+}
+.auth-bg .orb-1 { width:480px; height:480px; background:radial-gradient(circle,#8b5cf6,transparent 70%); top:-12%; right:-8%; animation-delay:0s; }
+.auth-bg .orb-2 { width:420px; height:420px; background:radial-gradient(circle,#06b6d4,transparent 70%); bottom:-8%; left:-5%; animation-delay:-4s; }
+.auth-bg .orb-3 { width:300px; height:300px; background:radial-gradient(circle,#6366f1,transparent 70%); top:50%; right:55%; animation-delay:-8s; opacity:0.3; }
+.auth-bg .orb-4 { width:200px; height:200px; background:radial-gradient(circle,#10b981,transparent 70%); bottom:25%; right:15%; animation-delay:-2s; opacity:0.2; }
+@keyframes orbFloat {
+    0% { transform:translate(0,0) scale(1); }
+    50% { transform:translate(30px,-40px) scale(1.08); }
+    100% { transform:translate(-20px,25px) scale(0.95); }
+}
+.auth-bg::after {
+    content:''; position:absolute; inset:0;
+    background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity:0.5; pointer-events:none;
+}
+
+.auth-page-wrapper {
+    position:relative; z-index:1;
+    display:flex; align-items:center; justify-content:center;
+    min-height:calc(100vh - 130px); padding:2rem 1rem;
+}
+
+/* ─── Split Layout ─── */
+.auth-split { display:flex; gap:4rem; align-items:center; max-width:1050px; width:100%; }
+
+/* ─── Left Hero ─── */
+.auth-hero { flex:1; color:#fff; display:none; }
+@media(min-width:900px) { .auth-hero { display:block; } }
+
+.auth-hero h1 {
+    font-size:2.5rem; font-weight:800; line-height:1.15; margin-bottom:0.75rem;
+    background:linear-gradient(135deg,#fff 0%,#c4b5fd 50%,#34d399 100%);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.auth-hero .hero-sub {
+    color:rgba(255,255,255,0.55); font-size:0.95rem; line-height:1.65; margin-bottom:2.25rem;
+}
+
+/* Benefits */
+.benefit {
+    display:flex; align-items:flex-start; gap:1rem;
+    padding:0.9rem 1rem; margin-bottom:0.65rem;
+    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07);
+    border-radius:14px; transition:all 0.3s ease;
+}
+.benefit:hover { background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.14); transform:translateX(4px); }
+.benefit .bic {
+    width:42px; height:42px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1rem; flex-shrink:0;
+}
+.benefit .btx strong { display:block; color:#fff; font-size:0.88rem; margin-bottom:2px; }
+.benefit .btx span { color:rgba(255,255,255,0.45); font-size:0.77rem; line-height:1.4; }
+
+/* Stats row */
+.stats-row {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:0.75rem;
+    margin-top:2rem; padding-top:1.5rem;
+    border-top:1px solid rgba(255,255,255,0.06);
+}
+.stat-box {
+    text-align:center; padding:0.8rem 0.5rem;
+    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06);
+    border-radius:12px;
+}
+.stat-box .val { display:block; font-size:1.4rem; font-weight:800; color:#fff; line-height:1; margin-bottom:0.2rem; }
+.stat-box .lbl { font-size:0.65rem; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.5px; }
+
+/* ─── Glass Card ─── */
+.auth-card-wrapper { flex-shrink:0; width:100%; max-width:440px; }
+.auth-glass-card {
+    background:rgba(255,255,255,0.05);
+    backdrop-filter:blur(24px) saturate(140%);
+    -webkit-backdrop-filter:blur(24px) saturate(140%);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:24px; padding:2.2rem 1.8rem;
+    box-shadow:0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05) inset;
+    position:relative; overflow:hidden;
+    animation:cardSlideIn 0.6s ease-out;
+}
+@keyframes cardSlideIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+.auth-glass-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:3px;
+    background:linear-gradient(90deg,#10b981,#06b6d4,#8b5cf6,#6366f1);
+    background-size:200% 100%;
+    animation:shimmer 3s linear infinite;
+}
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+.auth-logo-badge {
+    width:52px; height:52px; border-radius:14px;
+    background:linear-gradient(135deg,#10b981,#06b6d4);
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.35rem; color:#fff;
+    margin:0 auto 1rem;
+    box-shadow:0 8px 24px rgba(16,185,129,0.35);
+}
+.auth-glass-card h2 {
+    color:#fff; font-size:1.4rem; font-weight:800;
+    text-align:center; margin-bottom:0.3rem; letter-spacing:-0.02em;
+}
+.auth-glass-card .subtitle { color:rgba(255,255,255,0.5); font-size:0.82rem; text-align:center; margin-bottom:1.5rem; }
+
+/* Social buttons */
+.social-row { display:flex; gap:0.6rem; margin-bottom:1rem; }
+.social-btn {
+    flex:1; display:flex; align-items:center; justify-content:center; gap:0.5rem;
+    padding:0.6rem 0.75rem;
+    border:1.5px solid rgba(255,255,255,0.12);
+    border-radius:12px; background:rgba(255,255,255,0.04);
+    font-size:0.82rem; font-weight:600; color:rgba(255,255,255,0.8);
+    text-decoration:none; transition:all 0.25s;
+}
+.social-btn:hover {
+    background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.2);
+    color:#fff; text-decoration:none; transform:translateY(-2px);
+    box-shadow:0 6px 20px rgba(0,0,0,0.3);
+}
+
+/* Divider */
+.divider { display:flex; align-items:center; gap:0.75rem; margin:0.8rem 0 1rem; }
+.divider hr { flex:1; border:none; border-top:1px solid rgba(255,255,255,0.08); margin:0; }
+.divider span { color:rgba(255,255,255,0.35); font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap; }
+
+/* Fields */
+.auth-field { margin-bottom:0.85rem; }
+.auth-field label { display:block; color:rgba(255,255,255,0.7); font-size:0.8rem; font-weight:600; margin-bottom:0.35rem; }
+.auth-field input,
+.auth-field select {
+    width:100%; padding:0.65rem 0.9rem 0.65rem 2.5rem;
+    border:1.5px solid rgba(255,255,255,0.1);
+    border-radius:12px; font-size:0.86rem;
+    color:#fff; background:rgba(255,255,255,0.04);
+    transition:border-color 0.25s, box-shadow 0.25s, background 0.25s;
+    outline:none; font-family:inherit;
+}
+.auth-field select { padding-left:2.5rem; appearance:auto; }
+.auth-field select option { background:#1a1a2e; color:#fff; }
+.auth-field input::placeholder { color:rgba(255,255,255,0.25); }
+.auth-field input:focus,
+.auth-field select:focus {
+    border-color:rgba(16,185,129,0.6);
+    box-shadow:0 0 0 3px rgba(16,185,129,0.15);
+    background:rgba(255,255,255,0.06);
+}
+.input-icon-wrap { position:relative; }
+.input-icon-wrap .field-icon {
+    position:absolute; left:12px; top:50%; transform:translateY(-50%);
+    color:rgba(255,255,255,0.3); font-size:0.82rem; pointer-events:none;
+    transition:color 0.25s;
+}
+.input-icon-wrap:focus-within .field-icon { color:#34d399; }
+.auth-field .hint { display:block; color:rgba(255,255,255,0.3); font-size:0.68rem; margin-top:0.25rem; }
+
+.auth-field .pw-wrap { position:relative; }
+.auth-field .pw-wrap input { padding-right:2.75rem; }
+.auth-field .pw-toggle {
+    position:absolute; right:10px; top:50%; transform:translateY(-50%);
+    background:none; border:none; color:rgba(255,255,255,0.3);
+    cursor:pointer; padding:0.2rem; font-size:0.88rem; line-height:1;
+}
+.auth-field .pw-toggle:hover { color:rgba(255,255,255,0.6); }
+.auth-field .field-error { display:block; color:#f43f5e; font-size:0.73rem; margin-top:0.25rem; }
+
+/* Submit */
+.auth-submit-btn {
+    width:100%; padding:0.78rem; margin-top:0.5rem;
+    background:linear-gradient(135deg,#10b981,#06b6d4);
+    color:#fff; border:none; border-radius:12px;
+    font-size:0.95rem; font-weight:700; cursor:pointer;
+    transition:all 0.3s; font-family:inherit; letter-spacing:0.01em;
+    position:relative; overflow:hidden;
+}
+.auth-submit-btn::after {
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(135deg,transparent 30%,rgba(255,255,255,0.15) 50%,transparent 70%);
+    transform:translateX(-100%); transition:transform 0.5s;
+}
+.auth-submit-btn:hover::after { transform:translateX(100%); }
+.auth-submit-btn:hover {
+    transform:translateY(-2px);
+    box-shadow:0 8px 28px rgba(16,185,129,0.4);
+}
+.auth-submit-btn:active { transform:translateY(0); }
+
+/* Footer link */
+.auth-footer-link {
+    text-align:center; margin-top:1.1rem; padding-top:1rem;
+    border-top:1px solid rgba(255,255,255,0.06);
+    font-size:0.82rem; color:rgba(255,255,255,0.45);
+}
+.auth-footer-link a { color:#34d399; font-weight:700; text-decoration:none; }
+.auth-footer-link a:hover { text-decoration:underline; color:#6ee7b7; }
+
+/* Flash */
+.auth-flash {
+    padding:0.6rem 0.8rem; border-radius:10px; font-size:0.82rem;
+    margin-bottom:1rem; display:flex; align-items:flex-start; gap:0.5rem;
+    backdrop-filter:blur(8px);
+}
+.auth-flash.danger { background:rgba(244,63,94,0.12); color:#fb7185; border:1px solid rgba(244,63,94,0.2); }
+.auth-flash.success { background:rgba(16,185,129,0.12); color:#34d399; border:1px solid rgba(16,185,129,0.2); }
+
+/* Password strength */
+.pw-strength { margin-top:0.4rem; }
+.pw-strength .bar-track {
+    width:100%; height:4px; background:rgba(255,255,255,0.08);
+    border-radius:4px; overflow:hidden; margin-bottom:0.25rem;
+}
+.pw-strength .bar-fill { height:100%; border-radius:4px; transition:width 0.3s, background 0.3s; width:0; }
+.pw-strength .lbl { font-size:0.68rem; color:rgba(255,255,255,0.35); }
+
+@media(max-width:480px) {
+    .auth-glass-card { padding:1.4rem 1rem !important; border-radius:18px; }
+    .social-row { flex-direction:column !important; gap:0.5rem !important; }
+    .social-btn { width:100% !important; }
+    .auth-logo-badge { width:44px; height:44px; font-size:1.15rem; border-radius:12px; }
+    .auth-glass-card h2 { font-size:1.25rem; }
+}
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <div class="row g-5 align-items-center">
-        <!-- Left Side: Product Hero, Benefits & Testimonials -->
-        <div class="col-lg-6 d-none d-lg-block">
-            <div class="pe-xl-5">
-                <!-- Hero Panel -->
-                <div class="hero-showcase mb-5 p-4 rounded shadow-sm" style="background: linear-gradient(135deg, rgba(0, 120, 212, 0.08), rgba(0, 188, 242, 0.08)); border: 1.5px solid rgba(0, 120, 212, 0.15);">
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                        <div style="background:#0078d4; color:white; width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">
-                            <i class="fa-solid fa-user-plus"></i>
-                        </div>
-                        <div>
-                            <h3 class="fw-bold text-dark mb-0" style="font-size:1.35rem;">Start Your Growth Journey</h3>
-                            <span class="text-secondary" style="font-size:0.8rem;">Join over 15,000+ students nationwide</span>
-                        </div>
-                    </div>
-                    
-                    <p class="text-secondary" style="font-size:0.88rem; line-height:1.5;">
-                        Create your account today to unlock personalized roadmaps, gamified milestones learning, mock interview simulator cards, and ATS resume analyzers.
-                    </p>
-                </div>
+<!-- Animated background orbs -->
+<div class="auth-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="orb orb-4"></div>
+</div>
 
-                <!-- Product Benefits -->
-                <h3 class="fw-bold text-dark mb-3" style="font-size: 1.15rem;">What you unlock:</h3>
-                <ul class="d-flex flex-column gap-3 ps-0 mb-5" style="list-style: none;">
-                    <li class="d-flex align-items-start gap-3">
-                        <div style="background:#f0f9ff; color:#0078d4; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                            <i class="fa-solid fa-trophy" style="font-size:0.85rem;"></i>
-                        </div>
-                        <div>
-                            <strong class="text-dark d-block" style="font-size:0.9rem;">Gamified Milestones Tracking</strong>
-                            <p class="text-secondary mb-0" style="font-size:0.8rem;">Earn XP rewards, unlock badges, and maintain study streaks.</p>
-                        </div>
-                    </li>
-                    <li class="d-flex align-items-start gap-3">
-                        <div style="background:#f0fdf4; color:#10b981; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                            <i class="fa-solid fa-briefcase" style="font-size:0.85rem;"></i>
-                        </div>
-                        <div>
-                            <strong class="text-dark d-block" style="font-size:0.9rem;">Kanban Internship Management</strong>
-                            <p class="text-secondary mb-0" style="font-size:0.8rem;">Browse matching openings and simulate applications pipelines.</p>
-                        </div>
-                    </li>
-                    <li class="d-flex align-items-start gap-3">
-                        <div style="background:#fdf2f8; color:#db2777; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                            <i class="fa-solid fa-compass-drafting" style="font-size:0.85rem;"></i>
-                        </div>
-                        <div>
-                            <strong class="text-dark d-block" style="font-size:0.9rem;">AI Project Architect blueprints</strong>
-                            <p class="text-secondary mb-0" style="font-size:0.8rem;">Instantly compile configurations and Mermaid flowchart schemas.</p>
-                        </div>
-                    </li>
-                </ul>
+<div class="auth-page-wrapper">
+    <div class="auth-split">
+        <!-- LEFT: Hero -->
+        <div class="auth-hero">
+            <h1>Start Your Growth Journey Today</h1>
+            <p class="hero-sub">Create your free account and unlock AI-powered career tools designed for ambitious students like you.</p>
+
+            <div class="benefit">
+                <div class="bic" style="background:rgba(99,102,241,0.15); color:#818cf8;">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div class="btx">
+                    <strong>Gamified Milestones Tracking</strong>
+                    <span>Earn XP rewards, unlock badges, and maintain study streaks to stay motivated</span>
+                </div>
+            </div>
+            <div class="benefit">
+                <div class="bic" style="background:rgba(16,185,129,0.15); color:#34d399;">
+                    <i class="fa-solid fa-briefcase"></i>
+                </div>
+                <div class="btx">
+                    <strong>Kanban Internship Board</strong>
+                    <span>Browse 100+ openings from top companies and track your pipeline</span>
+                </div>
+            </div>
+            <div class="benefit">
+                <div class="bic" style="background:rgba(244,63,94,0.15); color:#fb7185;">
+                    <i class="fa-solid fa-compass-drafting"></i>
+                </div>
+                <div class="btx">
+                    <strong>AI Project Architect</strong>
+                    <span>Instantly generate project blueprints, configs, and flowchart schemas</span>
+                </div>
+            </div>
+            <div class="benefit">
+                <div class="bic" style="background:rgba(6,182,212,0.15); color:#22d3ee;">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <div class="btx">
+                    <strong>24/7 AI Mentor</strong>
+                    <span>Get instant career guidance, code reviews, and interview prep tips</span>
+                </div>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-box"><span class="val">15K+</span><span class="lbl">Students</span></div>
+                <div class="stat-box"><span class="val">92%</span><span class="lbl">Placed</span></div>
+                <div class="stat-box"><span class="val">4.9★</span><span class="lbl">Rating</span></div>
             </div>
         </div>
 
-        <!-- Right Side: Register Form -->
-        <div class="col-lg-6">
-            <div class="flat-card auth-card shadow-lg mx-auto" style="width: 100%; max-width: 450px; padding: 2.5rem 2rem 2rem;">
-                <div class="text-center mb-4">
-                    <div class="auth-logo-icon" style="background: rgba(0, 120, 212, 0.08); color: #0078d4; border: 1px solid rgba(0, 120, 212, 0.15);">
-                        <i class="fa-solid fa-user-plus"></i>
-                    </div>
-                    <h2 class="h4 mb-1 text-dark" style="font-weight: 700; letter-spacing: -0.02em;">Create Account</h2>
-                    <p class="text-secondary" style="font-size: 0.82rem;">Sign up using your university credentials</p>
+        <!-- RIGHT: Register Card -->
+        <div class="auth-card-wrapper">
+            <div class="auth-glass-card">
+                <div class="auth-logo-badge">
+                    <i class="fa-solid fa-user-plus"></i>
+                </div>
+                <h2>Create Account</h2>
+                <p class="subtitle">Sign up and start building your career</p>
+
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="auth-flash {{ category }}">
+                                <i class="fa-solid {% if category == 'success' %}fa-circle-check{% elif category == 'danger' %}fa-triangle-exclamation{% else %}fa-circle-info{% endif %}"></i>
+                                <span>{{ message }}</span>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Social Login -->
+                <div class="social-row">
+                    <a href="{{ url_for('auth.oauth_login', provider='google') }}" class="social-btn">
+                        <i class="fa-brands fa-google" style="color:#ea4335;"></i> Google
+                    </a>
+                    <a href="{{ url_for('auth.oauth_login', provider='github') }}" class="social-btn">
+                        <i class="fa-brands fa-github" style="color:#fff;"></i> GitHub
+                    </a>
                 </div>
 
-                <!-- Social Logins -->
-                <div class="d-flex flex-column flex-sm-row gap-2 mb-4">
-                    <a href="{{ url_for('auth.oauth_login', provider='google') }}" class="btn btn-outline border w-100 py-2 d-flex align-items-center justify-content-center gap-2 shadow-sm" style="font-size: 0.8rem; font-weight:600; color:var(--text-primary);">
-                        <i class="fa-brands fa-google text-danger"></i> Google
-                    </a>
-                    <a href="{{ url_for('auth.oauth_login', provider='github') }}" class="btn btn-outline border w-100 py-2 d-flex align-items-center justify-content-center gap-2 shadow-sm" style="font-size: 0.8rem; font-weight:600; color:var(--text-primary);">
-                        <i class="fa-brands fa-github text-dark"></i> GitHub
-                    </a>
-                </div>
-
-                <div class="d-flex align-items-center gap-2 mb-4">
-                    <hr class="flex-grow-1" style="border-color:#dee2e6;">
-                    <span class="text-muted" style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Or Register via Email</span>
-                    <hr class="flex-grow-1" style="border-color:#dee2e6;">
+                <div class="divider">
+                    <hr>
+                    <span>Or register via email</span>
+                    <hr>
                 </div>
 
                 <form method="POST" action="{{ url_for('auth.register') }}">
                     {{ form.csrf_token }}
-                    
-                    <!-- Username Input -->
-                    <div class="input-group mb-3 d-flex flex-column gap-1">
-                        {{ form.username.label(class="fw-semibold text-secondary", style="font-size: 0.82rem;") }}
-                        {{ form.username(class="form-control shadow-sm", placeholder="alex_smith") }}
+
+                    <!-- Username -->
+                    <div class="auth-field">
+                        {{ form.username.label() }}
+                        <div class="input-icon-wrap">
+                            <i class="fa-solid fa-user field-icon"></i>
+                            {{ form.username(placeholder="alex_smith", autocomplete="username") }}
+                        </div>
                         {% if form.username.errors %}
                             {% for error in form.username.errors %}
-                                <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
+                                <span class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</span>
                             {% endfor %}
                         {% endif %}
                     </div>
 
-                    <!-- Email Input -->
-                    <div class="input-group mb-3 d-flex flex-column gap-1">
-                        {{ form.email.label(class="fw-semibold text-secondary", style="font-size: 0.82rem;") }}
-                        {{ form.email(class="form-control shadow-sm", placeholder="student@nit.ac.in") }}
-                        <span class="text-muted" style="font-size: 0.65rem;">Academic domains preferred (.edu.in, .ac.in)</span>
+                    <!-- Email -->
+                    <div class="auth-field">
+                        {{ form.email.label() }}
+                        <div class="input-icon-wrap">
+                            <i class="fa-solid fa-envelope field-icon"></i>
+                            {{ form.email(placeholder="student@nit.ac.in", autocomplete="email") }}
+                        </div>
+                        <span class="hint">Academic domains preferred (.edu.in, .ac.in)</span>
                         {% if form.email.errors %}
                             {% for error in form.email.errors %}
-                                <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
+                                <span class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</span>
                             {% endfor %}
                         {% endif %}
                     </div>
 
-                    <!-- Password Input -->
-                    <div class="input-group mb-3 d-flex flex-column gap-1">
-                        {{ form.password.label(class="fw-semibold text-secondary", style="font-size: 0.82rem;") }}
-                        <div class="password-container position-relative">
-                            {{ form.password(class="form-control shadow-sm", placeholder="At least 8 characters", id="reg-password") }}
-                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('reg-password', this)" style="border:none; background:none; position:absolute; right:12px; top:50%; transform:translateY(-50%); color:#64748b;">
+                    <!-- Password -->
+                    <div class="auth-field">
+                        {{ form.password.label() }}
+                        <div class="input-icon-wrap pw-wrap">
+                            <i class="fa-solid fa-lock field-icon"></i>
+                            {{ form.password(placeholder="At least 8 characters", id="reg-password", autocomplete="new-password") }}
+                            <button type="button" class="pw-toggle" onclick="togglePw('reg-password', this)">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
                         </div>
+                        <div class="pw-strength" id="pw-strength">
+                            <div class="bar-track"><div class="bar-fill" id="pw-bar"></div></div>
+                            <span class="lbl" id="pw-label"></span>
+                        </div>
                         {% if form.password.errors %}
                             {% for error in form.password.errors %}
-                                <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
+                                <span class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</span>
                             {% endfor %}
                         {% endif %}
                     </div>
 
-                    <!-- Confirm Password Input -->
-                    <div class="input-group mb-3 d-flex flex-column gap-1">
-                        {{ form.confirm_password.label(class="fw-semibold text-secondary", style="font-size: 0.82rem;") }}
-                        <div class="password-container position-relative">
-                            {{ form.confirm_password(class="form-control shadow-sm", placeholder="Re-enter password", id="reg-confirm-password") }}
-                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('reg-confirm-password', this)" style="border:none; background:none; position:absolute; right:12px; top:50%; transform:translateY(-50%); color:#64748b;">
+                    <!-- Confirm Password -->
+                    <div class="auth-field">
+                        {{ form.confirm_password.label() }}
+                        <div class="input-icon-wrap pw-wrap">
+                            <i class="fa-solid fa-shield-halved field-icon"></i>
+                            {{ form.confirm_password(placeholder="Re-enter password", id="reg-confirm-password", autocomplete="new-password") }}
+                            <button type="button" class="pw-toggle" onclick="togglePw('reg-confirm-password', this)">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
                         </div>
                         {% if form.confirm_password.errors %}
                             {% for error in form.confirm_password.errors %}
-                                <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
+                                <span class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</span>
                             {% endfor %}
                         {% endif %}
                     </div>
 
-                    <!-- Academic Level Select -->
-                    <div class="input-group mb-4 d-flex flex-column gap-1">
-                        {{ form.academic_level.label(class="fw-semibold text-secondary", style="font-size: 0.82rem;") }}
-                        {{ form.academic_level(class="form-select shadow-sm") }}
+                    <!-- Academic Level -->
+                    <div class="auth-field">
+                        {{ form.academic_level.label() }}
+                        <div class="input-icon-wrap">
+                            <i class="fa-solid fa-graduation-cap field-icon"></i>
+                            {{ form.academic_level() }}
+                        </div>
                         {% if form.academic_level.errors %}
                             {% for error in form.academic_level.errors %}
-                                <span class="text-danger" style="font-size:0.75rem;">{{ error }}</span>
+                                <span class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</span>
                             {% endfor %}
                         {% endif %}
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-block py-2.5 fw-bold shadow-sm" style="background: linear-gradient(135deg, #0078d4, #00bcf2); border: none; font-size: 0.95rem;">Create Account <i class="fa-solid fa-user-plus ms-1"></i></button>
+                    <button type="submit" class="auth-submit-btn">
+                        Create Account &nbsp;<i class="fa-solid fa-rocket"></i>
+                    </button>
                 </form>
-                
-                <div class="text-center mt-4 pt-3 border-top" style="font-size:0.82rem; border-color: #dee2e6;">
-                    <span class="text-secondary">Already have an account?</span> 
-                    <a href="{{ url_for('auth.login') }}" class="fw-bold text-primary">Sign In</a>
+
+                <div class="auth-footer-link">
+                    Already have an account? <a href="{{ url_for('auth.login') }}">Sign In</a>
                 </div>
             </div>
         </div>
@@ -177,17 +436,47 @@
 </div>
 
 <script>
-function togglePasswordVisibility(fieldId, btn) {
-    const field = document.getElementById(fieldId);
-    if (!field) return;
-    const icon = btn.querySelector("i");
-    if (field.type === "password") {
-        field.type = "text";
-        icon.className = "fa-solid fa-eye-slash";
+function togglePw(id, btn) {
+    const f = document.getElementById(id);
+    if (!f) return;
+    const icon = btn.querySelector('i');
+    if (f.type === 'password') {
+        f.type = 'text';
+        icon.className = 'fa-solid fa-eye-slash';
     } else {
-        field.type = "password";
-        icon.className = "fa-solid fa-eye";
+        f.type = 'password';
+        icon.className = 'fa-solid fa-eye';
     }
+}
+
+// Password strength meter
+const pwField = document.getElementById('reg-password');
+if (pwField) {
+    pwField.addEventListener('input', function() {
+        const val = this.value;
+        const bar = document.getElementById('pw-bar');
+        const label = document.getElementById('pw-label');
+        let score = 0;
+        if (val.length >= 8) score++;
+        if (val.length >= 12) score++;
+        if (/[A-Z]/.test(val)) score++;
+        if (/[0-9]/.test(val)) score++;
+        if (/[^A-Za-z0-9]/.test(val)) score++;
+
+        const levels = [
+            { w:'0%', bg:'transparent', t:'' },
+            { w:'20%', bg:'#f43f5e', t:'Weak' },
+            { w:'40%', bg:'#f97316', t:'Fair' },
+            { w:'60%', bg:'#eab308', t:'Good' },
+            { w:'80%', bg:'#10b981', t:'Strong' },
+            { w:'100%', bg:'#06b6d4', t:'Excellent' }
+        ];
+        const lv = levels[Math.min(score, 5)];
+        bar.style.width = lv.w;
+        bar.style.background = lv.bg;
+        label.textContent = lv.t;
+        label.style.color = lv.bg;
+    });
 }
 </script>
 {% endblock %}
