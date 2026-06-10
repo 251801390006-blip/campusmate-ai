@@ -11,7 +11,7 @@
     <div class="resume-workspace-toolbar flat-card bg-primary-card border p-2 mb-3 d-flex justify-content-between align-items-center flex-wrap gap-2 shadow-sm" style="background-color: var(--bg-secondary) !important;">
         <!-- Left: Template Select & Gallery & Import -->
         <div class="d-flex align-items-center gap-2 flex-wrap" style="font-size:0.8rem;">
-            <label for="resume-theme-select" class="fw-bold text-secondary-text mb-0">Theme:</label>
+            <label for="resume-theme-select" class="fw-bold text-secondary-text mb-0">Template:</label>
             <select id="resume-theme-select" onchange="applyTheme(this.value)" class="form-input py-1 px-2 w-auto" style="max-width:145px; font-size:0.75rem; height:32px;">
                 <optgroup label="Original Classic">
                     <option value="classic">Classic Ivory</option>
@@ -161,6 +161,13 @@
             <div class="mb-3">
                 <label for="resume-title-field" class="fw-bold mb-1 d-block text-secondary-text" style="font-size:0.65rem; text-transform:uppercase;">Active Version Title</label>
                 <input type="text" id="resume-title-field" value="My Master CV" onchange="triggerAutoSave()" class="form-input py-1.5 px-2">
+            </div>
+
+            <!-- Drag & Drop Resume Upload Zone -->
+            <div id="drop-zone-builder" class="border-dashed p-3 mb-3 rounded text-center cursor-pointer position-relative hover-scale" style="border: 2px dashed var(--accent-color); background: rgba(0, 120, 212, 0.02); transition: all 0.2s ease; cursor: pointer;">
+                <i class="fa-solid fa-cloud-arrow-up text-accent mb-1" style="font-size: 1.5rem;"></i>
+                <h5 class="fw-bold mb-1 text-secondary-text" style="font-size: 0.8rem;">Upload existing resume</h5>
+                <p class="text-muted mb-0" style="font-size: 0.65rem;">Drag & drop PDF or DOCX here, or click to browse</p>
             </div>
 
             <!-- Scrollable Accordion Sections List -->
@@ -512,17 +519,59 @@
                     </div>
 
                     <!-- Visual sub-scores progress indicators -->
-                    <div class="row g-3 text-center mb-4">
-                        <div class="col-6">
-                            <div class="p-2 border rounded bg-secondary-card">
-                                <h4 class="fw-bold mb-0 text-success" id="score-readability" style="font-size: 1.15rem;">85%</h4>
-                                <span class="text-secondary d-block" style="font-size:0.65rem;">Readability Score</span>
+                    <div class="mb-4 d-flex flex-column gap-2.5">
+                        <!-- 1. Formatting Score -->
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.72rem;">
+                                <span class="text-secondary fw-semibold"><i class="fa-solid fa-crop text-muted me-1"></i> Formatting Score</span>
+                                <strong class="text-secondary" id="score-formatting-text">80%</strong>
+                            </div>
+                            <div class="progress-bar-container" style="background: var(--bg-tertiary); height: 6px; border-radius: 3px; overflow: hidden;">
+                                <div class="progress-bar-fill" id="score-formatting" style="background: #10b981; height: 100%; width: 80%; transition: width 0.3s ease;"></div>
                             </div>
                         </div>
-                        <div class="col-6">
-                            <div class="p-2 border rounded bg-secondary-card">
-                                <h4 class="fw-bold mb-0 text-info" id="score-skills" style="font-size: 1.15rem;">90%</h4>
-                                <span class="text-secondary d-block" style="font-size:0.65rem;">Keyword Relevance</span>
+
+                        <!-- 2. Skills Score -->
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.72rem;">
+                                <span class="text-secondary fw-semibold"><i class="fa-solid fa-screwdriver-wrench text-muted me-1"></i> Skills Match Score</span>
+                                <strong class="text-secondary" id="score-skills-text">85%</strong>
+                            </div>
+                            <div class="progress-bar-container" style="background: var(--bg-tertiary); height: 6px; border-radius: 3px; overflow: hidden;">
+                                <div class="progress-bar-fill" id="score-skills" style="background: #3b82f6; height: 100%; width: 85%; transition: width 0.3s ease;"></div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Keyword Score -->
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.72rem;">
+                                <span class="text-secondary fw-semibold"><i class="fa-solid fa-key text-muted me-1"></i> Keyword Relevance Score</span>
+                                <strong class="text-secondary" id="score-keyword-text">90%</strong>
+                            </div>
+                            <div class="progress-bar-container" style="background: var(--bg-tertiary); height: 6px; border-radius: 3px; overflow: hidden;">
+                                <div class="progress-bar-fill" id="score-keyword" style="background: #8b5cf6; height: 100%; width: 90%; transition: width 0.3s ease;"></div>
+                            </div>
+                        </div>
+
+                        <!-- 4. Recruiter Readability Score -->
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.72rem;">
+                                <span class="text-secondary fw-semibold"><i class="fa-solid fa-book-open text-muted me-1"></i> Recruiter Readability Score</span>
+                                <strong class="text-secondary" id="score-readability-text">85%</strong>
+                            </div>
+                            <div class="progress-bar-container" style="background: var(--bg-tertiary); height: 6px; border-radius: 3px; overflow: hidden;">
+                                <div class="progress-bar-fill" id="score-readability" style="background: #f59e0b; height: 100%; width: 85%; transition: width 0.3s ease;"></div>
+                            </div>
+                        </div>
+
+                        <!-- 5. Project Quality Score -->
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.72rem;">
+                                <span class="text-secondary fw-semibold"><i class="fa-solid fa-diagram-project text-muted me-1"></i> Project Quality Score</span>
+                                <strong class="text-secondary" id="score-projects-text">75%</strong>
+                            </div>
+                            <div class="progress-bar-container" style="background: var(--bg-tertiary); height: 6px; border-radius: 3px; overflow: hidden;">
+                                <div class="progress-bar-fill" id="score-projects" style="background: #ec4899; height: 100%; width: 75%; transition: width 0.3s ease;"></div>
                             </div>
                         </div>
                     </div>
@@ -551,21 +600,57 @@
             </div>
 
         </div>
+        
+        <!-- Mobile-only Templates tab container -->
+        <div id="mobile-templates-container" class="flat-card bg-secondary-card border p-3 mb-4 d-lg-none">
+            <h4 class="fw-bold mb-3"><i class="fa-solid fa-palette text-accent me-2"></i> Choose Template</h4>
+            <!-- Category Tab Buttons -->
+            <div class="modal-tabs-header d-flex flex-wrap gap-1 border-0 mb-3">
+                <button class="modal-tab-btn active py-1 px-2" onclick="filterModalTemplates('original', this)" style="font-size:0.65rem;">Original</button>
+                <button class="modal-tab-btn py-1 px-2" onclick="filterModalTemplates('ats', this)" style="font-size:0.65rem;">ATS Standard</button>
+                <button class="modal-tab-btn py-1 px-2" onclick="filterModalTemplates('modern', this)" style="font-size:0.65rem;">Modern</button>
+                <button class="modal-tab-btn py-1 px-2" onclick="filterModalTemplates('professional', this)" style="font-size:0.65rem;">Professional</button>
+                <button class="modal-tab-btn py-1 px-2" onclick="filterModalTemplates('student', this)" style="font-size:0.65rem;">Student CV</button>
+                <button class="modal-tab-btn py-1 px-2" onclick="filterModalTemplates('internship', this)" style="font-size:0.65rem;">Internships</button>
+                <button class="modal-tab-btn py-1 px-2" onclick="filterModalTemplates('cyber', this)" style="font-size:0.65rem;">Cyber Security</button>
+                <button class="modal-tab-btn py-1 px-2" onclick="filterModalTemplates('ai', this)" style="font-size:0.65rem;">AI/ML</button>
+                <button class="modal-tab-btn py-1 px-2" onclick="filterModalTemplates('cloud', this)" style="font-size:0.65rem;">Cloud Ops</button>
+                <button class="modal-tab-btn py-1 px-2" onclick="filterModalTemplates('swe', this)" style="font-size:0.65rem;">Software Eng</button>
+                <button class="modal-tab-btn py-1 px-2" onclick="filterModalTemplates('minimal', this)" style="font-size:0.65rem;">Minimalist</button>
+                <button class="modal-tab-btn py-1 px-2" onclick="filterModalTemplates('executive', this)" style="font-size:0.65rem;">Executive</button>
+                <button class="modal-tab-btn py-1 px-2" onclick="filterModalTemplates('canva', this)" style="font-size:0.65rem;">Canva Premium</button>
+            </div>
+            <!-- Template Grid Container (Dynamically rendered cards) -->
+            <div class="templates-grid modal-templates-grid" id="mobile-templates-list-grid">
+                <!-- Rendered via JavaScript -->
+            </div>
+        </div>
+
+        <!-- Mobile-only Export tab container -->
+        <div id="mobile-export-container" class="flat-card bg-secondary-card border p-3 mb-4 d-lg-none">
+            <h4 class="fw-bold mb-3"><i class="fa-solid fa-file-export text-accent me-2"></i> Export & Share</h4>
+            <div class="d-flex flex-column gap-2.5">
+                <button class="btn btn-primary w-100 py-2.5 fw-semibold" onclick="downloadResumePDF()"><i class="fa-solid fa-download me-2"></i> Download PDF</button>
+                <button class="btn btn-outline-secondary w-100 py-2.5" onclick="downloadResumeDOCX()"><i class="fa-solid fa-file-word text-primary me-2"></i> Word (DOCX)</button>
+                <button class="btn btn-outline-secondary w-100 py-2.5" onclick="downloadResumeJSON()"><i class="fa-solid fa-file-code text-info me-2"></i> JSON Schema</button>
+                <button class="btn btn-outline-secondary w-100 py-2.5" onclick="generateShareLink()"><i class="fa-solid fa-share-nodes text-success me-2"></i> Generate Share Link</button>
+                <button class="btn btn-outline-secondary w-100 py-2.5" onclick="window.print()"><i class="fa-solid fa-print me-2"></i> Print Resume</button>
+            </div>
+        </div>
+
     </div>
 
-</div>
-
-<!-- 55 Themes Browser Gallery Modal -->
+<!-- 55 Templates Browser Gallery Modal -->
 <div id="templateGalleryModal" class="modal-backdrop" style="display: none;">
     <div class="modal-content-wrapper flat-card border shadow-lg">
         <div class="modal-header d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
-            <h4><i class="fa-solid fa-palette text-accent me-2"></i> Select Premium Template Theme</h4>
+            <h4><i class="fa-solid fa-palette text-accent me-2"></i> Select Premium Template</h4>
             <button class="btn-close" onclick="closeTemplateGallery()" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:1.2rem;"><i class="fa-solid fa-xmark"></i></button>
         </div>
         
         <!-- Category Tab Buttons inside Modal -->
         <div class="modal-tabs-header">
-            <button class="modal-tab-btn active" onclick="filterModalTemplates('original', this)">Original Themes</button>
+            <button class="modal-tab-btn active" onclick="filterModalTemplates('original', this)">Original Templates</button>
             <button class="modal-tab-btn" onclick="filterModalTemplates('ats', this)">ATS Standard</button>
             <button class="modal-tab-btn" onclick="filterModalTemplates('modern', this)">Modern Premium</button>
             <button class="modal-tab-btn" onclick="filterModalTemplates('professional', this)">Professional</button>
@@ -591,15 +676,23 @@
 <div class="mobile-bottom-tabs-nav">
     <button class="mobile-tab-item active" id="mobile-tab-btn-edit" onclick="setMobileTab('edit')">
         <i class="fa-solid fa-file-pen"></i>
-        <span>Edit Sections</span>
+        <span>Edit</span>
     </button>
     <button class="mobile-tab-item" id="mobile-tab-btn-preview" onclick="setMobileTab('preview')">
         <i class="fa-solid fa-eye"></i>
-        <span>Live Preview</span>
+        <span>Preview</span>
     </button>
     <button class="mobile-tab-item" id="mobile-tab-btn-ats" onclick="setMobileTab('ats')">
         <i class="fa-solid fa-chart-line"></i>
         <span>ATS Report</span>
+    </button>
+    <button class="mobile-tab-item" id="mobile-tab-btn-templates" onclick="setMobileTab('templates')">
+        <i class="fa-solid fa-palette"></i>
+        <span>Templates</span>
+    </button>
+    <button class="mobile-tab-item" id="mobile-tab-btn-export" onclick="setMobileTab('export')">
+        <i class="fa-solid fa-file-export"></i>
+        <span>Export</span>
     </button>
 </div>
 
@@ -627,7 +720,7 @@ const maxStackSize = 30;
 
 // 55 Templates Configuration mapping
 const categories = [
-    { id: "original", name: "Original Themes", templates: [
+    { id: "original", name: "Original Templates", templates: [
         { id: "classic", name: "Classic Ivory" },
         { id: "modern-cyan", name: "Modern Cyan Accent" },
         { id: "slate-glass", name: "Slate Glassmorphic" },
@@ -835,7 +928,7 @@ function setMobileTab(tabId) {
 
     const workspace = document.querySelector(".resume-workspace-wrapper");
     if (workspace) {
-        workspace.classList.remove("tab-edit", "tab-preview", "tab-ats");
+        workspace.classList.remove("tab-edit", "tab-preview", "tab-ats", "tab-templates", "tab-export");
         workspace.classList.add(`tab-${tabId}`);
     }
     
@@ -883,30 +976,31 @@ function filterModalTemplates(categoryId, btnElement) {
 }
 
 function renderTemplatesList() {
-    const grid = document.querySelector(".templates-grid");
-    if (!grid) return;
-    grid.innerHTML = "";
-    
-    const cat = categories.find(c => c.id === activeTemplateCategory);
-    if (!cat) return;
-
-    cat.templates.forEach(t => {
-        const col = document.createElement("div");
-        col.className = "template-card-col";
-        col.style.cursor = "pointer";
-        col.onclick = () => applyTheme(t.id);
+    const grids = document.querySelectorAll(".templates-grid");
+    grids.forEach(grid => {
+        grid.innerHTML = "";
         
-        col.innerHTML = `
-            <div class="template-card border rounded p-2 text-center bg-secondary-card hover-scale ${document.getElementById("resume-theme-select").value === t.id ? 'selected-theme-border' : ''}" style="min-height:90px; border-width: 1.5px;">
-                <div class="theme-thumbnail-bar mx-auto mb-2 border rounded" style="width:100%; height:40px; background:#fafafa; border-top: 4px solid ${getAccentColorForTheme(t.id)} !important;">
-                    <div style="width:30%; height:4px; background:#e2e8f0; margin:4px;"></div>
-                    <div style="width:80%; height:3px; background:#f1f5f9; margin:2px 4px;"></div>
-                    <div style="width:70%; height:3px; background:#f1f5f9; margin:2px 4px;"></div>
+        const cat = categories.find(c => c.id === activeTemplateCategory);
+        if (!cat) return;
+
+        cat.templates.forEach(t => {
+            const col = document.createElement("div");
+            col.className = "template-card-col";
+            col.style.cursor = "pointer";
+            col.onclick = () => applyTheme(t.id);
+            
+            col.innerHTML = `
+                <div class="template-card border rounded p-2 text-center bg-secondary-card hover-scale ${document.getElementById("resume-theme-select").value === t.id ? 'selected-theme-border' : ''}" style="min-height:90px; border-width: 1.5px;">
+                    <div class="theme-thumbnail-bar mx-auto mb-2 border rounded" style="width:100%; height:40px; background:#fafafa; border-top: 4px solid ${getAccentColorForTheme(t.id)} !important;">
+                        <div style="width:30%; height:4px; background:#e2e8f0; margin:4px;"></div>
+                        <div style="width:80%; height:3px; background:#f1f5f9; margin:2px 4px;"></div>
+                        <div style="width:70%; height:3px; background:#f1f5f9; margin:2px 4px;"></div>
+                    </div>
+                    <span style="font-size:0.7rem; font-weight:600;" class="text-primary-text d-block">${t.name}</span>
                 </div>
-                <span style="font-size:0.7rem; font-weight:600;" class="text-primary-text d-block">${t.name}</span>
-            </div>
-        `;
-        grid.appendChild(col);
+            `;
+            grid.appendChild(col);
+        });
     });
 }
 
@@ -942,6 +1036,12 @@ function applyTheme(themeId) {
     renderTemplatesList();
     triggerAutoSave();
     closeTemplateGallery();
+    
+    // Switch view back to Preview if on mobile Templates tab
+    const workspace = document.querySelector(".resume-workspace-wrapper");
+    if (workspace && workspace.classList.contains("tab-templates")) {
+        setMobileTab("preview");
+    }
 }
 
 // Reorder layout sections
@@ -2629,9 +2729,23 @@ async function uploadFileAJAX(file, statusText) {
             populateForm(data.data);
             syncResumeFields();
             
+            // Main score
             document.getElementById("score-text-main").innerText = `${data.score}/100`;
-            document.getElementById("score-readability").innerText = `${data.readability}%`;
-            document.getElementById("score-skills").innerText = `${data.alignment}%`;
+
+            // Sub scores - Fills
+            document.getElementById("score-formatting").style.width = `${data.formatting}%`;
+            document.getElementById("score-skills").style.width = `${data.skills}%`;
+            document.getElementById("score-keyword").style.width = `${data.keyword}%`;
+            document.getElementById("score-readability").style.width = `${data.readability}%`;
+            document.getElementById("score-projects").style.width = `${data.projects}%`;
+
+            // Sub scores - Texts
+            document.getElementById("score-formatting-text").innerText = `${data.formatting}%`;
+            document.getElementById("score-skills-text").innerText = `${data.skills}%`;
+            document.getElementById("score-keyword-text").innerText = `${data.keyword}%`;
+            document.getElementById("score-readability-text").innerText = `${data.readability}%`;
+            document.getElementById("score-projects-text").innerText = `${data.projects}%`;
+            
             lastATSFeedback = data.feedback;
             renderATSFeedback(data.feedback);
             
@@ -2673,9 +2787,22 @@ async function triggerResumeATSAnalysis() {
         
         const data = await response.json();
         if (response.ok && data.success) {
+            // Main score
             document.getElementById("score-text-main").innerText = `${data.score}/100`;
-            document.getElementById("score-readability").innerText = `${data.readability}%`;
-            document.getElementById("score-skills").innerText = `${data.alignment}%`;
+
+            // Sub scores - Fills
+            document.getElementById("score-formatting").style.width = `${data.formatting}%`;
+            document.getElementById("score-skills").style.width = `${data.skills}%`;
+            document.getElementById("score-keyword").style.width = `${data.keyword}%`;
+            document.getElementById("score-readability").style.width = `${data.readability}%`;
+            document.getElementById("score-projects").style.width = `${data.projects}%`;
+
+            // Sub scores - Texts
+            document.getElementById("score-formatting-text").innerText = `${data.formatting}%`;
+            document.getElementById("score-skills-text").innerText = `${data.skills}%`;
+            document.getElementById("score-keyword-text").innerText = `${data.keyword}%`;
+            document.getElementById("score-readability-text").innerText = `${data.readability}%`;
+            document.getElementById("score-projects-text").innerText = `${data.projects}%`;
             
             lastATSFeedback = data.feedback;
             renderATSFeedback(data.feedback);
@@ -2881,6 +3008,109 @@ document.addEventListener("DOMContentLoaded", () => {
 .mobile-bottom-nav {
     display: none !important;
 }
+
+@media (max-width: 1099.98px) {
+    .mobile-bottom-tabs-nav {
+        display: flex !important;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 64px;
+        background: var(--bg-secondary);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid var(--border-color);
+        justify-content: space-around;
+        align-items: center;
+        z-index: 1500;
+        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+        padding: 0 10px;
+    }
+    .mobile-tab-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        font-size: 0.62rem;
+        font-weight: 500;
+        flex: 1;
+        padding: 6px 0;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+    .mobile-tab-item i {
+        font-size: 1.05rem;
+    }
+    .mobile-tab-item:hover {
+        color: var(--text-primary);
+    }
+    .mobile-tab-item.active {
+        color: var(--accent-color);
+    }
+    
+    /* Responsive columns show/hide based on active tab on workspace */
+    .resume-workspace-wrapper.tab-edit .editor-form-column {
+        display: block !important;
+    }
+    .resume-workspace-wrapper.tab-edit .visual-viewer-column,
+    .resume-workspace-wrapper.tab-edit #mobile-templates-container,
+    .resume-workspace-wrapper.tab-edit #mobile-export-container {
+        display: none !important;
+    }
+
+    .resume-workspace-wrapper.tab-preview .visual-viewer-column {
+        display: block !important;
+    }
+    .resume-workspace-wrapper.tab-preview .visual-viewer-column #resume-preview-sheet-wrapper-parent {
+        display: block !important;
+    }
+    .resume-workspace-wrapper.tab-preview .visual-viewer-column #ats-dashboard-parent {
+        display: none !important;
+    }
+    .resume-workspace-wrapper.tab-preview .editor-form-column,
+    .resume-workspace-wrapper.tab-preview #mobile-templates-container,
+    .resume-workspace-wrapper.tab-preview #mobile-export-container {
+        display: none !important;
+    }
+
+    .resume-workspace-wrapper.tab-ats .visual-viewer-column {
+        display: block !important;
+    }
+    .resume-workspace-wrapper.tab-ats .visual-viewer-column #resume-preview-sheet-wrapper-parent {
+        display: none !important;
+    }
+    .resume-workspace-wrapper.tab-ats .visual-viewer-column #ats-dashboard-parent {
+        display: block !important;
+    }
+    .resume-workspace-wrapper.tab-ats .editor-form-column,
+    .resume-workspace-wrapper.tab-ats #mobile-templates-container,
+    .resume-workspace-wrapper.tab-ats #mobile-export-container {
+        display: none !important;
+    }
+
+    .resume-workspace-wrapper.tab-templates #mobile-templates-container {
+        display: block !important;
+    }
+    .resume-workspace-wrapper.tab-templates .editor-form-column,
+    .resume-workspace-wrapper.tab-templates .visual-viewer-column,
+    .resume-workspace-wrapper.tab-templates #mobile-export-container {
+        display: none !important;
+    }
+
+    .resume-workspace-wrapper.tab-export #mobile-export-container {
+        display: block !important;
+    }
+    .resume-workspace-wrapper.tab-export .editor-form-column,
+    .resume-workspace-wrapper.tab-export .visual-viewer-column,
+    .resume-workspace-wrapper.tab-export #mobile-templates-container {
+        display: none !important;
+    }
+}
+
 /* Force stacked vertical scrollable layout globally for all screens (overridden on laptop) */
 html, body, .main-with-sidebar, .dashboard-inner-container, .resume-workspace-wrapper {
     height: auto !important;

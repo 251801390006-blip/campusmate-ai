@@ -5,6 +5,101 @@
 {% block header_title %}Student Operating Control Panel{% endblock %}
 
 {% block content %}
+<style>
+/* Premium Notion/LinkedIn-style card enhancements */
+.premium-dashboard-grid .flat-card {
+    background: var(--bg-secondary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 14px !important;
+    padding: 22px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01) !important;
+}
+
+.premium-dashboard-grid .flat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.03) !important;
+    border-color: rgba(99, 102, 241, 0.25) !important;
+}
+
+/* Specific HSL Gradient Accents for different modules */
+.accent-gradient-orange {
+    background: linear-gradient(135deg, var(--bg-secondary), rgba(249, 115, 22, 0.03)) !important;
+    border-top: 3px solid #f97316 !important;
+}
+.accent-gradient-blue {
+    background: linear-gradient(135deg, var(--bg-secondary), rgba(59, 130, 246, 0.03)) !important;
+    border-top: 3px solid #3b82f6 !important;
+}
+.accent-gradient-purple {
+    background: linear-gradient(135deg, var(--bg-secondary), rgba(139, 92, 246, 0.03)) !important;
+    border-top: 3px solid #8b5cf6 !important;
+}
+.accent-gradient-green {
+    background: linear-gradient(135deg, var(--bg-secondary), rgba(16, 185, 129, 0.03)) !important;
+    border-top: 3px solid #10b981 !important;
+}
+.accent-gradient-pink {
+    background: linear-gradient(135deg, var(--bg-secondary), rgba(236, 72, 153, 0.03)) !important;
+    border-top: 3px solid #ec4899 !important;
+}
+
+/* Circular progress ring styles */
+.circular-progress-container {
+    position: relative;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.circular-progress-svg {
+    transform: rotate(-90deg);
+    width: 70px;
+    height: 70px;
+}
+.circular-progress-bg {
+    fill: none;
+    stroke: var(--bg-tertiary);
+    stroke-width: 5px;
+}
+.circular-progress-fill {
+    fill: none;
+    stroke: var(--accent-color);
+    stroke-width: 5px;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.6s ease-in-out;
+}
+
+/* Streak badge visual */
+.streak-fire-badge {
+    background: linear-gradient(135deg, #ffedd5, #fee2e2);
+    border: 1px solid #fdba74;
+    color: #ea580c;
+    border-radius: 20px;
+    padding: 3px 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 700;
+}
+[data-theme="dark"] .streak-fire-badge {
+    background: linear-gradient(135deg, rgba(234, 88, 12, 0.15), rgba(239, 68, 68, 0.15));
+    border-color: rgba(234, 88, 12, 0.3);
+    color: #f97316;
+}
+
+/* Modern stats display block */
+.notion-stat-card {
+    padding: 10px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    text-align: center;
+}
+</style>
+
 <!-- Page-level check for dismissed card preferences -->
 <script>
     (function() {
@@ -85,10 +180,10 @@
 {% endif %}
 
 <!-- Primary Grid Layout -->
-<div class="row g-4">
-    <!-- Row 1 Left: Profile Details Card -->
+<div class="row g-4 premium-dashboard-grid">
+    <!-- Row 1 Left: Profile Summary Card -->
     <div class="col-md-6 col-lg-4" id="card-profile">
-        <div class="flat-card h-100 bg-white border">
+        <div class="flat-card h-100 border accent-gradient-blue">
             <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
                 <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-circle-user text-muted me-2"></i> Student Profile</h3>
                 <div class="d-flex align-items-center gap-2">
@@ -131,7 +226,7 @@
 
     <!-- Row 1 Middle: Learning Progress & Study Plan Card -->
     <div class="col-md-6 col-lg-4" id="card-learning">
-        <div class="flat-card h-100 bg-white border d-flex flex-column justify-content-between">
+        <div class="flat-card h-100 border d-flex flex-column justify-content-between accent-gradient-orange">
             <div>
                 <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
                     <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-graduation-cap text-muted me-2"></i> Learning Progress</h3>
@@ -155,9 +250,12 @@
                         </div>
                     </div>
                     <div class="col-6">
-                        <div class="p-2 border rounded bg-light" style="border-color:var(--border-color) !important;">
-                            <span class="text-muted d-block" style="font-size:0.65rem; text-transform:uppercase;">Streak</span>
-                            <strong class="text-warning" style="font-size:1rem;">{{ current_user.learning_streak }} Days</strong>
+                        <div class="p-2 border rounded bg-light d-flex flex-column align-items-center justify-content-center" style="border-color:var(--border-color) !important; min-height: 52px;">
+                            <span class="text-muted d-block mb-1" style="font-size:0.65rem; text-transform:uppercase;">Streak</span>
+                            <div class="streak-fire-badge" style="font-size: 0.72rem;">
+                                <i class="fa-solid fa-fire fa-bounce"></i>
+                                <span>{{ current_user.learning_streak }} Days</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -177,7 +275,7 @@
 
     <!-- Row 1 Right: Roadmap Progress Card -->
     <div class="col-md-12 col-lg-4" id="card-roadmap">
-        <div class="flat-card h-100 bg-white border d-flex flex-column justify-content-between">
+        <div class="flat-card h-100 border d-flex flex-column justify-content-between accent-gradient-purple">
             <div>
                 <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
                     <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-route text-muted me-2"></i> Roadmap Progress</h3>
@@ -214,10 +312,10 @@
     </div>
 </div>
 
-<div class="row g-4 mt-1">
+<div class="row g-4 mt-1 premium-dashboard-grid">
     <!-- Row 2 Left: Resume & ATS Score Card -->
     <div class="col-md-6 col-lg-6" id="card-ats-score">
-        <div class="flat-card h-100 bg-white border d-flex flex-column justify-content-between">
+        <div class="flat-card h-100 border d-flex flex-column justify-content-between accent-gradient-pink">
             <div>
                 <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
                     <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-file-circle-check text-muted me-2"></i> ATS Resume Score</h3>
@@ -234,23 +332,32 @@
                 </div>
 
                 {% if resume_score > 0 %}
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="circular-progress-container">
+                            <svg class="circular-progress-svg">
+                                <circle class="circular-progress-bg" cx="35" cy="35" r="30"></circle>
+                                <circle class="circular-progress-fill" cx="35" cy="35" r="30" style="stroke-dasharray: 188.4; stroke-dashoffset: {{ 188.4 - (188.4 * resume_score / 100) }}; stroke: var(--accent-color);"></circle>
+                            </svg>
+                            <div class="position-absolute text-center" style="font-size: 0.85rem; font-weight: 800; color: var(--text-primary);">
+                                {{ resume_score }}<span style="font-size:0.55rem; font-weight:normal;">/100</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="fw-bold mb-0.5 text-secondary" style="font-size:0.88rem;">Applicant score</h4>
+                            <span class="text-muted" style="font-size:0.7rem;">Scanned compatibility rank</span>
+                        </div>
+                    </div>
                     <div class="row g-2 text-center mb-3">
-                        <div class="col-4">
-                            <div class="p-2 border rounded bg-light" style="border-color: var(--border-color) !important;">
-                                <span class="text-muted d-block" style="font-size:0.65rem; text-transform:uppercase;">ATS score</span>
-                                <strong class="text-secondary" style="font-size:1.05rem; color: var(--neon-blue) !important;">{{ resume_score }}/100</strong>
+                        <div class="col-6">
+                            <div class="notion-stat-card">
+                                <span class="text-muted d-block" style="font-size:0.62rem; text-transform:uppercase;">Readability</span>
+                                <strong class="text-secondary" style="font-size:0.95rem;">{{ readability_score }}%</strong>
                             </div>
                         </div>
-                        <div class="col-4">
-                            <div class="p-2 border rounded bg-light" style="border-color: var(--border-color) !important;">
-                                <span class="text-muted d-block" style="font-size:0.65rem; text-transform:uppercase;">Readability</span>
-                                <strong class="text-secondary" style="font-size:1.05rem;">{{ readability_score }}%</strong>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="p-2 border rounded bg-light" style="border-color: var(--border-color) !important;">
-                                <span class="text-muted d-block" style="font-size:0.65rem; text-transform:uppercase;">Keywords</span>
-                                <strong class="text-secondary" style="font-size:1.05rem;">{{ industry_match_score }}%</strong>
+                        <div class="col-6">
+                            <div class="notion-stat-card">
+                                <span class="text-muted d-block" style="font-size:0.62rem; text-transform:uppercase;">Keywords</span>
+                                <strong class="text-secondary" style="font-size:0.95rem;">{{ industry_match_score }}%</strong>
                             </div>
                         </div>
                     </div>
@@ -274,7 +381,7 @@
 
     <!-- Row 2 Right: Internship Readiness Card -->
     <div class="col-md-6 col-lg-6" id="card-readiness">
-        <div class="flat-card h-100 bg-white border d-flex flex-column justify-content-between">
+        <div class="flat-card h-100 border d-flex flex-column justify-content-between accent-gradient-green">
             <div>
                 <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
                     <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-briefcase text-muted me-2"></i> Internship Readiness</h3>
@@ -304,10 +411,10 @@
     </div>
 </div>
 
-<<div class="row g-4 mt-1">
+<div class="row g-4 mt-1 premium-dashboard-grid">
     <!-- Row 3 Left: Certifications Plan Card -->
     <div class="col-md-6 col-lg-6" id="card-certs">
-        <div class="flat-card h-100 bg-white border d-flex flex-column justify-content-between">
+        <div class="flat-card h-100 border d-flex flex-column justify-content-between accent-gradient-blue">
             <div>
                 <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
                     <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-award text-muted me-2"></i> Recommended Certs</h3>
@@ -339,7 +446,7 @@
 
     <!-- Row 3 Right: AI Career Digital Twin Card -->
     <div class="col-md-6 col-lg-6" id="card-timeline">
-        <div class="flat-card h-100 bg-white border d-flex flex-column justify-content-between">
+        <div class="flat-card h-100 border d-flex flex-column justify-content-between accent-gradient-purple">
             <div>
                 <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
                     <h3 class="fw-bold mb-0" style="font-size:1rem;"><i class="fa-solid fa-timeline text-muted me-2"></i> Career Projection</h3>

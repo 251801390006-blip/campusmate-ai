@@ -83,16 +83,6 @@
         </div>
         
         <div class="flat-card shadow-sm border-light">
-            <h3 class="fw-bold text-dark mb-2" style="font-size:1.05rem;"><i class="fa-solid fa-circle-info text-primary me-2"></i> AI Eligibility Rules</h3>
-            <p class="text-secondary mb-0" style="font-size:0.82rem; line-height:1.5;">
-                Eligibility scores are calculated in real-time matching the job requirement checklist against your selected target track, gamified XP achievements, and parsed resume keywords score. Complete milestones to increase your ratings!
-            </p>
-        </div>
-    </div>
-
-    <!-- Right side: Matchings Internships List -->
-    <div class="col-lg-8">
-        <div class="flat-card shadow-sm border-light">
             <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom flex-wrap gap-2" style="border-color:#dee2e6;">
                 <div>
                     <h3 class="fw-bold text-dark mb-0" style="font-size:1.1rem;"><i class="fa-solid fa-list-check text-primary me-2"></i> Matched Student Openings</h3>
@@ -100,9 +90,54 @@
                 </div>
             </div>
 
+            <!-- Search and Filter Controls -->
+            <div class="row g-2 mb-4 p-3 border rounded bg-light-subtle" style="border-color: var(--border-color) !important;">
+                <div class="col-md-5">
+                    <label class="form-label" style="font-size: 0.65rem; font-weight:700; text-transform:uppercase; color:var(--text-secondary); margin-bottom:4px; display:block;">Search Role or Company</label>
+                    <input type="text" id="search-input" onkeyup="filterJobs()" class="form-input py-1.5 px-3" placeholder="e.g. Google, Software Engineer" style="width:100%; border:1px solid var(--border-color); border-radius:6px; background-color:var(--bg-primary); color:var(--text-primary); font-size:0.8rem;">
+                </div>
+                <div class="col-md-2.5">
+                    <label class="form-label" style="font-size: 0.65rem; font-weight:700; text-transform:uppercase; color:var(--text-secondary); margin-bottom:4px; display:block;">Location</label>
+                    <select id="location-filter" onchange="filterJobs()" class="form-input py-1.5 px-2" style="width:100%; border:1px solid var(--border-color); border-radius:6px; background-color:var(--bg-primary); color:var(--text-primary); font-size:0.8rem;">
+                        <option value="all">All Locations</option>
+                        <option value="Remote">Remote</option>
+                        <option value="Hybrid">Hybrid</option>
+                        <option value="Onsite">Onsite</option>
+                    </select>
+                </div>
+                <div class="col-md-2.5">
+                    <label class="form-label" style="font-size: 0.65rem; font-weight:700; text-transform:uppercase; color:var(--text-secondary); margin-bottom:4px; display:block;">Type</label>
+                    <select id="type-filter" onchange="filterJobs()" class="form-input py-1.5 px-2" style="width:100%; border:1px solid var(--border-color); border-radius:6px; background-color:var(--bg-primary); color:var(--text-primary); font-size:0.8rem;">
+                        <option value="all">All Types</option>
+                        <option value="Summer">Summer</option>
+                        <option value="Winter">Winter</option>
+                        <option value="Part-time">Part-time</option>
+                        <option value="Full-time">Full-time</option>
+                        <option value="Co-op">Co-op</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label" style="font-size: 0.65rem; font-weight:700; text-transform:uppercase; color:var(--text-secondary); margin-bottom:4px; display:block;">Sort By</label>
+                    <select id="sort-select" onchange="sortJobs()" class="form-input py-1.5 px-2" style="width:100%; border:1px solid var(--border-color); border-radius:6px; background-color:var(--bg-primary); color:var(--text-primary); font-size:0.8rem;">
+                        <option value="compatibility">Match Score</option>
+                        <option value="stipend">Stipend Rate</option>
+                        <option value="deadline">Deadline</option>
+                    </select>
+                </div>
+            </div>
+
             <div class="d-flex flex-column gap-3" id="jobs-container">
                 {% for job in jobs %}
-                <div class="job-card p-3 border rounded shadow-sm bg-white" id="job-card-{{ job.id }}" style="transition: all 0.2s ease; {% if job.is_pinned %}border-left: 4px solid var(--warning);{% endif %}">
+                <div class="job-card p-3 border rounded shadow-sm bg-white" 
+                     id="job-card-{{ job.id }}"
+                     data-title="{{ job.title|e }}" 
+                     data-company="{{ job.company|e }}" 
+                     data-location="{{ job.location_type|e }}" 
+                     data-type="{{ job.internship_type|e }}" 
+                     data-compatibility="{{ job.compatibility }}" 
+                     data-stipend-val="{% if 'mo' in job.stipend or '/mo' in job.stipend %}{{ job.stipend.replace('$','').replace('/mo','').replace(',','').replace('/m','').strip() }}{% else %}0{% endif %}" 
+                     data-deadline-val="{{ job.deadline or '9999-12-31' }}" 
+                     style="transition: all 0.2s ease; {% if job.is_pinned %}border-left: 4px solid var(--warning);{% endif %}">
                     <div class="row g-3">
                         <div class="col-md-9">
                             <div class="d-flex align-items-center gap-2 mb-1.5 flex-wrap">
@@ -122,8 +157,8 @@
                                 <span><i class="fa-solid fa-graduation-cap text-muted me-1"></i> Eligibility: <strong>{{ job.eligibility or 'Open' }}</strong></span>
                                 <span><i class="fa-solid fa-calendar-xmark text-danger me-1"></i> Deadline: <strong>{{ job.deadline or 'N/A' }}</strong></span>
                             </div>
-                            <div class="mb-2">
-                                <span class="text-muted d-block mb-1" style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Skills Required</span>
+                            <div class="mb-3">
+                                <span class="text-muted d-block mb-1" style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Skills Match</span>
                                 <div class="d-flex flex-wrap gap-1">
                                     {% for skill in job.matched_skills %}
                                         <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1" style="font-size:0.7rem;"><i class="fa-solid fa-check-double me-1"></i> {{ skill }}</span>
@@ -133,17 +168,28 @@
                                     {% endfor %}
                                 </div>
                             </div>
+                            <!-- Recommended Certifications -->
+                            <div class="mb-2">
+                                <span class="text-muted d-block mb-1" style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Recommended Certifications</span>
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for cert in job.recommended_certs %}
+                                        <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1" style="font-size:0.7rem;"><i class="fa-solid fa-award me-1"></i> {{ cert }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Match Rating / Actions -->
                         <div class="col-md-3 d-flex flex-column justify-content-between align-items-md-end text-md-end">
                             <div>
-                                <span class="text-secondary d-block" style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Readiness Score</span>
-                                <div class="d-flex align-items-center gap-2 justify-content-md-end mt-1">
-                                    <div class="progress-bar-container" style="background:#e9ecef; width: 60px; height: 6px; border-radius: 3px; overflow: hidden;">
-                                        <div class="progress-bar-fill" style="width: {{ job.compatibility }}%; height: 100%; background: {% if job.compatibility >= 80 %}#10b981{% elif job.compatibility >= 60 %}#f59e0b{% else %}#ef4444{% endif %};"></div>
-                                    </div>
-                                    <strong style="font-size: 0.95rem; color: {% if job.compatibility >= 80 %}#10b981{% elif job.compatibility >= 60 %}#f59e0b{% else %}#ef4444{% endif %};">{{ job.compatibility }}%</strong>
+                                <span class="text-secondary d-block" style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Match Metrics</span>
+                                <div class="d-flex align-items-center gap-2 justify-content-md-end mt-1 mb-1">
+                                    <span class="text-muted" style="font-size: 0.7rem;">Readiness Score:</span>
+                                    <strong style="font-size: 0.88rem; color: {% if job.compatibility >= 80 %}#10b981{% elif job.compatibility >= 60 %}#f59e0b{% else %}#ef4444{% endif %};">{{ job.compatibility }}%</strong>
+                                </div>
+                                <div class="d-flex align-items-center gap-2 justify-content-md-end">
+                                    <span class="text-muted" style="font-size: 0.7rem;">Resume Match:</span>
+                                    <strong style="font-size: 0.88rem; color: var(--accent-color);">{{ job.resume_match }}%</strong>
                                 </div>
                             </div>
 
@@ -154,7 +200,7 @@
                                 </button>
                                 {% if job.official_link %}
                                     <a href="{{ job.official_link }}" target="_blank" class="btn btn-sm btn-primary py-1.5 px-3" style="background: linear-gradient(135deg, #0078d4, #00bcf2); border: none; font-size:0.78rem; font-weight:600; text-decoration:none; display:inline-block;">
-                                        Official Link <i class="fa-solid fa-arrow-up-right-from-square ms-1"></i>
+                                        Apply <i class="fa-solid fa-arrow-up-right-from-square ms-1"></i>
                                     </a>
                                 {% endif %}
                             </div>
@@ -202,6 +248,61 @@ async function toggleBookmark(event, jobId, title) {
         console.error(e);
         alert("Failed to toggle bookmark.");
     }
+}
+
+function filterJobs() {
+    const query = document.getElementById("search-input").value.toLowerCase();
+    const locFilter = document.getElementById("location-filter").value;
+    const typeFilter = document.getElementById("type-filter").value;
+    
+    const cards = document.querySelectorAll(".job-card");
+    cards.forEach(card => {
+        const title = card.getAttribute("data-title").toLowerCase();
+        const company = card.getAttribute("data-company").toLowerCase();
+        const location = card.getAttribute("data-location");
+        const type = card.getAttribute("data-type");
+        
+        const matchQuery = title.includes(query) || company.includes(query);
+        const matchLoc = locFilter === "all" || location === locFilter;
+        const matchType = typeFilter === "all" || type === typeFilter;
+        
+        if (matchQuery && matchLoc && matchType) {
+            card.style.setProperty("display", "block", "important");
+        } else {
+            card.style.setProperty("display", "none", "important");
+        }
+    });
+}
+
+function sortJobs() {
+    const sortBy = document.getElementById("sort-select").value;
+    const container = document.getElementById("jobs-container");
+    const cards = Array.from(container.querySelectorAll(".job-card"));
+    
+    cards.sort((a, b) => {
+        // Pinned cards always stay on top
+        const aPinned = a.querySelector(".badge.bg-warning") !== null;
+        const bPinned = b.querySelector(".badge.bg-warning") !== null;
+        if (aPinned && !bPinned) return -1;
+        if (!aPinned && bPinned) return 1;
+        
+        if (sortBy === "compatibility") {
+            const compA = parseInt(a.getAttribute("data-compatibility") || "0");
+            const compB = parseInt(b.getAttribute("data-compatibility") || "0");
+            return compB - compA; // Descending
+        } else if (sortBy === "stipend") {
+            const stipendA = parseInt(a.getAttribute("data-stipend-val") || "0");
+            const stipendB = parseInt(b.getAttribute("data-stipend-val") || "0");
+            return stipendB - stipendA; // Descending
+        } else if (sortBy === "deadline") {
+            const valA = a.getAttribute("data-deadline-val") || "9999-12-31";
+            const valB = b.getAttribute("data-deadline-val") || "9999-12-31";
+            return valA.localeCompare(valB); // Ascending
+        }
+        return 0;
+    });
+    
+    cards.forEach(card => container.appendChild(card));
 }
 </script>
 {% endblock %}

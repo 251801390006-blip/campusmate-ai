@@ -5,211 +5,314 @@
 {% block header_title %}Platform Settings{% endblock %}
 
 {% block content %}
-<div class="row g-4 justify-content-center">
-    <div class="col-lg-8">
-        <!-- Profile Picture Upload Card -->
-        <div class="flat-card shadow-sm border-light mb-4">
-            <h3 class="fw-bold text-dark mb-3" style="font-size:1.05rem;"><i class="fa-solid fa-camera text-primary me-2"></i> Update Profile Picture</h3>
-            <div class="d-flex align-items-center gap-4 flex-wrap">
-                <div class="profile-photo-preview">
-                    {% if current_user.profile_photo %}
-                        <img src="{{ url_for('static', filename=current_user.profile_photo) }}" alt="Avatar" class="rounded-circle border shadow-sm" style="width: 80px; height: 80px; object-fit: cover;">
-                    {% else %}
-                        <img src="{{ url_for('static', filename='images/avatars/' ~ current_user.avatar) }}" alt="Avatar" class="rounded-circle border shadow-sm" style="width: 80px; height: 80px; object-fit: cover;">
-                    {% endif %}
+<style>
+.settings-tabs-container {
+    display: flex;
+    gap: 30px;
+    margin-top: 10px;
+}
+.settings-nav-sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.settings-nav-btn {
+    background: none;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+.settings-nav-btn:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+.settings-nav-btn.active {
+    background: rgba(0, 120, 212, 0.08);
+    color: var(--accent-color);
+}
+.settings-tab-panel {
+    flex-grow: 1;
+    display: none;
+}
+.settings-tab-panel.active {
+    display: block;
+}
+
+@media (max-width: 991.98px) {
+    .settings-tabs-container {
+        flex-direction: column;
+        gap: 20px;
+    }
+    .settings-nav-sidebar {
+        width: 100%;
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border-color);
+        scrollbar-width: none;
+    }
+    .settings-nav-sidebar::-webkit-scrollbar {
+        display: none;
+    }
+    .settings-nav-btn {
+        white-space: nowrap;
+        padding: 8px 14px;
+        font-size: 0.8rem;
+        width: auto;
+    }
+}
+</style>
+
+<div class="settings-tabs-container">
+    <!-- Sidebar navigation -->
+    <div class="settings-nav-sidebar">
+        <button class="settings-nav-btn active" onclick="switchSettingsTab('profile', this)">
+            <i class="fa-solid fa-user-gear"></i> Profile Info
+        </button>
+        <button class="settings-nav-btn" onclick="switchSettingsTab('security', this)">
+            <i class="fa-solid fa-key"></i> Security
+        </button>
+        <button class="settings-nav-btn" onclick="switchSettingsTab('templates', this)">
+            <i class="fa-solid fa-palette"></i> Style & APIs
+        </button>
+        <button class="settings-nav-btn" onclick="switchSettingsTab('notifications', this)">
+            <i class="fa-solid fa-sliders"></i> Preferences
+        </button>
+        <button class="settings-nav-btn text-danger" onclick="switchSettingsTab('danger', this)">
+            <i class="fa-solid fa-triangle-exclamation"></i> Danger Zone
+        </button>
+    </div>
+
+    <!-- Tab Panels Content -->
+    <div class="flex-grow-1" style="max-width: 800px; width: 100%;">
+        
+        <!-- Panel 1: Profile Info -->
+        <div id="panel-profile" class="settings-tab-panel active">
+            <!-- Profile Picture Upload Card -->
+            <div class="flat-card shadow-sm border-light mb-4 bg-white p-4">
+                <h3 class="fw-bold text-dark mb-3" style="font-size:1.05rem;"><i class="fa-solid fa-camera text-primary me-2"></i> Update Profile Picture</h3>
+                <div class="d-flex align-items-center gap-4 flex-wrap">
+                    <div class="profile-photo-preview">
+                        {% if current_user.profile_photo %}
+                            <img src="{{ url_for('static', filename=current_user.profile_photo) }}" alt="Avatar" class="rounded-circle border shadow-sm" style="width: 80px; height: 80px; object-fit: cover;">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='images/avatars/' ~ current_user.avatar) }}" alt="Avatar" class="rounded-circle border shadow-sm" style="width: 80px; height: 80px; object-fit: cover;">
+                        {% endif %}
+                    </div>
+                    <form method="POST" action="{{ url_for('dashboard.upload_photo') }}" enctype="multipart/form-data" class="d-flex flex-column gap-2">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="file" name="profile_photo" class="form-control form-control-sm" required accept="image/*">
+                        <button type="submit" class="btn btn-sm btn-primary align-self-start"><i class="fa-solid fa-upload me-1"></i> Upload Image</button>
+                    </form>
                 </div>
-                <form method="POST" action="{{ url_for('dashboard.upload_photo') }}" enctype="multipart/form-data" class="d-flex flex-column gap-2">
+            </div>
+
+            <!-- Profile Settings Card -->
+            <div class="flat-card shadow-sm border-light bg-white p-4">
+                <h3 class="fw-bold text-dark mb-3" style="font-size:1.05rem;"><i class="fa-solid fa-user-gear text-primary me-2"></i> Student Profile Information</h3>
+                
+                <form method="POST" action="{{ url_for('dashboard.settings') }}" class="d-flex flex-column gap-3">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <input type="file" name="profile_photo" class="form-control form-control-sm" required accept="image/*">
-                    <button type="submit" class="btn btn-sm btn-primary align-self-start"><i class="fa-solid fa-upload me-1"></i> Upload Image</button>
+                    <input type="hidden" name="action" value="profile">
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="profile-name" class="fw-semibold text-secondary" style="font-size:0.8rem;">Full Name</label>
+                            <input type="text" id="profile-name" name="name" value="{{ current_user.name or '' }}" class="form-control shadow-sm" placeholder="Enter full name">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="profile-email" class="fw-semibold text-secondary" style="font-size:0.8rem;">Email Address</label>
+                            <input type="email" id="profile-email" name="email" value="{{ current_user.email or '' }}" class="form-control shadow-sm" placeholder="Enter email address" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group d-flex flex-column gap-1 mb-3">
+                        <label for="profile-bio" class="fw-semibold text-secondary" style="font-size:0.8rem;">Bio Description</label>
+                        <textarea id="profile-bio" name="bio" rows="3" class="form-control shadow-sm" placeholder="Tell us about yourself" style="width:100%; border:1px solid var(--border-color); padding:8px; border-radius:4px; font-size:0.85rem;">{{ current_user.bio or '' }}</textarea>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="profile-branch" class="fw-semibold text-secondary" style="font-size:0.8rem;">Branch / Major</label>
+                            <input type="text" id="profile-branch" name="branch" value="{{ current_user.branch or '' }}" class="form-control shadow-sm" placeholder="e.g. Cyber Security">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="profile-year" class="fw-semibold text-secondary" style="font-size:0.8rem;">Year</label>
+                            <input type="text" id="profile-year" name="year" value="{{ current_user.year or '' }}" class="form-control shadow-sm" placeholder="e.g. 3rd Year">
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="profile-skills" class="fw-semibold text-secondary" style="font-size:0.8rem;">Technical Skills (comma-separated)</label>
+                            <input type="text" id="profile-skills" name="skills" value="{{ current_user.skills or '' }}" class="form-control shadow-sm" placeholder="e.g. Python, Git, Wireshark">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="profile-goals" class="fw-semibold text-secondary" style="font-size:0.8rem;">Career Goals</label>
+                            <input type="text" id="profile-goals" name="goals" value="{{ current_user.career_goal or '' }}" class="form-control shadow-sm" placeholder="e.g. Security Analyst">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary shadow-sm py-2 mt-2" style="background: linear-gradient(135deg, #0078d4, #00bcf2); border: none; font-size:0.9rem; font-weight:600; color:white;">
+                        Update Profile Details <i class="fa-solid fa-user-check ms-1"></i>
+                    </button>
                 </form>
             </div>
         </div>
 
-        <!-- Profile Settings Card -->
-        <div class="flat-card shadow-sm border-light mb-4">
-            <h3 class="fw-bold text-dark mb-3" style="font-size:1.05rem;"><i class="fa-solid fa-user-gear text-primary me-2"></i> Student Profile Information</h3>
-            
-            <form method="POST" action="{{ url_for('dashboard.settings') }}" class="d-flex flex-column gap-3">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="action" value="profile">
+        <!-- Panel 2: Security -->
+        <div id="panel-security" class="settings-tab-panel">
+            <div class="flat-card shadow-sm border-light bg-white p-4">
+                <h3 class="fw-bold text-dark mb-3" style="font-size:1.05rem;"><i class="fa-solid fa-key text-primary me-2"></i> Update Security Credentials</h3>
                 
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label for="profile-name" class="fw-semibold text-secondary" style="font-size:0.8rem;">Full Name</label>
-                        <input type="text" id="profile-name" name="name" value="{{ current_user.name or '' }}" class="form-control shadow-sm" placeholder="Enter full name">
-                    </div>
-                    <div class="col-md-6">
-                        <label for="profile-email" class="fw-semibold text-secondary" style="font-size:0.8rem;">Email Address</label>
-                        <input type="email" id="profile-email" name="email" value="{{ current_user.email or '' }}" class="form-control shadow-sm" placeholder="Enter email address" required>
-                    </div>
-                </div>
-
-                <div class="input-group d-flex flex-column gap-1 mb-3">
-                    <label for="profile-bio" class="fw-semibold text-secondary" style="font-size:0.8rem;">Bio Description</label>
-                    <textarea id="profile-bio" name="bio" rows="3" class="form-control shadow-sm" placeholder="Tell us about yourself" style="width:100%; border:1px solid var(--border-color); padding:8px; border-radius:4px; font-size:0.85rem;">{{ current_user.bio or '' }}</textarea>
-                </div>
-
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label for="profile-branch" class="fw-semibold text-secondary" style="font-size:0.8rem;">Branch / Major</label>
-                        <input type="text" id="profile-branch" name="branch" value="{{ current_user.branch or '' }}" class="form-control shadow-sm" placeholder="e.g. Cyber Security">
-                    </div>
-                    <div class="col-md-6">
-                        <label for="profile-year" class="fw-semibold text-secondary" style="font-size:0.8rem;">Year</label>
-                        <input type="text" id="profile-year" name="year" value="{{ current_user.year or '' }}" class="form-control shadow-sm" placeholder="e.g. 3rd Year">
-                    </div>
-                </div>
-
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label for="profile-skills" class="fw-semibold text-secondary" style="font-size:0.8rem;">Technical Skills (comma-separated)</label>
-                        <input type="text" id="profile-skills" name="skills" value="{{ current_user.skills or '' }}" class="form-control shadow-sm" placeholder="e.g. Python, Git, Wireshark">
-                    </div>
-                    <div class="col-md-6">
-                        <label for="profile-goals" class="fw-semibold text-secondary" style="font-size:0.8rem;">Career Goals</label>
-                        <input type="text" id="profile-goals" name="goals" value="{{ current_user.career_goal or '' }}" class="form-control shadow-sm" placeholder="e.g. Security Analyst">
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-primary shadow-sm py-2 mt-2" style="background: linear-gradient(135deg, #0078d4, #00bcf2); border: none; font-size:0.9rem; font-weight:600; color:white;">
-                    Update Profile Details <i class="fa-solid fa-user-check ms-1"></i>
-                </button>
-            </form>
-        </div>
-
-        <!-- AI Chatbot API Key Card -->
-        <div class="flat-card shadow-sm mb-4" style="border: 1.5px solid #0078d422;">
-            <h3 class="fw-bold text-dark mb-1" style="font-size:1.05rem;"><i class="fa-solid fa-robot text-primary me-2"></i> AI Chatbot API Key</h3>
-            <p class="text-secondary mb-3" style="font-size:0.82rem;">Power the live AI Career Mentor chatbot. Both providers are <strong>free</strong> — paste your key below.</p>
-
-            <!-- Provider pills -->
-            <div class="d-flex gap-2 mb-3 flex-wrap">
-                <div style="background: linear-gradient(135deg, #f97316, #fb923c); color: white; border-radius: 8px; padding: 8px 14px; font-size: 0.8rem; flex: 1; min-width: 180px;">
-                    <div class="fw-bold mb-1"><i class="fa-solid fa-star me-1"></i> Groq (Recommended)</div>
-                    <div style="font-size: 0.72rem; opacity: 0.92;">Free · LLaMA 3.3-70B · Any Gmail/Outlook</div>
-                    <a href="https://console.groq.com/keys" target="_blank" style="color: white; font-size: 0.72rem; text-decoration: underline;">→ console.groq.com/keys</a>
-                </div>
-                <div style="background: linear-gradient(135deg, #1a73e8, #4285f4); color: white; border-radius: 8px; padding: 8px 14px; font-size: 0.8rem; flex: 1; min-width: 180px;">
-                    <div class="fw-bold mb-1"><i class="fa-brands fa-google me-1"></i> Google Gemini</div>
-                    <div style="font-size: 0.72rem; opacity: 0.92;">Free · Gemini 2.5 Flash · Personal Gmail only</div>
-                    <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: white; font-size: 0.72rem; text-decoration: underline;">→ aistudio.google.com</a>
-                </div>
-            </div>
-
-            <div class="d-flex flex-column gap-2">
-                <div class="d-flex gap-2 align-items-center">
-                    <input type="password" id="settings-api-key-input" class="form-control shadow-sm" placeholder="Paste Groq key (gsk_...) or Gemini key (AIza...)" style="font-size: 0.85rem;">
-                    <button onclick="saveSettingsApiKey()" class="btn btn-primary px-3 py-2" style="font-size:0.85rem; white-space:nowrap; background: linear-gradient(135deg, #0078d4, #00bcf2); border:none;">
-                        <i class="fa-solid fa-save me-1"></i> Save Key
-                    </button>
-                    <button onclick="clearSettingsApiKey()" class="btn btn-outline-danger px-3 py-2" style="font-size:0.85rem; white-space:nowrap;">
-                        <i class="fa-solid fa-trash me-1"></i> Clear
-                    </button>
-                </div>
-                <p id="settings-api-key-status" class="mb-0" style="font-size: 0.78rem; color: #6b7280;"><i class="fa-solid fa-circle-info me-1"></i> Not configured — chatbot is offline.</p>
-                <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; padding: 8px 12px; font-size: 0.76rem; color: #0369a1;">
-                    <strong>How to get a Groq key (2 min):</strong><br>
-                    1. Open <a href="https://console.groq.com/keys" target="_blank" class="text-primary">console.groq.com/keys</a> → Sign up with any Gmail/Outlook<br>
-                    2. Click <strong>Create API Key</strong> → Copy the key (starts with <code>gsk_</code>)<br>
-                    3. Paste it above → Save. Done! The AI chat is now live.
-                </div>
-            </div>
-        </div>
-
-        <!-- Theme & Appearance Settings Card -->
-        <div class="flat-card shadow-sm border-light mb-4">
-            <h3 class="fw-bold text-dark mb-3" style="font-size:1.05rem;"><i class="fa-solid fa-palette text-primary me-2"></i> Theme & Appearance</h3>
-            <div class="d-flex flex-column gap-3">
-                <div class="input-group d-flex flex-column gap-1 mb-0">
-                    <label for="theme-select" class="fw-semibold text-secondary" style="font-size:0.8rem;">Select Theme Mode</label>
-                    <select id="theme-select" class="form-select shadow-sm" style="width: 100%; padding:8px; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary); font-size:0.85rem;" onchange="changeThemePreference(this.value)">
-                        <option value="light">Light Mode</option>
-                        <option value="dark">Dark Mode</option>
-                        <option value="system">System Default</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <!-- Password Settings Card -->
-        <div class="flat-card shadow-sm border-light mb-4">
-            <h3 class="fw-bold text-dark mb-3" style="font-size:1.05rem;"><i class="fa-solid fa-key text-primary me-2"></i> Update Security Credentials</h3>
-            
-            <form method="POST" action="{{ url_for('dashboard.settings') }}" class="d-flex flex-column gap-3">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="action" value="password">
-                
-                <div class="input-group d-flex flex-column gap-1">
-                    <label for="old-pass-field" class="fw-semibold text-secondary" style="font-size:0.8rem;">Current Password</label>
-                    <input type="password" id="old-pass-field" name="old_password" class="form-control shadow-sm" required placeholder="Enter current password">
-                </div>
-
-                <div class="input-group d-flex flex-column gap-1">
-                    <label for="new-pass-field" class="fw-semibold text-secondary" style="font-size:0.8rem;">New Password</label>
-                    <input type="password" id="new-pass-field" name="new_password" class="form-control shadow-sm" required placeholder="Minimum 8 characters">
-                </div>
-
-                <button type="submit" class="btn btn-primary shadow-sm py-2 mt-2" style="background: linear-gradient(135deg, #0078d4, #00bcf2); border: none; font-size:0.9rem;">
-                    Confirm Password Change <i class="fa-solid fa-shield-check ms-1"></i>
-                </button>
-            </form>
-        </div>
-
-        <!-- Preferences Settings Card -->
-        <div class="flat-card shadow-sm border-light mb-4">
-            <h3 class="fw-bold text-dark mb-3" style="font-size:1.05rem;"><i class="fa-solid fa-sliders text-primary me-2"></i> Platform Preferences</h3>
-            
-            <form method="POST" action="{{ url_for('dashboard.update_preferences') }}" class="d-flex flex-column gap-3">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                
-                <!-- Notification Settings -->
-                <div class="mb-3">
-                    <h4 class="fw-bold text-dark mb-2.5" style="font-size:0.9rem;">Notification Center Toggles</h4>
-                    <div class="d-flex flex-column gap-2">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="notify-enabled" name="notifications_enabled" value="y" {% if current_user.notifications_enabled %}checked{% endif %}>
-                            <label class="form-check-label text-dark" for="notify-enabled" style="font-size: 0.85rem;">Enable in-app alert notifications and newsletter updates</label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Privacy Settings -->
-                <div class="mb-4 border-top pt-3" style="border-color:#dee2e6;">
-                    <h4 class="fw-bold text-dark mb-2.5" style="font-size:0.9rem;">Recruiter Profile Visibility</h4>
-                    <div class="d-flex flex-column gap-2">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="public_profile" id="privacy-public" value="y" {% if current_user.public_profile %}checked{% endif %}>
-                            <label class="form-check-label text-dark" for="privacy-public" style="font-size: 0.85rem;">
-                                <strong>Public Registry</strong> (Show my profile compatibility to recruiters in the Internship Center)
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="public_profile" id="privacy-private" value="n" {% if not current_user.public_profile %}checked{% endif %}>
-                            <label class="form-check-label text-dark" for="privacy-private" style="font-size: 0.85rem;">
-                                <strong>Private/Hidden</strong> (Only visible to myself and platform mentors)
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-primary shadow-sm py-2" style="font-size:0.9rem; font-weight:600; background: linear-gradient(135deg, #0078d4, #00bcf2); border: none;">
-                    Save Preferences <i class="fa-solid fa-save ms-1"></i>
-                </button>
-            </form>
-        </div>
-
-        <!-- Danger Zone Card -->
-        <div class="flat-card shadow-sm border-danger border" style="border-color: #fca5a5 !important; background-color: #fff5f5;">
-            <h3 class="fw-bold text-danger mb-3" style="font-size:1.05rem;"><i class="fa-solid fa-triangle-exclamation me-2"></i> Danger Zone</h3>
-            <p class="text-secondary" style="font-size: 0.82rem; line-height: 1.4;">Export your student profile data as a structured JSON file, or permanently deactivate and purge your database records from CampusMate AI.</p>
-            
-            <div class="d-flex gap-3 flex-wrap mt-3">
-                <a href="{{ url_for('dashboard.export_data') }}" class="btn btn-outline-primary py-2 px-3 fw-semibold" style="font-size:0.8rem; background:white;"><i class="fa-solid fa-download me-1"></i> Export Profile Data (JSON)</a>
-                <form method="POST" action="{{ url_for('dashboard.delete_account') }}" onsubmit="return confirm('CRITICAL WARNING: This will permanently delete your account, saved resume drafts, roadmap milestones, and cannot be undone. Proceed?')" style="display:inline;">
+                <form method="POST" action="{{ url_for('dashboard.settings') }}" class="d-flex flex-column gap-3">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="btn btn-danger py-2 px-3"><i class="fa-solid fa-user-slash me-1"></i> Delete Account Permanently</button>
+                    <input type="hidden" name="action" value="password">
+                    
+                    <div class="input-group d-flex flex-column gap-1">
+                        <label for="old-pass-field" class="fw-semibold text-secondary" style="font-size:0.8rem;">Current Password</label>
+                        <input type="password" id="old-pass-field" name="old_password" class="form-control shadow-sm" required placeholder="Enter current password">
+                    </div>
+
+                    <div class="input-group d-flex flex-column gap-1">
+                        <label for="new-pass-field" class="fw-semibold text-secondary" style="font-size:0.8rem;">New Password</label>
+                        <input type="password" id="new-pass-field" name="new_password" class="form-control shadow-sm" required placeholder="Minimum 8 characters">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary shadow-sm py-2 mt-2" style="background: linear-gradient(135deg, #0078d4, #00bcf2); border: none; font-size:0.9rem;">
+                        Confirm Password Change <i class="fa-solid fa-shield-check ms-1"></i>
+                    </button>
                 </form>
+            </div>
+        </div>
+
+        <!-- Panel 3: Templates & APIs -->
+        <div id="panel-templates" class="settings-tab-panel">
+            <!-- AI Chatbot API Key Card -->
+            <div class="flat-card shadow-sm mb-4 bg-white p-4" style="border: 1.5px solid #0078d422;">
+                <h3 class="fw-bold text-dark mb-1" style="font-size:1.05rem;"><i class="fa-solid fa-robot text-primary me-2"></i> AI Chatbot API Key</h3>
+                <p class="text-secondary mb-3" style="font-size:0.82rem;">Power the live AI Career Mentor chatbot. Both providers are <strong>free</strong> — paste your key below.</p>
+
+                <!-- Provider pills -->
+                <div class="d-flex gap-2 mb-3 flex-wrap">
+                    <div style="background: linear-gradient(135deg, #f97316, #fb923c); color: white; border-radius: 8px; padding: 8px 14px; font-size: 0.8rem; flex: 1; min-width: 180px;">
+                        <div class="fw-bold mb-1"><i class="fa-solid fa-star me-1"></i> Groq (Recommended)</div>
+                        <div style="font-size: 0.72rem; opacity: 0.92;">Free · LLaMA 3.3-70B · Any Gmail/Outlook</div>
+                        <a href="https://console.groq.com/keys" target="_blank" style="color: white; font-size: 0.72rem; text-decoration: underline;">→ console.groq.com/keys</a>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #1a73e8, #4285f4); color: white; border-radius: 8px; padding: 8px 14px; font-size: 0.8rem; flex: 1; min-width: 180px;">
+                        <div class="fw-bold mb-1"><i class="fa-brands fa-google me-1"></i> Google Gemini</div>
+                        <div style="font-size: 0.72rem; opacity: 0.92;">Free · Gemini 2.5 Flash · Personal Gmail only</div>
+                        <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: white; font-size: 0.72rem; text-decoration: underline;">→ aistudio.google.com</a>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column gap-2">
+                    <div class="d-flex gap-2 align-items-center">
+                        <input type="password" id="settings-api-key-input" class="form-control shadow-sm" placeholder="Paste Groq key (gsk_...) or Gemini key (AIza...)" style="font-size: 0.85rem;">
+                        <button onclick="saveSettingsApiKey()" class="btn btn-primary px-3 py-2" style="font-size:0.85rem; white-space:nowrap; background: linear-gradient(135deg, #0078d4, #00bcf2); border:none;">
+                            <i class="fa-solid fa-save me-1"></i> Save Key
+                        </button>
+                        <button onclick="clearSettingsApiKey()" class="btn btn-outline-danger px-3 py-2" style="font-size:0.85rem; white-space:nowrap;">
+                            <i class="fa-solid fa-trash me-1"></i> Clear
+                        </button>
+                    </div>
+                    <p id="settings-api-key-status" class="mb-0" style="font-size: 0.78rem; color: #6b7280;"><i class="fa-solid fa-circle-info me-1"></i> Not configured — chatbot is offline.</p>
+                    <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; padding: 8px 12px; font-size: 0.76rem; color: #0369a1;">
+                        <strong>How to get a Groq key (2 min):</strong><br>
+                        1. Open <a href="https://console.groq.com/keys" target="_blank" class="text-primary">console.groq.com/keys</a> → Sign up with any Gmail/Outlook<br>
+                        2. Click <strong>Create API Key</strong> → Copy the key (starts with <code>gsk_</code>)<br>
+                        3. Paste it above → Save. Done! The AI chat is now live.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theme & Appearance Settings Card -->
+            <div class="flat-card shadow-sm border-light bg-white p-4">
+                <h3 class="fw-bold text-dark mb-3" style="font-size:1.05rem;"><i class="fa-solid fa-palette text-primary me-2"></i> Theme & Appearance</h3>
+                <div class="d-flex flex-column gap-3">
+                    <div class="input-group d-flex flex-column gap-1 mb-0">
+                        <label for="theme-select" class="fw-semibold text-secondary" style="font-size:0.8rem;">Select Theme Mode</label>
+                        <select id="theme-select" class="form-select shadow-sm" style="width: 100%; padding:8px; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary); font-size:0.85rem;" onchange="changeThemePreference(this.value)">
+                            <option value="light">Light Mode</option>
+                            <option value="dark">Dark Mode</option>
+                            <option value="system">System Default</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel 4: Notifications & Preferences -->
+        <div id="panel-notifications" class="settings-tab-panel">
+            <div class="flat-card shadow-sm border-light bg-white p-4">
+                <h3 class="fw-bold text-dark mb-3" style="font-size:1.05rem;"><i class="fa-solid fa-sliders text-primary me-2"></i> Platform Preferences</h3>
+                
+                <form method="POST" action="{{ url_for('dashboard.update_preferences') }}" class="d-flex flex-column gap-3">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
+                    <!-- Notification Settings -->
+                    <div class="mb-3">
+                        <h4 class="fw-bold text-dark mb-2.5" style="font-size:0.9rem;">Notification Center Toggles</h4>
+                        <div class="d-flex flex-column gap-2">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="notify-enabled" name="notifications_enabled" value="y" {% if current_user.notifications_enabled %}checked{% endif %}>
+                                <label class="form-check-label text-dark" for="notify-enabled" style="font-size: 0.85rem;">Enable in-app alert notifications and newsletter updates</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Privacy Settings -->
+                    <div class="mb-4 border-top pt-3" style="border-color:#dee2e6;">
+                        <h4 class="fw-bold text-dark mb-2.5" style="font-size:0.9rem;">Recruiter Profile Visibility</h4>
+                        <div class="d-flex flex-column gap-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="public_profile" id="privacy-public" value="y" {% if current_user.public_profile %}checked{% endif %}>
+                                <label class="form-check-label text-dark" for="privacy-public" style="font-size: 0.85rem;">
+                                    <strong>Public Registry</strong> (Show my profile compatibility to recruiters in the Internship Center)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="public_profile" id="privacy-private" value="n" {% if not current_user.public_profile %}checked{% endif %}>
+                                <label class="form-check-label text-dark" for="privacy-private" style="font-size: 0.85rem;">
+                                    <strong>Private/Hidden</strong> (Only visible to myself and platform mentors)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary shadow-sm py-2" style="font-size:0.9rem; font-weight:600; background: linear-gradient(135deg, #0078d4, #00bcf2); border: none;">
+                        Save Preferences <i class="fa-solid fa-save ms-1"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Panel 5: Danger Zone -->
+        <div id="panel-danger" class="settings-tab-panel">
+            <div class="flat-card shadow-sm border-danger border p-4 bg-white" style="border-color: #fca5a5 !important; background-color: #fff5f5 !important;">
+                <h3 class="fw-bold text-danger mb-3" style="font-size:1.05rem;"><i class="fa-solid fa-triangle-exclamation me-2"></i> Danger Zone</h3>
+                <p class="text-secondary" style="font-size: 0.82rem; line-height: 1.4;">Export your student profile data as a structured JSON file, or permanently deactivate and purge your database records from CampusMate AI.</p>
+                
+                <div class="d-flex gap-3 flex-wrap mt-3">
+                    <a href="{{ url_for('dashboard.export_data') }}" class="btn btn-outline-primary py-2 px-3 fw-semibold" style="font-size:0.8rem; background:white;"><i class="fa-solid fa-download me-1"></i> Export Profile Data (JSON)</a>
+                    <form method="POST" action="{{ url_for('dashboard.delete_account') }}" onsubmit="return confirm('CRITICAL WARNING: This will permanently delete your account, saved resume drafts, roadmap milestones, and cannot be undone. Proceed?')" style="display:inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-danger py-2 px-3"><i class="fa-solid fa-user-slash me-1"></i> Delete Account Permanently</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -235,6 +338,15 @@
             if (keyInput) keyInput.value = existingKey;
         }
     });
+
+    function switchSettingsTab(tabId, btn) {
+        document.querySelectorAll(".settings-nav-sidebar .settings-nav-btn").forEach(el => el.classList.remove("active"));
+        btn.classList.add("active");
+        
+        document.querySelectorAll(".settings-tab-panel").forEach(panel => panel.classList.remove("active"));
+        const activePanel = document.getElementById(`panel-${tabId}`);
+        if (activePanel) activePanel.classList.add("active");
+    }
 
     function changeThemePreference(val) {
         localStorage.setItem("campusmate_theme", val);

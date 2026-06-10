@@ -250,9 +250,18 @@ def heuristic_parse_resume(text: str) -> dict:
         "Format technical skills into distinct, scan-friendly categories."
     ]
     
+    formatting_score = min(100, 70 + (5 if email else 0) + (5 if phone else 0) + (10 if github or linkedin else 0) + (10 if words_count > 150 else 0))
+    skills_score = min(100, max(30, 50 + len(found_prog + found_cyber + found_tools + found_web) * 4))
+    keyword_score = industry_match
+    project_quality_score = min(100, max(40, 60 + len(found_verbs) * 4))
+
     return {
         "atsScore": score,
+        "formattingScore": formatting_score,
+        "skillsScore": skills_score,
+        "keywordScore": keyword_score,
         "readabilityScore": readability,
+        "projectQualityScore": project_quality_score,
         "industryMatchScore": industry_match,
         "name": name,
         "email": email or "student@university.edu.in",
@@ -1130,8 +1139,11 @@ def upload_resume():
             "You are an expert ATS (Applicant Tracking System) Resumes Auditor. Analyze the resume text and provide a structured audit in JSON format.\n"
             "The JSON must have these exact keys:\n"
             "- \"atsScore\": integer 0 to 100\n"
+            "- \"formattingScore\": integer 0 to 100\n"
+            "- \"skillsScore\": integer 0 to 100\n"
+            "- \"keywordScore\": integer 0 to 100\n"
             "- \"readabilityScore\": integer 0 to 100\n"
-            "- \"industryMatchScore\": integer 0 to 100\n"
+            "- \"projectQualityScore\": integer 0 to 100\n"
             "- \"missingKeywords\": list of strings\n"
             "- \"improvements\": list of objects, each with \"originalText\", \"suggestedText\", \"reason\"\n"
             "- \"mistakes\": list of strings\n"
@@ -1153,12 +1165,30 @@ def upload_resume():
     if not analysis:
         analysis = heuristic_parse_resume(extracted_text)
         
+    # Ensure all scores exist with default heuristics if missing from AI
+    formatting = analysis.get('formattingScore') or analysis.get('formatting')
+    if formatting is None:
+        formatting = min(100, 70 + (10 if fields.get('email') else 0) + (10 if fields.get('phone') else 0) + (10 if fields.get('github') or fields.get('linkedin') else 0))
+    analysis['formattingScore'] = formatting
+
+    skills = analysis.get('skillsScore') or analysis.get('skills') or analysis.get('industryMatchScore') or 75
+    analysis['skillsScore'] = skills
+
+    keyword = analysis.get('keywordScore') or analysis.get('keyword') or analysis.get('industryMatchScore') or 75
+    analysis['keywordScore'] = keyword
+
+    readability = analysis.get('readabilityScore') or analysis.get('readability') or 75
+    analysis['readabilityScore'] = readability
+
+    projects = analysis.get('projectQualityScore') or analysis.get('projectQuality') or 75
+    analysis['projectQualityScore'] = projects
+
     new_analysis = ResumeAnalysis(
         user_id=current_user.id,
         filename=filename,
         ats_score=analysis['atsScore'],
         readability_score=analysis['readabilityScore'],
-        industry_match_score=analysis['industryMatchScore'],
+        industry_match_score=analysis.get('industryMatchScore', 75),
         target_role="Software Engineer",
         analysis_json=json.dumps(analysis)
     )
@@ -1169,14 +1199,23 @@ def upload_resume():
         "success": True,
         "data": fields,
         "score": analysis['atsScore'],
-        "readability": analysis['readabilityScore'],
-        "alignment": analysis['industryMatchScore'],
+        "formatting": formatting,
+        "skills": skills,
+        "keyword": keyword,
+        "readability": readability,
+        "projects": projects,
+        "alignment": analysis.get('industryMatchScore', 75),
         "feedback": {
             "score": analysis['atsScore'],
-            "missingKeywords": analysis['missingKeywords'],
-            "improvements": analysis['improvements'],
-            "mistakes": analysis['mistakes'],
-            "suggestions": analysis['suggestions']
+            "formatting": formatting,
+            "skills": skills,
+            "keyword": keyword,
+            "readability": readability,
+            "projects": projects,
+            "missingKeywords": analysis.get('missingKeywords', []),
+            "improvements": analysis.get('improvements', []),
+            "mistakes": analysis.get('mistakes', []),
+            "suggestions": analysis.get('suggestions', [])
         }
     })
 
@@ -1467,8 +1506,11 @@ def analyze_resume_ajax():
             "You are an expert ATS (Applicant Tracking System) Resumes Auditor. Analyze the resume text and provide a structured audit in JSON format.\n"
             "The JSON must have these exact keys:\n"
             "- \"atsScore\": integer 0 to 100\n"
+            "- \"formattingScore\": integer 0 to 100\n"
+            "- \"skillsScore\": integer 0 to 100\n"
+            "- \"keywordScore\": integer 0 to 100\n"
             "- \"readabilityScore\": integer 0 to 100\n"
-            "- \"industryMatchScore\": integer 0 to 100\n"
+            "- \"projectQualityScore\": integer 0 to 100\n"
             "- \"missingKeywords\": list of strings\n"
             "- \"improvements\": list of objects, each with \"originalText\", \"suggestedText\", \"reason\"\n"
             "- \"mistakes\": list of strings\n"
@@ -1490,13 +1532,31 @@ def analyze_resume_ajax():
     progress = RoadmapProgress.query.filter_by(user_id=current_user.id).first()
     target_role = progress.role if progress else "Software Engineer"
     analysis['target_role'] = target_role
+
+    # Ensure all scores exist with default heuristics if missing from AI
+    formatting = analysis.get('formattingScore') or analysis.get('formatting')
+    if formatting is None:
+        formatting = min(100, 70 + (10 if email else 0) + (10 if phone else 0) + (10 if github or linkedin else 0))
+    analysis['formattingScore'] = formatting
+
+    skills = analysis.get('skillsScore') or analysis.get('skills') or analysis.get('industryMatchScore') or 75
+    analysis['skillsScore'] = skills
+
+    keyword = analysis.get('keywordScore') or analysis.get('keyword') or analysis.get('industryMatchScore') or 75
+    analysis['keywordScore'] = keyword
+
+    readability = analysis.get('readabilityScore') or analysis.get('readability') or 75
+    analysis['readabilityScore'] = readability
+
+    projects = analysis.get('projectQualityScore') or analysis.get('projectQuality') or 75
+    analysis['projectQualityScore'] = projects
     
     new_analysis = ResumeAnalysis(
         user_id=current_user.id,
         filename=data.get('title', 'Scratch_Resume_Version'),
         ats_score=analysis['atsScore'],
         readability_score=analysis['readabilityScore'],
-        industry_match_score=analysis['industryMatchScore'],
+        industry_match_score=analysis.get('industryMatchScore', 75),
         target_role=target_role,
         analysis_json=json.dumps(analysis)
     )
@@ -1506,14 +1566,23 @@ def analyze_resume_ajax():
     return jsonify({
         "success": True,
         "score": analysis['atsScore'],
-        "readability": analysis['readabilityScore'],
-        "alignment": analysis['industryMatchScore'],
+        "formatting": formatting,
+        "skills": skills,
+        "keyword": keyword,
+        "readability": readability,
+        "projects": projects,
+        "alignment": analysis.get('industryMatchScore', 75),
         "feedback": {
             "score": analysis['atsScore'],
-            "missingKeywords": analysis['missingKeywords'],
-            "improvements": analysis['improvements'],
-            "mistakes": analysis['mistakes'],
-            "suggestions": analysis['suggestions']
+            "formatting": formatting,
+            "skills": skills,
+            "keyword": keyword,
+            "readability": readability,
+            "projects": projects,
+            "missingKeywords": analysis.get('missingKeywords', []),
+            "improvements": analysis.get('improvements', []),
+            "mistakes": analysis.get('mistakes', []),
+            "suggestions": analysis.get('suggestions', [])
         }
     })
 
@@ -1631,6 +1700,23 @@ def internship_center():
         compatibility += int((tech_readiness / 100) * 10)
         compatibility = min(98, max(25, compatibility))
         
+        # Determine recommended certifications based on role name
+        role_lower = job.role.lower()
+        if "cloud" in role_lower or "devops" in role_lower:
+            recommended_certs = ["AWS Cloud Practitioner", "Docker Certified Associate"]
+        elif "cyber" in role_lower or "security" in role_lower:
+            recommended_certs = ["CompTIA Security+", "CEH (Ethical Hacker)"]
+        elif "data" in role_lower or "analytics" in role_lower or "stats" in role_lower:
+            recommended_certs = ["Google Data Engineer", "Microsoft Power BI Analyst"]
+        elif "machine learning" in role_lower or " ml " in role_lower or "ai" in role_lower:
+            recommended_certs = ["TensorFlow Developer Cert", "AWS ML Specialty"]
+        elif "front" in role_lower or "web" in role_lower or "react" in role_lower or "ui" in role_lower or "ux" in role_lower:
+            recommended_certs = ["Meta Front-End Developer", "Google UX Design"]
+        else:
+            recommended_certs = ["AWS Cloud Practitioner", "Microsoft Azure Fundamentals"]
+
+        resume_match = min(98, max(25, int(compatibility * 1.05)))
+
         jobs.append({
             "id": job.id,
             "title": job.role,
@@ -1645,6 +1731,8 @@ def internship_center():
             "official_link": job.official_link,
             "is_pinned": job.is_pinned,
             "compatibility": compatibility,
+            "resume_match": resume_match,
+            "recommended_certs": recommended_certs,
             "matched_skills": matched,
             "missing_skills": missing,
             "is_bookmarked": str(job.id) in bookmarked_ids
@@ -2172,11 +2260,14 @@ def render_resume_pdf_html(content, theme):
         # Left sidebar html
         left_html = ""
         pic_url = content.get('profilePic', '').strip()
+        if not pic_url and current_user.is_authenticated and current_user.profile_photo:
+            import os
+            pic_url = os.path.join(current_app.root_path, 'static', current_user.profile_photo).replace('\\', '/')
         if pic_url:
             left_html += f'<div style="text-align: center; margin-bottom: 12px;"><img src="{pic_url}" style="width: 70px; height: 70px; border-radius: 35px; border: 2px solid {"#ffffff" if is_dark else primary};" /></div>'
             
         left_html += '<div style="margin-bottom: 12px;">'
-        left_html += f'<h4 style="font-size: 8px; font-weight: bold; border-bottom: 1px solid {divider_color}; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase; color: {accent_color};">Contact</h4>'
+        left_html += f'<h4 style="font-size: 8px; font-weight: bold; border-bottom: 0.75px solid {divider_color}; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase; color: {accent_color};">Contact</h4>'
         left_html += f'<div style="font-size: 7px; line-height: 1.3; color: {"#e2e8f0" if is_dark else "#4b5563"};">'
         if addr: left_html += f'<div style="margin-bottom: 2px;">📍 {addr}</div>'
         if email: left_html += f'<div style="margin-bottom: 2px;">✉️ {email}</div>'
@@ -2196,7 +2287,7 @@ def render_resume_pdf_html(content, theme):
         skills_web = content.get('skillsWeb', '').strip()
         if skills_prog or skills_cyber or skills_tools or skills_web:
             left_html += '<div style="margin-bottom: 12px;">'
-            left_html += f'<h4 style="font-size: 8px; font-weight: bold; border-bottom: 1px solid {divider_color}; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase; color: {accent_color};">Skills</h4>'
+            left_html += f'<h4 style="font-size: 8px; font-weight: bold; border-bottom: 0.75px solid {divider_color}; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase; color: {accent_color};">Skills</h4>'
             left_html += f'<div style="font-size: 7px; line-height: 1.3; color: {"#e2e8f0" if is_dark else "#4b5563"};">'
             if skills_prog: left_html += f'<div style="margin-bottom: 2px;"><strong>Lang:</strong> {skills_prog}</div>'
             if skills_cyber: left_html += f'<div style="margin-bottom: 2px;"><strong>Cyber:</strong> {skills_cyber}</div>'
@@ -2209,7 +2300,7 @@ def render_resume_pdf_html(content, theme):
         interests = content.get('interests', '').strip()
         if langs or interests:
             left_html += '<div style="margin-bottom: 12px;">'
-            left_html += f'<h4 style="font-size: 8px; font-weight: bold; border-bottom: 1px solid {divider_color}; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase; color: {accent_color};">Languages</h4>'
+            left_html += f'<h4 style="font-size: 8px; font-weight: bold; border-bottom: 0.75px solid {divider_color}; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase; color: {accent_color};">Languages</h4>'
             left_html += f'<div style="font-size: 7px; line-height: 1.3; color: {"#e2e8f0" if is_dark else "#4b5563"};">'
             if langs: left_html += f'<div style="margin-bottom: 2px;"><strong>Langs:</strong> {langs}</div>'
             if interests: left_html += f'<div style="margin-bottom: 2px;"><strong>Interests:</strong> {interests}</div>'
@@ -2228,7 +2319,7 @@ def render_resume_pdf_html(content, theme):
             
         for sec in order:
             if sec == "experience" and exp_entries:
-                right_html += f'<div style="margin-bottom: 10px;"><h4 style="font-size: 9px; font-weight: bold; color: {primary}; border-bottom: 1px solid #cbd5e1; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase;">Experience</h4>'
+                right_html += f'<div style="margin-bottom: 10px;"><h4 style="font-size: 9px; font-weight: bold; color: {primary}; border-bottom: 0.75px solid #cbd5e1; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase;">Experience</h4>'
                 for exp in exp_entries:
                     role = exp.get('role', '').strip()
                     comp = exp.get('company', '').strip()
@@ -2255,7 +2346,7 @@ def render_resume_pdf_html(content, theme):
                 right_html += '</div>'
                 
             elif sec == "projects" and proj_entries:
-                right_html += f'<div style="margin-bottom: 10px;"><h4 style="font-size: 9px; font-weight: bold; color: {primary}; border-bottom: 1px solid #cbd5e1; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase;">Projects</h4>'
+                right_html += f'<div style="margin-bottom: 10px;"><h4 style="font-size: 9px; font-weight: bold; color: {primary}; border-bottom: 0.75px solid #cbd5e1; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase;">Projects</h4>'
                 for proj in proj_entries:
                     title = proj.get('title', '').strip()
                     link = proj.get('link', '').strip()
@@ -2278,7 +2369,7 @@ def render_resume_pdf_html(content, theme):
                 right_html += '</div>'
                 
             elif sec == "education" and edu_entries:
-                right_html += f'<div style="margin-bottom: 10px;"><h4 style="font-size: 9px; font-weight: bold; color: {primary}; border-bottom: 1px solid #cbd5e1; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase;">Education</h4>'
+                right_html += f'<div style="margin-bottom: 10px;"><h4 style="font-size: 9px; font-weight: bold; color: {primary}; border-bottom: 0.75px solid #cbd5e1; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase;">Education</h4>'
                 for edu in edu_entries:
                     inst = edu.get('inst', '').strip()
                     degree = edu.get('degree', '').strip()
@@ -2303,7 +2394,7 @@ def render_resume_pdf_html(content, theme):
                 right_html += '</div>'
                 
             elif sec == "schoolcollege" and school_list:
-                right_html += f'<div style="margin-bottom: 10px;"><h4 style="font-size: 9px; font-weight: bold; color: {primary}; border-bottom: 1px solid #cbd5e1; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase;">School & College List</h4>'
+                right_html += f'<div style="margin-bottom: 10px;"><h4 style="font-size: 9px; font-weight: bold; color: {primary}; border-bottom: 0.75px solid #cbd5e1; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase;">School & College List</h4>'
                 right_html += '<ul style="margin: 0; padding-left: 10px; font-size: 7.5px; line-height: 1.25; color: #4b5563;">'
                 for item in school_list:
                     name = item.get('name', '').strip()
@@ -2312,7 +2403,7 @@ def render_resume_pdf_html(content, theme):
                 right_html += '</ul></div>'
 
             elif sec == "certifications" and cert_entries:
-                right_html += f'<div style="margin-bottom: 10px;"><h4 style="font-size: 9px; font-weight: bold; color: {primary}; border-bottom: 1px solid #cbd5e1; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase;">Certifications</h4>'
+                right_html += f'<div style="margin-bottom: 10px;"><h4 style="font-size: 9px; font-weight: bold; color: {primary}; border-bottom: 0.75px solid #cbd5e1; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase;">Certifications</h4>'
                 right_html += '<ul style="margin: 0; padding-left: 10px; font-size: 7.5px; line-height: 1.25; color: #4b5563;">'
                 for cert in cert_entries:
                     name = cert.get('name', '').strip()
@@ -2321,7 +2412,7 @@ def render_resume_pdf_html(content, theme):
                 right_html += '</ul></div>'
                 
             elif sec == "customSection" and cust_sec_title:
-                right_html += f'<div style="margin-bottom: 10px;"><h4 style="font-size: 9px; font-weight: bold; color: {primary}; border-bottom: 1px solid #cbd5e1; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase;">{cust_sec_title}</h4>'
+                right_html += f'<div style="margin-bottom: 10px;"><h4 style="font-size: 9px; font-weight: bold; color: {primary}; border-bottom: 0.75px solid #cbd5e1; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase;">{cust_sec_title}</h4>'
                 if cust_sec_bullets:
                     right_html += '<ul style="margin: 0; padding-left: 10px; font-size: 7.5px; line-height: 1.25; color: #4b5563;">'
                     for b in cust_sec_bullets:
@@ -2332,7 +2423,7 @@ def render_resume_pdf_html(content, theme):
 
             elif sec == "achievements" and content.get('achievements', '').strip():
                 ach = content.get('achievements', '').strip()
-                right_html += f'<div style="margin-bottom: 10px;"><h4 style="font-size: 9px; font-weight: bold; color: {primary}; border-bottom: 1px solid #cbd5e1; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase;">Achievements</h4><div style="font-size: 7.5px; line-height: 1.25; color: #4b5563;">{ach}</div></div>'
+                right_html += f'<div style="margin-bottom: 10px;"><h4 style="font-size: 9px; font-weight: bold; color: {primary}; border-bottom: 0.75px solid #cbd5e1; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase;">Achievements</h4><div style="font-size: 7.5px; line-height: 1.25; color: #4b5563;">{ach}</div></div>'
                 
         # output pdf wrapper with tables
         full_html = f"""<!DOCTYPE html>
@@ -2424,7 +2515,7 @@ def render_resume_pdf_html(content, theme):
         font-size: 10px;
         font-weight: bold;
         color: {primary};
-        border-bottom: 1.5px solid {primary} !important;
+        border-bottom: 0.75px solid {primary} !important;
         margin-top: 8px;
         margin-bottom: 4px;
         padding-bottom: 1.5px;

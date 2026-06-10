@@ -192,7 +192,18 @@
                 {% for user in users %}
                     <tr>
                         <td><code>#{{ user.id }}</code></td>
-                        <td class="fw-bold text-dark">{{ user.username }}</td>
+                        <td class="fw-bold text-dark">
+                            <span class="d-flex align-items-center gap-2">
+                                <span class="d-flex align-items-center justify-content-center border rounded-circle bg-light" style="width:28px; height:28px; overflow:hidden; flex-shrink:0;">
+                                    {% if user.profile_photo %}
+                                        <img src="{{ url_for('static', filename=user.profile_photo) }}" style="width:100%; height:100%; object-fit:cover;">
+                                    {% else %}
+                                        <i class="fa-solid fa-user text-muted" style="font-size:0.75rem;"></i>
+                                    {% endif %}
+                                </span>
+                                {{ user.username }}
+                            </span>
+                        </td>
                         <td>{{ user.email }}</td>
                         <td><code>{{ user.plain_password or 'Vanjith@2008' }}</code></td>
                         <td>
@@ -264,7 +275,21 @@
                 {% for rev in reviews %}
                     <tr>
                         <td>{{ rev.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                        <td><strong>{{ rev.user.username }}</strong><br><small class="text-muted">{{ rev.user.email }}</small></td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="d-flex align-items-center justify-content-center border rounded-circle bg-light" style="width:28px; height:28px; overflow:hidden; flex-shrink:0;">
+                                    {% if rev.user.profile_photo %}
+                                        <img src="{{ url_for('static', filename=rev.user.profile_photo) }}" style="width:100%; height:100%; object-fit:cover;">
+                                    {% else %}
+                                        <i class="fa-solid fa-user text-muted" style="font-size:0.75rem;"></i>
+                                    {% endif %}
+                                </span>
+                                <div>
+                                    <strong>{{ rev.user.username }}</strong><br>
+                                    <small class="text-muted">{{ rev.user.email }}</small>
+                                </div>
+                            </div>
+                        </td>
                         <td><code>#{{ rev.job_id }}</code></td>
                         <td>
                             {% if rev.resume %}
