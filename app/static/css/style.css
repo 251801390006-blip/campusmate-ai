@@ -168,7 +168,7 @@ body {
 /* Laptop-Only Sizing: 125% root font scale for high readability on desktop */
 @media (min-width: 992px) {
     html {
-        font-size: 125%;
+        font-size: 100%;
     }
 }
 @media (max-width: 991.98px) {
@@ -1211,7 +1211,7 @@ a:hover {
     min-height: 520px;
     font-size: 13px;
     line-height: 1.5;
-    transition: all 0.3s ease;
+    transition: transform 0.2s ease;
 }
 
 /* Force PDF A4 single page constraints */
@@ -1224,7 +1224,7 @@ a:hover {
     height: 297mm !important;
     min-height: 297mm !important;
     max-height: 297mm !important;
-    padding: 18mm !important;
+    padding: 12mm !important;
     box-sizing: border-box !important;
     overflow: hidden !important;
 }

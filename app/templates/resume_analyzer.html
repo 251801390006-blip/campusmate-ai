@@ -211,6 +211,24 @@
                     <!-- Upload status text -->
                     <div id="upload-status-text-builder" class="text-center p-2 mb-2 border rounded bg-secondary-card text-secondary animate-fade-in" style="font-size: 0.72rem; display:none; border-color: var(--accent-color) !important;"></div>
                     
+                    <!-- Choose Template Accordion (Desktop Only) -->
+                    <details class="accordion-section p-2 border rounded bg-primary-card d-none d-xl-block" id="accordion-templates" open style="border-color: var(--border-color) !important;">
+                        <summary class="fw-bold text-secondary-text" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-palette me-2 text-muted"></i> Choose Template</summary>
+                        <div class="mt-2">
+                            <div class="modal-tabs-header d-flex flex-wrap gap-1 border-0 mb-2.5">
+                                <button class="modal-tab-btn active py-1 px-2" onclick="filterModalTemplates('original', this)" style="font-size:0.65rem;">Original</button>
+                                <button class="modal-tab-btn py-1 px-2" onclick="filterModalTemplates('ats', this)" style="font-size:0.65rem;">ATS Standard</button>
+                                <button class="modal-tab-btn py-1 px-2" onclick="filterModalTemplates('modern', this)" style="font-size:0.65rem;">Modern</button>
+                                <button class="modal-tab-btn py-1 px-2" onclick="filterModalTemplates('professional', this)" style="font-size:0.65rem;">Professional</button>
+                                <button class="modal-tab-btn py-1 px-2" onclick="filterModalTemplates('student', this)" style="font-size:0.65rem;">Student CV</button>
+                                <button class="modal-tab-btn py-1 px-2" onclick="filterModalTemplates('canva', this)" style="font-size:0.65rem;">Canva Premium</button>
+                            </div>
+                            <div class="templates-grid modal-templates-grid" id="desktop-templates-list-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap:8px; max-height: 200px; overflow-y: auto; padding: 4px;">
+                                <!-- Rendered via JavaScript -->
+                            </div>
+                        </div>
+                    </details>
+
                     <!-- 1. Profile Info Accordion -->
                     <details class="accordion-section p-2 border rounded bg-primary-card" id="accordion-profile">
                         <summary class="fw-bold text-secondary-text" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-user me-2 text-muted"></i> Profile & Contacts</summary>
@@ -504,127 +522,148 @@
                 </div>
             </div>
 
-            <!-- Preview wrapper parent (A4 Resume render container) -->
-            <div id="resume-preview-sheet-wrapper-parent" style="position: relative;">
-                <div class="resume-preview-sheet-wrapper border shadow-sm">
-                    <div id="resume-sheet-scaler">
-                        <!-- A4 Sheet Paper -->
-                        <div class="resume-sheet classic" id="resume-sheet-paper" style="font-family: 'Outfit', sans-serif;">
-                            <div class="resume-render-header" style="border-bottom: 2px solid #2563eb; padding-bottom: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px;">
-                                <div style="flex-grow: 1;">
-                                    <h1 id="res-render-name" style="font-size: 20px; font-weight:800; color: #1e3a8a; margin-bottom: 4px; text-transform: uppercase;">Alex Smith</h1>
-                                    <div class="resume-render-meta" style="font-size: 10px; color: #4b5563; line-height: 1.4;">
-                                        <!-- Built dynamically in syncResumeFields -->
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div id="resume-sections-container">
-                                <!-- Reordered dynamically -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Premium Floating Zoom & Fit Controls Toolbar -->
-                <div class="resume-canvas-toolbar shadow-sm">
-                    <button class="btn-canvas-ctrl" onclick="zoomOutResume()" title="Zoom Out"><i class="fa-solid fa-minus"></i></button>
-                    <input type="range" id="resume-zoom-slider" min="30" max="250" value="100" class="canvas-zoom-slider" oninput="onZoomSliderChange(this.value)">
-                    <button class="btn-canvas-ctrl" onclick="zoomInResume()" title="Zoom In"><i class="fa-solid fa-plus"></i></button>
-                    <span id="resume-zoom-percent">100%</span>
-                    <div class="canvas-ctrl-divider"></div>
-                    <button class="btn-canvas-ctrl" onclick="fitResumeToWidth()" title="Fit to Width"><i class="fa-solid fa-arrows-left-right"></i> Fit Width</button>
-                    <button class="btn-canvas-ctrl" onclick="fitResumeToPage()" title="Fit to Page"><i class="fa-solid fa-arrows-up-down"></i> Fit Page</button>
-                    <button class="btn-canvas-ctrl" onclick="resetResumeZoom()" title="Reset Zoom"><i class="fa-solid fa-arrows-to-dot"></i></button>
-                    <button class="btn-canvas-ctrl" onclick="toggleFullScreenResume()" title="Full Screen"><i class="fa-solid fa-expand"></i></button>
+            <!-- Desktop Download Options Toolbar -->
+            <div class="desktop-download-toolbar d-none d-xl-flex justify-content-between align-items-center mb-3 p-2.5 border rounded bg-primary-card" style="border-color: var(--border-color) !important;">
+                <span class="fw-bold" style="font-size:0.75rem; color:var(--text-secondary);"><i class="fa-solid fa-cloud-arrow-down me-2 text-accent"></i> Download & Export Options</span>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-primary py-1 px-3 fw-semibold text-nowrap" style="font-size: 0.72rem; height: 30px; display: inline-flex; align-items: center;" onclick="downloadResumePDF()"><i class="fa-solid fa-file-pdf me-1.5"></i> PDF</button>
+                    <button class="btn btn-sm btn-outline py-1 px-3 text-nowrap" style="font-size: 0.72rem; height: 30px; display: inline-flex; align-items: center;" onclick="downloadResumeDOCX()"><i class="fa-solid fa-file-word text-primary me-1.5"></i> Word</button>
+                    <button class="btn btn-sm btn-outline py-1 px-3 text-nowrap" style="font-size: 0.72rem; height: 30px; display: inline-flex; align-items: center;" onclick="downloadResumeJSON()"><i class="fa-solid fa-file-code text-info me-1.5"></i> JSON</button>
+                    <button class="btn btn-sm btn-outline py-1 px-3 text-nowrap" style="font-size: 0.72rem; height: 30px; display: inline-flex; align-items: center;" onclick="generateShareLink()"><i class="fa-solid fa-share-nodes text-success me-1.5"></i> Share</button>
                 </div>
             </div>
 
-            <!-- ATS Diagnostics & Scoring Panel (Converted into slide-out drawer) -->
-            <div id="ats-dashboard-parent" class="ats-slide-out-panel">
-                <div class="ats-drawer-header">
-                    <h4 class="fw-bold mb-0 text-secondary-text" style="font-size:0.95rem;"><i class="fa-solid fa-chart-line text-accent me-2"></i> ATS Diagnostics</h4>
-                    <button class="ats-drawer-close-btn" onclick="toggleAtsDrawer()"><i class="fa-solid fa-xmark"></i></button>
+            <!-- Wrapper for side-by-side preview and ATS diagnostics on desktop >= 1200px -->
+            <div class="preview-ats-container-desktop flex-grow-1 d-flex flex-column" style="min-height:0; width:100%;">
+                
+                <!-- Preview wrapper parent (A4 Resume render container) -->
+                <div id="resume-preview-sheet-wrapper-parent" style="position: relative; flex-grow:1; display:flex; flex-direction:column; min-height:0; width:100%;">
+                    <div class="resume-preview-sheet-wrapper border shadow-sm flex-grow-1" style="min-height:0; width:100%;">
+                        <div id="resume-sheet-scaler">
+                            <!-- A4 Sheet Paper -->
+                            <div class="resume-sheet classic" id="resume-sheet-paper" style="font-family: 'Outfit', sans-serif;">
+                                <div class="resume-render-header" style="border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px;">
+                                    <div style="flex-grow: 1;">
+                                        <h1 id="res-render-name" style="font-size: 22px; font-weight:800; color: #1e3a8a; margin-bottom: 4px; text-transform: uppercase;">Alex Smith</h1>
+                                        <div class="resume-render-meta" style="font-size: 10px; color: #4b5563; line-height: 1.4;">
+                                            <!-- Built dynamically in syncResumeFields -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="resume-sections-container">
+                                    <!-- Reordered dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Premium Floating Zoom & Fit Controls Toolbar -->
+                    <div class="resume-canvas-toolbar shadow-sm">
+                        <button class="btn-canvas-ctrl" onclick="zoomOutResume()" title="Zoom Out"><i class="fa-solid fa-minus"></i></button>
+                        <input type="range" id="resume-zoom-slider" min="30" max="250" value="100" class="canvas-zoom-slider" oninput="onZoomSliderChange(this.value)">
+                        <button class="btn-canvas-ctrl" onclick="zoomInResume()" title="Zoom In"><i class="fa-solid fa-plus"></i></button>
+                        <span id="resume-zoom-percent">100%</span>
+                        <div class="canvas-ctrl-divider"></div>
+                        <button class="btn-canvas-ctrl" onclick="fitResumeToWidth()" title="Fit to Width"><i class="fa-solid fa-arrows-left-right"></i> Fit Width</button>
+                        <button class="btn-canvas-ctrl" onclick="fitResumeToPage()" title="Fit to Page"><i class="fa-solid fa-arrows-up-down"></i> Fit Page</button>
+                        <button class="btn-canvas-ctrl" onclick="resetResumeZoom()" title="Reset Zoom"><i class="fa-solid fa-arrows-to-dot"></i></button>
+                        <button class="btn-canvas-ctrl" onclick="toggleFullScreenResume()" title="Full Screen"><i class="fa-solid fa-expand"></i></button>
+                    </div>
                 </div>
-                <div class="ats-drawer-content p-3" style="overflow-y: auto; height: calc(100vh - 60px);">
-                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color);">
-                        <h4 class="fw-bold mb-0 text-secondary-text" style="font-size:0.9rem;"><i class="fa-solid fa-gauge-high text-accent me-2"></i> Diagnostics Score</h4>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="text-secondary" style="font-size: 0.72rem;">ATS Score:</span>
-                            <h3 class="fw-bold mb-0 text-accent" id="score-text-main" style="font-size: 1.25rem;">80/100</h3>
-                        </div>
+
+                <!-- ATS Diagnostics & Scoring Panel (Slide-out on mobile, inline on desktop) -->
+                <div id="ats-dashboard-parent" class="ats-slide-out-panel">
+                    <div class="ats-drawer-header">
+                        <h4 class="fw-bold mb-0 text-secondary-text" style="font-size:0.95rem;"><i class="fa-solid fa-chart-line text-accent me-2"></i> ATS Diagnostics</h4>
+                        <button class="ats-drawer-close-btn" onclick="toggleAtsDrawer()"><i class="fa-solid fa-xmark"></i></button>
                     </div>
-
-                    <!-- Visual sub-scores progress indicators -->
-                    <div class="mb-4 d-flex flex-column gap-2.5">
-                        <!-- 1. Formatting Score -->
-                        <div>
-                            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.72rem;">
-                                <span class="text-secondary fw-semibold"><i class="fa-solid fa-crop text-muted me-1"></i> Formatting Score</span>
-                                <strong class="text-secondary" id="score-formatting-text">80%</strong>
+                    <div class="ats-drawer-content p-3" style="overflow-y: auto; height: calc(100% - 50px);">
+                        
+                        <!-- Circular Score Dashboard (Visual charts) -->
+                        <div class="circular-dashboard mb-4 p-3 border rounded bg-primary-card text-center d-flex flex-column align-items-center gap-3" style="border-color: var(--border-color) !important;">
+                            <div>
+                                <span class="text-secondary fw-bold" style="font-size: 0.72rem; text-transform: uppercase;">Overall ATS Compatibility</span>
+                                <div class="position-relative mt-2 mx-auto" style="width:90px; height:90px;">
+                                    <svg width="90" height="90" viewBox="0 0 36 36" class="circular-chart">
+                                      <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--bg-tertiary, #e2e8f0)" stroke-width="3" />
+                                      <path class="circle" id="circle-main" stroke-dasharray="80, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--accent-color, #0d9488)" stroke-width="3" stroke-linecap="round" />
+                                    </svg>
+                                    <div class="position-absolute top-50 start-50 translate-middle text-center">
+                                        <h3 class="fw-bold mb-0 text-accent" id="score-text-main" style="font-size:1.2rem; line-height:1;">80%</h3>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="progress-bar-container" style="background: var(--bg-tertiary); height: 6px; border-radius: 3px; overflow: hidden;">
-                                <div class="progress-bar-fill" id="score-formatting" style="background: #10b981; height: 100%; width: 80%; transition: width 0.3s ease;"></div>
+                            
+                            <div class="circular-charts-grid w-100" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:6px;">
+                                <!-- Formatting Score -->
+                                <div class="text-center">
+                                    <span class="d-block text-secondary" style="font-size: 0.55rem; font-weight:700; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="Formatting">Format</span>
+                                    <div class="position-relative mx-auto mt-1" style="width:42px; height:42px;">
+                                        <svg width="42" height="42" viewBox="0 0 36 36" class="circular-chart">
+                                          <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--bg-tertiary, #e2e8f0)" stroke-width="3.5" />
+                                          <path class="circle" id="circle-formatting" stroke-dasharray="80, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#10b981" stroke-width="3.5" stroke-linecap="round" />
+                                        </svg>
+                                        <span class="position-absolute top-50 start-50 translate-middle text-secondary-text fw-bold" id="score-formatting-text" style="font-size:0.55rem;">80%</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Skills Score -->
+                                <div class="text-center">
+                                    <span class="d-block text-secondary" style="font-size: 0.55rem; font-weight:700; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="Skills Match">Skills</span>
+                                    <div class="position-relative mx-auto mt-1" style="width:42px; height:42px;">
+                                        <svg width="42" height="42" viewBox="0 0 36 36" class="circular-chart">
+                                          <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--bg-tertiary, #e2e8f0)" stroke-width="3.5" />
+                                          <path class="circle" id="circle-skills" stroke-dasharray="85, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#3b82f6" stroke-width="3.5" stroke-linecap="round" />
+                                        </svg>
+                                        <span class="position-absolute top-50 start-50 translate-middle text-secondary-text fw-bold" id="score-skills-text" style="font-size:0.55rem;">85%</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Keyword Score -->
+                                <div class="text-center">
+                                    <span class="d-block text-secondary" style="font-size: 0.55rem; font-weight:700; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="Keywords">Keywords</span>
+                                    <div class="position-relative mx-auto mt-1" style="width:42px; height:42px;">
+                                        <svg width="42" height="42" viewBox="0 0 36 36" class="circular-chart">
+                                          <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--bg-tertiary, #e2e8f0)" stroke-width="3.5" />
+                                          <path class="circle" id="circle-keyword" stroke-dasharray="90, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#8b5cf6" stroke-width="3.5" stroke-linecap="round" />
+                                        </svg>
+                                        <span class="position-absolute top-50 start-50 translate-middle text-secondary-text fw-bold" id="score-keyword-text" style="font-size:0.55rem;">90%</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Projects Score -->
+                                <div class="text-center">
+                                    <span class="d-block text-secondary" style="font-size: 0.55rem; font-weight:700; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="Project Quality">Projects</span>
+                                    <div class="position-relative mx-auto mt-1" style="width:42px; height:42px;">
+                                        <svg width="42" height="42" viewBox="0 0 36 36" class="circular-chart">
+                                          <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--bg-tertiary, #e2e8f0)" stroke-width="3.5" />
+                                          <path class="circle" id="circle-projects" stroke-dasharray="75, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#ec4899" stroke-width="3.5" stroke-linecap="round" />
+                                        </svg>
+                                        <span class="position-absolute top-50 start-50 translate-middle text-secondary-text fw-bold" id="score-projects-text" style="font-size:0.55rem;">75%</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- 2. Skills Score -->
-                        <div>
-                            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.72rem;">
-                                <span class="text-secondary fw-semibold"><i class="fa-solid fa-screwdriver-wrench text-muted me-1"></i> Skills Match Score</span>
-                                <strong class="text-secondary" id="score-skills-text">85%</strong>
-                            </div>
-                            <div class="progress-bar-container" style="background: var(--bg-tertiary); height: 6px; border-radius: 3px; overflow: hidden;">
-                                <div class="progress-bar-fill" id="score-skills" style="background: #3b82f6; height: 100%; width: 85%; transition: width 0.3s ease;"></div>
-                            </div>
+                        <!-- Readability Score (Hidden from circular layout but preserved as hidden element for compatibility) -->
+                        <div style="display:none;">
+                            <span id="score-readability-text">85%</span>
+                            <div id="score-readability"></div>
                         </div>
 
-                        <!-- 3. Keyword Score -->
-                        <div>
-                            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.72rem;">
-                                <span class="text-secondary fw-semibold"><i class="fa-solid fa-key text-muted me-1"></i> Keyword Relevance Score</span>
-                                <strong class="text-secondary" id="score-keyword-text">90%</strong>
-                            </div>
-                            <div class="progress-bar-container" style="background: var(--bg-tertiary); height: 6px; border-radius: 3px; overflow: hidden;">
-                                <div class="progress-bar-fill" id="score-keyword" style="background: #8b5cf6; height: 100%; width: 90%; transition: width 0.3s ease;"></div>
-                            </div>
-                        </div>
-
-                        <!-- 4. Recruiter Readability Score -->
-                        <div>
-                            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.72rem;">
-                                <span class="text-secondary fw-semibold"><i class="fa-solid fa-book-open text-muted me-1"></i> Recruiter Readability Score</span>
-                                <strong class="text-secondary" id="score-readability-text">85%</strong>
-                            </div>
-                            <div class="progress-bar-container" style="background: var(--bg-tertiary); height: 6px; border-radius: 3px; overflow: hidden;">
-                                <div class="progress-bar-fill" id="score-readability" style="background: #f59e0b; height: 100%; width: 85%; transition: width 0.3s ease;"></div>
+                        <!-- Realtime Keyword checklist matching -->
+                        <div class="p-3 border rounded bg-secondary-card mb-3" style="border-color: var(--border-color) !important;">
+                            <span class="fw-bold text-secondary-text d-block mb-2" style="font-size:0.7rem; text-transform:uppercase;"><i class="fa-solid fa-satellite-dish text-cyan me-1"></i> Real-time Keyword Alignment Check</span>
+                            <div id="live-keywords-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap:6px;">
+                                <div class="live-keyword-item" id="kw-python" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Python</div>
+                                <div class="live-keyword-item" id="kw-flask" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Flask</div>
+                                <div class="live-keyword-item" id="kw-docker" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Docker</div>
+                                <div class="live-keyword-item" id="kw-wireshark" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Wireshark</div>
+                                <div class="live-keyword-item" id="kw-git" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Git</div>
+                                <div class="live-keyword-item" id="kw-react" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> React</div>
                             </div>
                         </div>
-
-                        <!-- 5. Project Quality Score -->
-                        <div>
-                            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.72rem;">
-                                <span class="text-secondary fw-semibold"><i class="fa-solid fa-diagram-project text-muted me-1"></i> Project Quality Score</span>
-                                <strong class="text-secondary" id="score-projects-text">75%</strong>
-                            </div>
-                            <div class="progress-bar-container" style="background: var(--bg-tertiary); height: 6px; border-radius: 3px; overflow: hidden;">
-                                <div class="progress-bar-fill" id="score-projects" style="background: #ec4899; height: 100%; width: 75%; transition: width 0.3s ease;"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Realtime Keyword checklist matching -->
-                    <div class="p-3 border rounded bg-secondary-card mb-3">
-                        <span class="fw-bold text-secondary-text d-block mb-2" style="font-size:0.7rem; text-transform:uppercase;"><i class="fa-solid fa-satellite-dish text-cyan me-1"></i> Real-time Keyword Alignment Check</span>
-                        <div id="live-keywords-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap:6px;">
-                            <div class="live-keyword-item" id="kw-python" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Python</div>
-                            <div class="live-keyword-item" id="kw-flask" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Flask</div>
-                            <div class="live-keyword-item" id="kw-docker" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Docker</div>
-                            <div class="live-keyword-item" id="kw-wireshark" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Wireshark</div>
-                            <div class="live-keyword-item" id="kw-git" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Git</div>
-                            <div class="live-keyword-item" id="kw-react" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> React</div>
-                        </div>
-                    </div>
 
                     <!-- Phrasing Suggestions body -->
                     <div class="flat-card border p-3 bg-secondary-card">
@@ -635,8 +674,9 @@
                     </div>
                 </div>
             </div>
-
-        </div>
+            
+            </div> <!-- Close preview-ats-container-desktop -->
+        </div> <!-- Close flat-card of visual-viewer-column -->
         
         <!-- Mobile-only Templates tab container -->
         <div id="mobile-templates-container" class="flat-card bg-secondary-card border p-3 mb-4 d-lg-none">
@@ -1708,26 +1748,26 @@ function syncResumeFields() {
     // SINGLE COLUMN CLASSIC LAYOUTS
     const isElegant = themeId === "canva-elegant";
     paper.className = `resume-sheet ${themeId}`;
-    paper.style.padding = "25px";
+    paper.style.padding = "45px"; // Matches 12mm print margins perfectly
     
     let headerHtml = "";
     if (isElegant) {
         headerHtml = `
-            <div style="text-align: center; margin-bottom: 15px; border-bottom: 2px solid ${accentColor}; padding-bottom: 8px;">
-                <h1 style="font-size: 22px; font-weight:800; color: ${accentColor}; margin-bottom: 4px; text-transform: uppercase; letter-spacing:1px;">${nameVal}</h1>
+            <div style="text-align: center; margin-bottom: 15px; border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 8px;">
+                <h1 style="font-size: 24px; font-weight:800; color: ${accentColor}; margin-bottom: 4px; text-transform: uppercase; letter-spacing:1px;">${nameVal}</h1>
                 ${headlineVal ? `<div style="font-size: 11px; font-weight:700; color:#475569; margin-bottom:4px; text-transform:uppercase;">${headlineVal}</div>` : ''}
-                <div style="font-size: 9px; color: #4b5563; line-height: 1.4; word-spacing: 2px;">
+                <div style="font-size: 9.5px; color: #4b5563; line-height: 1.45; word-spacing: 2px;">
                     ${metaParts.join(" &bull; ")}
                 </div>
             </div>
         `;
     } else {
         headerHtml = `
-            <div class="resume-render-header" style="border-bottom: 2px solid ${accentColor}; padding-bottom: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px;">
+            <div class="resume-render-header" style="border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px;">
                 <div style="flex-grow: 1; text-align:left;">
-                    <h1 id="res-render-name" style="font-size: 20px; font-weight:800; color: ${accentColor}; margin-bottom: 4px; text-transform: uppercase;">${nameVal}</h1>
-                    ${headlineVal ? `<div style="font-size: 10px; font-weight:700; color:#475569; margin-bottom:3px; text-transform:uppercase; text-align:left;">${headlineVal}</div>` : ''}
-                    <div class="resume-render-meta" style="font-size: 10px; color: #4b5563; line-height: 1.4; text-align:left;">
+                    <h1 id="res-render-name" style="font-size: 24px; font-weight:800; color: ${accentColor}; margin-bottom: 4px; text-transform: uppercase;">${nameVal}</h1>
+                    ${headlineVal ? `<div style="font-size: 11px; font-weight:700; color:#475569; margin-bottom:3px; text-transform:uppercase; text-align:left;">${headlineVal}</div>` : ''}
+                    <div class="resume-render-meta" style="font-size: 9.5px; color: #4b5563; line-height: 1.45; text-align:left;">
                         ${metaParts.join(" | ")}
                     </div>
                 </div>
@@ -1741,14 +1781,13 @@ function syncResumeFields() {
     
     const summaryVal = document.getElementById("res-custom").value.trim();
     if (summaryVal) {
-        let summaryHtml = `<div style="font-size: 9.5px; line-height: 1.4; color: #374151; margin-bottom: 12px; text-align: ${isElegant ? 'center' : 'left'}">${summaryVal}</div>`;
+        let summaryHtml = `<div style="font-size: 10px; line-height: 1.45; color: #374151; margin-bottom: 12px; text-align: ${isElegant ? 'center' : 'left'}">${summaryVal}</div>`;
         container.insertAdjacentHTML('beforeend', summaryHtml);
     }
-    
-    sectionOrder.forEach(sec => {
+      sectionOrder.forEach(sec => {
         if (sec === "education" && educationList.length > 0) {
             let html = `<div class="resume-render-section" data-section="education">`;
-            html += `<h3 style="font-size:11px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; letter-spacing:0.5px; border-bottom: 1.5px solid ${accentColor}; padding-bottom: 1px; text-align: ${isElegant ? 'center' : 'left'}">Education</h3>`;
+            html += `<h3 style="font-size:12px; font-weight:700; color:${accentColor}; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px; border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 2px; text-align: ${isElegant ? 'center' : 'left'}">Education</h3>`;
             educationList.forEach(item => {
                 if (item.inst || item.degree) {
                     html += `
@@ -1761,7 +1800,7 @@ function syncResumeFields() {
                             <span>${item.dates || ''}</span>
                             <span>${item.gpa || ''}</span>
                         </div>
-                        ${item.coursework ? `<div style="font-size:9.5px; margin-top:2px; color:#4b5563;">Relevant Coursework: ${item.coursework}</div>` : ''}
+                        ${item.coursework ? `<div style="font-size:9.5px; margin-top:2px; color:#4b5563; line-height:1.4;">Relevant Coursework: ${item.coursework}</div>` : ''}
                     </div>
                     `;
                 }
@@ -1778,8 +1817,8 @@ function syncResumeFields() {
             
             if (skillsProg || skillsCyber || skillsTools || skillsWeb) {
                 let html = `<div class="resume-render-section" data-section="skills">`;
-                html += `<h3 style="font-size:11px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; letter-spacing:0.5px; border-bottom: 1.5px solid ${accentColor}; padding-bottom: 1px; text-align: ${isElegant ? 'center' : 'left'}">Technical Skills</h3>`;
-                html += `<div style="font-size:10px; line-height:1.4; color:#374151; text-align:left;">`;
+                html += `<h3 style="font-size:12px; font-weight:700; color:${accentColor}; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px; border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 2px; text-align: ${isElegant ? 'center' : 'left'}">Technical Skills</h3>`;
+                html += `<div style="font-size:10px; line-height:1.45; color:#374151; text-align:left;">`;
                 if (skillsProg) html += `<div><strong>Programming:</strong> <span>${skillsProg}</span></div>`;
                 if (skillsCyber) html += `<div><strong>Cybersecurity:</strong> <span>${skillsCyber}</span></div>`;
                 if (skillsTools) html += `<div><strong>Tools:</strong> <span>${skillsTools}</span></div>`;
@@ -1791,7 +1830,7 @@ function syncResumeFields() {
         
         else if (sec === "experience" && experienceList.length > 0) {
             let html = `<div class="resume-render-section" data-section="experience">`;
-            html += `<h3 style="font-size:11px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; letter-spacing:0.5px; border-bottom: 1.5px solid ${accentColor}; padding-bottom: 1px; text-align: ${isElegant ? 'center' : 'left'}">Experience</h3>`;
+            html += `<h3 style="font-size:12px; font-weight:700; color:${accentColor}; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px; border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 2px; text-align: ${isElegant ? 'center' : 'left'}">Experience</h3>`;
             experienceList.forEach(item => {
                 if (item.role || item.company) {
                     let bulletsHtml = "";
@@ -1802,12 +1841,12 @@ function syncResumeFields() {
                     }
                     html += `
                     <div style="margin-bottom:8px; text-align:left;">
-                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:10px;">
+                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:10.5px;">
                             <span>${item.role || ''}</span>
-                            <span>${item.dates || ''}</span>
+                            <span style="font-weight:normal; font-size:9.5px; color:#6b7280;">${item.dates || ''}</span>
                         </div>
                         <div style="font-size:9.5px; font-style:italic; color:#6b7280; margin-bottom:2px;">${item.company || ''}</div>
-                        ${bulletsHtml ? `<ul class="bullet-list" style="font-size:9.5px; margin-left:14px; margin-top:2px; line-height:1.4; color:#374151;">${bulletsHtml}</ul>` : ''}
+                        ${bulletsHtml ? `<ul class="bullet-list" style="font-size:9.5px; margin-left:14px; margin-top:2px; line-height:1.45; color:#374151;">${bulletsHtml}</ul>` : ''}
                     </div>
                     `;
                 }
@@ -1818,7 +1857,7 @@ function syncResumeFields() {
         
         else if (sec === "projects" && projectsList.length > 0) {
             let html = `<div class="resume-render-section" data-section="projects">`;
-            html += `<h3 style="font-size:11px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; letter-spacing:0.5px; border-bottom: 1.5px solid ${accentColor}; padding-bottom: 1px; text-align: ${isElegant ? 'center' : 'left'}">Projects</h3>`;
+            html += `<h3 style="font-size:12px; font-weight:700; color:${accentColor}; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px; border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 2px; text-align: ${isElegant ? 'center' : 'left'}">Projects</h3>`;
             projectsList.forEach(item => {
                 if (item.title) {
                     let bulletsHtml = "";
@@ -1829,11 +1868,11 @@ function syncResumeFields() {
                     }
                     html += `
                     <div style="margin-bottom:8px; text-align:left;">
-                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:10px;">
+                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:10.5px;">
                             <span>${item.title || ''}</span>
                             <span style="font-weight:normal; font-size:9.5px; color:#4b5563;">${item.link || ''}</span>
                         </div>
-                        ${bulletsHtml ? `<ul class="bullet-list" style="font-size:9.5px; margin-left:14px; margin-top:2px; line-height:1.4; color:#374151;">${bulletsHtml}</ul>` : ''}
+                        ${bulletsHtml ? `<ul class="bullet-list" style="font-size:9.5px; margin-left:14px; margin-top:2px; line-height:1.45; color:#374151;">${bulletsHtml}</ul>` : ''}
                     </div>
                     `;
                 }
@@ -1844,8 +1883,8 @@ function syncResumeFields() {
         
         else if (sec === "schoolcollege" && schoolCollegeList.length > 0) {
             let html = `<div class="resume-render-section" data-section="schoolcollege">`;
-            html += `<h3 style="font-size:11px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; letter-spacing:0.5px; border-bottom: 1.5px solid ${accentColor}; padding-bottom: 1px; text-align: ${isElegant ? 'center' : 'left'}">School & College List</h3>`;
-            html += `<ul class="bullet-list" style="font-size:9.5px; margin-left:14px; margin-top:2px; line-height:1.4; color:#374151; text-align:left;">`;
+            html += `<h3 style="font-size:12px; font-weight:700; color:${accentColor}; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px; border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 2px; text-align: ${isElegant ? 'center' : 'left'}">School & College List</h3>`;
+            html += `<ul class="bullet-list" style="font-size:9.5px; margin-left:14px; margin-top:2px; line-height:1.45; color:#374151; text-align:left;">`;
             schoolCollegeList.forEach(item => {
                 if (item.name && item.name.trim()) html += `<li style="margin-bottom:2px;">${item.name.trim()}</li>`;
             });
@@ -1855,15 +1894,15 @@ function syncResumeFields() {
         
         else if (sec === "certifications" && certificationsList.length > 0) {
             let html = `<div class="resume-render-section" data-section="certifications">`;
-            html += `<h3 style="font-size:11px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; letter-spacing:0.5px; border-bottom: 1.5px solid ${accentColor}; padding-bottom: 1px; text-align: ${isElegant ? 'center' : 'left'}">Certifications</h3>`;
-            html += `<ul class="bullet-list" style="font-size:9.5px; margin-left:14px; margin-top:2px; line-height:1.4; color:#374151; text-align:left;">`;
+            html += `<h3 style="font-size:12px; font-weight:700; color:${accentColor}; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px; border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 2px; text-align: ${isElegant ? 'center' : 'left'}">Certifications</h3>`;
+            html += `<ul class="bullet-list" style="font-size:9.5px; margin-left:14px; margin-top:2px; line-height:1.45; color:#374151; text-align:left;">`;
             certificationsList.forEach(item => {
                 if (item.name.trim()) html += `<li style="margin-bottom:2px;">${item.name.trim()}</li>`;
             });
             html += `</ul></div>`;
             container.insertAdjacentHTML('beforeend', html);
         }
-
+        
         else if (sec === "customSection" && customSection && customSection.title && customSection.title.trim()) {
             const title = customSection.title.trim();
             let bulletsHtml = "";
@@ -1873,9 +1912,9 @@ function syncResumeFields() {
                 });
             }
             let html = `<div class="resume-render-section" data-section="customSection">`;
-            html += `<h3 style="font-size:11px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; letter-spacing:0.5px; border-bottom: 1.5px solid ${accentColor}; padding-bottom: 1px; text-align: ${isElegant ? 'center' : 'left'}">${title}</h3>`;
+            html += `<h3 style="font-size:12px; font-weight:700; color:${accentColor}; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px; border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 2px; text-align: ${isElegant ? 'center' : 'left'}">${title}</h3>`;
             if (bulletsHtml) {
-                html += `<ul class="bullet-list" style="font-size:9.5px; margin-left:14px; margin-top:2px; line-height:1.4; color:#374151; text-align:left;">${bulletsHtml}</ul>`;
+                html += `<ul class="bullet-list" style="font-size:9.5px; margin-left:14px; margin-top:2px; line-height:1.45; color:#374151; text-align:left;">${bulletsHtml}</ul>`;
             }
             html += `</div>`;
             container.insertAdjacentHTML('beforeend', html);
@@ -1885,8 +1924,8 @@ function syncResumeFields() {
             const achievementsVal = document.getElementById("res-achievements") ? document.getElementById("res-achievements").value.trim() : "";
             if (achievementsVal) {
                 let html = `<div class="resume-render-section" data-section="achievements">`;
-                html += `<h3 style="font-size:11px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; letter-spacing:0.5px; border-bottom: 1.5px solid ${accentColor}; padding-bottom: 1px; text-align: ${isElegant ? 'center' : 'left'}">Achievements</h3>`;
-                html += `<div style="font-size:9.5px; line-height:1.4; color:#374151; text-align:left;">${achievementsVal}</div></div>`;
+                html += `<h3 style="font-size:12px; font-weight:700; color:${accentColor}; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px; border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 2px; text-align: ${isElegant ? 'center' : 'left'}">Achievements</h3>`;
+                html += `<div style="font-size:10px; line-height:1.45; color:#374151; text-align:left;">${achievementsVal}</div></div>`;
                 container.insertAdjacentHTML('beforeend', html);
             }
         }
@@ -1896,8 +1935,8 @@ function syncResumeFields() {
             const workshopsVal = document.getElementById("res-workshops") ? document.getElementById("res-workshops").value.trim() : "";
             if (hackathonsVal || workshopsVal) {
                 let html = `<div class="resume-render-section" data-section="hackathons">`;
-                html += `<h3 style="font-size:11px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; letter-spacing:0.5px; border-bottom: 1.5px solid ${accentColor}; padding-bottom: 1px; text-align: ${isElegant ? 'center' : 'left'}">Hackathons & Workshops</h3>`;
-                html += `<div style="font-size:9.5px; line-height:1.4; color:#374151; text-align:left;">`;
+                html += `<h3 style="font-size:12px; font-weight:700; color:${accentColor}; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px; border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 2px; text-align: ${isElegant ? 'center' : 'left'}">Hackathons & Workshops</h3>`;
+                html += `<div style="font-size:10px; line-height:1.45; color:#374151; text-align:left;">`;
                 if (hackathonsVal) html += `<div><strong>Hackathons:</strong> ${hackathonsVal}</div>`;
                 if (workshopsVal) html += `<div style="margin-top:2px;"><strong>Workshops:</strong> ${workshopsVal}</div>`;
                 html += `</div></div>`;
@@ -1910,8 +1949,8 @@ function syncResumeFields() {
             const interestsVal = document.getElementById("res-interests") ? document.getElementById("res-interests").value.trim() : "";
             if (languagesVal || interestsVal) {
                 let html = `<div class="resume-render-section" data-section="languages">`;
-                html += `<h3 style="font-size:11px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; letter-spacing:0.5px; border-bottom: 1.5px solid ${accentColor}; padding-bottom: 1px; text-align: ${isElegant ? 'center' : 'left'}">Languages & Interests</h3>`;
-                html += `<div style="font-size:9.5px; line-height:1.4; color:#374151; text-align:left;">`;
+                html += `<h3 style="font-size:12px; font-weight:700; color:${accentColor}; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px; border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 2px; text-align: ${isElegant ? 'center' : 'left'}">Languages & Interests</h3>`;
+                html += `<div style="font-size:10px; line-height:1.45; color:#374151; text-align:left;">`;
                 if (languagesVal) html += `<div><strong>Languages:</strong> ${languagesVal}</div>`;
                 if (interestsVal) html += `<div style="margin-top:2px;"><strong>Interests:</strong> ${interestsVal}</div>`;
                 html += `</div></div>`;
@@ -2446,6 +2485,14 @@ async function downloadResumePDF() {
     const theme = document.getElementById("resume-theme-select").value;
     const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
     
+    let previewHtml = "";
+    const sheet = document.getElementById("resume-sheet-paper");
+    if (sheet) {
+        const clone = sheet.cloneNode(true);
+        clone.classList.add("pdf-export-mode");
+        previewHtml = clone.outerHTML;
+    }
+    
     try {
         const response = await fetch('/resume-analyzer/export-pdf', {
             method: 'POST',
@@ -2455,7 +2502,8 @@ async function downloadResumePDF() {
             },
             body: JSON.stringify({
                 content: content,
-                theme: theme
+                theme: theme,
+                preview_html: previewHtml
             })
         });
         
@@ -2766,22 +2814,8 @@ async function uploadFileAJAX(file, statusText) {
             populateForm(data.data);
             syncResumeFields();
             
-            // Main score
-            document.getElementById("score-text-main").innerText = `${data.score}/100`;
-
-            // Sub scores - Fills
-            document.getElementById("score-formatting").style.width = `${data.formatting}%`;
-            document.getElementById("score-skills").style.width = `${data.skills}%`;
-            document.getElementById("score-keyword").style.width = `${data.keyword}%`;
-            document.getElementById("score-readability").style.width = `${data.readability}%`;
-            document.getElementById("score-projects").style.width = `${data.projects}%`;
-
-            // Sub scores - Texts
-            document.getElementById("score-formatting-text").innerText = `${data.formatting}%`;
-            document.getElementById("score-skills-text").innerText = `${data.skills}%`;
-            document.getElementById("score-keyword-text").innerText = `${data.keyword}%`;
-            document.getElementById("score-readability-text").innerText = `${data.readability}%`;
-            document.getElementById("score-projects-text").innerText = `${data.projects}%`;
+            // Update ATS circular gauges & labels
+            updateAtsScores(data.score, data.formatting, data.skills, data.keyword, data.readability, data.projects);
             
             lastATSFeedback = data.feedback;
             renderATSFeedback(data.feedback);
@@ -2824,22 +2858,8 @@ async function triggerResumeATSAnalysis() {
         
         const data = await response.json();
         if (response.ok && data.success) {
-            // Main score
-            document.getElementById("score-text-main").innerText = `${data.score}/100`;
-
-            // Sub scores - Fills
-            document.getElementById("score-formatting").style.width = `${data.formatting}%`;
-            document.getElementById("score-skills").style.width = `${data.skills}%`;
-            document.getElementById("score-keyword").style.width = `${data.keyword}%`;
-            document.getElementById("score-readability").style.width = `${data.readability}%`;
-            document.getElementById("score-projects").style.width = `${data.projects}%`;
-
-            // Sub scores - Texts
-            document.getElementById("score-formatting-text").innerText = `${data.formatting}%`;
-            document.getElementById("score-skills-text").innerText = `${data.skills}%`;
-            document.getElementById("score-keyword-text").innerText = `${data.keyword}%`;
-            document.getElementById("score-readability-text").innerText = `${data.readability}%`;
-            document.getElementById("score-projects-text").innerText = `${data.projects}%`;
+            // Update ATS circular gauges & labels
+            updateAtsScores(data.score, data.formatting, data.skills, data.keyword, data.readability, data.projects);
             
             lastATSFeedback = data.feedback;
             renderATSFeedback(data.feedback);
@@ -2855,6 +2875,34 @@ async function triggerResumeATSAnalysis() {
         console.error(e);
         atsBox.innerHTML = `<p class="text-danger text-center mb-0">Connection failed.</p>`;
     }
+}
+
+// Helper function to update circular charts and progress bars
+function updateAtsScores(overall, formatting, skills, keyword, readability, projects) {
+    const circleMain = document.getElementById("circle-main");
+    const textMain = document.getElementById("score-text-main");
+    if (circleMain) circleMain.setAttribute("stroke-dasharray", `${overall}, 100`);
+    if (textMain) textMain.innerText = `${overall}%`;
+    
+    const map = {
+        "formatting": formatting,
+        "skills": skills,
+        "keyword": keyword,
+        "readability": readability,
+        "projects": projects
+    };
+    
+    Object.keys(map).forEach(key => {
+        const val = map[key] || 0;
+        const circle = document.getElementById(`circle-${key}`);
+        if (circle) circle.setAttribute("stroke-dasharray", `${val}, 100`);
+        
+        const text = document.getElementById(`score-${key}-text`);
+        if (text) text.innerText = `${val}%`;
+        
+        const fill = document.getElementById(`score-${key}`);
+        if (fill) fill.style.width = `${val}%`;
+    });
 }
 
 function renderATSFeedback(feedback) {
@@ -3820,6 +3868,59 @@ html, body, .main-with-sidebar, .dashboard-inner-container, .resume-workspace-wr
 }
 .ats-drawer-close-btn:hover {
     color: var(--text-primary);
+}
+
+/* Circular Score Gauges Styling */
+.circular-chart {
+    display: block;
+    margin: 0 auto;
+}
+.circle-bg {
+    stroke: var(--bg-tertiary, #f3f4f6);
+}
+.circle {
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.5s ease;
+}
+body.dark .circle-bg {
+    stroke: var(--bg-tertiary, #334155);
+}
+
+/* Laptop/Desktop side-by-side layout (>= 1200px) */
+@media (min-width: 1200px) {
+    .preview-ats-container-desktop {
+        display: grid !important;
+        grid-template-columns: 1.15fr 0.85fr !important;
+        gap: 15px !important;
+        height: 100% !important;
+        overflow: hidden !important;
+    }
+    
+    .preview-ats-container-desktop #resume-preview-sheet-wrapper-parent {
+        height: 100% !important;
+        overflow: hidden !important;
+    }
+    
+    .ats-slide-out-panel {
+        position: static !important;
+        width: 100% !important;
+        height: 100% !important;
+        box-shadow: none !important;
+        border-left: 1px solid var(--border-color) !important;
+        right: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        background: var(--bg-secondary) !important;
+    }
+    
+    .ats-drawer-close-btn {
+        display: none !important; /* Hide close button on laptop views */
+    }
+    
+    .ats-drawer-content {
+        height: calc(100% - 50px) !important;
+        overflow-y: auto !important;
+    }
 }
 </style>
 {% endblock %}

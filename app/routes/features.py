@@ -2772,11 +2772,85 @@ def export_pdf():
         data = request.get_json() or {}
         content = data.get('content', {})
         theme = data.get('theme', 'ats-modern')
+        preview_html = data.get('preview_html')
         
-        html_content = render_resume_pdf_html(content, theme)
-        
+        def link_callback(uri, rel):
+            import os
+            from flask import current_app
+            if uri.startswith('/static/'):
+                path = os.path.join(current_app.root_path, uri.replace('/static/', 'static/')).replace('\\', '/')
+                return path
+            return uri
+            
+        if preview_html:
+            import os
+            css_path = os.path.join(current_app.root_path, 'static', 'css', 'style.css')
+            css_content = ""
+            if os.path.exists(css_path):
+                with open(css_path, 'r', encoding='utf-8') as f:
+                    css_content = f.read()
+            
+            pdf_styles = """
+            @page {
+                size: A4;
+                margin: 12mm;
+            }
+            body {
+                font-family: 'Outfit', 'Helvetica', 'Arial', sans-serif;
+                background: #ffffff;
+                color: #1e293b;
+                margin: 0;
+                padding: 0;
+            }
+            .resume-sheet {
+                box-shadow: none !important;
+                border: none !important;
+                border-radius: 0 !important;
+                width: 100% !important;
+                height: auto !important;
+                min-height: 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: transparent !important;
+            }
+            .canva-left-sidebar {
+                float: left !important;
+                width: 30% !important;
+                box-sizing: border-box !important;
+            }
+            .canva-right-panel {
+                float: right !important;
+                width: 68% !important;
+                box-sizing: border-box !important;
+            }
+            .resume-canvas-toolbar, .resume-zoom-slider, .btn-canvas-ctrl {
+                display: none !important;
+            }
+            i {
+                display: none !important;
+            }
+            """
+            
+            html_content = f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <style>
+                    {css_content}
+                    {pdf_styles}
+                </style>
+            </head>
+            <body>
+                {preview_html}
+            </body>
+            </html>
+            """
+        else:
+            html_content = render_resume_pdf_html(content, theme)
+            
         pdf_io = BytesIO()
-        pisa_status = pisa.CreatePDF(html_content, dest=pdf_io)
+        pisa_status = pisa.CreatePDF(html_content, dest=pdf_io, link_callback=link_callback)
         
         if pisa_status.err:
             return jsonify({"success": False, "error": "PDF generation failed"}), 500
