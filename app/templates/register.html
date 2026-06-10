@@ -1,6 +1,15 @@
 {% extends "base.html" %}
 
 {% block title %}Sign Up - CampusMate AI{% endblock %}
+{% block extra_head %}
+<style>
+    @media (max-width: 480px) {
+        .auth-card {
+            padding: 1.5rem 1rem 1.5rem !important;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container py-4">
@@ -71,7 +80,7 @@
                 </div>
 
                 <!-- Social Logins -->
-                <div class="d-flex gap-2 mb-4">
+                <div class="d-flex flex-column flex-sm-row gap-2 mb-4">
                     <a href="{{ url_for('auth.oauth_login', provider='google') }}" class="btn btn-outline border w-100 py-2 d-flex align-items-center justify-content-center gap-2 shadow-sm" style="font-size: 0.8rem; font-weight:600; color:var(--text-primary);">
                         <i class="fa-brands fa-google text-danger"></i> Google
                     </a>

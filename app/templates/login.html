@@ -371,7 +371,18 @@
 }
 .auth-flash.danger { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
 .auth-flash.success { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
-.auth-flash.info { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+@media (max-width: 480px) {
+    .auth-glass-card {
+        padding: 1.5rem 1rem !important;
+    }
+    .social-row {
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+    }
+    .social-btn {
+        width: 100% !important;
+    }
+}
 </style>
 {% endblock %}
 

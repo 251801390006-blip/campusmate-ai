@@ -2010,34 +2010,34 @@ def public_portfolio(username):
 
 THEME_STYLES = {
     # Original Themes (Classic)
-    "classic": {"font": "Helvetica", "primary": "#1e293b", "bg": "#fffdfa", "border_bottom": "2px solid #1e293b"},
-    "modern-cyan": {"font": "Helvetica", "primary": "#06b6d4", "bg": "#ffffff", "border_bottom": "2px solid #06b6d4"},
-    "slate-glass": {"font": "Helvetica", "primary": "#475569", "bg": "#ffffff", "border_bottom": "2px solid #475569"},
-    "minimalist-executive": {"font": "Helvetica", "primary": "#1e293b", "bg": "#ffffff", "border_bottom": "2px solid #1e293b"},
-    "tech-mono": {"font": "Courier", "primary": "#111827", "bg": "#ffffff", "border_bottom": "1px solid #111827"},
-    "creative-violet": {"font": "Helvetica", "primary": "#7c3aed", "bg": "#ffffff", "border_bottom": "2px solid #7c3aed"},
-    "emerald-forest": {"font": "Helvetica", "primary": "#059669", "bg": "#ffffff", "border_bottom": "2px solid #059669"},
-    "royal-indigo": {"font": "Helvetica", "primary": "#4f46e5", "bg": "#ffffff", "border_bottom": "2px solid #4f46e5"},
-    "corporate-navy": {"font": "Helvetica", "primary": "#1e3a8a", "bg": "#ffffff", "border_bottom": "2px solid #1e3a8a"},
-    "modern-warm": {"font": "Helvetica", "primary": "#b45309", "bg": "#ffffff", "border_bottom": "2px solid #b45309"},
-    "clean-slate": {"font": "Helvetica", "primary": "#475569", "bg": "#ffffff", "border_bottom": "2px solid #475569"},
-    "elegant-georgia": {"font": "Times-Roman", "primary": "#111827", "bg": "#ffffff", "border_bottom": "1px solid #111827"},
-    "stanford-academic": {"font": "Times-Roman", "primary": "#8c1515", "bg": "#ffffff", "border_bottom": "1.5px solid #8c1515"},
-    "sleek-tech": {"font": "Helvetica", "primary": "#1e293b", "bg": "#ffffff", "border_bottom": "2px solid #1e293b"},
-    "compact-cv": {"font": "Helvetica", "primary": "#111827", "bg": "#ffffff", "border_bottom": "1px solid #111827"},
-    "hybrid-columns": {"font": "Helvetica", "primary": "#1e293b", "bg": "#ffffff", "border_bottom": "2px solid #1e293b"},
+    "classic": {"font": "Helvetica", "primary": "#1e293b", "bg": "#fffdfa"},
+    "modern-cyan": {"font": "Helvetica", "primary": "#06b6d4", "bg": "#ffffff"},
+    "slate-glass": {"font": "Helvetica", "primary": "#475569", "bg": "#ffffff"},
+    "minimalist-executive": {"font": "Helvetica", "primary": "#1e293b", "bg": "#ffffff"},
+    "tech-mono": {"font": "Courier", "primary": "#111827", "bg": "#ffffff"},
+    "creative-violet": {"font": "Helvetica", "primary": "#7c3aed", "bg": "#ffffff"},
+    "emerald-forest": {"font": "Helvetica", "primary": "#059669", "bg": "#ffffff"},
+    "royal-indigo": {"font": "Helvetica", "primary": "#4f46e5", "bg": "#ffffff"},
+    "corporate-navy": {"font": "Helvetica", "primary": "#1e3a8a", "bg": "#ffffff"},
+    "modern-warm": {"font": "Helvetica", "primary": "#b45309", "bg": "#ffffff"},
+    "clean-slate": {"font": "Helvetica", "primary": "#475569", "bg": "#ffffff"},
+    "elegant-georgia": {"font": "Times-Roman", "primary": "#111827", "bg": "#ffffff"},
+    "stanford-academic": {"font": "Times-Roman", "primary": "#8c1515", "bg": "#ffffff"},
+    "sleek-tech": {"font": "Helvetica", "primary": "#1e293b", "bg": "#ffffff"},
+    "compact-cv": {"font": "Helvetica", "primary": "#111827", "bg": "#ffffff"},
+    "hybrid-columns": {"font": "Helvetica", "primary": "#1e293b", "bg": "#ffffff"},
 
     # 1. Student
-    "student-academic": {"font": "Times-Roman", "primary": "#1e3a8a", "align": "center", "border_bottom": "1.5px solid #111"},
+    "student-academic": {"font": "Times-Roman", "primary": "#1e3a8a", "align": "center"},
     "student-entry": {"font": "Helvetica", "primary": "#0f766e", "bg": "#fafbfc"},
-    "student-grad": {"font": "Times-Roman", "primary": "#1e293b", "border_bottom": "1.5px double #374151"},
+    "student-grad": {"font": "Times-Roman", "primary": "#1e293b"},
     "student-campus": {"font": "Helvetica", "primary": "#059669", "border_top": "6px solid #059669"},
-    "student-scholar": {"font": "Times-Roman", "primary": "#111827", "border_bottom": "1.5px solid #111827"},
+    "student-scholar": {"font": "Times-Roman", "primary": "#111827"},
     
     # 2. ATS
-    "ats-classic": {"font": "Times-Roman", "primary": "#111827", "align": "center", "border_bottom": "1.5px solid #111827"},
-    "ats-modern": {"font": "Helvetica", "primary": "#111827", "border_bottom": "1.5px solid #111827"},
-    "ats-minimal": {"font": "Helvetica", "primary": "#111827", "border_bottom": "none"},
+    "ats-classic": {"font": "Times-Roman", "primary": "#111827", "align": "center"},
+    "ats-modern": {"font": "Helvetica", "primary": "#111827"},
+    "ats-minimal": {"font": "Helvetica", "primary": "#111827"},
     "ats-compact": {"font": "Helvetica", "primary": "#111827", "line_height": "1.1", "font_size": "8.5px"},
     "ats-formal": {"font": "Times-Roman", "primary": "#111827", "border": "1px double #374151"},
     
@@ -2095,13 +2095,13 @@ THEME_STYLES = {
     "minimal-dark": {"font": "Helvetica", "primary": "#0f172a", "bg": "#fafbfc"},
     "minimal-border": {"font": "Helvetica", "primary": "#cbd5e1", "border": "1px solid #cbd5e1"},
     "minimal-compact": {"font": "Helvetica", "primary": "#1f2937", "line_height": "1.1", "font_size": "8.5px"},
-    "minimal-swiss": {"font": "Helvetica", "primary": "#000", "border_bottom": "3px solid #000"},
+    "minimal-swiss": {"font": "Helvetica", "primary": "#000"},
     
     # 11. Executive
     "exec-director": {"font": "Times-Roman", "primary": "#b45309", "border_top": "6px solid #b45309"},
     "exec-vp": {"font": "Helvetica", "primary": "#1e293b", "border_top": "6px solid #1e293b"},
-    "exec-board": {"font": "Times-Roman", "primary": "#000", "align": "center", "border_bottom": "1.5px solid #000"},
-    "exec-legal": {"font": "Times-Roman", "primary": "#000", "border_bottom": "2px double #000"},
+    "exec-board": {"font": "Times-Roman", "primary": "#000", "align": "center"},
+    "exec-legal": {"font": "Times-Roman", "primary": "#000"},
     "exec-partner": {"font": "Times-Roman", "primary": "#1e3a8a", "border_top": "6px solid #1e3a8a"},
     
     # 12. Canva-style Premium Themes
@@ -2239,14 +2239,26 @@ def render_resume_pdf_html(content, theme):
     
     meta_parts = []
     if addr: meta_parts.append(addr)
-    if email: meta_parts.append(email)
-    if phone: meta_parts.append(phone)
-    if linkedin: meta_parts.append(linkedin)
-    if github: meta_parts.append(github)
-    if portfolio: meta_parts.append(portfolio)
-    if leetcode: meta_parts.append(f"LeetCode: {leetcode}")
-    if hackerrank: meta_parts.append(f"HackerRank: {hackerrank}")
-    if codeforces: meta_parts.append(f"Codeforces: {codeforces}")
+    if email: meta_parts.append(f'<a href="mailto:{email}" style="color: {primary}; text-decoration: none;">{email}</a>')
+    if phone: meta_parts.append(f'<a href="tel:{phone}" style="color: {primary}; text-decoration: none;">{phone}</a>')
+    if linkedin:
+        linkedin_url = linkedin if linkedin.startswith('http') else f"https://{linkedin}"
+        meta_parts.append(f'<a href="{linkedin_url}" style="color: {primary}; text-decoration: none;">{linkedin}</a>')
+    if github:
+        github_url = github if github.startswith('http') else f"https://{github}"
+        meta_parts.append(f'<a href="{github_url}" style="color: {primary}; text-decoration: none;">{github}</a>')
+    if portfolio:
+        portfolio_url = portfolio if portfolio.startswith('http') else f"https://{portfolio}"
+        meta_parts.append(f'<a href="{portfolio_url}" style="color: {primary}; text-decoration: none;">{portfolio}</a>')
+    if leetcode:
+        leetcode_url = leetcode if leetcode.startswith('http') else f"https://{leetcode}"
+        meta_parts.append(f'<a href="{leetcode_url}" style="color: {primary}; text-decoration: none;">LeetCode: {leetcode}</a>')
+    if hackerrank:
+        hackerrank_url = hackerrank if hackerrank.startswith('http') else f"https://{hackerrank}"
+        meta_parts.append(f'<a href="{hackerrank_url}" style="color: {primary}; text-decoration: none;">HackerRank: {hackerrank}</a>')
+    if codeforces:
+        codeforces_url = codeforces if codeforces.startswith('http') else f"https://{codeforces}"
+        meta_parts.append(f'<a href="{codeforces_url}" style="color: {primary}; text-decoration: none;">Codeforces: {codeforces}</a>')
 
     # TWO-COLUMN CANVA TEMPLATES (canva-sidebar and canva-split)
     if theme in ["canva-sidebar", "canva-split"]:
@@ -2267,17 +2279,29 @@ def render_resume_pdf_html(content, theme):
             left_html += f'<div style="text-align: center; margin-bottom: 12px;"><img src="{pic_url}" style="width: 70px; height: 70px; border-radius: 35px; border: 2px solid {"#ffffff" if is_dark else primary};" /></div>'
             
         left_html += '<div style="margin-bottom: 12px;">'
-        left_html += f'<h4 style="font-size: 8px; font-weight: bold; border-bottom: 0.75px solid {divider_color}; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase; color: {accent_color};">Contact</h4>'
-        left_html += f'<div style="font-size: 7px; line-height: 1.3; color: {"#e2e8f0" if is_dark else "#4b5563"};">'
-        if addr: left_html += f'<div style="margin-bottom: 2px;">📍 {addr}</div>'
-        if email: left_html += f'<div style="margin-bottom: 2px;">✉️ {email}</div>'
-        if phone: left_html += f'<div style="margin-bottom: 2px;">📞 {phone}</div>'
-        if linkedin: left_html += f'<div style="margin-bottom: 2px;">🔗 {linkedin}</div>'
-        if github: left_html += f'<div style="margin-bottom: 2px;">🐙 {github}</div>'
-        if portfolio: left_html += f'<div style="margin-bottom: 2px;">🌐 {portfolio}</div>'
-        if leetcode: left_html += f'<div style="margin-bottom: 2px;">💻 LC: {leetcode}</div>'
-        if hackerrank: left_html += f'<div style="margin-bottom: 2px;">💻 HR: {hackerrank}</div>'
-        if codeforces: left_html += f'<div style="margin-bottom: 2px;">💻 CF: {codeforces}</div>'
+        left_html += f'<h4 style="font-size: 9.5px; font-weight: bold; border-bottom: 0.75px solid {divider_color}; padding-bottom: 1.5px; margin-bottom: 5px; text-transform: uppercase; color: {accent_color};">Contact</h4>'
+        left_html += f'<div style="font-size: 8.5px; line-height: 1.35; color: {"#e2e8f0" if is_dark else "#4b5563"};">'
+        if addr: left_html += f'<div style="margin-bottom: 3.5px;">📍 {addr}</div>'
+        if email: left_html += f'<div style="margin-bottom: 3.5px;">✉️ <a href="mailto:{email}" style="color: inherit; text-decoration: none;">{email}</a></div>'
+        if phone: left_html += f'<div style="margin-bottom: 3.5px;">📞 <a href="tel:{phone}" style="color: inherit; text-decoration: none;">{phone}</a></div>'
+        if linkedin:
+            linkedin_url = linkedin if linkedin.startswith('http') else f"https://{linkedin}"
+            left_html += f'<div style="margin-bottom: 3.5px;">🔗 <a href="{linkedin_url}" style="color: inherit; text-decoration: none;">{linkedin}</a></div>'
+        if github:
+            github_url = github if github.startswith('http') else f"https://{github}"
+            left_html += f'<div style="margin-bottom: 3.5px;">🐙 <a href="{github_url}" style="color: inherit; text-decoration: none;">{github}</a></div>'
+        if portfolio:
+            portfolio_url = portfolio if portfolio.startswith('http') else f"https://{portfolio}"
+            left_html += f'<div style="margin-bottom: 3.5px;">🌐 <a href="{portfolio_url}" style="color: inherit; text-decoration: none;">{portfolio}</a></div>'
+        if leetcode:
+            leetcode_url = leetcode if leetcode.startswith('http') else f"https://{leetcode}"
+            left_html += f'<div style="margin-bottom: 3.5px;">💻 <a href="{leetcode_url}" style="color: inherit; text-decoration: none;">LC: {leetcode}</a></div>'
+        if hackerrank:
+            hackerrank_url = hackerrank if hackerrank.startswith('http') else f"https://{hackerrank}"
+            left_html += f'<div style="margin-bottom: 3.5px;">💻 <a href="{hackerrank_url}" style="color: inherit; text-decoration: none;">HR: {hackerrank}</a></div>'
+        if codeforces:
+            codeforces_url = codeforces if codeforces.startswith('http') else f"https://{codeforces}"
+            left_html += f'<div style="margin-bottom: 3.5px;">💻 <a href="{codeforces_url}" style="color: inherit; text-decoration: none;">CF: {codeforces}</a></div>'
         left_html += '</div></div>'
         
         # Skills
@@ -2287,12 +2311,12 @@ def render_resume_pdf_html(content, theme):
         skills_web = content.get('skillsWeb', '').strip()
         if skills_prog or skills_cyber or skills_tools or skills_web:
             left_html += '<div style="margin-bottom: 12px;">'
-            left_html += f'<h4 style="font-size: 8px; font-weight: bold; border-bottom: 0.75px solid {divider_color}; padding-bottom: 1px; margin-bottom: 4px; text-transform: uppercase; color: {accent_color};">Skills</h4>'
-            left_html += f'<div style="font-size: 7px; line-height: 1.3; color: {"#e2e8f0" if is_dark else "#4b5563"};">'
-            if skills_prog: left_html += f'<div style="margin-bottom: 2px;"><strong>Lang:</strong> {skills_prog}</div>'
-            if skills_cyber: left_html += f'<div style="margin-bottom: 2px;"><strong>Cyber:</strong> {skills_cyber}</div>'
-            if skills_tools: left_html += f'<div style="margin-bottom: 2px;"><strong>Tools:</strong> {skills_tools}</div>'
-            if skills_web: left_html += f'<div style="margin-bottom: 2px;"><strong>Web:</strong> {skills_web}</div>'
+            left_html += f'<h4 style="font-size: 9.5px; font-weight: bold; border-bottom: 0.75px solid {divider_color}; padding-bottom: 1.5px; margin-bottom: 5px; text-transform: uppercase; color: {accent_color};">Skills</h4>'
+            left_html += f'<div style="font-size: 8.5px; line-height: 1.35; color: {"#e2e8f0" if is_dark else "#4b5563"};">'
+            if skills_prog: left_html += f'<div style="margin-bottom: 3.5px;"><strong>Lang:</strong> {skills_prog}</div>'
+            if skills_cyber: left_html += f'<div style="margin-bottom: 3.5px;"><strong>Cyber:</strong> {skills_cyber}</div>'
+            if skills_tools: left_html += f'<div style="margin-bottom: 3.5px;"><strong>Tools:</strong> {skills_tools}</div>'
+            if skills_web: left_html += f'<div style="margin-bottom: 3.5px;"><strong>Web:</strong> {skills_web}</div>'
             left_html += '</div></div>'
             
         # Languages & Interests
@@ -2479,10 +2503,10 @@ def render_resume_pdf_html(content, theme):
     css = f"""
     @page {{
         size: a4;
-        margin-top: 10mm;
-        margin-bottom: 10mm;
-        margin-left: 12mm;
-        margin-right: 12mm;
+        margin-top: 8mm;
+        margin-bottom: 8mm;
+        margin-left: 10mm;
+        margin-right: 10mm;
     }}
     body {{
         font-family: {font};
@@ -2498,33 +2522,36 @@ def render_resume_pdf_html(content, theme):
         border: 0;
     }}
     h1 {{
-        font-size: 18px;
+        font-size: 20px;
         font-weight: bold;
         color: {primary};
         margin: 0 0 3px 0;
         text-transform: uppercase;
     }}
     .meta {{
-        font-size: 8px;
+        font-size: 8.5px;
         color: #4b5563;
-        line-height: 1.25;
+        line-height: 1.35;
         margin-top: 3px;
         margin-bottom: 8px;
     }}
     .section-title {{
-        font-size: 10px;
+        font-size: 11.5px;
         font-weight: bold;
         color: {primary};
         border-bottom: 0.75px solid {primary} !important;
-        margin-top: 8px;
-        margin-bottom: 4px;
-        padding-bottom: 1.5px;
+        margin-top: 12px;
+        margin-bottom: 6px;
+        padding-bottom: 2px;
         text-transform: uppercase;
     }}
     .item-header {{
+        font-size: 10px;
         font-weight: bold;
+        color: #1e293b;
     }}
     .item-date {{
+        font-size: 9.5px;
         text-align: right;
         color: #4b5563;
     }}
@@ -2534,8 +2561,10 @@ def render_resume_pdf_html(content, theme):
         padding-left: 12px;
     }}
     .bullet-item {{
-        margin-bottom: 1.5px;
-        font-size: 8.5px;
+        margin-bottom: 2px;
+        font-size: 9.5px;
+        line-height: 1.35;
+        color: #374151;
     }}
     """
     
@@ -2544,7 +2573,7 @@ def render_resume_pdf_html(content, theme):
     
     summary_val = content.get('custom', '').strip()
     if summary_val:
-        sections_html += f'<div style="font-size: 8.5px; line-height: 1.3; color: #4b5563; margin-bottom: 8px; text-align: {"center" if is_elegant else "left"};">{summary_val}</div>'
+        sections_html += f'<div style="font-size: 9px; line-height: 1.35; color: #4b5563; margin-bottom: 8px; text-align: {"center" if is_elegant else "left"};">{summary_val}</div>'
 
     for sec in order:
         if sec == "education" and edu_entries:
@@ -2562,17 +2591,17 @@ def render_resume_pdf_html(content, theme):
                     sections_html += f"""
                     <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 3px;">
                         <tr>
-                            <td class="item-header" style="font-size: 8.5px;">{inst}</td>
-                            <td class="item-date" style="font-size: 8px;">{dates}</td>
+                            <td class="item-header">{inst}</td>
+                            <td class="item-date">{dates}</td>
                         </tr>
                         <tr>
-                            <td style="font-style: italic; font-size: 8px;">{degree}</td>
-                            <td style="text-align: right; font-size: 8px;">{gpa}</td>
+                            <td style="font-style: italic; font-size: 9px; color: #4b5563;">{degree}</td>
+                            <td style="text-align: right; font-size: 9px; color: #4b5563;">{gpa}</td>
                         </tr>
                     </table>
                     """
                     if cw:
-                        sections_html += f'<div style="margin-top: 1px; margin-bottom: 3px; font-size: 7.5px; color: #4b5563;">Relevant Coursework: {cw}</div>'
+                        sections_html += f'<div style="margin-top: 2px; margin-bottom: 4px; font-size: 9px; color: #4b5563;">Relevant Coursework: {cw}</div>'
             sections_html += "</div>"
             
         elif sec == "skills":
@@ -2585,7 +2614,7 @@ def render_resume_pdf_html(content, theme):
                 sections_html += f"""
                 <div class="resume-section">
                     <h3 class="section-title" style="text-align: {"center" if is_elegant else "left"};">Technical Skills</h3>
-                    <table width="100%" cellpadding="1.5" cellspacing="0" style="font-size: 8px;">
+                    <table width="100%" cellpadding="2" cellspacing="0" style="font-size: 9px; line-height: 1.35;">
                 """
                 if prog:
                     sections_html += f'<tr><td width="22%"><strong>Programming:</strong></td><td>{prog}</td></tr>'
@@ -2614,11 +2643,11 @@ def render_resume_pdf_html(content, theme):
                     sections_html += f"""
                     <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 2px; margin-bottom: 2px;">
                         <tr>
-                            <td class="item-header" style="font-size: 8.5px;">{role}</td>
-                            <td class="item-date" style="font-size: 8px;">{dates}</td>
+                            <td class="item-header">{role}</td>
+                            <td class="item-date">{dates}</td>
                         </tr>
                         <tr>
-                            <td colspan="2" style="font-style: italic; font-size: 8px; color: #4b5563;">{comp}</td>
+                            <td colspan="2" style="font-style: italic; font-size: 9px; color: #4b5563; padding-top: 1px;">{comp}</td>
                         </tr>
                     </table>
                     """
@@ -2640,11 +2669,15 @@ def render_resume_pdf_html(content, theme):
                 link = proj.get('link', '').strip()
                 bullets = proj.get('bullets', [])
                 if title:
+                    proj_link_html = link
+                    if link:
+                        proj_link_url = link if link.startswith('http') else f"https://{link}"
+                        proj_link_html = f'<a href="{proj_link_url}" style="color: {primary}; text-decoration: underline;">{link}</a>'
                     sections_html += f"""
                     <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 2px; margin-bottom: 2px;">
                         <tr>
-                            <td class="item-header" style="font-size: 8.5px;">{title}</td>
-                            <td class="item-date" style="font-size: 7.5px; font-weight: normal; color: #4b5563;">{link}</td>
+                            <td class="item-header">{title}</td>
+                            <td class="item-date" style="font-weight: normal; font-size: 9px;">{proj_link_html}</td>
                         </tr>
                     </table>
                     """
@@ -2676,7 +2709,7 @@ def render_resume_pdf_html(content, theme):
             sections_html += f"""
             <div class="resume-section">
                 <h3 class="section-title" style="text-align: {"center" if is_elegant else "left"};">Achievements</h3>
-                <div style="font-size: 8px; line-height: 1.3;">{ach}</div>
+                <div style="font-size: 9px; line-height: 1.35; color: #374151;">{ach}</div>
             </div>
             """
             
@@ -2689,9 +2722,9 @@ def render_resume_pdf_html(content, theme):
                     <h3 class="section-title" style="text-align: {"center" if is_elegant else "left"};">Hackathons & Workshops</h3>
                 """
                 if hacks:
-                    sections_html += f'<div style="font-size: 8px; line-height: 1.3; margin-bottom: 2px;"><strong>Hackathons:</strong> {hacks}</div>'
+                    sections_html += f'<div style="font-size: 9px; line-height: 1.35; margin-bottom: 3px;"><strong>Hackathons:</strong> {hacks}</div>'
                 if workshops:
-                    sections_html += f'<div style="font-size: 8px; line-height: 1.3;"><strong>Workshops:</strong> {workshops}</div>'
+                    sections_html += f'<div style="font-size: 9px; line-height: 1.35;"><strong>Workshops:</strong> {workshops}</div>'
                 sections_html += "</div>"
                 
         elif sec == "languages":
@@ -2703,9 +2736,9 @@ def render_resume_pdf_html(content, theme):
                     <h3 class="section-title" style="text-align: {"center" if is_elegant else "left"};">Languages & Interests</h3>
                 """
                 if langs:
-                    sections_html += f'<div style="font-size: 8px; line-height: 1.3; margin-bottom: 2px;"><strong>Languages:</strong> {langs}</div>'
+                    sections_html += f'<div style="font-size: 9px; line-height: 1.35; margin-bottom: 3px;"><strong>Languages:</strong> {langs}</div>'
                 if interests:
-                    sections_html += f'<div style="font-size: 8px; line-height: 1.3;"><strong>Interests:</strong> {interests}</div>'
+                    sections_html += f'<div style="font-size: 9px; line-height: 1.35;"><strong>Interests:</strong> {interests}</div>'
                 sections_html += "</div>"
 
     meta_str = (" &bull; " if is_elegant else " | ").join(meta_parts)

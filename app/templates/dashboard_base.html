@@ -58,6 +58,12 @@
             <a href="{{ url_for('features.internship_center') }}" class="sidebar-link {% if request.endpoint == 'features.internship_center' %}active{% endif %}">
                 <span class="sidebar-icon"><i class="fa-solid fa-briefcase"></i></span> Internship Center
             </a>
+            <a href="{{ url_for('features.portfolio_builder') }}" class="sidebar-link {% if request.endpoint == 'features.portfolio_builder' %}active{% endif %}">
+                <span class="sidebar-icon"><i class="fa-solid fa-compass-drafting"></i></span> Portfolio Builder
+            </a>
+            <a href="{{ url_for('dashboard.profile') }}" class="sidebar-link {% if request.endpoint == 'dashboard.profile' %}active{% endif %}">
+                <span class="sidebar-icon"><i class="fa-solid fa-user-check"></i></span> Profile
+            </a>
             <a href="{{ url_for('dashboard.settings') }}" class="sidebar-link {% if request.endpoint == 'dashboard.settings' %}active{% endif %}">
                 <span class="sidebar-icon"><i class="fa-solid fa-gear"></i></span> Settings
             </a>
@@ -219,13 +225,13 @@
             <span class="mobile-bottom-icon"><i class="fa-solid fa-file-invoice"></i></span>
             <span>Resumes</span>
         </a>
-        <a href="{{ url_for('features.interview_prep') }}" class="mobile-bottom-link {% if request.endpoint == 'features.interview_prep' %}active{% endif %}">
-            <span class="mobile-bottom-icon"><i class="fa-solid fa-microphone"></i></span>
-            <span>Interview</span>
-        </a>
         <a href="{{ url_for('features.internship_center') }}" class="mobile-bottom-link {% if request.endpoint == 'features.internship_center' %}active{% endif %}">
             <span class="mobile-bottom-icon"><i class="fa-solid fa-briefcase"></i></span>
             <span>Internships</span>
+        </a>
+        <a href="javascript:void(0)" class="mobile-bottom-link" onclick="toggleSidebar()">
+            <span class="mobile-bottom-icon"><i class="fa-solid fa-bars"></i></span>
+            <span>Menu</span>
         </a>
     </nav>
 

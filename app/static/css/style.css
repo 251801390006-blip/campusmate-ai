@@ -2796,3 +2796,30 @@ body.dark .notification-dropdown-card {
     display: block;
 }
 
+/* Global Safe Area Support */
+body {
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Mobile Safe Area Extra spacing for bottom navigation */
+@media (max-width: 767.98px) {
+    .mobile-bottom-nav {
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        height: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+    .content-wrapper, .container-fluid, .container {
+        padding-bottom: calc(85px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+}
+
+/* Tap Target Size Guidelines: ensure touch buttons are at least 44px on mobile */
+@media (max-width: 767.98px) {
+    .btn, button, select, input, .form-select, .form-control, .mobile-bottom-link, .sidebar-link, .landing-nav a {
+        min-height: 44px; /* Ensure 44px minimum touch target size */
+    }
+}
+
+

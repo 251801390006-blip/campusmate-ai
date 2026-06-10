@@ -363,6 +363,7 @@ function renderRoadmapTree() {
 
         div.onclick = (e) => {
             e.stopPropagation();
+            if (hasDragged) return;
             openNodeModal(node, index + 1);
         };
 
@@ -591,13 +592,18 @@ function searchRoadmapNodes() {
 
 // Drag, Pan, and Zoom Logic
 let isDragging = false;
+let hasDragged = false;
+let touchStartX = 0;
+let touchStartY = 0;
 let startX, startY;
 let translateX = 0;
 let translateY = 0;
 const isMobile = window.innerWidth < 768;
-let scale = isMobile ? 0.45 : 0.85; 
+let scale = isMobile ? 0.5 : 0.85; 
 let touchStartDist = 0;
 let initialScale = 1;
+let lastTap = 0;
+let longPressTimeout = null;
 
 const viewport = document.getElementById("canvas-viewport");
 const container = document.getElementById("canvas-container");
@@ -610,6 +616,7 @@ viewport.addEventListener("mousedown", (e) => {
     if (e.target.closest(".roadmap-node-badge") || e.target.closest("button") || e.target.closest("input")) return;
     closeNodeModal();
     isDragging = true;
+    hasDragged = false;
     viewport.style.cursor = "grabbing";
     startX = e.clientX - translateX;
     startY = e.clientY - translateY;
@@ -653,20 +660,48 @@ viewport.addEventListener("wheel", (e) => {
 
 // Touch Drag and Pinch Zoom
 viewport.addEventListener("touchstart", (e) => {
-    if (e.target.closest(".roadmap-node-badge") || e.target.closest("button") || e.target.closest("input")) return;
+    // Only return early if touching a button or input (allowing badge for drag/pan)
+    if (e.target.closest("button") || e.target.closest("input")) return;
     
-    // Disable pinch-zoom gestures on mobile screens < 768px to keep panning smooth
-    if (window.innerWidth < 768 && e.touches.length > 1) {
+    hasDragged = false;
+    
+    // Double tap check to toggle zoom between 0.45 and 1.0
+    const now = Date.now();
+    if (now - lastTap < 300) {
+        if (scale < 0.8) {
+            scale = 1.0;
+        } else {
+            scale = 0.45;
+        }
+        translateX = viewport.clientWidth / 2 - (450 * scale);
+        updateTransform();
+        e.preventDefault();
+        lastTap = 0;
         isDragging = false;
         return;
     }
+    lastTap = now;
     
     isDragging = true;
     if (e.touches.length === 1) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
         startX = e.touches[0].clientX - translateX;
         startY = e.touches[0].clientY - translateY;
         touchStartDist = 0;
+        
+        // Setup long press (600ms hold) to open node details if we touched a badge
+        const badge = e.target.closest(".roadmap-node-badge");
+        if (badge) {
+            if (longPressTimeout) clearTimeout(longPressTimeout);
+            longPressTimeout = setTimeout(() => {
+                if (!hasDragged && isDragging) {
+                    badge.click();
+                }
+            }, 600);
+        }
     } else if (e.touches.length === 2) {
+        if (longPressTimeout) clearTimeout(longPressTimeout);
         touchStartDist = Math.hypot(
             e.touches[0].clientX - e.touches[1].clientX,
             e.touches[0].clientY - e.touches[1].clientY
@@ -675,28 +710,34 @@ viewport.addEventListener("touchstart", (e) => {
         startX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - translateX;
         startY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - translateY;
     }
-}, { passive: true });
+}, { passive: false });
 
 viewport.addEventListener("touchmove", (e) => {
     if (!isDragging) return;
-    
-    // Disable multi-finger movement calculations on mobile devices
-    if (window.innerWidth < 768 && e.touches.length > 1) return;
     
     if (e.cancelable) {
         e.preventDefault();
     }
     
     if (e.touches.length === 1) {
+        const dx = e.touches[0].clientX - touchStartX;
+        const dy = e.touches[0].clientY - touchStartY;
+        const distance = Math.hypot(dx, dy);
+        
+        if (distance > 8) {
+            hasDragged = true;
+            if (longPressTimeout) clearTimeout(longPressTimeout);
+        }
+        
         translateX = e.touches[0].clientX - startX;
         translateY = e.touches[0].clientY - startY;
     } else if (e.touches.length === 2 && touchStartDist > 0) {
+        if (longPressTimeout) clearTimeout(longPressTimeout);
         const dist = Math.hypot(
             e.touches[0].clientX - e.touches[1].clientX,
             e.touches[0].clientY - e.touches[1].clientY
         );
         const factor = dist / touchStartDist;
-        const prevScale = scale;
         scale = Math.min(1.8, Math.max(0.3, initialScale * factor));
         
         const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
@@ -717,10 +758,12 @@ viewport.addEventListener("touchmove", (e) => {
 
 viewport.addEventListener("touchend", () => {
     isDragging = false;
+    if (longPressTimeout) clearTimeout(longPressTimeout);
 });
 
 viewport.addEventListener("touchcancel", () => {
     isDragging = false;
+    if (longPressTimeout) clearTimeout(longPressTimeout);
 });
 
 function zoomIn() {
@@ -738,6 +781,15 @@ function resetZoom() {
     scale = isMobile ? 0.45 : 0.85;
     translateX = (viewport.clientWidth - 900 * scale) / 2;
     translateY = 30;
+    updateTransform();
+}
+
+function autoFitRoadmap() {
+    if (activeNodes.length === 0) return;
+    const isMobile = window.innerWidth < 768;
+    scale = isMobile ? 0.5 : 0.85;
+    translateX = viewport.clientWidth / 2 - 450 * scale;
+    translateY = isMobile ? 60 : 80;
     updateTransform();
 }
 
@@ -826,7 +878,7 @@ async function bookmarkCurrentNode() {
 // Initialize layout
 document.addEventListener("DOMContentLoaded", () => {
     renderRoadmapTree();
-    setTimeout(resetZoom, 200);
+    setTimeout(autoFitRoadmap, 200);
     
     // Listen for Enter key on search input to center and open the matched node
     const searchInput = document.getElementById("roadmap-node-search");

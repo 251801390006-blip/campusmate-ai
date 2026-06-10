@@ -16,15 +16,59 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap-utilities.min.css">
     <!-- Custom Light Design System with Cache Busting -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=1.1.1">
-    {% block extra_head %}{% endblock %}
+    <style>
+        /* Mobile Drawer Styles */
+        .mobile-drawer-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            visibility: hidden;
+            z-index: 1999;
+            transition: all 0.3s ease;
+        }
+        .mobile-drawer-backdrop.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .mobile-landing-drawer {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 260px;
+            height: 100vh;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            box-shadow: 6px 0 18px rgba(0,0,0,0.1);
+            z-index: 2000;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+        .mobile-landing-drawer.open {
+            left: 0;
+        }
+        .drawer-link {
+            transition: all 0.2s;
+        }
+        .drawer-link:hover {
+            background: var(--border-color);
+            color: var(--accent-color) !important;
+        }
+    </style>
 </head>
 <body>
     <div class="landing-layout">
         <!-- Landing Header -->
-        <header class="landing-header">
-            <div class="logo">🎓 CampusMate AI</div>
-            <nav class="landing-nav">
-                <a href="{{ url_for('dashboard.landing') }}">Home</a>
+        <header class="landing-header d-flex justify-content-between align-items-center py-3 px-4 border-bottom" style="background: var(--bg-secondary); position: sticky; top: 0; z-index: 1100;">
+            <div class="logo fw-bold" style="font-size: 1.2rem; cursor: pointer;" onclick="window.location.href='{{ url_for('dashboard.landing') }}'">🎓 CampusMate AI</div>
+            
+            <!-- Desktop Nav (Visible >= 768px) -->
+            <nav class="landing-nav d-none d-md-flex align-items-center gap-3">
+                <a href="{{ url_for('dashboard.landing') }}" class="text-secondary-text" style="text-decoration:none; font-weight:500;">Home</a>
                 {% if current_user.is_authenticated %}
                     <a href="{{ url_for('dashboard.home') }}" class="btn btn-sm btn-outline">Dashboard</a>
                     <a href="{{ url_for('auth.logout') }}" class="btn btn-sm btn-outline">Sign Out</a>
@@ -33,7 +77,55 @@
                     <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-primary">Sign Up</a>
                 {% endif %}
             </nav>
+
+            <!-- Mobile Nav Toggle & Quick Actions (Visible < 768px) -->
+            <div class="d-flex d-md-none align-items-center gap-2">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('dashboard.home') }}" class="btn btn-sm btn-primary px-3 py-2" style="font-size: 0.72rem; min-height: 40px; display: inline-flex; align-items: center; justify-content: center;">Dashboard</a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-sm btn-outline px-3 py-2" style="font-size: 0.72rem; min-height: 40px; display: inline-flex; align-items: center; justify-content: center;">Sign In</a>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-primary px-3 py-2" style="font-size: 0.72rem; min-height: 40px; display: inline-flex; align-items: center; justify-content: center;">Sign Up</a>
+                {% endif %}
+                <button class="btn-hamburger" onclick="toggleMobileDrawer()" aria-label="Toggle Navigation" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: none; border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); cursor: pointer; padding: 0;">
+                    <i class="fa-solid fa-bars" style="font-size: 1.25rem;"></i>
+                </button>
+            </div>
         </header>
+
+        <!-- Mobile Drawer Backdrop -->
+        <div id="mobile-drawer-backdrop" class="mobile-drawer-backdrop" onclick="toggleMobileDrawer()"></div>
+
+        <!-- Mobile Slide-out Drawer -->
+        <div id="mobile-landing-drawer" class="mobile-landing-drawer">
+            <div class="drawer-header border-bottom p-3 d-flex justify-content-between align-items-center">
+                <div class="logo fw-bold" style="font-size: 1.15rem;">🎓 CampusMate AI</div>
+                <button onclick="toggleMobileDrawer()" style="background:none; border:none; font-size:1.35rem; color:var(--text-secondary); cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="drawer-content p-3 d-flex flex-column gap-2">
+                <a href="{{ url_for('dashboard.landing') }}" class="drawer-link py-2.5 px-3 rounded text-secondary-text" style="text-decoration:none; font-weight:500; display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-house text-muted"></i> Home</a>
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('dashboard.home') }}" class="drawer-link py-2.5 px-3 rounded text-secondary-text" style="text-decoration:none; font-weight:500; display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-chart-line text-muted"></i> Dashboard</a>
+                    <a href="{{ url_for('features.roadmap_generator') }}" class="drawer-link py-2.5 px-3 rounded text-secondary-text" style="text-decoration:none; font-weight:500; display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-route text-muted"></i> Roadmaps</a>
+                    <a href="{{ url_for('features.resume_analyzer') }}" class="drawer-link py-2.5 px-3 rounded text-secondary-text" style="text-decoration:none; font-weight:500; display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-file-invoice text-muted"></i> Resume Builder</a>
+                    <a href="{{ url_for('features.internship_center') }}" class="drawer-link py-2.5 px-3 rounded text-secondary-text" style="text-decoration:none; font-weight:500; display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-briefcase text-muted"></i> Internships</a>
+                    <a href="{{ url_for('auth.logout') }}" class="drawer-link py-2.5 px-3 rounded text-danger mt-4 border-top pt-3" style="text-decoration:none; font-weight:500; display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="drawer-link py-2.5 px-3 rounded text-secondary-text" style="text-decoration:none; font-weight:500; display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-right-to-bracket text-muted"></i> Sign In</a>
+                    <a href="{{ url_for('auth.register') }}" class="drawer-link py-2.5 px-3 rounded text-secondary-text" style="text-decoration:none; font-weight:500; display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-user-plus text-muted"></i> Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <script>
+            function toggleMobileDrawer() {
+                const drawer = document.getElementById("mobile-landing-drawer");
+                const backdrop = document.getElementById("mobile-drawer-backdrop");
+                if (drawer && backdrop) {
+                    drawer.classList.toggle("open");
+                    backdrop.classList.toggle("show");
+                }
+            }
+        </script>
 
         <!-- Main Content Container -->
         <main class="flex-grow-1">
