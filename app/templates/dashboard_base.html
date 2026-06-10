@@ -40,38 +40,38 @@
         <div class="sidebar-menu">
             <div class="sidebar-section-label">General</div>
             <a href="{{ url_for('dashboard.home') }}" class="sidebar-link {% if request.endpoint == 'dashboard.home' %}active{% endif %}">
-                <span class="sidebar-icon">📊</span> Dashboard
+                <span class="sidebar-icon"><i class="fa-solid fa-chart-simple"></i></span> Dashboard
             </a>
             
             <hr class="sidebar-divider">
             
             <div class="sidebar-section-label">Core Modules</div>
             <a href="{{ url_for('features.list_roadmaps') }}" class="sidebar-link {% if request.endpoint == 'features.list_roadmaps' %}active{% endif %}">
-                <span class="sidebar-icon">🛣️</span> Learning Roadmaps
+                <span class="sidebar-icon"><i class="fa-solid fa-route"></i></span> Learning Roadmaps
             </a>
             <a href="{{ url_for('features.resume_analyzer') }}" class="sidebar-link {% if request.endpoint == 'features.resume_analyzer' %}active{% endif %}">
-                <span class="sidebar-icon">📝</span> Resume Builder
+                <span class="sidebar-icon"><i class="fa-solid fa-file-invoice"></i></span> Resume Builder
             </a>
             <a href="{{ url_for('features.interview_prep') }}" class="sidebar-link {% if request.endpoint == 'features.interview_prep' %}active{% endif %}">
-                <span class="sidebar-icon">🎙️</span> Interview Simulator
+                <span class="sidebar-icon"><i class="fa-solid fa-microphone"></i></span> Interview Simulator
             </a>
             <a href="{{ url_for('features.internship_center') }}" class="sidebar-link {% if request.endpoint == 'features.internship_center' %}active{% endif %}">
-                <span class="sidebar-icon">💼</span> Internship Center
+                <span class="sidebar-icon"><i class="fa-solid fa-briefcase"></i></span> Internship Center
             </a>
             <a href="{{ url_for('dashboard.settings') }}" class="sidebar-link {% if request.endpoint == 'dashboard.settings' %}active{% endif %}">
-                <span class="sidebar-icon">⚙️</span> Settings
+                <span class="sidebar-icon"><i class="fa-solid fa-gear"></i></span> Settings
             </a>
             
             <div class="sidebar-section-label">Collaboration & Help</div>
             <a href="{{ url_for('feedback.list_feedback') }}" class="sidebar-link {% if request.blueprint == 'feedback' %}active{% endif %}">
-                <span class="sidebar-icon">💬</span> Feedback & Support
+                <span class="sidebar-icon"><i class="fa-solid fa-comments"></i></span> Feedback & Support
             </a>
             
             {% if current_user.role == 'admin' %}
                 <hr class="sidebar-divider">
                 <div class="sidebar-section-label">Administration</div>
                 <a href="{{ url_for('admin.dashboard') }}" class="sidebar-link {% if request.blueprint == 'admin' %}active{% endif %}">
-                    <span class="sidebar-icon">🛡️</span> Admin Console
+                    <span class="sidebar-icon"><i class="fa-solid fa-shield-halved"></i></span> Admin Console
                 </a>
             {% endif %}
         </div>
@@ -83,7 +83,7 @@
                     {% if current_user.profile_photo %}
                         <img src="{{ url_for('static', filename=current_user.profile_photo) }}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                     {% else %}
-                        <span style="font-size: 1.15rem; line-height: 1;">👤</span>
+                        <span style="font-size: 0.95rem; line-height: 1;"><i class="fa-solid fa-user"></i></span>
                     {% endif %}
                 </div>
                 <div class="details">
@@ -91,7 +91,7 @@
                     <span class="role">{{ current_user.role | upper }}</span>
                 </div>
             </div>
-            <a href="{{ url_for('auth.logout') }}" class="logout-link"><span class="sidebar-icon">🚪</span> Sign Out</a>
+            <a href="{{ url_for('auth.logout') }}" class="logout-link"><span class="sidebar-icon"><i class="fa-solid fa-right-from-bracket"></i></span> Sign Out</a>
         </div>
     </aside>
 
@@ -120,13 +120,13 @@
                 <!-- Notification Bell -->
                 <div class="dropdown" style="position: relative;">
                     <button type="button" class="header-icon-btn" onclick="toggleNotifDropdown(event)" title="Notifications" style="font-size: 1.1rem; cursor: pointer; color: var(--text-secondary); background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; position: relative; transition: all 0.2s ease;">
-                        🔔
+                        <i class="fa-solid fa-bell"></i>
                         {% if unread_notifications_count > 0 %}
                         <span style="position:absolute; top:4px; right:4px; width:8px; height:8px; background:#ef4444; border-radius:50%; border:1.5px solid var(--bg-secondary);"></span>
                         {% endif %}
                     </button>
                     <div id="notif-dropdown-menu" class="hidden" style="position: absolute; right: 0; top: 42px; z-index: 100; min-width: 280px; max-height: 320px; overflow-y: auto; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 0;">
-                        <div style="padding: 10px 14px; border-bottom: 1px solid var(--border-color); font-size: 0.78rem; font-weight: 700; color: var(--text-primary);">🔔 Notifications</div>
+                        <div style="padding: 10px 14px; border-bottom: 1px solid var(--border-color); font-size: 0.78rem; font-weight: 700; color: var(--text-primary);"><i class="fa-solid fa-bell me-1.5"></i> Notifications</div>
                         {% if unread_notifications %}
                             {% for notif in unread_notifications[:5] %}
                             <div style="padding: 10px 14px; border-bottom: 1px solid var(--border-color); font-size: 0.78rem;">
@@ -135,25 +135,25 @@
                             </div>
                             {% endfor %}
                         {% else %}
-                            <div style="padding: 16px 14px; text-align: center; color: var(--text-muted); font-size: 0.78rem;">🔕 No new notifications</div>
+                            <div style="padding: 16px 14px; text-align: center; color: var(--text-muted); font-size: 0.78rem;"><i class="fa-solid fa-bell-slash me-1.5"></i> No new notifications</div>
                         {% endif %}
                     </div>
                 </div>
 
                 <!-- Settings Quick Access -->
                 <a href="{{ url_for('dashboard.settings') }}" class="header-icon-btn" title="Settings" style="font-size: 1.1rem; cursor: pointer; color: var(--text-secondary); background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; text-decoration: none; transition: all 0.2s ease;">
-                    ⚙️
+                    <i class="fa-solid fa-gear"></i>
                 </a>
 
                 <!-- Day / Dark Mode Switcher -->
                 <div class="dropdown theme-mode-dropdown" style="position: relative;">
                     <button type="button" id="theme-toggle-btn" class="header-icon-btn" onclick="toggleThemeDropdown(event)" title="Choose Theme Mode" style="font-size: 1.1rem; cursor: pointer; color: var(--text-secondary); background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;">
-                        <span id="theme-toggle-icon">☀️</span>
+                        <span id="theme-toggle-icon"><i class="fa-solid fa-sun"></i></span>
                     </button>
                     <ul id="theme-dropdown-menu" class="dropdown-menu dropdown-menu-end shadow hidden" style="position: absolute; right: 0; top: 42px; z-index: 100; min-width: 150px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; list-style: none; padding: 4px 0; margin: 0; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
-                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeThemePreference('light')" style="display: flex; align-items: center; gap: 8px; padding: 8px 14px; font-size: 0.8rem; color: var(--text-primary); text-decoration: none; transition: background 0.15s;">☀️ Light Mode</a></li>
-                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeThemePreference('dark')" style="display: flex; align-items: center; gap: 8px; padding: 8px 14px; font-size: 0.8rem; color: var(--text-primary); text-decoration: none; transition: background 0.15s;">🌙 Dark Mode</a></li>
-                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeThemePreference('system')" style="display: flex; align-items: center; gap: 8px; padding: 8px 14px; font-size: 0.8rem; color: var(--text-primary); text-decoration: none; transition: background 0.15s;">🖥️ System</a></li>
+                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeThemePreference('light')" style="display: flex; align-items: center; gap: 8px; padding: 8px 14px; font-size: 0.8rem; color: var(--text-primary); text-decoration: none; transition: background 0.15s;"><i class="fa-solid fa-sun"></i> Light Mode</a></li>
+                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeThemePreference('dark')" style="display: flex; align-items: center; gap: 8px; padding: 8px 14px; font-size: 0.8rem; color: var(--text-primary); text-decoration: none; transition: background 0.15s;"><i class="fa-solid fa-moon"></i> Dark Mode</a></li>
+                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeThemePreference('system')" style="display: flex; align-items: center; gap: 8px; padding: 8px 14px; font-size: 0.8rem; color: var(--text-primary); text-decoration: none; transition: background 0.15s;"><i class="fa-solid fa-desktop"></i> System</a></li>
                     </ul>
                 </div>
 
@@ -164,17 +164,17 @@
                             <img src="{{ url_for('static', filename=current_user.profile_photo) }}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
                         {% elif current_user.avatar %}
                             <img src="{{ url_for('static', filename='images/avatars/' + current_user.avatar) }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
-                            <span style="display: none; font-size: 1.1rem;">👤</span>
+                            <span style="display: none; font-size: 0.95rem;"><i class="fa-solid fa-user"></i></span>
                         {% else %}
-                            <span style="font-size: 1.1rem; line-height: 1;">👤</span>
+                            <span style="font-size: 0.95rem; line-height: 1;"><i class="fa-solid fa-user"></i></span>
                         {% endif %}
                     </a>
                     <ul id="profile-dropdown-menu" class="dropdown-menu dropdown-menu-end shadow hidden" style="position: absolute; right: 0; top: 38px; z-index: 100; min-width: 160px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 6px; list-style: none; padding: 4px 0; margin: 0;">
-                        <li><a class="dropdown-item" href="{{ url_for('dashboard.profile') }}" style="display: block; padding: 8px 16px; font-size: 0.8rem; color: var(--text-primary); text-decoration: none;">👤 View Profile</a></li>
-                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="openProfileSettingsModal()" style="display: block; padding: 8px 16px; font-size: 0.8rem; color: var(--text-primary); text-decoration: none;">✏️ Edit Profile</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('dashboard.settings') }}" style="display: block; padding: 8px 16px; font-size: 0.8rem; color: var(--text-primary); text-decoration: none;">⚙️ Settings</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('dashboard.profile') }}" style="display: block; padding: 8px 16px; font-size: 0.8rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-user me-2"></i> View Profile</a></li>
+                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="openProfileSettingsModal()" style="display: block; padding: 8px 16px; font-size: 0.8rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-user-pen me-2"></i> Edit Profile</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('dashboard.settings') }}" style="display: block; padding: 8px 16px; font-size: 0.8rem; color: var(--text-primary); text-decoration: none;"><i class="fa-solid fa-gear me-2"></i> Settings</a></li>
                         <li><hr style="margin: 4px 0; border-color: var(--border-color);"></li>
-                        <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}" style="display: block; padding: 8px 16px; font-size: 0.8rem; text-decoration: none;">🚪 Sign Out</a></li>
+                        <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}" style="display: block; padding: 8px 16px; font-size: 0.8rem; text-decoration: none;"><i class="fa-solid fa-right-from-bracket me-2 text-danger"></i> Sign Out</a></li>
                     </ul>
                 </div>
 
@@ -208,23 +208,23 @@
     <!-- Mobile Bottom Navigation Bar -->
     <nav class="mobile-bottom-nav d-lg-none">
         <a href="{{ url_for('dashboard.home') }}" class="mobile-bottom-link {% if request.endpoint == 'dashboard.home' %}active{% endif %}">
-            <span class="mobile-bottom-icon">🏠</span>
+            <span class="mobile-bottom-icon"><i class="fa-solid fa-house"></i></span>
             <span>Home</span>
         </a>
         <a href="{{ url_for('features.list_roadmaps') }}" class="mobile-bottom-link {% if request.endpoint == 'features.list_roadmaps' %}active{% endif %}">
-            <span class="mobile-bottom-icon">🛣️</span>
+            <span class="mobile-bottom-icon"><i class="fa-solid fa-route"></i></span>
             <span>Roadmaps</span>
         </a>
         <a href="{{ url_for('features.resume_analyzer') }}" class="mobile-bottom-link {% if request.endpoint == 'features.resume_analyzer' %}active{% endif %}">
-            <span class="mobile-bottom-icon">📝</span>
+            <span class="mobile-bottom-icon"><i class="fa-solid fa-file-invoice"></i></span>
             <span>Resumes</span>
         </a>
         <a href="{{ url_for('features.interview_prep') }}" class="mobile-bottom-link {% if request.endpoint == 'features.interview_prep' %}active{% endif %}">
-            <span class="mobile-bottom-icon">🎙️</span>
+            <span class="mobile-bottom-icon"><i class="fa-solid fa-microphone"></i></span>
             <span>Interview</span>
         </a>
         <a href="{{ url_for('features.internship_center') }}" class="mobile-bottom-link {% if request.endpoint == 'features.internship_center' %}active{% endif %}">
-            <span class="mobile-bottom-icon">💼</span>
+            <span class="mobile-bottom-icon"><i class="fa-solid fa-briefcase"></i></span>
             <span>Internships</span>
         </a>
     </nav>
@@ -297,7 +297,7 @@
             const icon = document.getElementById("theme-toggle-icon");
             if (!icon) return;
             const isDark = document.body.classList.contains("dark");
-            icon.innerHTML = isDark ? "🌙" : "☀️";
+            icon.innerHTML = isDark ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
         }
 
         function applyThemePreference(val) {

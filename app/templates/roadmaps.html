@@ -111,25 +111,25 @@
                     <div class="canvas-controls d-none d-lg-flex" style="position: absolute; bottom: 20px; right: 20px; z-index: 100; display: flex; flex-direction: column; align-items: center; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(8px); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); gap: 6px;">
                         <!-- Pan Up -->
                         <button class="btn btn-light btn-sm shadow-sm" onclick="panCanvas('up')" title="Pan Up" style="width: 32px; height: 32px; border-radius: 4px; border: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; padding:0; background:#ffffff; cursor:pointer;">
-                            <i class="fa-solid fa-chevron-up"></i>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-primary);"><polyline points="18 15 12 9 6 15"></polyline></svg>
                         </button>
                         
                         <!-- Pan Left, Reset, Pan Right -->
                         <div class="d-flex gap-1">
                             <button class="btn btn-light btn-sm shadow-sm" onclick="panCanvas('left')" title="Pan Left" style="width: 32px; height: 32px; border-radius: 4px; border: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; padding:0; background:#ffffff; cursor:pointer;">
-                                <i class="fa-solid fa-chevron-left"></i>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-primary);"><polyline points="15 18 9 12 15 6"></polyline></svg>
                             </button>
                             <button class="btn btn-light btn-sm shadow-sm" onclick="resetZoom()" title="Reset Zoom" style="width: 32px; height: 32px; border-radius: 4px; border: 1px solid #bae6fd; display:flex; align-items:center; justify-content:center; padding:0; background:#e0f2fe; color:#0078d4; cursor:pointer;">
-                                <i class="fa-solid fa-arrows-to-dot"></i>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: #0078d4;"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3" fill="#0078d4"></circle></svg>
                             </button>
                             <button class="btn btn-light btn-sm shadow-sm" onclick="panCanvas('right')" title="Pan Right" style="width: 32px; height: 32px; border-radius: 4px; border: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; padding:0; background:#ffffff; cursor:pointer;">
-                                <i class="fa-solid fa-chevron-right"></i>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-primary);"><polyline points="9 18 15 12 9 6"></polyline></svg>
                             </button>
                         </div>
                         
                         <!-- Pan Down -->
                         <button class="btn btn-light btn-sm shadow-sm" onclick="panCanvas('down')" title="Pan Down" style="width: 32px; height: 32px; border-radius: 4px; border: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; padding:0; background:#ffffff; cursor:pointer;">
-                            <i class="fa-solid fa-chevron-down"></i>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-primary);"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </button>
                         
                         <div style="width: 100%; border-top: 1px solid #e2e8f0; margin: 2px 0;"></div>
@@ -137,13 +137,13 @@
                         <!-- Zoom In, Zoom Out, Fit -->
                         <div class="d-flex gap-1">
                             <button class="btn btn-light btn-sm shadow-sm" onclick="zoomIn()" title="Zoom In" style="width: 32px; height: 32px; border-radius: 4px; border: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; padding:0; background:#ffffff; cursor:pointer;">
-                                <i class="fa-solid fa-magnifying-glass-plus"></i>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-primary);"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
                             </button>
                             <button class="btn btn-light btn-sm shadow-sm" onclick="zoomOut()" title="Zoom Out" style="width: 32px; height: 32px; border-radius: 4px; border: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; padding:0; background:#ffffff; cursor:pointer;">
-                                <i class="fa-solid fa-magnifying-glass-minus"></i>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-primary);"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
                             </button>
                             <button class="btn btn-light btn-sm shadow-sm" onclick="fitToScreen()" title="Fit to Screen" style="width: 32px; height: 32px; border-radius: 4px; border: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; padding:0; background:#ffffff; cursor:pointer;">
-                                <i class="fa-solid fa-expand"></i>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-primary);"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
                             </button>
                         </div>
                     </div>
@@ -476,7 +476,15 @@ function showToast(title, message, emoji = "") {
     const toastTitle = toast.querySelector("strong");
     const toastText = document.getElementById("toast-text");
     
-    if (emojiContainer) emojiContainer.innerHTML = emoji;
+    if (emojiContainer) {
+        if (emoji.trim().startsWith("<")) {
+            emojiContainer.innerHTML = emoji;
+        } else if (emoji.trim() !== "") {
+            emojiContainer.innerHTML = `<i class="fa-solid ${emoji}"></i>`;
+        } else {
+            emojiContainer.innerHTML = "";
+        }
+    }
     if (toastTitle) toastTitle.innerText = title;
     if (toastText) toastText.innerText = message;
     
