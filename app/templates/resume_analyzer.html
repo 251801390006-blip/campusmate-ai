@@ -2506,7 +2506,6 @@ async function downloadResumePDF() {
                 preview_html: previewHtml
             })
         });
-        
         if (response.ok) {
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
@@ -2518,12 +2517,77 @@ async function downloadResumePDF() {
             a.click();
             a.remove();
         } else {
-            const errData = await response.json();
-            alert("Failed to generate PDF: " + (errData.error || "Server error"));
+            console.warn("Server-side PDF failed. Trying client-side fallback...");
+            if (typeof html2pdf !== 'undefined' && sheet) {
+                const clone = sheet.cloneNode(true);
+                clone.style.transform = 'none';
+                clone.style.width = '210mm';
+                clone.style.boxShadow = 'none';
+                clone.style.borderRadius = '0';
+                clone.style.margin = '0';
+                clone.style.boxSizing = 'border-box';
+                clone.style.background = '#ffffff';
+                clone.querySelectorAll('.resume-canvas-toolbar, .resume-zoom-slider, .btn-canvas-ctrl, [data-no-pdf]').forEach(el => el.remove());
+                
+                const wrapper = document.createElement('div');
+                wrapper.style.cssText = 'position:fixed; left:-9999px; top:0; z-index:-1; background:#fff;';
+                wrapper.appendChild(clone);
+                document.body.appendChild(wrapper);
+                
+                const nameVal = content.name || 'Resume';
+                const opt = {
+                    margin: 0,
+                    filename: `${nameVal.trim().replace(/\s+/g, '_')}_Resume.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+                
+                await html2pdf().set(opt).from(clone).save();
+                wrapper.remove();
+            } else {
+                const errData = await response.json().catch(() => ({}));
+                alert("Failed to generate PDF: " + (errData.error || "Server error"));
+            }
         }
     } catch (err) {
-        console.error(err);
-        alert("Failed to export PDF: " + err.message);
+        console.error("PDF download caught error:", err);
+        if (typeof html2pdf !== 'undefined' && sheet) {
+            console.warn("Attempting client-side fallback...");
+            try {
+                const clone = sheet.cloneNode(true);
+                clone.style.transform = 'none';
+                clone.style.width = '210mm';
+                clone.style.boxShadow = 'none';
+                clone.style.borderRadius = '0';
+                clone.style.margin = '0';
+                clone.style.boxSizing = 'border-box';
+                clone.style.background = '#ffffff';
+                clone.querySelectorAll('.resume-canvas-toolbar, .resume-zoom-slider, .btn-canvas-ctrl, [data-no-pdf]').forEach(el => el.remove());
+                
+                const wrapper = document.createElement('div');
+                wrapper.style.cssText = 'position:fixed; left:-9999px; top:0; z-index:-1; background:#fff;';
+                wrapper.appendChild(clone);
+                document.body.appendChild(wrapper);
+                
+                const nameVal = content.name || 'Resume';
+                const opt = {
+                    margin: 0,
+                    filename: `${nameVal.trim().replace(/\s+/g, '_')}_Resume.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+                
+                await html2pdf().set(opt).from(clone).save();
+                wrapper.remove();
+            } catch (fallbackErr) {
+                console.error("Client-side fallback failed:", fallbackErr);
+                alert("Failed to generate PDF: " + err.message);
+            }
+        } else {
+            alert("Failed to export PDF: " + err.message);
+        }
     } finally {
         if (btn) {
             btn.disabled = false;
