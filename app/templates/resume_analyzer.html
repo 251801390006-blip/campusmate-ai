@@ -139,20 +139,9 @@
             <button id="ats-score-badge-btn" class="btn btn-sm btn-outline rounded shadow-sm" style="height:32px; font-size:0.75rem; display: none; white-space: nowrap; color: #0d9488; border-color: #0d9488;" onclick="toggleAtsDrawer()"><i class="fa-solid fa-gauge-high me-1"></i> ATS: <span id="ats-score-text">0</span>%</button>
         </div>
 
-        <!-- Right: Export / PDF / Print Actions -->
+        <!-- Right: PDF Download -->
         <div class="d-flex gap-1.5 flex-nowrap align-items-center">
             <button class="btn btn-sm btn-primary py-1 px-3.5 rounded fw-semibold shadow-sm" style="height:32px; font-size:0.75rem; white-space: nowrap;" onclick="downloadResumePDF()"><i class="fa-solid fa-download me-1"></i> Download PDF</button>
-            <button class="btn btn-sm btn-outline py-1 px-3 d-none d-sm-inline-block rounded" style="height:32px; font-size:0.75rem; white-space: nowrap;" onclick="window.print()"><i class="fa-solid fa-print"></i> Print</button>
-            
-            <!-- Export Dropdown -->
-            <div class="dropdown" style="position:relative; display:inline-block;">
-                <button class="btn btn-sm btn-outline py-1 px-3 rounded dropdown-toggle" style="height:32px; font-size:0.75rem; white-space: nowrap;" onclick="toggleExportMenu()"><i class="fa-solid fa-file-export me-1"></i> Export <i class="fa-solid fa-chevron-down ms-1" style="font-size:8px;"></i></button>
-                <div id="export-dropdown-menu" class="dropdown-menu border shadow-sm p-1" style="display:none; position:absolute; right:0; top:35px; background:var(--bg-secondary); border-radius:6px; z-index:1500; min-width:140px;">
-                    <a href="javascript:void(0)" onclick="downloadResumeDOCX()" class="dropdown-item py-2 px-3 d-block text-secondary-text" style="font-size:0.75rem; text-decoration:none;"><i class="fa-solid fa-file-word text-primary me-2"></i> Word (DOCX)</a>
-                    <a href="javascript:void(0)" onclick="downloadResumeJSON()" class="dropdown-item py-2 px-3 d-block text-secondary-text" style="font-size:0.75rem; text-decoration:none;"><i class="fa-solid fa-file-code text-info me-2"></i> JSON Schema</a>
-                    <a href="javascript:void(0)" onclick="generateShareLink()" class="dropdown-item py-2 px-3 d-block text-secondary-text" style="font-size:0.75rem; text-decoration:none;"><i class="fa-solid fa-share-nodes text-success me-2"></i> Share Link</a>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -522,14 +511,11 @@
                 </div>
             </div>
 
-            <!-- Desktop Download Options Toolbar -->
+            <!-- Desktop Download Toolbar -->
             <div class="desktop-download-toolbar d-none d-xl-flex justify-content-between align-items-center mb-3 p-2.5 border rounded bg-primary-card" style="border-color: var(--border-color) !important;">
-                <span class="fw-bold" style="font-size:0.75rem; color:var(--text-secondary);"><i class="fa-solid fa-cloud-arrow-down me-2 text-accent"></i> Download & Export Options</span>
+                <span class="fw-bold" style="font-size:0.75rem; color:var(--text-secondary);"><i class="fa-solid fa-cloud-arrow-down me-2 text-accent"></i> Download Resume</span>
                 <div class="d-flex gap-2">
-                    <button class="btn btn-sm btn-primary py-1 px-3 fw-semibold text-nowrap" style="font-size: 0.72rem; height: 30px; display: inline-flex; align-items: center;" onclick="downloadResumePDF()"><i class="fa-solid fa-file-pdf me-1.5"></i> PDF</button>
-                    <button class="btn btn-sm btn-outline py-1 px-3 text-nowrap" style="font-size: 0.72rem; height: 30px; display: inline-flex; align-items: center;" onclick="downloadResumeDOCX()"><i class="fa-solid fa-file-word text-primary me-1.5"></i> Word</button>
-                    <button class="btn btn-sm btn-outline py-1 px-3 text-nowrap" style="font-size: 0.72rem; height: 30px; display: inline-flex; align-items: center;" onclick="downloadResumeJSON()"><i class="fa-solid fa-file-code text-info me-1.5"></i> JSON</button>
-                    <button class="btn btn-sm btn-outline py-1 px-3 text-nowrap" style="font-size: 0.72rem; height: 30px; display: inline-flex; align-items: center;" onclick="generateShareLink()"><i class="fa-solid fa-share-nodes text-success me-1.5"></i> Share</button>
+                    <button class="btn btn-sm btn-primary py-1 px-3 fw-semibold text-nowrap" style="font-size: 0.72rem; height: 30px; display: inline-flex; align-items: center;" onclick="downloadResumePDF()"><i class="fa-solid fa-file-pdf me-1.5"></i> Download PDF</button>
                 </div>
             </div>
 
@@ -703,15 +689,11 @@
             </div>
         </div>
 
-        <!-- Mobile-only Export tab container -->
+        <!-- Mobile-only Download container -->
         <div id="mobile-export-container" class="flat-card bg-secondary-card border p-3 mb-4 d-lg-none">
-            <h4 class="fw-bold mb-3"><i class="fa-solid fa-file-export text-accent me-2"></i> Export & Share</h4>
+            <h4 class="fw-bold mb-3"><i class="fa-solid fa-download text-accent me-2"></i> Download Resume</h4>
             <div class="d-flex flex-column gap-2.5">
-                <button class="btn btn-primary w-100 py-2.5 fw-semibold" onclick="downloadResumePDF()"><i class="fa-solid fa-download me-2"></i> Download PDF</button>
-                <button class="btn btn-outline-secondary w-100 py-2.5" onclick="downloadResumeDOCX()"><i class="fa-solid fa-file-word text-primary me-2"></i> Word (DOCX)</button>
-                <button class="btn btn-outline-secondary w-100 py-2.5" onclick="downloadResumeJSON()"><i class="fa-solid fa-file-code text-info me-2"></i> JSON Schema</button>
-                <button class="btn btn-outline-secondary w-100 py-2.5" onclick="generateShareLink()"><i class="fa-solid fa-share-nodes text-success me-2"></i> Generate Share Link</button>
-                <button class="btn btn-outline-secondary w-100 py-2.5" onclick="window.print()"><i class="fa-solid fa-print me-2"></i> Print Resume</button>
+                <button class="btn btn-primary w-100 py-2.5 fw-semibold" onclick="downloadResumePDF()"><i class="fa-solid fa-file-pdf me-2"></i> Download PDF</button>
             </div>
         </div>
 
@@ -768,8 +750,8 @@
         <span>Templates</span>
     </button>
     <button class="mobile-tab-item" id="mobile-tab-btn-export" onclick="setMobileTab('export')">
-        <i class="fa-solid fa-file-export"></i>
-        <span>Export</span>
+        <i class="fa-solid fa-download"></i>
+        <span>Download</span>
     </button>
 </div>
 
@@ -1014,22 +996,7 @@ function setMobileTab(tabId) {
     }
 }
 
-// Export Dropdown menu trigger
-function toggleExportMenu() {
-    const menu = document.getElementById("export-dropdown-menu");
-    if (menu) {
-        menu.style.display = menu.style.display === "none" ? "block" : "none";
-    }
-}
-
-// Close dropdown when clicking outside
-document.addEventListener("click", (e) => {
-    const dropdown = document.querySelector(".dropdown");
-    if (dropdown && !dropdown.contains(e.target)) {
-        const menu = document.getElementById("export-dropdown-menu");
-        if (menu) menu.style.display = "none";
-    }
-});
+// (Export dropdown removed — PDF-only mode)
 
 // Modal Template Browser actions
 function openTemplateGallery() {
@@ -2471,192 +2438,84 @@ function runVersionComparison() {
     historyPane.innerHTML = historyHtml;
 }
 
-// Server-side PDF export trigger
+// ─── Client-side PDF Download (html2pdf.js) ───
+// Captures the live preview exactly as displayed, fits to 1 A4 page
 async function downloadResumePDF() {
-    const btn = document.querySelector('button[onclick="downloadResumePDF()"]');
-    let originalHtml = "";
-    if (btn) {
+    const btns = document.querySelectorAll('button[onclick="downloadResumePDF()"]');
+    const originals = [];
+    btns.forEach(btn => {
         btn.disabled = true;
-        originalHtml = btn.innerHTML;
-        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Downloading...`;
-    }
-    
-    const content = getFormContent();
-    const theme = document.getElementById("resume-theme-select").value;
-    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
-    
-    let previewHtml = "";
-    const sheet = document.getElementById("resume-sheet-paper");
-    if (sheet) {
+        originals.push(btn.innerHTML);
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Generating...`;
+    });
+
+    try {
+        const sheet = document.getElementById("resume-sheet-paper");
+        if (!sheet) { alert("No resume preview found. Please fill in your details first."); return; }
+
+        // Clone and prepare for PDF
         const clone = sheet.cloneNode(true);
-        clone.classList.add("pdf-export-mode");
-        previewHtml = clone.outerHTML;
-    }
-    
-    try {
-        const response = await fetch('/resume-analyzer/export-pdf', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
-            },
-            body: JSON.stringify({
-                content: content,
-                theme: theme,
-                preview_html: previewHtml
+        clone.style.transform = 'none';
+        clone.style.width = '210mm';
+        clone.style.minHeight = '297mm';
+        clone.style.maxHeight = '297mm';
+        clone.style.height = '297mm';
+        clone.style.overflow = 'hidden';
+        clone.style.boxShadow = 'none';
+        clone.style.borderRadius = '0';
+        clone.style.margin = '0';
+        clone.style.padding = clone.style.padding || '10mm 12mm';
+        clone.style.boxSizing = 'border-box';
+        clone.style.background = '#ffffff';
+        clone.style.position = 'relative';
+
+        // Remove any toolbar/control elements inside the clone
+        clone.querySelectorAll('.resume-canvas-toolbar, .resume-zoom-slider, .btn-canvas-ctrl, [data-no-pdf]').forEach(el => el.remove());
+
+        // Create a temp container off-screen
+        const wrapper = document.createElement('div');
+        wrapper.style.cssText = 'position:fixed; left:-9999px; top:0; z-index:-1; background:#fff;';
+        wrapper.appendChild(clone);
+        document.body.appendChild(wrapper);
+
+        const content = getFormContent();
+        const nameVal = (content.name || 'Resume').trim().replace(/\s+/g, '_');
+
+        // Use html2pdf.js for exact rendering
+        await html2pdf()
+            .set({
+                margin: 0,
+                filename: `${nameVal}_Resume.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    letterRendering: true,
+                    logging: false,
+                    width: clone.scrollWidth,
+                    height: clone.scrollHeight,
+                    windowWidth: clone.scrollWidth
+                },
+                jsPDF: {
+                    unit: 'mm',
+                    format: 'a4',
+                    orientation: 'portrait'
+                },
+                pagebreak: { mode: ['avoid-all'] }
             })
-        });
-        
-        if (response.ok) {
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            const nameVal = content.name || 'Resume';
-            a.download = `${nameVal.trim().replace(/\s+/g, '_')}_Resume.pdf`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-        } else {
-            const errData = await response.json();
-            alert("Failed to generate PDF: " + (errData.error || "Server error"));
-        }
+            .from(clone)
+            .save();
+
+        wrapper.remove();
+
     } catch (err) {
-        console.error(err);
-        alert("Failed to export PDF: " + err.message);
+        console.error('PDF generation error:', err);
+        alert('Failed to generate PDF. Please try again.');
     } finally {
-        if (btn) {
+        btns.forEach((btn, i) => {
             btn.disabled = false;
-            btn.innerHTML = originalHtml;
-        }
-    }
-}
-
-// Export DOCX (Word File)
-function downloadResumeDOCX() {
-    const content = getFormContent();
-    const nameVal = content.name || 'Resume';
-    const filename = `${nameVal.trim().replace(/\s+/g, '_')}_Resume.doc`;
-    
-    let htmlContent = `
-    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-    <head>
-        <title>${nameVal} - Resume</title>
-        <style>
-            body { font-family: Arial, sans-serif; font-size: 11pt; line-height: 1.5; color: #333333; }
-            h1 { font-size: 20pt; color: #1e3a8a; margin-bottom: 5px; text-transform: uppercase; }
-            h3 { font-size: 12pt; color: #1e3a8a; border-bottom: 2px solid #1e3a8a; margin-top: 15px; margin-bottom: 5px; text-transform: uppercase; }
-            .meta { font-size: 10pt; color: #666666; margin-bottom: 15px; }
-            table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
-            td { vertical-align: top; }
-        </style>
-    </head>
-    <body>
-        <h1>${content.name || 'Alex Smith'}</h1>
-        <div class="meta">
-            ${content.address || ''} | ${content.email || ''} | ${content.phone || ''} | ${content.linkedin || ''} | ${content.github || ''}
-        </div>
-    `;
-    
-    educationList.forEach(item => {
-        htmlContent += `
-        <h3>Education</h3>
-        <table>
-            <tr>
-                <td><strong>${item.inst}</strong></td>
-                <td style="text-align: right;">${item.dates}</td>
-            </tr>
-            <tr>
-                <td><em>${item.degree}</em></td>
-                <td style="text-align: right;">${item.gpa}</td>
-            </tr>
-        </table>
-        `;
-    });
-    
-    experienceList.forEach(item => {
-        let bulletsHtml = "";
-        (item.bullets || []).forEach(b => {
-            if (b.trim()) bulletsHtml += `<li>${b.trim()}</li>`;
+            btn.innerHTML = originals[i] || `<i class="fa-solid fa-download me-1"></i> Download PDF`;
         });
-        htmlContent += `
-        <h3>Experience</h3>
-        <table>
-            <tr>
-                <td><strong>${item.role}</strong></td>
-                <td style="text-align: right;">${item.dates}</td>
-            </tr>
-            <tr>
-                <td colspan="2"><em>${item.company}</em></td>
-            </tr>
-        </table>
-        <ul>${bulletsHtml}</ul>
-        `;
-    });
-    
-    projectsList.forEach(item => {
-        let bulletsHtml = "";
-        (item.bullets || []).forEach(b => {
-            if (b.trim()) bulletsHtml += `<li>${b.trim()}</li>`;
-        });
-        htmlContent += `
-        <h3>Projects</h3>
-        <table>
-            <tr>
-                <td><strong>${item.title}</strong></td>
-                <td style="text-align: right;">${item.link}</td>
-            </tr>
-        </table>
-        <ul>${bulletsHtml}</ul>
-        `;
-    });
-    
-    htmlContent += `</body></html>`;
-    
-    const blob = new Blob(['\ufeff' + htmlContent], {
-        type: 'application/msword'
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-}
-
-// Export JSON
-async function downloadResumeJSON() {
-    const content = getFormContent();
-    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
-    
-    try {
-        const response = await fetch('/resume-analyzer/export-json', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
-            },
-            body: JSON.stringify({
-                content: content
-            })
-        });
-        if (response.ok) {
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            const nameVal = content.name || 'Resume';
-            a.download = `${nameVal.trim().replace(/\s+/g, '_')}_Resume.json`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-        } else {
-            alert('Failed to export JSON.');
-        }
-    } catch (e) {
-        console.error(e);
-        alert('Connection error occurred while exporting JSON.');
     }
 }
 
