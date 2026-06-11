@@ -147,6 +147,28 @@ def create_app():
             'unread_notifications_count': 0
         }
 
+    # PHASE 14: Performance Optimization
+    from app.utils.performance import (
+        PerformanceOptimizations,
+        init_performance_tracking,
+        init_cache
+    )
+    
+    # Initialize caching
+    init_cache(app)
+    
+    # Enable compression
+    PerformanceOptimizations.enable_compression(app)
+    
+    # Configure caching headers
+    PerformanceOptimizations.enable_caching_headers(app)
+    
+    # Enable lazy loading components
+    PerformanceOptimizations.lazy_load_components(app)
+    
+    # Initialize performance tracking
+    init_performance_tracking(app)
+
     return app
 
 
