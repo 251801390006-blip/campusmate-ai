@@ -10,7 +10,10 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 from flask_login import login_required, current_user
 from app.models import db, User, ChatMessage, ResumeAnalysis, RoadmapProgress, UserResume, Internship, SavedItem
 from pypdf import PdfReader
-from xhtml2pdf import pisa
+try:
+    from xhtml2pdf import pisa
+except ImportError:
+    pisa = None
 from io import BytesIO
 
 features_bp = Blueprint('features', __name__)
@@ -2848,6 +2851,9 @@ def export_pdf():
             """
         else:
             html_content = render_resume_pdf_html(content, theme)
+            
+        if pisa is None:
+            return jsonify({"success": False, "error": "xhtml2pdf library is not installed or available on this server."}), 500
             
         pdf_io = BytesIO()
         pisa_status = pisa.CreatePDF(html_content, dest=pdf_io, link_callback=link_callback)
