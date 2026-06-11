@@ -345,11 +345,48 @@
             transform: none !important;
         }
     }
+
+/* 6:00 AM overlay styles */
+#six-am-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(2,6,23,0.65);
+    z-index: 9999;
+}
+#six-am-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(250,250,250,0.96));
+    color: #0f172a;
+    border-radius: 14px;
+    padding: 28px 30px;
+    max-width: 760px;
+    width: calc(100% - 48px);
+    box-shadow: 0 30px 80px rgba(2,6,23,0.6);
+    text-align: center;
+}
+#six-am-card h3 { font-size: 1.6rem; margin-bottom: 8px; }
+#six-am-card p { color: rgba(15,23,42,0.85); margin-bottom: 14px; }
+#six-am-close { margin-left: 12px; }
+#six-am-countdown { font-weight: 800; color: #3b82f6; }
+
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container py-4 position-relative">
+    <!-- 6:00 AM overlay (appears exactly at local 06:00:00 for 10s) -->
+    <div id="six-am-overlay" aria-hidden="true">
+        <div id="six-am-card">
+            <h3>Good Morning — 6:00 AM</h3>
+            <p id="six-am-message">It's exactly 6:00 AM in your local time.</p>
+            <div style="display:flex; gap:8px; align-items:center; justify-content:center;">
+                <div id="six-am-countdown">10s</div>
+                <button id="six-am-close" class="btn btn-outline" type="button">Dismiss</button>
+            </div>
+        </div>
+    </div>
     <!-- Glowing background blobs -->
     <div class="glow-blob-1"></div>
     <div class="glow-blob-2"></div>
@@ -515,4 +552,73 @@
         </a>
     </div>
 </div>
+
+<script>
+// 6:00 AM exact local-time trigger — shows overlay for 10 seconds
+(function(){
+const OVERLAY_ID = 'six-am-overlay';
+const CLOSE_ID = 'six-am-close';
+const COUNTDOWN_ID = 'six-am-countdown';
+const VISIBLE_MS = 10000; // 10 seconds
+
+function showOverlay() {
+    const el = document.getElementById(OVERLAY_ID);
+    const count = document.getElementById(COUNTDOWN_ID);
+    if(!el) return;
+    el.style.display = 'flex';
+    let remaining = Math.ceil(VISIBLE_MS/1000);
+    count.textContent = remaining + 's';
+    const tick = setInterval(()=>{
+        remaining -= 1;
+        if(remaining <= 0) {
+            clearInterval(tick);
+            el.style.display = 'none';
+        } else {
+            count.textContent = remaining + 's';
+        }
+    }, 1000);
+    setTimeout(()=>{ el.style.display = 'none'; clearInterval(tick); }, VISIBLE_MS);
+}
+
+function scheduleNextTrigger(){
+    const now = new Date();
+    const target = new Date(now);
+    target.setHours(6,0,0,0);
+    if(now.getTime() > target.getTime()) target.setDate(target.getDate()+1);
+    const delay = target.getTime() - now.getTime();
+    // Use setTimeout to wait until the exact 6:00:00 local time
+    setTimeout(()=>{
+        // double-check exact second alignment
+        const now2 = new Date();
+        if(now2.getHours()===6 && now2.getMinutes()===0 && now2.getSeconds()===0){
+            showOverlay();
+        }
+        // schedule next day's trigger
+        scheduleNextTrigger();
+    }, delay);
+}
+
+// Attach dismiss handler
+document.addEventListener('click', function(e){
+    const el = document.getElementById(OVERLAY_ID);
+    if(!el) return;
+    if(e.target && e.target.id === CLOSE_ID){ el.style.display='none'; }
+}, {capture:false});
+
+// Start scheduling after DOM ready
+if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', scheduleNextTrigger);
+} else {
+    scheduleNextTrigger();
+}
+
+// Also handle immediate load case if the page is loaded exactly at 06:00:00
+const now = new Date();
+if(now.getHours()===6 && now.getMinutes()===0 && now.getSeconds()===0){
+    // slight delay to ensure DOM elements exist
+    setTimeout(showOverlay, 50);
+}
+})();
+</script>
+
 {% endblock %}
