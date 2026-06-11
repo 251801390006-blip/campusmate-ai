@@ -11,9 +11,9 @@ from flask_login import login_required, current_user
 from app.models import db, User, ChatMessage, ResumeAnalysis, RoadmapProgress, UserResume, Internship, SavedItem
 from pypdf import PdfReader
 try:
-    from xhtml2pdf import pisa
-except ImportError:
-    pisa = None
+    import weasyprint
+except Exception:
+    weasyprint = None
 from io import BytesIO
 
 features_bp = Blueprint('features', __name__)
@@ -2506,13 +2506,18 @@ def render_resume_pdf_html(content, theme):
     css = f"""
     @page {{
         size: a4;
-        margin-top: 8mm;
-        margin-bottom: 8mm;
-        margin-left: 10mm;
-        margin-right: 10mm;
+        margin-top: 10mm;
+        margin-bottom: 10mm;
+        margin-left: 12mm;
+        margin-right: 12mm;
+    }}
+    * {{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }}
     body {{
-        font-family: {font};
+        font-family: {font}, 'Helvetica Neue', Arial, sans-serif;
         font-size: {f_size};
         line-height: {line_h};
         color: {text_color};
@@ -2521,55 +2526,80 @@ def render_resume_pdf_html(content, theme):
     .resume-container {{
         {container_css_str}
     }}
-    table, tr, td, th, ul, li, p, span, h1, h2, h3, h4, h5, h6 {{
-        border: 0;
+    table, tr, td, th {{
+        border: none !important;
+        border-collapse: collapse;
+    }}
+    ul, li, p, span, h1, h2, h3, h4, h5, h6 {{
+        border: none !important;
+    }}
+    a {{
+        color: {primary};
+        text-decoration: none;
     }}
     h1 {{
         font-size: 20px;
-        font-weight: bold;
+        font-weight: 700;
         color: {primary};
-        margin: 0 0 3px 0;
+        margin: 0 0 2px 0;
         text-transform: uppercase;
+        letter-spacing: 0.5px;
     }}
     .meta {{
         font-size: 8.5px;
         color: #4b5563;
-        line-height: 1.35;
-        margin-top: 3px;
-        margin-bottom: 8px;
+        line-height: 1.4;
+        margin-top: 2px;
+        margin-bottom: 6px;
+    }}
+    .meta a {{
+        color: {primary};
+        text-decoration: none;
+    }}
+    .resume-section {{
+        page-break-inside: avoid;
+        margin-bottom: 2px;
     }}
     .section-title {{
-        font-size: 11.5px;
-        font-weight: bold;
+        font-size: 10.5px;
+        font-weight: 700;
         color: {primary};
-        border-bottom: 0.75px solid {primary} !important;
-        margin-top: 12px;
-        margin-bottom: 6px;
-        padding-bottom: 2px;
+        border-bottom: 1px solid {primary};
+        margin-top: 8px;
+        margin-bottom: 4px;
+        padding-bottom: 1.5px;
         text-transform: uppercase;
+        letter-spacing: 0.3px;
     }}
     .item-header {{
-        font-size: 10px;
-        font-weight: bold;
+        font-size: 9.5px;
+        font-weight: 700;
         color: #1e293b;
     }}
     .item-date {{
-        font-size: 9.5px;
+        font-size: 9px;
         text-align: right;
         color: #4b5563;
     }}
     .bullet-list {{
-        margin-top: 2px;
-        margin-bottom: 4px;
-        padding-left: 12px;
+        margin-top: 1px;
+        margin-bottom: 3px;
+        padding-left: 14px;
+        list-style-type: disc;
     }}
     .bullet-item {{
-        margin-bottom: 2px;
-        font-size: 9.5px;
+        margin-bottom: 1px;
+        font-size: 9px;
         line-height: 1.35;
         color: #374151;
     }}
+    hr {{
+        border: none;
+        border-top: 0.5px solid #d1d5db;
+        margin: 4px 0;
+    }}
     """
+
     
     # Render sections
     sections_html = ""
@@ -2775,101 +2805,27 @@ def export_pdf():
         data = request.get_json() or {}
         content = data.get('content', {})
         theme = data.get('theme', 'ats-modern')
-        preview_html = data.get('preview_html')
         
-        def link_callback(uri, rel):
-            import os
-            from flask import current_app
-            if uri.startswith('/static/'):
-                path = os.path.join(current_app.root_path, uri.replace('/static/', 'static/')).replace('\\', '/')
-                return path
-            return uri
+        # Always use the clean, structured ATS template builder for server-side PDF generation to ensure perfect format and fit
+        html_content = render_resume_pdf_html(content, theme)
+        
+        if weasyprint is not None:
+            # Generate PDF using WeasyPrint
+            pdf_bytes = weasyprint.HTML(string=html_content, base_url=request.base_url).write_pdf()
+            name_val = content.get('name', 'Resume').strip().replace(' ', '_')
+            filename = f"{name_val}_Resume.pdf"
             
-        if preview_html:
-            import os
-            css_path = os.path.join(current_app.root_path, 'static', 'css', 'style.css')
-            css_content = ""
-            if os.path.exists(css_path):
-                with open(css_path, 'r', encoding='utf-8') as f:
-                    css_content = f.read()
-            
-            pdf_styles = """
-            @page {
-                size: A4;
-                margin: 12mm;
-            }
-            body {
-                font-family: 'Outfit', 'Helvetica', 'Arial', sans-serif;
-                background: #ffffff;
-                color: #1e293b;
-                margin: 0;
-                padding: 0;
-            }
-            .resume-sheet {
-                box-shadow: none !important;
-                border: none !important;
-                border-radius: 0 !important;
-                width: 100% !important;
-                height: auto !important;
-                min-height: 0 !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                background: transparent !important;
-            }
-            .canva-left-sidebar {
-                float: left !important;
-                width: 30% !important;
-                box-sizing: border-box !important;
-            }
-            .canva-right-panel {
-                float: right !important;
-                width: 68% !important;
-                box-sizing: border-box !important;
-            }
-            .resume-canvas-toolbar, .resume-zoom-slider, .btn-canvas-ctrl {
-                display: none !important;
-            }
-            i {
-                display: none !important;
-            }
-            """
-            
-            html_content = f"""
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="utf-8">
-                <style>
-                    {css_content}
-                    {pdf_styles}
-                </style>
-            </head>
-            <body>
-                {preview_html}
-            </body>
-            </html>
-            """
+            response = make_response(pdf_bytes)
+            response.headers['Content-Disposition'] = f'attachment; filename={filename}'
+            response.headers['Content-Type'] = 'application/pdf'
+            return response
         else:
-            html_content = render_resume_pdf_html(content, theme)
-            
-        if pisa is None:
-            return jsonify({"success": False, "error": "xhtml2pdf library is not installed or available on this server."}), 500
-            
-        pdf_io = BytesIO()
-        pisa_status = pisa.CreatePDF(html_content, dest=pdf_io, link_callback=link_callback)
-        
-        if pisa_status.err:
-            return jsonify({"success": False, "error": "PDF generation failed"}), 500
-            
-        pdf_io.seek(0)
-        
-        name_val = content.get('name', 'Resume').strip().replace(' ', '_')
-        filename = f"{name_val}_Resume.pdf"
-        
-        response = make_response(pdf_io.getvalue())
-        response.headers['Content-Disposition'] = f'attachment; filename={filename}'
-        response.headers['Content-Type'] = 'application/pdf'
-        return response
+            # WeasyPrint is not available (such as in local windows dev without GTK installed)
+            # Return error so the client-side html2pdf.js fallback is triggered instantly
+            return jsonify({
+                "success": False, 
+                "error": "WeasyPrint is not available on this server. Falling back to browser-side PDF engine."
+            }), 400
     except Exception as e:
         import traceback
         traceback.print_exc()
