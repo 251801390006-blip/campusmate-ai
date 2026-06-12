@@ -212,7 +212,7 @@
                     <div id="upload-status-text-builder" class="text-center p-2 mb-2 border rounded bg-secondary-card text-secondary animate-fade-in" style="font-size: 0.72rem; display:none; border-color: var(--accent-color) !important;"></div>
                     
                     <!-- Choose Template Accordion (Desktop Only) -->
-                    <details class="accordion-section p-2 border rounded bg-primary-card d-none d-xl-block" id="accordion-templates" open style="border-color: var(--border-color) !important;">
+                    <details class="accordion-section p-2 border rounded bg-primary-card d-none d-lg-block" id="accordion-templates" open style="border-color: var(--border-color) !important;">
                         <summary class="fw-bold text-secondary-text" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-palette me-2 text-muted"></i> Choose Template</summary>
                         <div class="mt-2">
                             <div class="modal-tabs-header d-flex flex-wrap gap-1 border-0 mb-2.5">
@@ -523,7 +523,7 @@
             </div>
 
             <!-- Desktop Download Options Toolbar -->
-            <div class="desktop-download-toolbar d-none d-xl-flex justify-content-between align-items-center mb-3 p-2.5 border rounded bg-primary-card" style="border-color: var(--border-color) !important;">
+            <div class="desktop-download-toolbar d-none d-lg-flex justify-content-between align-items-center mb-3 p-2.5 border rounded bg-primary-card" style="border-color: var(--border-color) !important;">
                 <span class="fw-bold" style="font-size:0.75rem; color:var(--text-secondary);"><i class="fa-solid fa-cloud-arrow-down me-2 text-accent"></i> Download & Export Options</span>
                 <div class="d-flex gap-2">
                     <button class="btn btn-sm btn-primary py-1 px-3 fw-semibold text-nowrap" style="font-size: 0.72rem; height: 30px; display: inline-flex; align-items: center;" onclick="downloadResumePDF()"><i class="fa-solid fa-file-pdf me-1.5"></i> PDF</button>
@@ -2523,13 +2523,18 @@ async function downloadResumePDF() {
     }
     
     try {
+        // Strip out any UI elements (like edit buttons) from the sheet HTML before sending
+        const cleanSheet = sheet.cloneNode(true);
+        cleanSheet.querySelectorAll('.resume-canvas-toolbar, .resume-zoom-slider, .btn-canvas-ctrl, [data-no-pdf]').forEach(el => el.remove());
+        const previewHtml = cleanSheet.innerHTML;
+
         const response = await fetch('/resume-analyzer/export-pdf', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': csrfToken
             },
-            body: JSON.stringify({ content, theme })
+            body: JSON.stringify({ content: content, theme: theme, preview_html: previewHtml })
         });
         
         if (response.ok) {
