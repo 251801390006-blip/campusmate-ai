@@ -1,10 +1,78 @@
 {% extends "dashboard_base.html" %}
 
-{% block title %}Resume Builder - CampusMate AI{% endblock %}
+{% block title %}Resume Builder - CampusMate AI</div></div></div>{% endblock %}
 
-{% block header_title %}ATS Resume Builder{% endblock %}
+{% block header_title %}ATS Resume Builder</div></div></div>{% endblock %}
 
 {% block content %}
+
+<script>
+function switchResumeTab(tab) {
+    // Get Elements
+    const navBtns = document.querySelectorAll('.resume-mobile-nav .btn-nav');
+    const editorCol = document.getElementById('resume-editor-col');
+    const previewCol = document.getElementById('resume-preview-col');
+    const atsCol = document.getElementById('resume-ats-col');
+    const toolsCol = document.getElementById('resume-tools-col');
+    
+    // Update active button
+    navBtns.forEach(btn => btn.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    
+    // Force hide all on mobile/tablet
+    if(window.innerWidth < 992) {
+        editorCol.classList.add('d-none');
+        editorCol.classList.remove('d-block');
+        
+        previewCol.classList.add('d-none');
+        previewCol.classList.remove('d-block');
+        
+        atsCol.classList.add('d-none');
+        atsCol.classList.remove('d-block');
+        
+        toolsCol.classList.add('d-none');
+        toolsCol.classList.remove('d-block');
+        
+        // Show selected
+        if(tab === 'editor') {
+            editorCol.classList.remove('d-none');
+            editorCol.classList.add('d-block');
+        } else if(tab === 'preview') {
+            previewCol.classList.remove('d-none');
+            previewCol.classList.add('d-block');
+        } else if(tab === 'ats') {
+            atsCol.classList.remove('d-none');
+            atsCol.classList.add('d-block');
+        } else if(tab === 'tools') {
+            toolsCol.classList.remove('d-none');
+            toolsCol.classList.add('d-block');
+        }
+    }
+}
+
+// Window resize listener to restore desktop view
+window.addEventListener('resize', () => {
+    if(window.innerWidth >= 992) {
+        const editorCol = document.getElementById('resume-editor-col');
+        const previewCol = document.getElementById('resume-preview-col');
+        const atsCol = document.getElementById('resume-ats-col');
+        const toolsCol = document.getElementById('resume-tools-col');
+        
+        // Restore bootstrap default classes for lg+
+        editorCol.className = 'col-lg-6 mb-4 d-none d-lg-block';
+        previewCol.className = 'col-lg-6 mb-4 d-none d-lg-block';
+        atsCol.className = 'col-lg-12 mb-4 d-none d-lg-block';
+        toolsCol.className = 'col-lg-12 mb-4 d-none d-lg-block';
+    } else {
+        // Switch back to tab mode, defaulting to editor
+        const navBtns = document.querySelectorAll('.resume-mobile-nav .btn-nav');
+        if(navBtns.length > 0) {
+            navBtns[0].click();
+        }
+    }
+});
+</script>
+
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
     <!-- Unified Premium Workspace Toolbar (Always Visible & Sticky) -->
@@ -165,10 +233,18 @@
     </div>
 
 <!-- Responsive Premium Layout Container -->
-    <div class="resume-workspace-wrapper tab-edit">
+    
+<div class="container-fluid max-w-1600">
+    <div class="resume-mobile-nav d-flex d-lg-none">
+        <button class="btn-nav active" onclick="switchResumeTab('editor')"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+        <button class="btn-nav" onclick="switchResumeTab('preview')"><i class="fa-solid fa-file-lines"></i> Preview</button>
+        <button class="btn-nav" onclick="switchResumeTab('ats')"><i class="fa-solid fa-gauge-high"></i> ATS</button>
+        <button class="btn-nav" onclick="switchResumeTab('tools')"><i class="fa-solid fa-download"></i> Tools</button>
+    </div>
+<div class="row">
     
     <!-- Left Column: Scrollable Editor Sections (col-xl-5) -->
-    <div class="editor-form-column">
+    <div id="resume-editor-col" class="col-lg-6 mb-4 d-none d-lg-block"><div class="editor-form-column editor-scroll-area">
         <div class="flat-card h-100 p-3 bg-secondary-card border d-flex flex-column" style="overflow: hidden;">
             
             <!-- Editor Title & Version Info -->
@@ -555,7 +631,7 @@
     <div id="panel-divider" class="panel-divider"></div>
 
     <!-- Right Column: Visual Preview & ATS Panel (col-xl-7) -->
-    <div class="visual-viewer-column">
+    </div><!-- End Editor Col --><div id="resume-preview-col" class="col-lg-6 mb-4 d-none d-lg-block"><div class="visual-viewer-column preview-scroll-area">
         <div class="flat-card h-100 bg-secondary-card border d-flex flex-column" style="overflow-y: auto; overflow-x: hidden; padding: 15px;">
 
             <!-- Before/After optimizations panel -->
@@ -739,7 +815,7 @@
     </button>
 </div>
 
-{% endblock %}
+</div></div></div>{% endblock %}
 
 {% block extra_scripts %}
 <script src="{{ url_for('static', filename='js/html2pdf.bundle.min.js') }}"></script>
@@ -2519,149 +2595,78 @@ function downloadResumeDOCX() {
             .meta { font-size: 10pt; color: #666666; margin-bottom: 15px; }
             table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
             td { vertical-align: top; }
-        </style>
+        
+/* ========================================================================= */
+/* CAMPUSMATE AI - BULLETPROOF RESUME BUILDER ARCHITECTURE (PURE BOOTSTRAP)  */
+/* ========================================================================= */
+
+/* Hide Legacy Nav Elements */
+.mobile-bottom-tabs-nav, .mobile-bottom-nav, .tablet-top-nav { display: none !important; }
+
+/* The new Top Nav for Mobile/Tablet */
+.resume-mobile-nav {
+    display: none;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 6px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+    gap: 5px;
+}
+
+.resume-mobile-nav .btn-nav {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 10px 5px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.resume-mobile-nav .btn-nav.active {
+    background: var(--bg-primary);
+    color: var(--accent-color);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Ensure columns scroll internally so page doesn't stretch infinitely */
+.editor-scroll-area, .preview-scroll-area {
+    height: 80vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 5px; /* for scrollbar */
+}
+
+/* Custom Scrollbar for columns */
+.editor-scroll-area::-webkit-scrollbar, .preview-scroll-area::-webkit-scrollbar {
+    width: 6px;
+}
+.editor-scroll-area::-webkit-scrollbar-thumb, .preview-scroll-area::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 10px;
+}
+
+/* 
+ * RESPONSIVE LOGIC:
+ * We use Bootstrap classes (col-lg-6, d-none, d-lg-block) for layout.
+ * We only use CSS to show the custom nav on small screens.
+ */
+@media (max-width: 991.98px) {
+    .resume-mobile-nav {
+        display: flex !important;
+    }
+    .editor-scroll-area, .preview-scroll-area {
+        height: auto; /* Let it flow naturally on mobile */
+        min-height: 60vh;
+    }
+}
+</style>
+
     
 <style>
-/* ARCHITECTURE BREAKPOINTS CSS - FINAL */
-
-/* Hide legacy nav globally */
-.mobile-bottom-tabs-nav { display: none !important; }
-
-/* My Custom Navs Styling */
-.mobile-bottom-nav .btn-nav { color: var(--text-secondary); border: none; background: transparent; }
-.mobile-bottom-nav .btn-nav.active { color: var(--accent-color); }
-.tablet-top-nav .btn.active { background: var(--bg-primary); border-color: var(--accent-color); color: var(--text-primary); font-weight: bold; }
-
-.bottom-tools-container { width: 100%; max-width: 1400px; margin: 0 auto; }
-.bottom-tools-container .desktop-download-toolbar { display: flex !important; }
-
-/* ---------------------------------------------------- */
-/* MOBILE & TABLET (max-width: 991px): SINGLE SECTION   */
-/* ---------------------------------------------------- */
-
-@media (max-width: 991.98px) {
-    .panel-divider { display: none !important; }
-    
-    .resume-workspace-wrapper {
-        display: flex !important;
-        flex-direction: column !important;
-        width: 100%;
-        margin: 0 auto;
-    }
-    
-    .editor-form-column, .visual-viewer-column {
-        width: 100% !important;
-        max-width: 100% !important;
-    }
-    
-    .editor-form-column > .flat-card, .visual-viewer-column > .flat-card {
-        max-height: none !important;
-        height: auto !important;
-        overflow-y: visible !important;
-    }
-
-    .resume-workspace-wrapper.tab-edit .visual-viewer-column, 
-    .resume-workspace-wrapper.tab-edit .bottom-tools-container { display: none !important; }
-    .resume-workspace-wrapper.tab-edit .editor-form-column { display: flex !important; flex-direction: column; }
-
-    .resume-workspace-wrapper.tab-preview .editor-form-column, 
-    .resume-workspace-wrapper.tab-preview .bottom-tools-container { display: none !important; }
-    .resume-workspace-wrapper.tab-preview .visual-viewer-column { display: flex !important; flex-direction: column; }
-
-    .resume-workspace-wrapper.tab-ats .editor-form-column, 
-    .resume-workspace-wrapper.tab-ats .visual-viewer-column { display: none !important; }
-    .resume-workspace-wrapper.tab-ats .bottom-tools-container { display: block !important; }
-    .resume-workspace-wrapper.tab-ats .bottom-tools-container .desktop-download-toolbar { display: none !important; }
-
-    .resume-workspace-wrapper.tab-export .editor-form-column, 
-    .resume-workspace-wrapper.tab-export .visual-viewer-column { display: none !important; }
-    .resume-workspace-wrapper.tab-export .bottom-tools-container { display: block !important; }
-    .resume-workspace-wrapper.tab-export .bottom-tools-container #ats-dashboard-parent { display: none !important; }
-}
-
-/* Specific Mobile Nav (max 767px) */
-@media (max-width: 767.98px) {
-    .tablet-top-nav { display: none !important; }
-    .mobile-bottom-nav { display: flex !important; }
-    body { padding-bottom: 70px; }
-}
-
-/* Specific Tablet Nav (768px to 991px) */
-@media (min-width: 768px) and (max-width: 991.98px) {
-    .mobile-bottom-nav { display: none !important; }
-    .tablet-top-nav { display: flex !important; max-width: 800px; margin: 0 auto 20px auto; }
-}
-
-/* ---------------------------------------------------- */
-/* LAPTOP / DESKTOP (992px+): SPLIT SCREEN LAYOUT       */
-/* ---------------------------------------------------- */
-
-@media (min-width: 992px) {
-    .mobile-bottom-nav, .tablet-top-nav { display: none !important; }
-    
-    .resume-workspace-wrapper {
-        display: flex !important;
-        flex-direction: row !important;
-        align-items: stretch !important;
-        max-width: 1600px;
-        margin: 0 auto 30px auto;
-        min-height: 80vh;
-    }
-    
-    .editor-form-column { 
-        width: 50% !important; 
-        max-width: 750px !important; 
-        display: flex !important; 
-        flex-direction: column;
-    }
-    
-    .panel-divider { 
-        display: block !important; 
-        width: 6px; 
-        cursor: col-resize; 
-        background: var(--border-color); 
-        margin: 0 10px;
-    }
-    
-    .visual-viewer-column { 
-        width: 50% !important; 
-        flex: 1 !important; 
-        display: flex !important; 
-        flex-direction: column;
-    }
-    
-    .editor-form-column > .flat-card, .visual-viewer-column > .flat-card {
-        height: 100%;
-        max-height: 85vh;
-        overflow-y: auto;
-    }
-
-    .bottom-tools-container { 
-        display: block !important; 
-        margin-top: 20px;
-        width: 100% !important;
-    }
-    .bottom-tools-container #ats-dashboard-parent {
-        display: block !important;
-    }
-    .bottom-tools-container .desktop-download-toolbar {
-        display: flex !important;
-    }
-
-    /* VITAL: OVERRIDE ANY TAB CLASSES ON DESKTOP */
-    /* Never hide editor or preview on desktop, no matter what Javascript tab is active */
-    .resume-workspace-wrapper.tab-edit .visual-viewer-column,
-    .resume-workspace-wrapper.tab-edit .bottom-tools-container,
-    .resume-workspace-wrapper.tab-preview .editor-form-column,
-    .resume-workspace-wrapper.tab-preview .bottom-tools-container,
-    .resume-workspace-wrapper.tab-ats .editor-form-column,
-    .resume-workspace-wrapper.tab-ats .visual-viewer-column,
-    .resume-workspace-wrapper.tab-export .editor-form-column,
-    .resume-workspace-wrapper.tab-export .visual-viewer-column {
-        display: flex !important;
-        flex-direction: column;
-    }
-}
 </style>
 
 </head>
@@ -3363,52 +3368,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <style>
 /* Hide mobile bottom tabs on desktop/tablet by default */
-.mobile-bottom-tabs-nav {
-    display: none !important;
-}
-/* Hide dashboard mobile nav bottom bar globally on this page */
-.mobile-bottom-nav {
-    display: none !important;
-}
+
 
 @media (max-width: 1023.98px) {
     .panel-divider {
         display: none !important;
     }
-    .mobile-bottom-tabs-nav {
-        display: flex !important;
-        position: fixed;
-        left: 0;
-        right: 0;
-        background: var(--bg-secondary);
-        backdrop-filter: blur(10px);
-        justify-content: space-around;
-        align-items: center;
-        z-index: 1500;
-        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
-        padding: 0 10px;
-    }
     
-    /* Mobile: Bottom Tabs */
-    @media (max-width: 767.98px) {
-        .mobile-bottom-tabs-nav {
-            bottom: 0;
-            height: 64px;
-            border-top: 1px solid var(--border-color);
-        }
-    }
-    
-    /* Tablet: Top Tabs */
-    @media (min-width: 768px) {
-        .mobile-bottom-tabs-nav {
-            top: 64px; /* Below the main navbar */
-            height: 56px;
-            border-bottom: 1px solid var(--border-color);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            /* Add horizontal layout for tablet */
-            justify-content: center;
-            gap: 20px;
-        }
         .resume-workspace-wrapper {
             padding-top: 56px !important; /* Offset for top tabs */
         }
@@ -4053,7 +4019,7 @@ body.dark .circle-bg {
     }
 }
 </style>
-{% endblock %}
+</div></div></div>{% endblock %}
 
     <div class="mobile-bottom-nav d-flex justify-content-around align-items-center bg-primary-card border-top p-2" style="position:fixed; bottom:0; left:0; right:0; z-index:2000; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); display:none !important;">
         <button class="btn btn-sm btn-nav d-flex flex-column align-items-center flex-grow-1 active" onclick="switchMobileTab('edit', this)"><i class="fa-solid fa-pen-to-square mb-1 fs-5"></i><span style="font-size:0.65rem;">Edit</span></button>
