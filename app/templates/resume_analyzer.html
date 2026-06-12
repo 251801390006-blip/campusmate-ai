@@ -2527,7 +2527,7 @@ function downloadResumeDOCX() {
 .mobile-bottom-nav .btn-nav.active { color: var(--accent-color); }
 .tablet-top-nav .btn.active { background: var(--bg-primary); border-color: var(--accent-color); color: var(--text-primary); font-weight: bold; }
 
-.bottom-tools-container { width: 100%; max-width: 1400px; margin: 0 auto; }
+.bottom-tools-container { width: 100%; max-width: 1600px; margin: 0 auto; }
 .bottom-tools-container .desktop-download-toolbar { display: flex !important; }
 
 /* Mobile (360px - 767px) */
@@ -2551,8 +2551,8 @@ function downloadResumeDOCX() {
     .resume-workspace-wrapper.tab-export .bottom-tools-container #ats-dashboard-parent { display: none !important; }
 }
 
-/* Tablet (768px - 1365px) */
-@media (min-width: 768px) and (max-width: 1365px) {
+/* Tablet (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
     .mobile-bottom-nav { display: none !important; }
     .tablet-top-nav { display: flex !important; }
     
@@ -2571,20 +2571,27 @@ function downloadResumeDOCX() {
     .resume-workspace-wrapper.tab-export .bottom-tools-container #ats-dashboard-parent { display: none !important; }
 }
 
-/* Laptop / Desktop (1366px+) */
-@media (min-width: 1366px) {
+/* Laptop / Desktop (1025px+) */
+@media (min-width: 1025px) {
     .mobile-bottom-nav, .tablet-top-nav { display: none !important; }
     
     .resume-workspace-wrapper {
         display: flex;
         flex-direction: row;
-        height: calc(100vh - 130px);
+        min-height: 85vh; /* Changed from fixed height */
         max-width: 1600px; margin: 0 auto;
+        align-items: stretch;
     }
     .editor-form-column { width: 50%; max-width: 700px; display: block !important; }
     .visual-viewer-column { width: 50%; flex: 1; display: block !important; }
     .panel-divider { display: block !important; width: 6px; cursor: col-resize; background: var(--border-color); }
     .bottom-tools-container { display: block !important; }
+    
+    /* Ensure scrolling works inside the columns on desktop */
+    .editor-form-column > .flat-card, .visual-viewer-column > .flat-card {
+        max-height: 90vh; /* Keep scroll within columns */
+        overflow-y: auto;
+    }
 }
 </style>
 
