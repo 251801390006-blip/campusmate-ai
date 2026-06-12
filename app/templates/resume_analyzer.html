@@ -742,7 +742,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script src="{{ url_for('static', filename='js/html2pdf.bundle.min.js') }}"></script>
+
 <script>
 let educationList = [];
 let schoolCollegeList = [];
@@ -2447,59 +2447,100 @@ async function downloadResumePDF() {
         btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Generating...`;
     });
     
-    const content = getFormContent();
-    const theme = document.getElementById("resume-theme-select").value;
-    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
-    const sheet = document.getElementById("resume-sheet-paper");
-    
-    // Helper: client-side PDF fallback using html2pdf.js
-    async function clientSideFallback() {
-        if (typeof html2pdf === 'undefined' || !sheet) {
-            alert("PDF generation is temporarily unavailable. Please try again later.");
+    try {
+        const content = getFormContent();
+        
+        // PRE-FLIGHT VALIDATION
+        if (!content.name || content.name.trim() === "") {
+            alert("Validation Error: Please enter your Name before generating PDF.");
             return;
         }
+        if (!content.email || content.email.trim() === "") {
+            alert("Validation Error: Please enter your Email before generating PDF.");
+            return;
+        }
+        if (!content.education || content.education.length === 0) {
+            alert("Validation Error: Please add at least one Education entry.");
+            return;
+        }
+        if (!content.skills || content.skills.length === 0) {
+            alert("Validation Error: Please add at least one Skill.");
+            return;
+        }
+
+        const sheet = document.getElementById("resume-sheet-paper");
+        if (!sheet) {
+            alert("Error: Resume preview not found.");
+            return;
+        }
+
+        // ONE-PAGE ATS CHECK: Warn if content overflows
+        const contentHeight = sheet.scrollHeight;
+        const pageHeight = sheet.clientHeight;
+        // Approximate A4 height ratio check, if it's way taller than a typical page (assuming A4 aspect ratio)
+        // If content height is greater than container height, it overflows.
+        if (contentHeight > pageHeight + 10) {
+            const proceed = confirm("Warning: Resume content exceeds one page. It is highly recommended to reduce content for an ATS-compliant one-page resume. Do you want to proceed anyway?");
+            if (!proceed) {
+                btns.forEach((btn, i) => {
+                    btn.disabled = false;
+                    btn.innerHTML = originals[i] || `<i class="fa-solid fa-download me-1"></i> Download PDF`;
+                });
+                return;
+            }
+        }
+        
+        // Create a pristine clone for PDF generation
         const clone = sheet.cloneNode(true);
-        clone.style.transform = 'none';
-        clone.style.width = '210mm';
-        clone.style.minHeight = '297mm';
-        clone.style.boxShadow = 'none';
-        clone.style.borderRadius = '0';
-        clone.style.margin = '0';
-        clone.style.boxSizing = 'border-box';
-        clone.style.background = '#ffffff';
-        clone.style.overflow = 'hidden';
+        // Remove interactive UI elements that shouldn't be in PDF
         clone.querySelectorAll('.resume-canvas-toolbar, .resume-zoom-slider, .btn-canvas-ctrl, [data-no-pdf]').forEach(el => el.remove());
         
-        const wrapper = document.createElement('div');
-        wrapper.style.cssText = 'position:fixed; left:-9999px; top:0; z-index:-1; background:#fff;';
-        wrapper.appendChild(clone);
-        document.body.appendChild(wrapper);
+        // Convert URLs to absolute if needed, or just send raw HTML. WeasyPrint will need absolute URLs for images.
+        // We will just send the innerHTML.
+        const htmlPayload = clone.outerHTML;
         
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
+        
+        const response = await fetch('/resume-analyzer/export-pdf', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                html: htmlPayload,
+                name: content.name,
+                theme: document.getElementById("resume-theme-select").value || 'classic'
+            })
+        });
+        
+        if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(errData.error || `Server returned ${response.status}`);
+        }
+        
+        // Trigger download
+        const blob = await response.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
         const nameVal = (content.name || 'Resume').trim().replace(/\s+/g, '_');
-        await html2pdf().set({
-            margin: 0,
-            filename: `${nameVal}_Resume.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, letterRendering: true, logging: false },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            pagebreak: { mode: ['avoid-all'] }
-        }).from(clone).save();
+        a.download = `${nameVal}_ATS_Resume.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(downloadUrl);
         
-        wrapper.remove();
-    }
-    
-    try {
-        await clientSideFallback();
     } catch (err) {
         console.error("PDF export error:", err);
-        alert("Failed to generate PDF. Please try again.");
+        alert("Failed to generate PDF: " + err.message);
     } finally {
         btns.forEach((btn, i) => {
             btn.disabled = false;
             btn.innerHTML = originals[i] || `<i class="fa-solid fa-download me-1"></i> Download PDF`;
         });
     }
-}
+}}
 
 
 // Export DOCX (Word File)
