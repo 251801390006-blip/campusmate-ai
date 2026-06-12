@@ -130,7 +130,7 @@
 
             <div class="d-flex flex-column gap-3" id="jobs-container">
                 {% for job in jobs %}
-                <div class="job-card p-3 border rounded shadow-sm bg-white" 
+                <div class="job-card p-3 border rounded shadow-sm bg-primary-card glass-panel hover-3d-lift" 
                      id="job-card-{{ job.id }}"
                      data-title="{{ job.title|e }}" 
                      data-company="{{ job.company|e }}" 
