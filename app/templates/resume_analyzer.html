@@ -241,7 +241,7 @@ window.addEventListener('resize', () => {
         <button class="btn-nav" onclick="switchResumeTab('ats')"><i class="fa-solid fa-gauge-high"></i> ATS</button>
         <button class="btn-nav" onclick="switchResumeTab('tools')"><i class="fa-solid fa-download"></i> Tools</button>
     </div>
-<div class="row">
+<div class="row resume-workspace-wrapper">
     
     <!-- Left Column: Scrollable Editor Sections (col-xl-5) -->
     <div id="resume-editor-col" class="col-lg-6 mb-4 d-none d-lg-block"><div class="editor-form-column editor-scroll-area">
@@ -3424,98 +3424,6 @@ document.addEventListener("DOMContentLoaded", () => {
     
 }
 
-/* Force stacked vertical scrollable layout globally for all screens (overridden on laptop) */
-html, body, .main-with-sidebar, .dashboard-inner-container, .resume-workspace-wrapper {
-    height: auto !important;
-    overflow: visible !important;
-}
-.resume-workspace-wrapper {
-    display: flex !important; flex-direction: column;
-    width: 100% !important;
-    box-sizing: border-box;
-    padding-bottom: 40px !important;
-}
-.editor-form-column, .visual-viewer-column {
-    display: flex !important; flex-direction: column;
-    width: 100% !important;
-    height: auto !important;
-    margin-bottom: 30px !important;
-}
-.editor-form-column .flat-card, .visual-viewer-column .flat-card {
-    height: auto !important;
-    overflow: visible !important;
-}
-.form-scroller {
-    height: auto !important;
-    overflow-y: visible !important;
-}
-
-/* Lock page scroll on laptop/desktop/tablet viewports only to force column scrolling */
-@media (min-width: 768px) {
-    html, body {
-        height: 100vh !important;
-        overflow: hidden !important;
-    }
-    .main-with-sidebar {
-        height: 100vh !important;
-        overflow: hidden !important;
-    }
-    .dashboard-inner-container {
-        height: calc(100vh - 64px) !important;
-        overflow: hidden !important;
-        display: flex;
-        flex-direction: column;
-        padding: 15px 20px !important;
-        box-sizing: border-box;
-    }
-    .resume-workspace-wrapper {
-        display: grid !important;
-        gap: 0 !important;
-        height: 0 !important;
-        min-height: 0 !important;
-        flex-grow: 1 !important;
-        overflow: hidden !important;
-        padding-bottom: 0 !important;
-    }
-    .editor-form-column, .visual-viewer-column {
-        display: flex !important; flex-direction: column;
-        height: 100% !important;
-        width: auto !important;
-        margin-bottom: 0 !important;
-    }
-    .editor-form-column .flat-card, .visual-viewer-column .flat-card {
-        height: 100% !important;
-        overflow: hidden !important;
-        display: flex;
-        flex-direction: column;
-    }
-    .form-scroller {
-        overflow-y: auto !important;
-        height: 0 !important;
-        flex-grow: 1 !important;
-        min-height: 0 !important;
-    }
-}
-
-/* Base laptop layout: 2 columns (Editor + Preview/ATS) */
-@media (min-width: 1024px) {
-    .resume-workspace-wrapper {
-        grid-template-columns: 350px 8px 1fr !important;
-    }
-    .preview-ats-container-desktop {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 15px !important;
-        height: 100% !important;
-        overflow-y: auto !important;
-        padding-right: 5px;
-    }
-    .preview-ats-container-desktop #resume-preview-sheet-wrapper-parent {
-        flex: 1 1 500px !important; /* Minimum height for preview */
-        height: auto !important;
-        min-height: 500px !important;
-    }
-}
 
 /* Form inputs & styles */
 .form-label {
