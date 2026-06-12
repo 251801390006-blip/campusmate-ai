@@ -879,14 +879,14 @@ document.addEventListener("DOMContentLoaded", () => {
         educationList.push({
             inst: "State University",
             degree: "B.S. in Computer Science",
-            dates: "2024 – 2028",
+            dates: "2024 - 2028",
             gpa: "GPA: 3.8/4.0",
             coursework: "Data Structures, Algorithms, Database Systems, Software Engineering, Object-Oriented Programming"
         });
         educationList.push({
             inst: "High School / Preparatory Academy",
             degree: "High School Diploma",
-            dates: "2020 – 2024",
+            dates: "2020 - 2024",
             gpa: "GPA: 3.9/4.0",
             coursework: "Calculus, Physics, Computer Science AP"
         });
@@ -895,7 +895,7 @@ document.addEventListener("DOMContentLoaded", () => {
         experienceList.push({
             role: "Software Engineering Intern",
             company: "Tech Solutions Inc.",
-            dates: "June 2025 – August 2025",
+            dates: "June 2025 - August 2025",
             bullets: [
                 "Assisted in developing and maintaining web applications using Python and modern web frameworks.",
                 "Collaborated with senior engineers to implement new user interface features and API endpoints.",
@@ -906,7 +906,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (projectsList.length === 0) {
         projectsList.push({
-            title: "CampusMate AI – Student Learning Workspace",
+            title: "CampusMate AI - Student Learning Workspace",
             link: "github.com/alexsmith/student-workspace",
             bullets: [
                 "Developed a web application that helps students organize their coursework and generate study plans.",
@@ -1500,8 +1500,8 @@ async function optimizeBullets(btn, type, idx) {
 
 // Live Resume Preview Fields syncing
 function syncResumeFields() {
-    const nameVal = document.getElementById("res-name").value || "Alex Smith";
-    const themeId = document.getElementById("resume-theme-select").value || "classic";
+    const nameVal = getValSafe("res-name") || "Alex Smith";
+    const themeId = getValSafe("resume-theme-select") || "classic";
     const accentColor = getAccentColorForTheme(themeId);
     const font = getFontForTheme(themeId);
     
@@ -1510,16 +1510,16 @@ function syncResumeFields() {
         paper.style.fontFamily = font;
     }
     
-    const addressVal = document.getElementById("res-address").value.trim();
-    const emailVal = document.getElementById("res-email").value.trim();
-    const phoneVal = document.getElementById("res-phone").value.trim();
-    const linkedinVal = document.getElementById("res-linkedin").value.trim();
-    const githubVal = document.getElementById("res-github").value.trim();
-    const portfolioVal = document.getElementById("res-portfolio").value.trim();
-    const leetcodeVal = document.getElementById("res-leetcode") ? document.getElementById("res-leetcode").value.trim() : "";
-    const hackerrankVal = document.getElementById("res-hackerrank") ? document.getElementById("res-hackerrank").value.trim() : "";
-    const codeforcesVal = document.getElementById("res-codeforces") ? document.getElementById("res-codeforces").value.trim() : "";
-    const headlineVal = document.getElementById("res-headline") ? document.getElementById("res-headline").value.trim() : "";
+    const addressVal = getValSafe("res-address").trim();
+    const emailVal = getValSafe("res-email").trim();
+    const phoneVal = getValSafe("res-phone").trim();
+    const linkedinVal = getValSafe("res-linkedin").trim();
+    const githubVal = getValSafe("res-github").trim();
+    const portfolioVal = getValSafe("res-portfolio").trim();
+    const leetcodeVal = getValSafe("res-leetcode").trim();
+    const hackerrankVal = getValSafe("res-hackerrank").trim();
+    const codeforcesVal = getValSafe("res-codeforces").trim();
+    const headlineVal = getValSafe("res-headline").trim();
     
     const metaParts = [];
     if (addressVal) metaParts.push(`<i class="fa-solid fa-location-dot me-1 text-muted"></i> ${addressVal}`);
@@ -1542,7 +1542,7 @@ function syncResumeFields() {
         const dividerColor = isDarkSidebar ? "rgba(255,255,255,0.2)" : "var(--border-color)";
         
         // Profile Photo
-        const picUrl = document.getElementById("res-profile-pic").value.trim();
+        const picUrl = getValSafe("res-profile-pic").trim();
         if (picUrl) {
             leftSideHtml += `<div style="text-align:center; margin-bottom:15px;"><img src="${picUrl}" style="width:80px; height:80px; border-radius:50%; border:2px solid ${isDarkSidebar ? '#fff' : accentColor}; object-fit:cover;" /></div>`;
         }
@@ -1563,10 +1563,10 @@ function syncResumeFields() {
         leftSideHtml += `</div></div>`;
         
         // Technical Skills
-        const skillsProg = document.getElementById("res-skills-prog").value.trim();
-        const skillsCyber = document.getElementById("res-skills-cyber").value.trim();
-        const skillsTools = document.getElementById("res-skills-tools").value.trim();
-        const skillsWeb = document.getElementById("res-skills-web").value.trim();
+        const skillsProg = getValSafe("res-skills-prog").trim();
+        const skillsCyber = getValSafe("res-skills-cyber").trim();
+        const skillsTools = getValSafe("res-skills-tools").trim();
+        const skillsWeb = getValSafe("res-skills-web").trim();
         if (skillsProg || skillsCyber || skillsTools || skillsWeb) {
             leftSideHtml += `<div style="margin-bottom:15px;">`;
             leftSideHtml += `<h4 style="font-size:10px; font-weight:800; border-bottom:1px solid ${dividerColor}; padding-bottom:2px; margin-bottom:6px; text-transform:uppercase; color:${titleColor};">Skills</h4>`;
@@ -1579,8 +1579,8 @@ function syncResumeFields() {
         }
         
         // Languages & Interests
-        const languagesVal = document.getElementById("res-languages").value.trim();
-        const interestsVal = document.getElementById("res-interests").value.trim();
+        const languagesVal = getValSafe("res-languages").trim();
+        const interestsVal = getValSafe("res-interests").trim();
         if (languagesVal || interestsVal) {
             leftSideHtml += `<div style="margin-bottom:15px;">`;
             leftSideHtml += `<h4 style="font-size:10px; font-weight:800; border-bottom:1px solid ${dividerColor}; padding-bottom:2px; margin-bottom:6px; text-transform:uppercase; color:${titleColor};">Languages</h4>`;
@@ -1594,7 +1594,7 @@ function syncResumeFields() {
         rightSideHtml += `<h1 style="font-size:20px; font-weight:800; color:${accentColor}; margin-bottom:2px; text-transform:uppercase;">${nameVal}</h1>`;
         rightSideHtml += `<div style="font-size:9.5px; font-weight:700; color:#64748b; text-transform:uppercase; margin-bottom:10px; letter-spacing:0.5px;">${headlineVal || 'Resume Portfolio'}</div>`;
         
-        const summaryVal = document.getElementById("res-custom").value.trim();
+        const summaryVal = getValSafe("res-custom").trim();
         if (summaryVal) {
             rightSideHtml += `<div style="font-size:9.5px; line-height:1.3; color:#4b5563; margin-bottom:15px; border-left:3px solid ${accentColor}; padding-left:8px;">${summaryVal}</div>`;
         }
@@ -1789,10 +1789,10 @@ function syncResumeFields() {
         }
         
         else if (sec === "skills") {
-            const skillsProg = document.getElementById("res-skills-prog").value.trim();
-            const skillsCyber = document.getElementById("res-skills-cyber").value.trim();
-            const skillsTools = document.getElementById("res-skills-tools").value.trim();
-            const skillsWeb = document.getElementById("res-skills-web").value.trim();
+            const skillsProg = getValSafe("res-skills-prog").trim();
+            const skillsCyber = getValSafe("res-skills-cyber").trim();
+            const skillsTools = getValSafe("res-skills-tools").trim();
+            const skillsWeb = getValSafe("res-skills-web").trim();
             
             if (skillsProg || skillsCyber || skillsTools || skillsWeb) {
                 let html = `<div class="resume-render-section" data-section="skills">`;
@@ -1944,7 +1944,9 @@ function syncResumeFields() {
 }
 
 function scanKeywordsInline() {
-    const text = document.getElementById("resume-sheet-paper").innerText.toLowerCase();
+    const paper = document.getElementById("resume-sheet-paper");
+    if (!paper) return;
+    const text = paper.innerText.toLowerCase();
     const keywords = ["python", "flask", "docker", "wireshark", "git", "react"];
     keywords.forEach(kw => {
         const item = document.getElementById(`kw-${kw}`);
@@ -2476,10 +2478,15 @@ async function downloadResumePDF() {
             alert("Validation Error: Please add at least one Education entry.");
             return;
         }
-        if (!content.skills || content.skills.length === 0) {
+        const hasSkill = (content.skillsProg && content.skillsProg.trim()) ||
+                         (content.skillsCyber && content.skillsCyber.trim()) ||
+                         (content.skillsTools && content.skillsTools.trim()) ||
+                         (content.skillsWeb && content.skillsWeb.trim());
+        if (!hasSkill) {
             alert("Validation Error: Please add at least one Skill.");
             return;
         }
+
 
         const sheet = document.getElementById("resume-sheet-paper");
         if (!sheet) {
