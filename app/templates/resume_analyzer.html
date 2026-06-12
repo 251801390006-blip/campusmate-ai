@@ -2527,72 +2527,62 @@ function downloadResumeDOCX() {
 .mobile-bottom-nav .btn-nav.active { color: var(--accent-color); }
 .tablet-top-nav .btn.active { background: var(--bg-primary); border-color: var(--accent-color); color: var(--text-primary); font-weight: bold; }
 
-.bottom-tools-container { width: 100%; max-width: 1600px; margin: 0 auto; }
+.bottom-tools-container { width: 100%; max-width: 1000px; margin: 0 auto; }
 .bottom-tools-container .desktop-download-toolbar { display: flex !important; }
 
-/* Mobile (360px - 767px) */
+/* Hide default mobile navs so they don't leak into desktop */
+.tablet-top-nav, .mobile-bottom-nav { display: none !important; }
+
+/* ---------------------------------------------------- */
+/* ALL DEVICES: SINGLE SECTION TABBED LAYOUT            */
+/* ---------------------------------------------------- */
+
+/* Mobile (360px - 767px) - Bottom Sticky Nav */
 @media (max-width: 767px) {
     .tablet-top-nav { display: none !important; }
     .mobile-bottom-nav { display: flex !important; }
     body { padding-bottom: 70px; }
-    
-    .resume-workspace-wrapper.tab-edit .visual-viewer-column, 
-    .resume-workspace-wrapper.tab-edit .bottom-tools-container { display: none !important; }
-    
-    .resume-workspace-wrapper.tab-preview .editor-form-column, 
-    .resume-workspace-wrapper.tab-preview .bottom-tools-container { display: none !important; }
-    
-    .resume-workspace-wrapper.tab-ats .editor-form-column, 
-    .resume-workspace-wrapper.tab-ats .visual-viewer-column { display: none !important; }
-    .resume-workspace-wrapper.tab-ats .bottom-tools-container .desktop-download-toolbar { display: none !important; }
-    
-    .resume-workspace-wrapper.tab-export .editor-form-column, 
-    .resume-workspace-wrapper.tab-export .visual-viewer-column { display: none !important; }
-    .resume-workspace-wrapper.tab-export .bottom-tools-container #ats-dashboard-parent { display: none !important; }
 }
 
-/* Tablet (768px - 1024px) */
-@media (min-width: 768px) and (max-width: 1024px) {
+/* Tablet & Desktop (768px+) - Top Nav */
+@media (min-width: 768px) {
     .mobile-bottom-nav { display: none !important; }
-    .tablet-top-nav { display: flex !important; }
+    .tablet-top-nav { display: flex !important; max-width: 800px; margin: 0 auto 20px auto; }
     
-    .resume-workspace-wrapper.tab-edit .visual-viewer-column, 
-    .resume-workspace-wrapper.tab-edit .bottom-tools-container { display: none !important; }
-    
-    .resume-workspace-wrapper.tab-preview .editor-form-column, 
-    .resume-workspace-wrapper.tab-preview .bottom-tools-container { display: none !important; }
-    
-    .resume-workspace-wrapper.tab-ats .editor-form-column, 
-    .resume-workspace-wrapper.tab-ats .visual-viewer-column { display: none !important; }
-    .resume-workspace-wrapper.tab-ats .bottom-tools-container .desktop-download-toolbar { display: none !important; }
-    
-    .resume-workspace-wrapper.tab-export .editor-form-column, 
-    .resume-workspace-wrapper.tab-export .visual-viewer-column { display: none !important; }
-    .resume-workspace-wrapper.tab-export .bottom-tools-container #ats-dashboard-parent { display: none !important; }
-}
-
-/* Laptop / Desktop (1025px+) */
-@media (min-width: 1025px) {
-    .mobile-bottom-nav, .tablet-top-nav { display: none !important; }
-    
+    /* Center the content */
     .resume-workspace-wrapper {
         display: flex;
-        flex-direction: row;
-        min-height: 85vh; /* Changed from fixed height */
-        max-width: 1600px; margin: 0 auto;
-        align-items: stretch;
+        justify-content: center;
+        max-width: 1000px;
+        margin: 0 auto;
     }
-    .editor-form-column { width: 50%; max-width: 700px; display: block !important; }
-    .visual-viewer-column { width: 50%; flex: 1; display: block !important; }
-    .panel-divider { display: block !important; width: 6px; cursor: col-resize; background: var(--border-color); }
-    .bottom-tools-container { display: block !important; }
-    
-    /* Ensure scrolling works inside the columns on desktop */
-    .editor-form-column > .flat-card, .visual-viewer-column > .flat-card {
-        max-height: 90vh; /* Keep scroll within columns */
-        overflow-y: auto;
+    .editor-form-column, .visual-viewer-column {
+        width: 100%;
+        max-width: 900px;
     }
+    /* Hide the resizing divider since it's single column now */
+    .panel-divider { display: none !important; }
 }
+
+/* GLOBAL TAB VISIBILITY RULES FOR ALL DEVICES */
+.resume-workspace-wrapper.tab-edit .visual-viewer-column, 
+.resume-workspace-wrapper.tab-edit .bottom-tools-container { display: none !important; }
+.resume-workspace-wrapper.tab-edit .editor-form-column { display: block !important; width: 100%; }
+
+.resume-workspace-wrapper.tab-preview .editor-form-column, 
+.resume-workspace-wrapper.tab-preview .bottom-tools-container { display: none !important; }
+.resume-workspace-wrapper.tab-preview .visual-viewer-column { display: block !important; width: 100%; }
+
+.resume-workspace-wrapper.tab-ats .editor-form-column, 
+.resume-workspace-wrapper.tab-ats .visual-viewer-column { display: none !important; }
+.resume-workspace-wrapper.tab-ats .bottom-tools-container { display: block !important; }
+.resume-workspace-wrapper.tab-ats .bottom-tools-container .desktop-download-toolbar { display: none !important; }
+
+.resume-workspace-wrapper.tab-export .editor-form-column, 
+.resume-workspace-wrapper.tab-export .visual-viewer-column { display: none !important; }
+.resume-workspace-wrapper.tab-export .bottom-tools-container { display: block !important; }
+.resume-workspace-wrapper.tab-export .bottom-tools-container #ats-dashboard-parent { display: none !important; }
+
 </style>
 
 </head>
