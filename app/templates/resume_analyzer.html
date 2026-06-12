@@ -716,7 +716,7 @@
 </div>
 
 <!-- Mobile Bottom Navigation Tab Bar (Shown < 1100px) -->
-<div class="mobile-bottom-tabs-nav">
+<div class="mobile-bottom-tabs-nav d-none" style="display:none !important;">
     <button class="mobile-tab-item active" id="mobile-tab-btn-edit" onclick="setMobileTab('edit')">
         <i class="fa-solid fa-file-pen"></i>
         <span>Edit</span>
@@ -2522,7 +2522,12 @@ function downloadResumeDOCX() {
         </style>
     
 <style>
-/* ARCHITECTURE BREAKPOINTS CSS */
+/* ARCHITECTURE BREAKPOINTS CSS - FINAL */
+
+/* Hide legacy nav globally */
+.mobile-bottom-tabs-nav { display: none !important; }
+
+/* My Custom Navs Styling */
 .mobile-bottom-nav .btn-nav { color: var(--text-secondary); border: none; background: transparent; }
 .mobile-bottom-nav .btn-nav.active { color: var(--accent-color); }
 .tablet-top-nav .btn.active { background: var(--bg-primary); border-color: var(--accent-color); color: var(--text-primary); font-weight: bold; }
@@ -2531,31 +2536,37 @@ function downloadResumeDOCX() {
 .bottom-tools-container .desktop-download-toolbar { display: flex !important; }
 
 /* ---------------------------------------------------- */
-/* MOBILE & TABLET: SINGLE SECTION TABBED LAYOUT        */
+/* MOBILE & TABLET (max-width: 991px): SINGLE SECTION   */
 /* ---------------------------------------------------- */
 
-@media (max-width: 1024px) {
-    /* Base Container */
+@media (max-width: 991.98px) {
+    .panel-divider { display: none !important; }
+    
     .resume-workspace-wrapper {
-        display: flex;
-        justify-content: center;
+        display: flex !important;
+        flex-direction: column !important;
         width: 100%;
         margin: 0 auto;
     }
+    
     .editor-form-column, .visual-viewer-column {
-        width: 100%;
-        max-width: 900px;
+        width: 100% !important;
+        max-width: 100% !important;
     }
-    .panel-divider { display: none !important; }
+    
+    .editor-form-column > .flat-card, .visual-viewer-column > .flat-card {
+        max-height: none !important;
+        height: auto !important;
+        overflow-y: visible !important;
+    }
 
-    /* TAB BEHAVIORS (Only apply under 1025px) */
     .resume-workspace-wrapper.tab-edit .visual-viewer-column, 
     .resume-workspace-wrapper.tab-edit .bottom-tools-container { display: none !important; }
-    .resume-workspace-wrapper.tab-edit .editor-form-column { display: block !important; width: 100%; }
+    .resume-workspace-wrapper.tab-edit .editor-form-column { display: flex !important; flex-direction: column; }
 
     .resume-workspace-wrapper.tab-preview .editor-form-column, 
     .resume-workspace-wrapper.tab-preview .bottom-tools-container { display: none !important; }
-    .resume-workspace-wrapper.tab-preview .visual-viewer-column { display: block !important; width: 100%; }
+    .resume-workspace-wrapper.tab-preview .visual-viewer-column { display: flex !important; flex-direction: column; }
 
     .resume-workspace-wrapper.tab-ats .editor-form-column, 
     .resume-workspace-wrapper.tab-ats .visual-viewer-column { display: none !important; }
@@ -2568,46 +2579,42 @@ function downloadResumeDOCX() {
     .resume-workspace-wrapper.tab-export .bottom-tools-container #ats-dashboard-parent { display: none !important; }
 }
 
-/* Mobile Specific (Bottom Nav) */
-@media (max-width: 767px) {
+/* Specific Mobile Nav (max 767px) */
+@media (max-width: 767.98px) {
     .tablet-top-nav { display: none !important; }
     .mobile-bottom-nav { display: flex !important; }
     body { padding-bottom: 70px; }
 }
 
-/* Tablet Specific (Top Nav) */
-@media (min-width: 768px) and (max-width: 1024px) {
+/* Specific Tablet Nav (768px to 991px) */
+@media (min-width: 768px) and (max-width: 991.98px) {
     .mobile-bottom-nav { display: none !important; }
     .tablet-top-nav { display: flex !important; max-width: 800px; margin: 0 auto 20px auto; }
 }
 
+/* ---------------------------------------------------- */
+/* LAPTOP / DESKTOP (992px+): SPLIT SCREEN LAYOUT       */
+/* ---------------------------------------------------- */
 
-/* ---------------------------------------------------- */
-/* LAPTOP / DESKTOP (1025px+): SPLIT SCREEN LAYOUT      */
-/* ---------------------------------------------------- */
-@media (min-width: 1025px) {
-    /* Hide Navs */
+@media (min-width: 992px) {
     .mobile-bottom-nav, .tablet-top-nav { display: none !important; }
     
-    /* Wrapper should be side-by-side flex */
     .resume-workspace-wrapper {
         display: flex !important;
         flex-direction: row !important;
-        justify-content: center;
-        align-items: stretch;
+        align-items: stretch !important;
         max-width: 1600px;
         margin: 0 auto 30px auto;
         min-height: 80vh;
     }
     
-    /* Left column */
     .editor-form-column { 
         width: 50% !important; 
         max-width: 750px !important; 
-        display: block !important; 
+        display: flex !important; 
+        flex-direction: column;
     }
     
-    /* Divider */
     .panel-divider { 
         display: block !important; 
         width: 6px; 
@@ -2616,24 +2623,23 @@ function downloadResumeDOCX() {
         margin: 0 10px;
     }
     
-    /* Right column */
     .visual-viewer-column { 
         width: 50% !important; 
         flex: 1 !important; 
-        display: block !important; 
+        display: flex !important; 
+        flex-direction: column;
     }
     
-    /* Make columns scrollable internally so page doesn't get infinitely tall */
     .editor-form-column > .flat-card, .visual-viewer-column > .flat-card {
         height: 100%;
         max-height: 85vh;
         overflow-y: auto;
     }
 
-    /* Below Section */
     .bottom-tools-container { 
         display: block !important; 
         margin-top: 20px;
+        width: 100% !important;
     }
     .bottom-tools-container #ats-dashboard-parent {
         display: block !important;
@@ -2642,15 +2648,18 @@ function downloadResumeDOCX() {
         display: flex !important;
     }
 
-    /* VITAL: OVERRIDE ANY JAVASCRIPT/HTML TAB CLASSES ON DESKTOP */
-    /* If the wrapper has tab-edit, tab-ats, etc., IGNORE IT and force everything to show */
+    /* VITAL: OVERRIDE ANY TAB CLASSES ON DESKTOP */
+    /* Never hide editor or preview on desktop, no matter what Javascript tab is active */
     .resume-workspace-wrapper.tab-edit .visual-viewer-column,
+    .resume-workspace-wrapper.tab-edit .bottom-tools-container,
     .resume-workspace-wrapper.tab-preview .editor-form-column,
+    .resume-workspace-wrapper.tab-preview .bottom-tools-container,
     .resume-workspace-wrapper.tab-ats .editor-form-column,
     .resume-workspace-wrapper.tab-ats .visual-viewer-column,
     .resume-workspace-wrapper.tab-export .editor-form-column,
     .resume-workspace-wrapper.tab-export .visual-viewer-column {
-        display: block !important;
+        display: flex !important;
+        flex-direction: column;
     }
 }
 </style>
@@ -3455,13 +3464,13 @@ html, body, .main-with-sidebar, .dashboard-inner-container, .resume-workspace-wr
     overflow: visible !important;
 }
 .resume-workspace-wrapper {
-    display: block !important;
+    display: flex !important; flex-direction: column;
     width: 100% !important;
     box-sizing: border-box;
     padding-bottom: 40px !important;
 }
 .editor-form-column, .visual-viewer-column {
-    display: block !important;
+    display: flex !important; flex-direction: column;
     width: 100% !important;
     height: auto !important;
     margin-bottom: 30px !important;
@@ -3503,7 +3512,7 @@ html, body, .main-with-sidebar, .dashboard-inner-container, .resume-workspace-wr
         padding-bottom: 0 !important;
     }
     .editor-form-column, .visual-viewer-column {
-        display: block !important;
+        display: flex !important; flex-direction: column;
         height: 100% !important;
         width: auto !important;
         margin-bottom: 0 !important;
@@ -3931,7 +3940,7 @@ html, body, .main-with-sidebar, .dashboard-inner-container, .resume-workspace-wr
     border-left: 2.5px solid var(--bg-secondary);
     border-right: 2.5px solid var(--bg-secondary);
     height: 100%;
-    display: block !important;
+    display: flex !important; flex-direction: column;
 }
 .panel-divider:hover, .panel-divider.dragging {
     background: var(--accent-color, #0d9488);
