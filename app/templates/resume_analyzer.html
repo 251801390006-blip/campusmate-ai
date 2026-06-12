@@ -2527,62 +2527,132 @@ function downloadResumeDOCX() {
 .mobile-bottom-nav .btn-nav.active { color: var(--accent-color); }
 .tablet-top-nav .btn.active { background: var(--bg-primary); border-color: var(--accent-color); color: var(--text-primary); font-weight: bold; }
 
-.bottom-tools-container { width: 100%; max-width: 1000px; margin: 0 auto; }
+.bottom-tools-container { width: 100%; max-width: 1400px; margin: 0 auto; }
 .bottom-tools-container .desktop-download-toolbar { display: flex !important; }
 
-/* Hide default mobile navs so they don't leak into desktop */
-.tablet-top-nav, .mobile-bottom-nav { display: none !important; }
-
 /* ---------------------------------------------------- */
-/* ALL DEVICES: SINGLE SECTION TABBED LAYOUT            */
+/* MOBILE & TABLET: SINGLE SECTION TABBED LAYOUT        */
 /* ---------------------------------------------------- */
 
-/* Mobile (360px - 767px) - Bottom Sticky Nav */
-@media (max-width: 767px) {
-    .tablet-top-nav { display: none !important; }
-    .mobile-bottom-nav { display: flex !important; }
-    body { padding-bottom: 70px; }
-}
-
-/* Tablet & Desktop (768px+) - Top Nav */
-@media (min-width: 768px) {
-    .mobile-bottom-nav { display: none !important; }
-    .tablet-top-nav { display: flex !important; max-width: 800px; margin: 0 auto 20px auto; }
-    
-    /* Center the content */
+@media (max-width: 1024px) {
+    /* Base Container */
     .resume-workspace-wrapper {
         display: flex;
         justify-content: center;
-        max-width: 1000px;
+        width: 100%;
         margin: 0 auto;
     }
     .editor-form-column, .visual-viewer-column {
         width: 100%;
         max-width: 900px;
     }
-    /* Hide the resizing divider since it's single column now */
     .panel-divider { display: none !important; }
+
+    /* TAB BEHAVIORS (Only apply under 1025px) */
+    .resume-workspace-wrapper.tab-edit .visual-viewer-column, 
+    .resume-workspace-wrapper.tab-edit .bottom-tools-container { display: none !important; }
+    .resume-workspace-wrapper.tab-edit .editor-form-column { display: block !important; width: 100%; }
+
+    .resume-workspace-wrapper.tab-preview .editor-form-column, 
+    .resume-workspace-wrapper.tab-preview .bottom-tools-container { display: none !important; }
+    .resume-workspace-wrapper.tab-preview .visual-viewer-column { display: block !important; width: 100%; }
+
+    .resume-workspace-wrapper.tab-ats .editor-form-column, 
+    .resume-workspace-wrapper.tab-ats .visual-viewer-column { display: none !important; }
+    .resume-workspace-wrapper.tab-ats .bottom-tools-container { display: block !important; }
+    .resume-workspace-wrapper.tab-ats .bottom-tools-container .desktop-download-toolbar { display: none !important; }
+
+    .resume-workspace-wrapper.tab-export .editor-form-column, 
+    .resume-workspace-wrapper.tab-export .visual-viewer-column { display: none !important; }
+    .resume-workspace-wrapper.tab-export .bottom-tools-container { display: block !important; }
+    .resume-workspace-wrapper.tab-export .bottom-tools-container #ats-dashboard-parent { display: none !important; }
 }
 
-/* GLOBAL TAB VISIBILITY RULES FOR ALL DEVICES */
-.resume-workspace-wrapper.tab-edit .visual-viewer-column, 
-.resume-workspace-wrapper.tab-edit .bottom-tools-container { display: none !important; }
-.resume-workspace-wrapper.tab-edit .editor-form-column { display: block !important; width: 100%; }
+/* Mobile Specific (Bottom Nav) */
+@media (max-width: 767px) {
+    .tablet-top-nav { display: none !important; }
+    .mobile-bottom-nav { display: flex !important; }
+    body { padding-bottom: 70px; }
+}
 
-.resume-workspace-wrapper.tab-preview .editor-form-column, 
-.resume-workspace-wrapper.tab-preview .bottom-tools-container { display: none !important; }
-.resume-workspace-wrapper.tab-preview .visual-viewer-column { display: block !important; width: 100%; }
+/* Tablet Specific (Top Nav) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .mobile-bottom-nav { display: none !important; }
+    .tablet-top-nav { display: flex !important; max-width: 800px; margin: 0 auto 20px auto; }
+}
 
-.resume-workspace-wrapper.tab-ats .editor-form-column, 
-.resume-workspace-wrapper.tab-ats .visual-viewer-column { display: none !important; }
-.resume-workspace-wrapper.tab-ats .bottom-tools-container { display: block !important; }
-.resume-workspace-wrapper.tab-ats .bottom-tools-container .desktop-download-toolbar { display: none !important; }
 
-.resume-workspace-wrapper.tab-export .editor-form-column, 
-.resume-workspace-wrapper.tab-export .visual-viewer-column { display: none !important; }
-.resume-workspace-wrapper.tab-export .bottom-tools-container { display: block !important; }
-.resume-workspace-wrapper.tab-export .bottom-tools-container #ats-dashboard-parent { display: none !important; }
+/* ---------------------------------------------------- */
+/* LAPTOP / DESKTOP (1025px+): SPLIT SCREEN LAYOUT      */
+/* ---------------------------------------------------- */
+@media (min-width: 1025px) {
+    /* Hide Navs */
+    .mobile-bottom-nav, .tablet-top-nav { display: none !important; }
+    
+    /* Wrapper should be side-by-side flex */
+    .resume-workspace-wrapper {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: center;
+        align-items: stretch;
+        max-width: 1600px;
+        margin: 0 auto 30px auto;
+        min-height: 80vh;
+    }
+    
+    /* Left column */
+    .editor-form-column { 
+        width: 50% !important; 
+        max-width: 750px !important; 
+        display: block !important; 
+    }
+    
+    /* Divider */
+    .panel-divider { 
+        display: block !important; 
+        width: 6px; 
+        cursor: col-resize; 
+        background: var(--border-color); 
+        margin: 0 10px;
+    }
+    
+    /* Right column */
+    .visual-viewer-column { 
+        width: 50% !important; 
+        flex: 1 !important; 
+        display: block !important; 
+    }
+    
+    /* Make columns scrollable internally so page doesn't get infinitely tall */
+    .editor-form-column > .flat-card, .visual-viewer-column > .flat-card {
+        height: 100%;
+        max-height: 85vh;
+        overflow-y: auto;
+    }
 
+    /* Below Section */
+    .bottom-tools-container { 
+        display: block !important; 
+        margin-top: 20px;
+    }
+    .bottom-tools-container #ats-dashboard-parent {
+        display: block !important;
+    }
+    .bottom-tools-container .desktop-download-toolbar {
+        display: flex !important;
+    }
+
+    /* VITAL: OVERRIDE ANY JAVASCRIPT/HTML TAB CLASSES ON DESKTOP */
+    /* If the wrapper has tab-edit, tab-ats, etc., IGNORE IT and force everything to show */
+    .resume-workspace-wrapper.tab-edit .visual-viewer-column,
+    .resume-workspace-wrapper.tab-preview .editor-form-column,
+    .resume-workspace-wrapper.tab-ats .editor-form-column,
+    .resume-workspace-wrapper.tab-ats .visual-viewer-column,
+    .resume-workspace-wrapper.tab-export .editor-form-column,
+    .resume-workspace-wrapper.tab-export .visual-viewer-column {
+        display: block !important;
+    }
+}
 </style>
 
 </head>
