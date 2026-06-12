@@ -5,489 +5,361 @@
 {% block extra_head %}
 <script type="module" src="https://unpkg.com/@splinetool/viewer@1.0.51/build/spline-viewer.js"></script>
 <style>
-/* ─── Auth Page Root ─── */
-.landing-layout { min-height:100vh; background:#050a18; overflow-x:hidden; }
-.landing-header { background:rgba(10,15,30,0.7); backdrop-filter:blur(18px); border-bottom:1px solid rgba(255,255,255,0.06); }
+/* ─── Light Mode Google-like Auth Root ─── */
+.landing-layout { min-height:100vh; background:#f8fafc; overflow-x:hidden; }
+.landing-header { background:rgba(255,255,255,0.8); backdrop-filter:blur(18px); border-bottom:1px solid rgba(0,0,0,0.06); }
 .landing-header .logo,
-.landing-header .landing-nav a { color:rgba(255,255,255,0.88) !important; }
-.landing-header .landing-nav a.btn-outline { border-color:rgba(255,255,255,0.18); color:rgba(255,255,255,0.8) !important; }
-.landing-header .landing-nav a.btn-primary { background:linear-gradient(135deg,#6366f1,#8b5cf6); border:none; color:#fff !important; }
-.landing-footer { background:rgba(0,0,0,0.25); color:rgba(255,255,255,0.35); }
+.landing-header .landing-nav a { color:#1e293b !important; }
+.landing-header .landing-nav a.btn-outline { border-color:rgba(0,0,0,0.18); color:#334155 !important; }
+.landing-header .landing-nav a.btn-primary { background:#2563eb; border:none; color:#fff !important; }
+.landing-footer { background:#f1f5f9; color:#64748b; }
 
-/* Animated mesh background */
-.auth-bg { position:fixed; inset:0; z-index:0; overflow:hidden; }
+/* Light Animated background */
+.auth-bg { position:fixed; inset:0; z-index:0; overflow:hidden; background: #f8fafc; }
 .auth-bg .orb {
-    position:absolute; border-radius:50%; filter:blur(90px); opacity:0.45;
-    animation: orbFloat 12s ease-in-out infinite alternate;
+    position:absolute; border-radius:50%; filter:blur(90px); opacity:0.5;
+    animation: orbFloat 15s ease-in-out infinite alternate;
 }
-.auth-bg .orb-1 { width:520px; height:520px; background:radial-gradient(circle,#6366f1,transparent 70%); top:-15%; left:-10%; animation-delay:0s; }
-.auth-bg .orb-2 { width:450px; height:450px; background:radial-gradient(circle,#06b6d4,transparent 70%); bottom:-10%; right:-5%; animation-delay:-4s; }
-.auth-bg .orb-3 { width:350px; height:350px; background:radial-gradient(circle,#8b5cf6,transparent 70%); top:40%; left:55%; animation-delay:-8s; opacity:0.3; }
-.auth-bg .orb-4 { width:200px; height:200px; background:radial-gradient(circle,#f43f5e,transparent 70%); top:15%; right:20%; animation-delay:-2s; opacity:0.2; }
+.auth-bg .orb-1 { width:600px; height:600px; background:radial-gradient(circle,#bae6fd,transparent 70%); top:-10%; left:-10%; animation-delay:0s; }
+.auth-bg .orb-2 { width:500px; height:500px; background:radial-gradient(circle,#c7d2fe,transparent 70%); bottom:-10%; right:-5%; animation-delay:-4s; }
+.auth-bg .orb-3 { width:400px; height:400px; background:radial-gradient(circle,#e9d5ff,transparent 70%); top:40%; left:55%; animation-delay:-8s; }
+
 @keyframes orbFloat {
     0% { transform:translate(0,0) scale(1); }
-    50% { transform:translate(30px,-40px) scale(1.08); }
-    100% { transform:translate(-20px,25px) scale(0.95); }
-}
-.auth-bg::after {
-    content:''; position:absolute; inset:0;
-    background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-    opacity:0.5; pointer-events:none;
+    50% { transform:translate(40px,-50px) scale(1.05); }
+    100% { transform:translate(-30px,30px) scale(0.95); }
 }
 
 .auth-page-wrapper {
     position:relative; z-index:1;
     display:flex; align-items:center; justify-content:center;
-    min-height:calc(100vh - 130px); padding:2rem 1rem;
+    min-height:calc(100vh - 80px); padding:2rem 1rem;
 }
 
-/* ─── Split Layout ─── */
-.auth-split { display:flex; gap:3rem; align-items:center; justify-content:center; max-width:1100px; width:100%; }
-
-/* ─── Left Hero ─── */
-.auth-hero { flex:1; color:#fff; display:none; max-width: 480px; }
-@media(min-width:950px) { .auth-hero { display:block; } }
-
-.auth-hero h1 {
-    font-size:2.6rem; font-weight:800; line-height:1.15; margin-bottom:0.75rem;
-    background:linear-gradient(135deg,#fff 0%,#a5b4fc 50%,#06b6d4 100%);
-    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-}
-.auth-hero .hero-sub {
-    color:rgba(255,255,255,0.75); font-size:0.95rem; line-height:1.65; margin-bottom:2.25rem;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
-}
-
-/* Feature Pills */
-.fp {
-    display:flex; align-items:center; gap:0.85rem;
-    padding:0.75rem 1rem; margin-bottom:0.65rem;
-    background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.1);
-    border-radius:14px; transition:all 0.3s ease;
-    backdrop-filter: blur(10px);
-}
-.fp:hover { background:rgba(0,0,0,0.6); border-color:rgba(255,255,255,0.2); transform:translateX(4px); }
-.fp .ic {
-    width:40px; height:40px; border-radius:10px;
-    display:flex; align-items:center; justify-content:center;
-    font-size:1rem; flex-shrink:0;
-}
-.fp .tx strong { display:block; color:#fff; font-size:0.88rem; margin-bottom:1px; }
-.fp .tx span { color:rgba(255,255,255,0.65); font-size:0.77rem; }
-
-/* ─── Glass Card ─── */
-.auth-card-wrapper { flex-shrink:0; width:100%; max-width:480px; }
+/* ─── Glass Card (Google-style centered) ─── */
+.auth-card-wrapper { flex-shrink:0; width:100%; max-width:440px; margin: 0 auto; }
 .auth-glass-card {
-    background:rgba(10, 15, 30, 0.6);
+    background:rgba(255, 255, 255, 0.85);
     backdrop-filter:blur(24px) saturate(140%);
     -webkit-backdrop-filter:blur(24px) saturate(140%);
-    border:1px solid rgba(255,255,255,0.1);
-    border-radius:24px; padding:2rem;
-    box-shadow:0 32px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05) inset;
+    border:1px solid rgba(255,255,255,0.8);
+    border-radius:24px; padding:3rem 2.5rem;
+    box-shadow:0 20px 40px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.03);
     position:relative; overflow:hidden;
     animation:cardSlideIn 0.6s ease-out;
 }
 @keyframes cardSlideIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
 
-.auth-glass-card::before {
-    content:''; position:absolute; top:0; left:0; right:0; height:3px;
-    background:linear-gradient(90deg,#10b981,#06b6d4,#6366f1,#8b5cf6);
-    background-size:200% 100%; animation:shimmer 3s linear infinite;
+.auth-logo-badge {
+    width:56px; height:56px; border-radius:16px;
+    background:#2563eb;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.5rem; color:#fff;
+    margin:0 auto 1.5rem;
+    box-shadow:0 8px 20px rgba(37,99,235,0.25);
 }
-@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-
-.auth-header { text-align:center; margin-bottom:1.5rem; }
-.auth-header .icon {
-    width:50px; height:50px; border-radius:14px;
-    background:linear-gradient(135deg,#10b981,#06b6d4);
-    display:inline-flex; align-items:center; justify-content:center;
-    font-size:1.3rem; color:#fff; margin-bottom:0.8rem;
-    box-shadow:0 8px 24px rgba(16,185,129,0.35);
+.auth-glass-card h2 {
+    color:#0f172a; font-size:1.6rem; font-weight:700;
+    text-align:center; margin-bottom:0.5rem; letter-spacing:-0.02em;
 }
-.auth-header h2 { color:#fff; font-size:1.4rem; font-weight:800; margin-bottom:0.25rem; letter-spacing:-0.02em; }
-.auth-header p { color:rgba(255,255,255,0.6); font-size:0.8rem; }
+.auth-glass-card .subtitle { color:#64748b; font-size:0.95rem; text-align:center; margin-bottom:2.2rem; }
 
 /* Steps indicator */
-.auth-steps { display:flex; justify-content:center; gap:0.5rem; margin-bottom:1.5rem; }
-.step-dot {
-    width:32px; height:6px; border-radius:3px;
-    background:rgba(255,255,255,0.1); transition:all 0.4s ease;
+.auth-stepper { display:flex; justify-content:center; align-items:center; gap:0.5rem; margin-bottom:1.5rem; }
+.step-circle {
+    width:28px; height:28px; border-radius:50%;
+    background:#f1f5f9; color:#94a3b8; font-size:0.8rem; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+    transition:all 0.3s;
 }
-.step-dot.active { background:#10b981; box-shadow:0 0 10px rgba(16,185,129,0.5); width:40px; }
-.step-dot.completed { background:rgba(16,185,129,0.5); }
+.step-circle.active { background:#2563eb; color:#fff; box-shadow:0 0 10px rgba(37,99,235,0.3); }
+.step-circle.completed { background:#dbeafe; color:#2563eb; }
+.step-line { flex:1; height:3px; background:#f1f5f9; border-radius:2px; transition:all 0.3s; max-width: 40px; }
+.step-line.active { background:#bfdbfe; }
 
 /* Step Panels */
 .step-panel { display:none; animation:fadeIn 0.4s ease; }
-.step-panel.active { display:block; }
+.form-step { display:none; animation:fadeIn 0.4s ease; }
+.form-step.active { display:block; }
 @keyframes fadeIn { from{opacity:0; transform:translateX(10px);} to{opacity:1; transform:translateX(0);} }
 
 /* Fields */
-.auth-field { margin-bottom:1.1rem; }
-.auth-field label { display:block; color:rgba(255,255,255,0.8); font-size:0.82rem; font-weight:600; margin-bottom:0.4rem; }
+.auth-field { margin-bottom:1.25rem; text-align: left; }
+.auth-field label { display:none; }
 .auth-field input, .auth-field select {
-    width:100%; padding:0.7rem 0.9rem 0.7rem 2.6rem;
-    border:1.5px solid rgba(255,255,255,0.1);
-    border-radius:12px; font-size:0.88rem;
-    color:#fff; background:rgba(0,0,0,0.2);
-    transition:border-color 0.25s, box-shadow 0.25s, background 0.25s;
+    width:100%; padding:0.9rem 1rem 0.9rem 2.8rem;
+    border:1.5px solid #cbd5e1;
+    border-radius:12px; font-size:0.95rem;
+    color:#1e293b; background:#fff;
+    transition:all 0.25s;
     outline:none; font-family:inherit;
     appearance:none;
 }
-.auth-field select { padding-left:1rem; cursor:pointer; }
-.auth-field select option { background:#0f172a; color:#fff; }
-.auth-field input::placeholder { color:rgba(255,255,255,0.35); }
+.auth-field select { padding-left:2.8rem; cursor:pointer; }
+.auth-field select option { background:#fff; color:#1e293b; }
+.auth-field input::placeholder { color:#94a3b8; font-weight: 400; }
 .auth-field input:focus, .auth-field select:focus {
-    border-color:rgba(16,185,129,0.8);
-    box-shadow:0 0 0 3px rgba(16,185,129,0.25);
-    background:rgba(0,0,0,0.4);
+    border-color:#2563eb;
+    box-shadow:0 0 0 4px rgba(37,99,235,0.1);
 }
 .input-icon-wrap { position:relative; }
 .input-icon-wrap .field-icon {
-    position:absolute; left:12px; top:50%; transform:translateY(-50%);
-    color:rgba(255,255,255,0.4); font-size:0.85rem; pointer-events:none;
+    position:absolute; left:14px; top:50%; transform:translateY(-50%);
+    color:#94a3b8; font-size:1rem; pointer-events:none;
     transition:color 0.25s;
 }
-.input-icon-wrap:focus-within .field-icon { color:#34d399; }
+.input-icon-wrap:focus-within .field-icon { color:#2563eb; }
 
 .auth-field .pw-wrap { position:relative; }
 .auth-field .pw-wrap input { padding-right:2.75rem; }
 .auth-field .pw-toggle {
-    position:absolute; right:10px; top:50%; transform:translateY(-50%);
-    background:none; border:none; color:rgba(255,255,255,0.4);
-    cursor:pointer; padding:0.2rem; font-size:0.9rem;
+    position:absolute; right:12px; top:50%; transform:translateY(-50%);
+    background:none; border:none; color:#94a3b8;
+    cursor:pointer; padding:0.2rem; font-size:1rem;
 }
-.auth-field .pw-toggle:hover { color:rgba(255,255,255,0.7); }
-.field-error { display:block; color:#f43f5e; font-size:0.74rem; margin-top:0.3rem; }
-
-/* Grid for side-by-side fields */
-.field-group-row { display:flex; gap:1rem; margin-bottom:1.1rem; }
-.field-group-row .auth-field { margin-bottom:0; flex:1; }
+.auth-field .pw-toggle:hover { color:#475569; }
+.field-error { display:block; color:#e11d48; font-size:0.8rem; margin-top:0.4rem; font-weight: 500; }
+.hint { display:block; color:#64748b; font-size:0.8rem; margin-top:0.4rem; }
 
 /* Actions */
-.step-actions { display:flex; gap:0.75rem; margin-top:1.5rem; }
+.step-actions { display:flex; gap:0.75rem; margin-top:2rem; }
 .step-actions button {
-    padding:0.78rem; border-radius:12px; font-size:0.92rem; font-weight:700;
-    cursor:pointer; transition:all 0.3s;
+    padding:0.9rem; border-radius:12px; font-size:0.95rem; font-weight:600;
+    cursor:pointer; transition:all 0.3s; font-family: inherit;
 }
 .step-actions .btn-next {
-    flex:1; background:linear-gradient(135deg,#10b981,#06b6d4); color:#fff; border:none;
+    flex:1; background:#2563eb; color:#fff; border:none;
 }
-.step-actions .btn-next:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(16,185,129,0.3); }
+.step-actions .btn-next:hover { background:#1d4ed8; box-shadow:0 8px 20px rgba(37,99,235,0.25); transform:translateY(-1px); }
 .step-actions .btn-secondary {
-    flex:1; background:rgba(255,255,255,0.05); color:rgba(255,255,255,0.8);
-    border:1px solid rgba(255,255,255,0.1);
+    flex:1; background:#fff; color:#475569;
+    border:1.5px solid #cbd5e1;
 }
-.step-actions .btn-secondary:hover { background:rgba(255,255,255,0.1); }
+.step-actions .btn-secondary:hover { background:#f8fafc; border-color:#94a3b8; }
 .auth-submit-btn {
-    flex:2; padding:0.78rem;
-    background:linear-gradient(135deg,#10b981,#06b6d4);
+    width: 100%; padding:0.9rem;
+    background:#2563eb;
     color:#fff; border:none; border-radius:12px;
-    font-size:0.95rem; font-weight:700; cursor:pointer;
+    font-size:1rem; font-weight:600; cursor:pointer;
     transition:all 0.3s; font-family:inherit; letter-spacing:0.01em;
-    position:relative; overflow:hidden;
 }
-.auth-submit-btn::after {
-    content:''; position:absolute; inset:0;
-    background:linear-gradient(135deg,transparent 30%,rgba(255,255,255,0.15) 50%,transparent 70%);
-    transform:translateX(-100%); transition:transform 0.5s;
-}
-.auth-submit-btn:hover::after { transform:translateX(100%); }
 .auth-submit-btn:hover {
-    transform:translateY(-2px);
-    box-shadow:0 8px 28px rgba(16,185,129,0.4);
+    background:#1d4ed8;
+    box-shadow:0 8px 20px rgba(37,99,235,0.25);
+    transform:translateY(-1px);
 }
 .auth-submit-btn:active { transform:translateY(0); }
 
 /* Footer link */
 .auth-footer-link {
-    text-align:center; margin-top:1.1rem; padding-top:1rem;
-    border-top:1px solid rgba(255,255,255,0.1);
-    font-size:0.82rem; color:rgba(255,255,255,0.55);
+    text-align:center; margin-top:2rem;
+    font-size:0.95rem; color:#64748b;
 }
-.auth-footer-link a { color:#34d399; font-weight:700; text-decoration:none; }
-.auth-footer-link a:hover { text-decoration:underline; color:#6ee7b7; }
+.auth-footer-link a { color:#2563eb; font-weight:600; text-decoration:none; }
+.auth-footer-link a:hover { text-decoration:underline; color:#1d4ed8; }
 
 /* Flash */
 .auth-flash {
-    padding:0.6rem 0.8rem; border-radius:10px; font-size:0.82rem;
-    margin-bottom:1rem; display:flex; align-items:flex-start; gap:0.5rem;
-    backdrop-filter:blur(8px);
+    padding:0.8rem 1rem; border-radius:12px; font-size:0.9rem; font-weight: 500;
+    margin-bottom:1.5rem; display:flex; align-items:flex-start; gap:0.5rem; text-align: left;
 }
-.auth-flash.danger { background:rgba(244,63,94,0.12); color:#fb7185; border:1px solid rgba(244,63,94,0.2); }
-.auth-flash.success { background:rgba(16,185,129,0.12); color:#34d399; border:1px solid rgba(16,185,129,0.2); }
+.auth-flash.danger { background:#ffe4e6; color:#be123c; border:1px solid #fecdd3; }
+.auth-flash.success { background:#d1fae5; color:#047857; border:1px solid #a7f3d0; }
 
 /* Password strength */
-.pw-strength { margin-top:0.4rem; text-align:left; }
+.pw-strength { margin-top:0.5rem; text-align:left; }
 .pw-strength .bar-track {
-    width:100%; height:4px; background:rgba(255,255,255,0.08);
+    width:100%; height:4px; background:#e2e8f0;
     border-radius:4px; overflow:hidden; margin-bottom:0.25rem;
 }
 .pw-strength .bar-fill { height:100%; border-radius:4px; transition:width 0.3s, background 0.3s; width:0; }
-.pw-strength .lbl { font-size:0.68rem; color:rgba(255,255,255,0.35); }
+.pw-strength .lbl { font-size:0.75rem; color:#64748b; font-weight: 500; }
 
 @media(max-width:480px) {
-    .auth-glass-card { padding:1.4rem 1rem !important; border-radius:18px; }
-    .social-row { flex-direction:column !important; gap:0.5rem !important; }
-    .social-btn { width:100% !important; }
-    .auth-logo-badge { width:44px; height:44px; font-size:1.15rem; border-radius:12px; }
-    .auth-glass-card h2 { font-size:1.25rem; }
+    .auth-glass-card { padding:2rem 1.5rem !important; border-radius:20px; box-shadow: none; border: none; background: transparent; }
+    .landing-layout { background: #fff; }
+    .auth-bg { display: none; }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Live 3D Visual Background -->
+<!-- Light 3D Visual Background -->
 <div class="auth-bg" style="pointer-events: none;">
-    <spline-viewer url="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode" style="width: 100vw; height: 100vh; position: absolute; inset: 0;"></spline-viewer>
-    <div style="position:absolute; inset:0; background: radial-gradient(circle at center, transparent 0%, #050a18 100%); z-index: 1;"></div>
+    <spline-viewer url="https://prod.spline.design/qg9bNf5I1B4GfN7E/scene.splinecode" style="width: 100vw; height: 100vh; position: absolute; inset: 0; opacity: 0.8;"></spline-viewer>
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
-    <div class="orb orb-4"></div>
+    <div class="orb orb-3"></div>
 </div>
 
 <div class="auth-page-wrapper">
-    <div class="auth-split">
-        <!-- LEFT: Hero -->
-        <div class="auth-hero">
-            <h1>Start Your Growth Journey Today</h1>
-            <p class="hero-sub">Create your free account and unlock AI-powered career tools designed for ambitious students like you.</p>
+    <div class="auth-card-wrapper">
+        <div class="auth-glass-card text-center">
+            <div class="auth-logo-badge">
+                <i class="fa-solid fa-user-plus"></i>
+            </div>
+            <h2>Create an account</h2>
+            <p class="subtitle">Join CampusMate AI to continue</p>
 
-            <div class="benefit">
-                <div class="bic" style="background:rgba(99,102,241,0.15); color:#818cf8;">
-                    <i class="fa-solid fa-trophy"></i>
-                </div>
-                <div class="btx">
-                    <strong>Gamified Milestones Tracking</strong>
-                    <span>Earn XP rewards, unlock badges, and maintain study streaks to stay motivated</span>
-                </div>
-            </div>
-            <div class="benefit">
-                <div class="bic" style="background:rgba(16,185,129,0.15); color:#34d399;">
-                    <i class="fa-solid fa-briefcase"></i>
-                </div>
-                <div class="btx">
-                    <strong>Kanban Internship Board</strong>
-                    <span>Browse 100+ openings from top companies and track your pipeline</span>
-                </div>
-            </div>
-            <div class="benefit">
-                <div class="bic" style="background:rgba(244,63,94,0.15); color:#fb7185;">
-                    <i class="fa-solid fa-compass-drafting"></i>
-                </div>
-                <div class="btx">
-                    <strong>AI Project Architect</strong>
-                    <span>Instantly generate project blueprints, configs, and flowchart schemas</span>
-                </div>
-            </div>
-            <div class="benefit">
-                <div class="bic" style="background:rgba(6,182,212,0.15); color:#22d3ee;">
-                    <i class="fa-solid fa-robot"></i>
-                </div>
-                <div class="btx">
-                    <strong>24/7 AI Mentor</strong>
-                    <span>Get instant career guidance, code reviews, and interview prep tips</span>
-                </div>
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="auth-flash {{ category }}">
+                            <i class="fa-solid {% if category == 'success' %}fa-circle-check{% elif category == 'danger' %}fa-triangle-exclamation{% else %}fa-circle-info{% endif %}"></i>
+                            <span>{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="auth-stepper">
+                <div class="step-circle active" id="st-1">1</div>
+                <div class="step-line" id="ln-1"></div>
+                <div class="step-circle" id="st-2">2</div>
+                <div class="step-line" id="ln-2"></div>
+                <div class="step-circle" id="st-3">3</div>
             </div>
 
-            <div class="stats-row">
-                <div class="stat-box"><span class="val">15K+</span><span class="lbl">Students</span></div>
-                <div class="stat-box"><span class="val">92%</span><span class="lbl">Placed</span></div>
-                <div class="stat-box"><span class="val">4.9★</span><span class="lbl">Rating</span></div>
-            </div>
-        </div>
+            <form method="POST" action="{{ url_for('auth.register') }}" id="register-form">
+                {{ form.csrf_token }}
 
-        <!-- RIGHT: Register Card -->
-        <div class="auth-card-wrapper">
-            <div class="auth-glass-card text-center">
-                <div class="auth-logo-badge">
-                    <i class="fa-solid fa-user-plus"></i>
-                </div>
-                <h2>Create Account</h2>
-                <p class="subtitle">Join CampusMate AI and accelerate your career</p>
-
-                <!-- Flash Messages -->
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            <div class="auth-flash {{ category }}">
-                                <i class="fa-solid {% if category == 'success' %}fa-circle-check{% elif category == 'danger' %}fa-triangle-exclamation{% else %}fa-circle-info{% endif %}"></i>
-                                <span>{{ message }}</span>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
-
-                <div class="auth-stepper">
-                    <div class="step-circle active" id="st-1">1</div>
-                    <div class="step-line" id="ln-1"></div>
-                    <div class="step-circle" id="st-2">2</div>
-                    <div class="step-line" id="ln-2"></div>
-                    <div class="step-circle" id="st-3">3</div>
-                </div>
-
-                <form method="POST" action="{{ url_for('auth.register') }}" id="register-form">
-                    {{ form.csrf_token }}
-
-                    <!-- STEP 1: Account Details -->
-                    <div class="form-step active" id="step-1">
-                        <div class="social-row">
-                            <a href="{{ url_for('auth.oauth_login', provider='google') }}" class="social-btn">
-                                <i class="fa-brands fa-google" style="color:#ea4335;"></i> Google
-                            </a>
-                            <a href="{{ url_for('auth.oauth_login', provider='github') }}" class="social-btn">
-                                <i class="fa-brands fa-github" style="color:#fff;"></i> GitHub
-                            </a>
+                <!-- STEP 1: Account Details -->
+                <div class="form-step active" id="step-1">
+                    
+                    <!-- Username -->
+                    <div class="auth-field">
+                        <div class="input-icon-wrap">
+                            <i class="fa-solid fa-user field-icon"></i>
+                            {{ form.username(placeholder="Username (e.g. alex_smith)", autocomplete="username") }}
                         </div>
-                        <div class="divider">
-                            <hr>
-                            <span>Or register with email</span>
-                            <hr>
-                        </div>
-
-                        <!-- Username -->
-                        <div class="auth-field">
-                            {{ form.username.label() }}
-                            <div class="input-icon-wrap">
-                                <i class="fa-solid fa-user field-icon"></i>
-                                {{ form.username(placeholder="alex_smith", autocomplete="username") }}
-                            </div>
-                            {% if form.username.errors %}{% for error in form.username.errors %}<span class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</span>{% endfor %}{% endif %}
-                        </div>
-
-                        <!-- Email -->
-                        <div class="auth-field">
-                            {{ form.email.label() }}
-                            <div class="input-icon-wrap">
-                                <i class="fa-solid fa-envelope field-icon"></i>
-                                {{ form.email(placeholder="student@nit.ac.in", autocomplete="email") }}
-                            </div>
-                            <span class="hint">Academic domains preferred (.edu.in, .ac.in)</span>
-                            {% if form.email.errors %}{% for error in form.email.errors %}<span class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</span>{% endfor %}{% endif %}
-                        </div>
-
-                        <!-- Password -->
-                        <div class="auth-field">
-                            {{ form.password.label() }}
-                            <div class="input-icon-wrap pw-wrap">
-                                <i class="fa-solid fa-lock field-icon"></i>
-                                {{ form.password(placeholder="At least 8 characters", id="reg-password", autocomplete="new-password") }}
-                                <button type="button" class="pw-toggle" onclick="togglePw('reg-password', this)"><i class="fa-solid fa-eye"></i></button>
-                            </div>
-                            <div class="pw-strength" id="pw-strength">
-                                <div class="bar-track"><div class="bar-fill" id="pw-bar"></div></div>
-                                <span class="lbl" id="pw-label"></span>
-                            </div>
-                            {% if form.password.errors %}{% for error in form.password.errors %}<span class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</span>{% endfor %}{% endif %}
-                        </div>
-
-                        <!-- Confirm Password -->
-                        <div class="auth-field">
-                            {{ form.confirm_password.label() }}
-                            <div class="input-icon-wrap pw-wrap">
-                                <i class="fa-solid fa-shield-halved field-icon"></i>
-                                {{ form.confirm_password(placeholder="Re-enter password", id="reg-confirm-password", autocomplete="new-password") }}
-                                <button type="button" class="pw-toggle" onclick="togglePw('reg-confirm-password', this)"><i class="fa-solid fa-eye"></i></button>
-                            </div>
-                            {% if form.confirm_password.errors %}{% for error in form.confirm_password.errors %}<span class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</span>{% endfor %}{% endif %}
-                        </div>
-
-                        <button type="button" class="auth-submit-btn w-100 mt-2" onclick="nextStep(2)">Continue &nbsp;<i class="fa-solid fa-arrow-right"></i></button>
+                        {% if form.username.errors %}{% for error in form.username.errors %}<span class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</span>{% endfor %}{% endif %}
                     </div>
 
-                    <!-- STEP 2: Personal Profile -->
-                    <div class="form-step" id="step-2">
-                        <div class="auth-field">
-                            <label>Full Name</label>
-                            <div class="input-icon-wrap">
-                                <i class="fa-solid fa-id-card field-icon"></i>
-                                <input type="text" name="name" placeholder="Alex Smith" id="input-name">
-                            </div>
+                    <!-- Email -->
+                    <div class="auth-field">
+                        <div class="input-icon-wrap">
+                            <i class="fa-solid fa-envelope field-icon"></i>
+                            {{ form.email(placeholder="Email address", autocomplete="email") }}
                         </div>
+                        {% if form.email.errors %}{% for error in form.email.errors %}<span class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</span>{% endfor %}{% endif %}
+                    </div>
 
-                        <div class="auth-field">
-                            {{ form.academic_level.label() }}
-                            <div class="input-icon-wrap">
-                                <i class="fa-solid fa-graduation-cap field-icon"></i>
-                                {{ form.academic_level(id="input-academic-level") }}
-                            </div>
-                            {% if form.academic_level.errors %}{% for error in form.academic_level.errors %}<span class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</span>{% endfor %}{% endif %}
+                    <!-- Password -->
+                    <div class="auth-field">
+                        <div class="input-icon-wrap pw-wrap">
+                            <i class="fa-solid fa-lock field-icon"></i>
+                            {{ form.password(placeholder="Password (At least 8 characters)", id="reg-password", autocomplete="new-password") }}
+                            <button type="button" class="pw-toggle" onclick="togglePw('reg-password', this)"><i class="fa-solid fa-eye"></i></button>
                         </div>
+                        <div class="pw-strength" id="pw-strength">
+                            <div class="bar-track"><div class="bar-fill" id="pw-bar"></div></div>
+                            <span class="lbl" id="pw-label"></span>
+                        </div>
+                        {% if form.password.errors %}{% for error in form.password.errors %}<span class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</span>{% endfor %}{% endif %}
+                    </div>
 
-                        <div class="auth-field">
-                            <label>Academic Branch / Major</label>
-                            <div class="input-icon-wrap">
-                                <i class="fa-solid fa-book-open field-icon"></i>
-                                <input type="text" name="branch" placeholder="e.g. Computer Science" id="input-branch">
-                            </div>
+                    <!-- Confirm Password -->
+                    <div class="auth-field">
+                        <div class="input-icon-wrap pw-wrap">
+                            <i class="fa-solid fa-shield-halved field-icon"></i>
+                            {{ form.confirm_password(placeholder="Confirm password", id="reg-confirm-password", autocomplete="new-password") }}
+                            <button type="button" class="pw-toggle" onclick="togglePw('reg-confirm-password', this)"><i class="fa-solid fa-eye"></i></button>
                         </div>
-                        
-                        <div class="auth-field">
-                            <label>Current Year</label>
-                            <div class="input-icon-wrap">
-                                <i class="fa-solid fa-calendar field-icon"></i>
-                                <select name="year" id="input-year">
-                                    <option value="1st Year">1st Year</option>
-                                    <option value="2nd Year">2nd Year</option>
-                                    <option value="3rd Year">3rd Year</option>
-                                    <option value="4th Year">4th Year</option>
-                                    <option value="Postgraduate">Postgraduate</option>
-                                </select>
-                            </div>
-                        </div>
+                        {% if form.confirm_password.errors %}{% for error in form.confirm_password.errors %}<span class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</span>{% endfor %}{% endif %}
+                    </div>
 
-                        <div class="step-actions">
-                            <button type="button" class="btn-secondary" onclick="prevStep(1)">Back</button>
-                            <button type="button" class="auth-submit-btn" onclick="nextStep(3)">Continue &nbsp;<i class="fa-solid fa-arrow-right"></i></button>
+                    <button type="button" class="auth-submit-btn mt-3" onclick="nextStep(2)">Next</button>
+                </div>
+
+                <!-- STEP 2: Personal Profile -->
+                <div class="form-step" id="step-2">
+                    <div class="auth-field">
+                        <div class="input-icon-wrap">
+                            <i class="fa-solid fa-id-card field-icon"></i>
+                            <input type="text" name="name" placeholder="Full Name (e.g. Alex Smith)" id="input-name">
                         </div>
                     </div>
 
-                    <!-- STEP 3: Career Goals -->
-                    <div class="form-step" id="step-3">
-                        <div class="auth-field">
-                            <label>Target Career Path</label>
-                            <div class="input-icon-wrap">
-                                <i class="fa-solid fa-compass field-icon"></i>
-                                <select name="career_goal" id="input-career">
-                                    <option value="Full Stack Development">Full Stack Development</option>
-                                    <option value="Frontend Development">Frontend Development</option>
-                                    <option value="Backend Development">Backend Development</option>
-                                    <option value="Data Science">Data Science</option>
-                                    <option value="Machine Learning">Machine Learning</option>
-                                    <option value="DevOps & Cloud">DevOps & Cloud</option>
-                                    <option value="Cyber Security">Cyber Security</option>
-                                    <option value="Mobile App Development">Mobile App Development</option>
-                                    <option value="UI/UX Design">UI/UX Design</option>
-                                    <option value="Product Management">Product Management</option>
-                                </select>
-                            </div>
-                            <span class="hint">You can change this later from your dashboard</span>
+                    <div class="auth-field">
+                        <div class="input-icon-wrap">
+                            <i class="fa-solid fa-graduation-cap field-icon"></i>
+                            {{ form.academic_level(id="input-academic-level", class="form-select") }}
                         </div>
+                        {% if form.academic_level.errors %}{% for error in form.academic_level.errors %}<span class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</span>{% endfor %}{% endif %}
+                    </div>
 
-                        <div class="auth-field">
-                            <label>Daily Study Commitment</label>
-                            <div class="input-icon-wrap">
-                                <i class="fa-solid fa-clock field-icon"></i>
-                                <select name="daily_study_time" id="input-study">
-                                    <option value="1 hour/day">1 hour / day</option>
-                                    <option value="2 hours/day" selected>2 hours / day</option>
-                                    <option value="3 hours/day">3 hours / day</option>
-                                    <option value="4+ hours/day">4+ hours / day</option>
-                                </select>
-                            </div>
+                    <div class="auth-field">
+                        <div class="input-icon-wrap">
+                            <i class="fa-solid fa-book-open field-icon"></i>
+                            <input type="text" name="branch" placeholder="Branch / Major (e.g. Computer Science)" id="input-branch">
                         </div>
-
-                        <div class="step-actions">
-                            <button type="button" class="btn-secondary" onclick="prevStep(2)">Back</button>
-                            <button type="submit" class="auth-submit-btn">Complete &nbsp;<i class="fa-solid fa-rocket"></i></button>
+                    </div>
+                    
+                    <div class="auth-field">
+                        <div class="input-icon-wrap">
+                            <i class="fa-solid fa-calendar field-icon"></i>
+                            <select name="year" id="input-year">
+                                <option value="" disabled selected>Select Current Year</option>
+                                <option value="1st Year">1st Year</option>
+                                <option value="2nd Year">2nd Year</option>
+                                <option value="3rd Year">3rd Year</option>
+                                <option value="4th Year">4th Year</option>
+                                <option value="Postgraduate">Postgraduate</option>
+                            </select>
                         </div>
                     </div>
 
-                </form>
-
-                <div class="auth-footer-link">
-                    Already have an account? <a href="{{ url_for('auth.login') }}">Sign In</a>
+                    <div class="step-actions">
+                        <button type="button" class="btn-secondary" onclick="prevStep(1)">Back</button>
+                        <button type="button" class="btn-next" onclick="nextStep(3)">Next</button>
+                    </div>
                 </div>
+
+                <!-- STEP 3: Career Goals -->
+                <div class="form-step" id="step-3">
+                    <div class="auth-field">
+                        <div class="input-icon-wrap">
+                            <i class="fa-solid fa-compass field-icon"></i>
+                            <select name="career_goal" id="input-career">
+                                <option value="" disabled selected>Target Career Path</option>
+                                <option value="Full Stack Development">Full Stack Development</option>
+                                <option value="Frontend Development">Frontend Development</option>
+                                <option value="Backend Development">Backend Development</option>
+                                <option value="Data Science">Data Science</option>
+                                <option value="Machine Learning">Machine Learning</option>
+                                <option value="DevOps & Cloud">DevOps & Cloud</option>
+                                <option value="Cyber Security">Cyber Security</option>
+                                <option value="Mobile App Development">Mobile App Development</option>
+                                <option value="UI/UX Design">UI/UX Design</option>
+                                <option value="Product Management">Product Management</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="auth-field">
+                        <div class="input-icon-wrap">
+                            <i class="fa-solid fa-clock field-icon"></i>
+                            <select name="daily_study_time" id="input-study">
+                                <option value="" disabled selected>Daily Study Commitment</option>
+                                <option value="1 hour/day">1 hour / day</option>
+                                <option value="2 hours/day">2 hours / day</option>
+                                <option value="3 hours/day">3 hours / day</option>
+                                <option value="4+ hours/day">4+ hours / day</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="step-actions">
+                        <button type="button" class="btn-secondary" onclick="prevStep(2)">Back</button>
+                        <button type="submit" class="btn-next">Create account</button>
+                    </div>
+                </div>
+
+            </form>
+
+            <div class="auth-footer-link">
+                Already have an account? <a href="{{ url_for('auth.login') }}">Sign in</a>
             </div>
         </div>
     </div>
@@ -523,11 +395,11 @@ if (pwField) {
 
         const levels = [
             { w:'0%', bg:'transparent', t:'' },
-            { w:'20%', bg:'#f43f5e', t:'Weak' },
-            { w:'40%', bg:'#f97316', t:'Fair' },
-            { w:'60%', bg:'#eab308', t:'Good' },
-            { w:'80%', bg:'#10b981', t:'Strong' },
-            { w:'100%', bg:'#06b6d4', t:'Excellent' }
+            { w:'20%', bg:'#e11d48', t:'Weak' },
+            { w:'40%', bg:'#ea580c', t:'Fair' },
+            { w:'60%', bg:'#ca8a04', t:'Good' },
+            { w:'80%', bg:'#2563eb', t:'Strong' },
+            { w:'100%', bg:'#059669', t:'Excellent' }
         ];
         const lv = levels[Math.min(score, 5)];
         bar.style.width = lv.w;
