@@ -572,107 +572,57 @@
                     </div>
                 </div>
 
-                <!-- ATS Diagnostics & Scoring Panel (Slide-out on mobile, inline on desktop) -->
+                <!-- ATS Diagnostics & Scoring Panel (Compact Card Layout) -->
                 <div id="ats-dashboard-parent" class="ats-slide-out-panel">
                     <div class="ats-drawer-header">
-                        <h4 class="fw-bold mb-0 text-secondary-text" style="font-size:0.95rem;"><i class="fa-solid fa-chart-line text-accent me-2"></i> ATS Diagnostics</h4>
+                        <h4 class="fw-bold mb-0 text-secondary-text" style="font-size:0.95rem;"><i class="fa-solid fa-chart-line text-accent me-2"></i> ATS Scorecard</h4>
                         <button class="ats-drawer-close-btn" onclick="toggleAtsDrawer()"><i class="fa-solid fa-xmark"></i></button>
                     </div>
-                    <div class="ats-drawer-content p-3" style="overflow-y: auto; height: calc(100% - 50px);">
+                    <div class="ats-drawer-content p-3">
                         
-                        <!-- Circular Score Dashboard (Visual charts) -->
-                        <div class="circular-dashboard mb-4 p-3 border rounded bg-primary-card text-center d-flex flex-column align-items-center gap-3" style="border-color: var(--border-color) !important;">
+                        <!-- Compact Overall Score -->
+                        <div class="d-flex align-items-center justify-content-between p-3 border rounded bg-primary-card mb-3" style="border-color: var(--border-color) !important;">
                             <div>
-                                <span class="text-secondary fw-bold" style="font-size: 0.72rem; text-transform: uppercase;">Overall ATS Compatibility</span>
-                                <div class="position-relative mt-2 mx-auto" style="width:90px; height:90px;">
-                                    <svg width="90" height="90" viewBox="0 0 36 36" class="circular-chart">
-                                      <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--bg-tertiary, #e2e8f0)" stroke-width="3" />
-                                      <path class="circle" id="circle-main" stroke-dasharray="80, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--accent-color, #0d9488)" stroke-width="3" stroke-linecap="round" />
-                                    </svg>
-                                    <div class="position-absolute top-50 start-50 translate-middle text-center">
-                                        <h3 class="fw-bold mb-0 text-accent" id="score-text-main" style="font-size:1.2rem; line-height:1;">80%</h3>
-                                    </div>
-                                </div>
+                                <span class="text-secondary fw-bold" style="font-size: 0.65rem; text-transform: uppercase;">Overall Match</span>
+                                <h3 class="fw-bold mb-0 text-accent" id="score-text-main" style="font-size:1.5rem; line-height:1;">80%</h3>
                             </div>
-                            
-                            <div class="circular-charts-grid w-100" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:6px;">
-                                <!-- Formatting Score -->
-                                <div class="text-center">
-                                    <span class="d-block text-secondary" style="font-size: 0.55rem; font-weight:700; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="Formatting">Format</span>
-                                    <div class="position-relative mx-auto mt-1" style="width:42px; height:42px;">
-                                        <svg width="42" height="42" viewBox="0 0 36 36" class="circular-chart">
-                                          <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--bg-tertiary, #e2e8f0)" stroke-width="3.5" />
-                                          <path class="circle" id="circle-formatting" stroke-dasharray="80, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#10b981" stroke-width="3.5" stroke-linecap="round" />
-                                        </svg>
-                                        <span class="position-absolute top-50 start-50 translate-middle text-secondary-text fw-bold" id="score-formatting-text" style="font-size:0.55rem;">80%</span>
-                                    </div>
-                                </div>
+                            <!-- Mini Progress Bars for Categories -->
+                            <div class="flex-grow-1 ms-4">
+                                <div class="d-flex justify-content-between mb-1" style="font-size: 0.6rem; font-weight:700;"><span class="text-success">Format</span><span id="score-formatting-text">80%</span></div>
+                                <div class="progress mb-2" style="height: 4px;"><div class="progress-bar bg-success" style="width: 80%;"></div></div>
                                 
-                                <!-- Skills Score -->
-                                <div class="text-center">
-                                    <span class="d-block text-secondary" style="font-size: 0.55rem; font-weight:700; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="Skills Match">Skills</span>
-                                    <div class="position-relative mx-auto mt-1" style="width:42px; height:42px;">
-                                        <svg width="42" height="42" viewBox="0 0 36 36" class="circular-chart">
-                                          <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--bg-tertiary, #e2e8f0)" stroke-width="3.5" />
-                                          <path class="circle" id="circle-skills" stroke-dasharray="85, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#3b82f6" stroke-width="3.5" stroke-linecap="round" />
-                                        </svg>
-                                        <span class="position-absolute top-50 start-50 translate-middle text-secondary-text fw-bold" id="score-skills-text" style="font-size:0.55rem;">85%</span>
-                                    </div>
-                                </div>
+                                <div class="d-flex justify-content-between mb-1" style="font-size: 0.6rem; font-weight:700;"><span class="text-primary">Skills</span><span id="score-skills-text">85%</span></div>
+                                <div class="progress mb-2" style="height: 4px;"><div class="progress-bar bg-primary" style="width: 85%;"></div></div>
                                 
-                                <!-- Keyword Score -->
-                                <div class="text-center">
-                                    <span class="d-block text-secondary" style="font-size: 0.55rem; font-weight:700; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="Keywords">Keywords</span>
-                                    <div class="position-relative mx-auto mt-1" style="width:42px; height:42px;">
-                                        <svg width="42" height="42" viewBox="0 0 36 36" class="circular-chart">
-                                          <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--bg-tertiary, #e2e8f0)" stroke-width="3.5" />
-                                          <path class="circle" id="circle-keyword" stroke-dasharray="90, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#8b5cf6" stroke-width="3.5" stroke-linecap="round" />
-                                        </svg>
-                                        <span class="position-absolute top-50 start-50 translate-middle text-secondary-text fw-bold" id="score-keyword-text" style="font-size:0.55rem;">90%</span>
-                                    </div>
-                                </div>
+                                <div class="d-flex justify-content-between mb-1" style="font-size: 0.6rem; font-weight:700;"><span class="text-info">Keywords</span><span id="score-keyword-text">90%</span></div>
+                                <div class="progress mb-2" style="height: 4px;"><div class="progress-bar bg-info" style="width: 90%;"></div></div>
                                 
-                                <!-- Projects Score -->
-                                <div class="text-center">
-                                    <span class="d-block text-secondary" style="font-size: 0.55rem; font-weight:700; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="Project Quality">Projects</span>
-                                    <div class="position-relative mx-auto mt-1" style="width:42px; height:42px;">
-                                        <svg width="42" height="42" viewBox="0 0 36 36" class="circular-chart">
-                                          <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--bg-tertiary, #e2e8f0)" stroke-width="3.5" />
-                                          <path class="circle" id="circle-projects" stroke-dasharray="75, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#ec4899" stroke-width="3.5" stroke-linecap="round" />
-                                        </svg>
-                                        <span class="position-absolute top-50 start-50 translate-middle text-secondary-text fw-bold" id="score-projects-text" style="font-size:0.55rem;">75%</span>
-                                    </div>
-                                </div>
+                                <div class="d-flex justify-content-between mb-1" style="font-size: 0.6rem; font-weight:700;"><span class="text-pink">Projects</span><span id="score-projects-text">75%</span></div>
+                                <div class="progress" style="height: 4px;"><div class="progress-bar bg-pink" style="width: 75%;"></div></div>
                             </div>
-                        </div>
-
-                        <!-- Readability Score (Hidden from circular layout but preserved as hidden element for compatibility) -->
-                        <div style="display:none;">
-                            <span id="score-readability-text">85%</span>
-                            <div id="score-readability"></div>
                         </div>
 
                         <!-- Realtime Keyword checklist matching -->
-                        <div class="p-3 border rounded bg-secondary-card mb-3" style="border-color: var(--border-color) !important;">
-                            <span class="fw-bold text-secondary-text d-block mb-2" style="font-size:0.7rem; text-transform:uppercase;"><i class="fa-solid fa-satellite-dish text-cyan me-1"></i> Real-time Keyword Alignment Check</span>
-                            <div id="live-keywords-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap:6px;">
-                                <div class="live-keyword-item" id="kw-python" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Python</div>
-                                <div class="live-keyword-item" id="kw-flask" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Flask</div>
-                                <div class="live-keyword-item" id="kw-docker" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Docker</div>
-                                <div class="live-keyword-item" id="kw-wireshark" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Wireshark</div>
-                                <div class="live-keyword-item" id="kw-git" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> Git</div>
-                                <div class="live-keyword-item" id="kw-react" style="font-size:10.5px;"><i class="fa-solid fa-circle-notch"></i> React</div>
+                        <details class="mb-3 border rounded bg-secondary-card" open>
+                            <summary class="p-2 fw-bold text-secondary-text" style="font-size:0.75rem; cursor:pointer; list-style:none; border-bottom: 1px solid var(--border-color);"><i class="fa-solid fa-satellite-dish text-cyan me-1"></i> Keyword Alignment Check</summary>
+                            <div class="p-2" id="live-keywords-list" style="display:flex; flex-wrap:wrap; gap:6px;">
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25"><i class="fa-solid fa-check me-1"></i>Python</span>
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25"><i class="fa-solid fa-check me-1"></i>Flask</span>
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25"><i class="fa-solid fa-check me-1"></i>Docker</span>
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25"><i class="fa-regular fa-circle text-muted me-1"></i>Wireshark</span>
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25"><i class="fa-solid fa-check me-1"></i>Git</span>
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25"><i class="fa-solid fa-check me-1"></i>React</span>
                             </div>
-                        </div>
+                        </details>
 
-                    <!-- Phrasing Suggestions body -->
-                    <div class="flat-card border p-3 bg-secondary-card">
-                        <h4 class="fw-bold fs-6 mb-3 text-secondary-text"><i class="fa-solid fa-chart-bar text-muted me-2"></i> Checkpoints & Phrasing</h4>
-                        <div class="space-y-3" id="ats-analysis-body" style="font-size: 0.78rem;">
-                            <p class="text-muted text-center py-4">Click "ATS Analyze" in the toolbar to evaluate metrics.</p>
-                        </div>
+                        <!-- Phrasing Suggestions body -->
+                        <details class="border rounded bg-secondary-card" open>
+                            <summary class="p-2 fw-bold text-secondary-text" style="font-size:0.75rem; cursor:pointer; list-style:none; border-bottom: 1px solid var(--border-color);"><i class="fa-solid fa-chart-bar text-muted me-2"></i> Actionable Suggestions</summary>
+                            <div class="p-3" id="ats-analysis-body" style="font-size: 0.78rem;">
+                                <p class="text-muted text-center py-2 m-0">Click "ATS Analyze" in the toolbar to evaluate metrics.</p>
+                            </div>
+                        </details>
                     </div>
-                </div>
             </div>
             
             </div> <!-- Close preview-ats-container-desktop -->
@@ -707,13 +657,18 @@
         <div id="mobile-export-container" class="flat-card bg-secondary-card border p-3 mb-4 d-lg-none">
             <h4 class="fw-bold mb-3"><i class="fa-solid fa-file-export text-accent me-2"></i> Export & Share</h4>
             <div class="d-flex flex-column gap-2.5">
-                <button class="btn btn-primary w-100 py-2.5 fw-semibold" onclick="downloadResumePDF()"><i class="fa-solid fa-download me-2"></i> Download PDF</button>
+                <button class="btn w-100 py-2.5 fw-semibold text-white shadow" style="background: linear-gradient(135deg, var(--neon-blue), #8b5cf6); border: none;" onclick="downloadResumePDF()"><i class="fa-solid fa-download me-2"></i> Download PDF</button>
                 <button class="btn btn-outline-secondary w-100 py-2.5" onclick="downloadResumeDOCX()"><i class="fa-solid fa-file-word text-primary me-2"></i> Word (DOCX)</button>
                 <button class="btn btn-outline-secondary w-100 py-2.5" onclick="downloadResumeJSON()"><i class="fa-solid fa-file-code text-info me-2"></i> JSON Schema</button>
                 <button class="btn btn-outline-secondary w-100 py-2.5" onclick="generateShareLink()"><i class="fa-solid fa-share-nodes text-success me-2"></i> Generate Share Link</button>
                 <button class="btn btn-outline-secondary w-100 py-2.5" onclick="window.print()"><i class="fa-solid fa-print me-2"></i> Print Resume</button>
             </div>
         </div>
+        
+        <!-- Floating Download Button (Visible only on mobile/tablet) -->
+        <button id="floating-download-btn" class="btn d-lg-none rounded-circle shadow-lg d-flex align-items-center justify-content-center" style="position: fixed; bottom: 80px; right: 20px; width: 56px; height: 56px; background: linear-gradient(135deg, var(--neon-blue), #8b5cf6); border: none; color: white; z-index: 1040; transition: transform 0.2s;" onclick="downloadResumePDF()">
+            <i class="fa-solid fa-download" style="font-size: 1.3rem;"></i>
+        </button>
 
     </div>
 
@@ -726,20 +681,20 @@
         </div>
         
         <!-- Category Tab Buttons inside Modal -->
-        <div class="modal-tabs-header">
-            <button class="modal-tab-btn active" onclick="filterModalTemplates('original', this)">Original Templates</button>
-            <button class="modal-tab-btn" onclick="filterModalTemplates('ats', this)">ATS Standard</button>
-            <button class="modal-tab-btn" onclick="filterModalTemplates('modern', this)">Modern Premium</button>
-            <button class="modal-tab-btn" onclick="filterModalTemplates('professional', this)">Professional</button>
-            <button class="modal-tab-btn" onclick="filterModalTemplates('student', this)">Student CV</button>
-            <button class="modal-tab-btn" onclick="filterModalTemplates('internship', this)">Internships</button>
-            <button class="modal-tab-btn" onclick="filterModalTemplates('cyber', this)">Cyber Security</button>
-            <button class="modal-tab-btn" onclick="filterModalTemplates('ai', this)">AI/ML Engineer</button>
-            <button class="modal-tab-btn" onclick="filterModalTemplates('cloud', this)">Cloud Ops</button>
-            <button class="modal-tab-btn" onclick="filterModalTemplates('swe', this)">Software Eng</button>
-            <button class="modal-tab-btn" onclick="filterModalTemplates('minimal', this)">Minimalist</button>
-            <button class="modal-tab-btn" onclick="filterModalTemplates('executive', this)">Executive</button>
-            <button class="modal-tab-btn" onclick="filterModalTemplates('canva', this)">Canva Premium</button>
+        <div class="modal-tabs-header d-flex flex-nowrap gap-2 pb-2" style="overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none;">
+            <button class="modal-tab-btn active rounded-pill px-3 py-1.5" onclick="filterModalTemplates('original', this)" style="border: 1px solid var(--border-color); background: var(--bg-secondary);">Original</button>
+            <button class="modal-tab-btn rounded-pill px-3 py-1.5" onclick="filterModalTemplates('ats', this)" style="border: 1px solid var(--border-color); background: var(--bg-secondary);">ATS Standard</button>
+            <button class="modal-tab-btn rounded-pill px-3 py-1.5" onclick="filterModalTemplates('modern', this)" style="border: 1px solid var(--border-color); background: var(--bg-secondary);">Modern</button>
+            <button class="modal-tab-btn rounded-pill px-3 py-1.5" onclick="filterModalTemplates('professional', this)" style="border: 1px solid var(--border-color); background: var(--bg-secondary);">Professional</button>
+            <button class="modal-tab-btn rounded-pill px-3 py-1.5" onclick="filterModalTemplates('student', this)" style="border: 1px solid var(--border-color); background: var(--bg-secondary);">Student CV</button>
+            <button class="modal-tab-btn rounded-pill px-3 py-1.5" onclick="filterModalTemplates('internship', this)" style="border: 1px solid var(--border-color); background: var(--bg-secondary);">Internships</button>
+            <button class="modal-tab-btn rounded-pill px-3 py-1.5" onclick="filterModalTemplates('cyber', this)" style="border: 1px solid var(--border-color); background: var(--bg-secondary);">Cyber Security</button>
+            <button class="modal-tab-btn rounded-pill px-3 py-1.5" onclick="filterModalTemplates('ai', this)" style="border: 1px solid var(--border-color); background: var(--bg-secondary);">AI/ML</button>
+            <button class="modal-tab-btn rounded-pill px-3 py-1.5" onclick="filterModalTemplates('cloud', this)" style="border: 1px solid var(--border-color); background: var(--bg-secondary);">Cloud Ops</button>
+            <button class="modal-tab-btn rounded-pill px-3 py-1.5" onclick="filterModalTemplates('swe', this)" style="border: 1px solid var(--border-color); background: var(--bg-secondary);">Software Eng</button>
+            <button class="modal-tab-btn rounded-pill px-3 py-1.5" onclick="filterModalTemplates('minimal', this)" style="border: 1px solid var(--border-color); background: var(--bg-secondary);">Minimalist</button>
+            <button class="modal-tab-btn rounded-pill px-3 py-1.5" onclick="filterModalTemplates('executive', this)" style="border: 1px solid var(--border-color); background: var(--bg-secondary);">Executive</button>
+            <button class="modal-tab-btn rounded-pill px-3 py-1.5" onclick="filterModalTemplates('canva', this)" style="border: 1px solid var(--border-color); background: var(--bg-secondary);">Canva Premium</button>
         </div>
         
         <!-- Template Grid Container (Dynamically rendered cards) -->
@@ -2523,49 +2478,10 @@ async function downloadResumePDF() {
     }
     
     try {
-        // Strip out any UI elements (like edit buttons) from the sheet HTML before sending
-        const cleanSheet = sheet.cloneNode(true);
-        cleanSheet.querySelectorAll('.resume-canvas-toolbar, .resume-zoom-slider, .btn-canvas-ctrl, [data-no-pdf]').forEach(el => el.remove());
-        const previewHtml = cleanSheet.innerHTML;
-
-        const response = await fetch('/resume-analyzer/export-pdf', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
-            },
-            body: JSON.stringify({ content: content, theme: theme, preview_html: previewHtml })
-        });
-        
-        if (response.ok) {
-            const blob = await response.blob();
-            if (blob.size < 500) {
-                // Blank or near-empty PDF — fall back to client
-                console.warn("Server returned very small PDF, using client-side fallback.");
-                await clientSideFallback();
-            } else {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                const nameVal = (content.name || 'Resume').trim().replace(/\s+/g, '_');
-                a.download = `${nameVal}_Resume.pdf`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                window.URL.revokeObjectURL(url);
-            }
-        } else {
-            console.warn("Server-side PDF failed, using client-side fallback.");
-            await clientSideFallback();
-        }
+        await clientSideFallback();
     } catch (err) {
         console.error("PDF export error:", err);
-        try {
-            await clientSideFallback();
-        } catch (fallbackErr) {
-            console.error("Client-side fallback also failed:", fallbackErr);
-            alert("Failed to generate PDF. Please try again.");
-        }
+        alert("Failed to generate PDF. Please try again.");
     } finally {
         btns.forEach((btn, i) => {
             btn.disabled = false;
@@ -3300,26 +3216,49 @@ document.addEventListener("DOMContentLoaded", () => {
     display: none !important;
 }
 
-@media (max-width: 767.98px) {
+@media (max-width: 1023.98px) {
     .panel-divider {
         display: none !important;
     }
     .mobile-bottom-tabs-nav {
         display: flex !important;
         position: fixed;
-        bottom: 0;
         left: 0;
         right: 0;
-        height: 64px;
         background: var(--bg-secondary);
         backdrop-filter: blur(10px);
-        border-top: 1px solid var(--border-color);
         justify-content: space-around;
         align-items: center;
         z-index: 1500;
         box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
         padding: 0 10px;
     }
+    
+    /* Mobile: Bottom Tabs */
+    @media (max-width: 767.98px) {
+        .mobile-bottom-tabs-nav {
+            bottom: 0;
+            height: 64px;
+            border-top: 1px solid var(--border-color);
+        }
+    }
+    
+    /* Tablet: Top Tabs */
+    @media (min-width: 768px) {
+        .mobile-bottom-tabs-nav {
+            top: 64px; /* Below the main navbar */
+            height: 56px;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            /* Add horizontal layout for tablet */
+            justify-content: center;
+            gap: 20px;
+        }
+        .resume-workspace-wrapper {
+            padding-top: 56px !important; /* Offset for top tabs */
+        }
+    }
+
     .mobile-tab-item {
         display: flex;
         flex-direction: column;
@@ -3335,6 +3274,20 @@ document.addEventListener("DOMContentLoaded", () => {
         padding: 6px 0;
         cursor: pointer;
         transition: all 0.15s ease;
+    }
+    @media (min-width: 768px) {
+        .mobile-tab-item {
+            flex-direction: row;
+            font-size: 0.85rem;
+            gap: 8px;
+            flex: 0 1 auto;
+            padding: 0 15px;
+            height: 100%;
+            border-bottom: 2px solid transparent;
+        }
+        .mobile-tab-item.active {
+            border-bottom: 2px solid var(--accent-color);
+        }
     }
     .mobile-tab-item i {
         font-size: 1.05rem;
@@ -3451,7 +3404,6 @@ html, body, .main-with-sidebar, .dashboard-inner-container, .resume-workspace-wr
     }
     .resume-workspace-wrapper {
         display: grid !important;
-        grid-template-columns: 350px 8px 1fr !important;
         gap: 0 !important;
         height: 0 !important;
         min-height: 0 !important;
@@ -3476,6 +3428,26 @@ html, body, .main-with-sidebar, .dashboard-inner-container, .resume-workspace-wr
         height: 0 !important;
         flex-grow: 1 !important;
         min-height: 0 !important;
+    }
+}
+
+/* Base laptop layout: 2 columns (Editor + Preview/ATS) */
+@media (min-width: 1024px) {
+    .resume-workspace-wrapper {
+        grid-template-columns: 350px 8px 1fr !important;
+    }
+    .preview-ats-container-desktop {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 15px !important;
+        height: 100% !important;
+        overflow-y: auto !important;
+        padding-right: 5px;
+    }
+    .preview-ats-container-desktop #resume-preview-sheet-wrapper-parent {
+        flex: 1 1 500px !important; /* Minimum height for preview */
+        height: auto !important;
+        min-height: 500px !important;
     }
 }
 
@@ -3874,7 +3846,7 @@ html, body, .main-with-sidebar, .dashboard-inner-container, .resume-workspace-wr
     background: var(--accent-color, #0d9488);
 }
 
-/* ATS slide out drawer styles */
+/* ATS slide out drawer styles (default hidden on mobile/tablet) */
 .ats-slide-out-panel {
     position: fixed;
     top: 0;
@@ -3929,14 +3901,37 @@ body.dark .circle-bg {
     stroke: var(--bg-tertiary, #334155);
 }
 
-/* Ultra-wide side-by-side layout (>= 1400px) */
+/* Override slide-out on Laptop (1024px+) to stack it neatly underneath the preview */
+@media (min-width: 1024px) {
+    .ats-slide-out-panel {
+        position: static !important;
+        width: 100% !important;
+        height: auto !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 12px;
+        box-shadow: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+        background: var(--bg-secondary) !important;
+    }
+    .ats-drawer-close-btn {
+        display: none !important; /* Hide close button on laptop/desktop */
+    }
+    .ats-drawer-content {
+        height: auto !important;
+        overflow-y: visible !important;
+    }
+}
+
+/* Ultra-wide side-by-side layout (>= 1400px): TRUE 3-PANEL */
 @media (min-width: 1400px) {
     .preview-ats-container-desktop {
         display: grid !important;
-        grid-template-columns: 1fr 320px !important;
+        grid-template-columns: 1fr 340px !important;
         gap: 15px !important;
         height: 100% !important;
         overflow: hidden !important;
+        padding-right: 0 !important;
     }
     
     .preview-ats-container-desktop #resume-preview-sheet-wrapper-parent {
@@ -3945,21 +3940,13 @@ body.dark .circle-bg {
     }
     
     .ats-slide-out-panel {
-        position: static !important;
-        width: 100% !important;
         height: 100% !important;
-        box-shadow: none !important;
+        border: none !important;
         border-left: 1px solid var(--border-color) !important;
-        right: 0 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        background: var(--bg-secondary) !important;
+        border-radius: 0 !important;
+        margin-top: 0 !important;
+        overflow: hidden !important;
     }
-    
-    .ats-drawer-close-btn {
-        display: none !important; /* Hide close button on laptop views */
-    }
-    
     .ats-drawer-content {
         height: calc(100% - 50px) !important;
         overflow-y: auto !important;

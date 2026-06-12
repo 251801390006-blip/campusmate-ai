@@ -4,18 +4,7 @@ FROM python:3.12
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    libpango-1.0-0 \
-    libharfbuzz0b \
-    libpangoft2-1.0-0 \
-    libffi-dev \
-    libjpeg-dev \
-    libopenjp2-7-dev \
-    shared-mime-info \
-    && rm -rf /var/lib/apt/lists/*
-
+# Install system dependencies (None needed for lightweight app)
 # Copy requirements file
 COPY requirements.txt .
 

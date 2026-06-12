@@ -43,6 +43,59 @@
         background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(6, 182, 212, 0.1) 50%, transparent 100%);
     }
     
+    /* Live Wallpaper Text Effect */
+    .bg-marquee-container {
+        position: absolute;
+        top: 10%;
+        left: -10vw;
+        width: 150vw;
+        overflow: hidden;
+        z-index: 0;
+        transform: rotate(-6deg);
+        pointer-events: none;
+        opacity: 0.04;
+    }
+    body.dark .bg-marquee-container {
+        opacity: 0.02;
+    }
+    .bg-marquee-text {
+        display: inline-block;
+        white-space: nowrap;
+        font-size: 18rem;
+        font-weight: 900;
+        text-transform: uppercase;
+        color: var(--text-primary);
+        animation: scrollText 50s linear infinite;
+        letter-spacing: -0.05em;
+        line-height: 1;
+    }
+    @keyframes scrollText {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+    }
+
+    /* Immersive 3D Spline Background */
+    .spline-bg-container {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 60vw;
+        height: 100vh;
+        z-index: 0;
+        pointer-events: auto;
+        opacity: 0.9;
+        mask-image: linear-gradient(to right, transparent, black 30%);
+        -webkit-mask-image: linear-gradient(to right, transparent, black 30%);
+    }
+    @media (max-width: 991.98px) {
+        .spline-bg-container {
+            width: 100vw;
+            opacity: 0.4;
+            mask-image: none;
+            -webkit-mask-image: none;
+        }
+    }
+    
     .hero-badge {
         display: inline-flex;
         align-items: center;
@@ -350,15 +403,27 @@
 {% endblock %}
 
 {% block content %}
+<!-- Immersive 3D Spline Background -->
+<div class="spline-bg-container">
+    <spline-viewer url="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode" style="width: 100%; height: 100%; background: transparent;"></spline-viewer>
+</div>
+
+<!-- Live Wallpaper Scrolling Text -->
+<div class="bg-marquee-container">
+    <div class="bg-marquee-text">
+        STUDENT OS &bull; RESUME BUILDER &bull; ROADMAPS &bull; ATS CHECKER &bull; INTERNSHIPS &bull; STUDENT OS &bull; RESUME BUILDER &bull; ROADMAPS &bull; ATS CHECKER &bull; INTERNSHIPS &bull; 
+    </div>
+</div>
+
 <div class="container py-4 position-relative">
     <!-- Glowing background blobs -->
     <div class="glow-blob-1"></div>
     <div class="glow-blob-2"></div>
     
     <!-- Hero Block -->
-    <div class="row align-items-center py-5 g-5 position-relative" style="z-index: 10;">
+    <div class="row align-items-center py-5 g-5 position-relative" style="z-index: 10; min-height: 70vh;">
         <!-- Left Details -->
-        <div class="col-lg-6">
+        <div class="col-lg-7">
             <div class="hero-badge">
                 <span>🚀</span> Next-Gen Academic & Career Operating System
             </div>
@@ -375,16 +440,31 @@
                 <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg px-4" style="background: linear-gradient(135deg, var(--neon-blue), #8b5cf6); border: none; box-shadow: 0 4px 14px rgba(0, 120, 212, 0.35); border-radius: 8px;">
                     Create Free Account <i class="fa-solid fa-user-plus ms-1"></i>
                 </a>
-                <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-lg px-4" style="border-radius: 8px;">
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-lg px-4" style="border-radius: 8px; backdrop-filter: blur(10px); background: rgba(255,255,255,0.1);">
                     Sign In <i class="fa-solid fa-right-to-bracket ms-1"></i>
                 </a>
             </div>
         </div>
         
-        <!-- Right Image (Live 3D Visuals) -->
-        <div class="col-lg-6" style="height: 500px; display: flex; align-items: center; justify-content: center; position: relative; perspective: 1000px;">
-            <div style="width: 120%; height: 120%; position: absolute; right: -10%; z-index: 1; transform: scale(1.1) rotateY(-10deg);">
-                <spline-viewer url="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode" style="width: 100%; height: 100%; background: transparent;"></spline-viewer>
+        <!-- Right Details (Optional extra elements since Spline is now full BG) -->
+        <div class="col-lg-5 d-none d-lg-block" style="perspective: 1000px;">
+            <!-- Floating glass cards to add depth over the 3D background -->
+            <div class="hero-image-container ms-auto" style="width: 320px; border-radius: 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); transform: rotateY(-15deg) rotateX(10deg); box-shadow: -20px 20px 40px rgba(0,0,0,0.1);">
+                <div class="p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;color:white;font-size:1.2rem;">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h5 class="mb-0 fw-bold text-primary-text" style="font-size:0.9rem;">ATS Analyzer</h5>
+                            <small class="text-secondary">AI-Powered Scoring</small>
+                        </div>
+                    </div>
+                    <div class="progress mb-2" style="height: 6px; background: rgba(0,0,0,0.1);">
+                        <div class="progress-bar bg-success" style="width: 92%;"></div>
+                    </div>
+                    <small class="text-success fw-bold">92% Match</small>
+                </div>
             </div>
         </div>
     </div>
