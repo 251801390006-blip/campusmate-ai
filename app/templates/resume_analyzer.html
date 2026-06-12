@@ -156,7 +156,15 @@
         </div>
     </div>
 
-    <!-- Responsive Premium Layout Container -->
+    
+    <div class="tablet-top-nav d-none justify-content-center gap-2 mb-3 bg-secondary-card p-2 rounded shadow-sm container-fluid">
+        <button class="btn btn-outline flex-grow-1 active" onclick="switchMobileTab('edit', this)"><i class="fa-solid fa-pen-to-square"></i> Editor</button>
+        <button class="btn btn-outline flex-grow-1" onclick="switchMobileTab('preview', this)"><i class="fa-solid fa-file-lines"></i> Preview</button>
+        <button class="btn btn-outline flex-grow-1" onclick="switchMobileTab('ats', this)"><i class="fa-solid fa-gauge-high"></i> ATS</button>
+        <button class="btn btn-outline flex-grow-1" onclick="switchMobileTab('export', this)"><i class="fa-solid fa-download"></i> PDF</button>
+    </div>
+
+<!-- Responsive Premium Layout Container -->
     <div class="resume-workspace-wrapper tab-edit">
     
     <!-- Left Column: Scrollable Editor Sections (col-xl-5) -->
@@ -480,50 +488,8 @@
                 <button class="btn btn-sm btn-outline w-100 py-1.5" onclick="duplicateCurrentVersion()" title="Duplicate Draft"><i class="fa-solid fa-copy me-1"></i> Duplicate Version</button>
             </div>
         </div>
-    </div>
-
-    <!-- Panel Resizer Divider -->
-    <div id="panel-divider" class="panel-divider"></div>
-
-    <!-- Right Column: Visual Preview & ATS Panel (col-xl-7) -->
-    <div class="visual-viewer-column">
-        <div class="flat-card h-100 bg-secondary-card border d-flex flex-column" style="overflow-y: auto; overflow-x: hidden; padding: 15px;">
-
-            <!-- Before/After optimizations panel -->
-            <div class="flat-card border p-2 mb-3 bg-primary-card" id="before-after-card" style="display:none; border-color: rgba(16,185,129,0.2) !important;">
-                <div class="d-flex justify-content-between align-items-center mb-1">
-                    <span class="fw-bold text-success" style="font-size:0.65rem;"><i class="fa-solid fa-circle-check"></i> Phrasing Optimization applied!</span>
-                    <button class="btn-close" onclick="document.getElementById('before-after-card').style.display='none'" style="background:none; border:none; color:var(--text-secondary); cursor:pointer;"><i class="fa-solid fa-x"></i></button>
-                </div>
-                <div class="row g-2">
-                    <div class="col-6">
-                        <div class="p-1.5 border rounded bg-secondary-card" style="font-size:0.65rem;">
-                            <span class="text-danger d-block fw-bold mb-0.5">Original:</span>
-                            <div id="compare-original" class="text-secondary italic"></div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="p-1.5 border rounded bg-secondary-card" style="font-size:0.65rem;">
-                            <span class="text-success d-block fw-bold mb-0.5">Optimized:</span>
-                            <div id="compare-optimized" class="text-primary fw-semibold"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-
-            <!-- Share Link Container -->
-            <div id="share-link-container" class="mt-1 mb-3 p-3 border rounded bg-primary-card" style="display:none;">
-                <label class="form-label" style="font-size: 0.65rem;">Public Read-Only Portfolio URL</label>
-                <div class="d-flex gap-2">
-                    <input type="text" id="share-link-input" class="form-input" readonly>
-                    <button class="btn btn-sm btn-primary px-3 text-nowrap" onclick="copyShareLink()">Copy URL</button>
-                </div>
-            </div>
-
-            <!-- Desktop Download Options Toolbar -->
-            <div class="desktop-download-toolbar d-none d-lg-flex justify-content-between align-items-center mb-3 p-2.5 border rounded bg-primary-card" style="border-color: var(--border-color) !important;">
+    </div><div class="bottom-tools-container container-fluid mt-4 mb-5">
+<div class="desktop-download-toolbar d-none d-lg-flex justify-content-between align-items-center mb-3 p-2.5 border rounded bg-primary-card" style="border-color: var(--border-color) !important;">
                 <span class="fw-bold" style="font-size:0.75rem; color:var(--text-secondary);"><i class="fa-solid fa-cloud-arrow-down me-2 text-accent"></i> Download & Export Options</span>
                 <div class="d-flex gap-2">
                     <button class="btn btn-sm btn-primary py-1 px-3 fw-semibold text-nowrap" style="font-size: 0.72rem; height: 30px; display: inline-flex; align-items: center;" onclick="downloadResumePDF()"><i class="fa-solid fa-file-pdf me-1.5"></i> PDF</button>
@@ -532,48 +498,7 @@
                     <button class="btn btn-sm btn-outline py-1 px-3 text-nowrap" style="font-size: 0.72rem; height: 30px; display: inline-flex; align-items: center;" onclick="generateShareLink()"><i class="fa-solid fa-share-nodes text-success me-1.5"></i> Share</button>
                 </div>
             </div>
-
-            <!-- Wrapper for side-by-side preview and ATS diagnostics on desktop >= 1200px -->
-            <div class="preview-ats-container-desktop flex-grow-1 d-flex flex-column" style="min-height:0; width:100%;">
-                
-                <!-- Preview wrapper parent (A4 Resume render container) -->
-                <div id="resume-preview-sheet-wrapper-parent" style="position: relative; flex-grow:1; display:flex; flex-direction:column; min-height:0; width:100%;">
-                    <div class="resume-preview-sheet-wrapper border shadow-sm flex-grow-1" style="min-height:0; width:100%;">
-                        <div id="resume-sheet-scaler">
-                            <!-- A4 Sheet Paper -->
-                            <div class="resume-sheet classic" id="resume-sheet-paper" style="font-family: 'Outfit', sans-serif;">
-                                <div class="resume-render-header" style="border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px;">
-                                    <div style="flex-grow: 1;">
-                                        <h1 id="res-render-name" style="font-size: 22px; font-weight:800; color: #1e3a8a; margin-bottom: 4px; text-transform: uppercase;">Alex Smith</h1>
-                                        <div class="resume-render-meta" style="font-size: 10px; color: #4b5563; line-height: 1.4;">
-                                            <!-- Built dynamically in syncResumeFields -->
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div id="resume-sections-container">
-                                    <!-- Reordered dynamically -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Premium Floating Zoom & Fit Controls Toolbar -->
-                    <div class="resume-canvas-toolbar shadow-sm">
-                        <button class="btn-canvas-ctrl" onclick="zoomOutResume()" title="Zoom Out"><i class="fa-solid fa-minus"></i></button>
-                        <input type="range" id="resume-zoom-slider" min="30" max="250" value="100" class="canvas-zoom-slider" oninput="onZoomSliderChange(this.value)">
-                        <button class="btn-canvas-ctrl" onclick="zoomInResume()" title="Zoom In"><i class="fa-solid fa-plus"></i></button>
-                        <span id="resume-zoom-percent">100%</span>
-                        <div class="canvas-ctrl-divider"></div>
-                        <button class="btn-canvas-ctrl" onclick="fitResumeToWidth()" title="Fit to Width"><i class="fa-solid fa-arrows-left-right"></i> Fit Width</button>
-                        <button class="btn-canvas-ctrl" onclick="fitResumeToPage()" title="Fit to Page"><i class="fa-solid fa-arrows-up-down"></i> Fit Page</button>
-                        <button class="btn-canvas-ctrl" onclick="resetResumeZoom()" title="Reset Zoom"><i class="fa-solid fa-arrows-to-dot"></i></button>
-                        <button class="btn-canvas-ctrl" onclick="toggleFullScreenResume()" title="Full Screen"><i class="fa-solid fa-expand"></i></button>
-                    </div>
-                </div>
-
-                <!-- ATS Diagnostics & Scoring Panel (Compact Card Layout) -->
-                <div id="ats-dashboard-parent" class="ats-slide-out-panel">
+<div id="ats-dashboard-parent" class="ats-slide-out-panel">
                     <div class="ats-drawer-header">
                         <h4 class="fw-bold mb-0 text-secondary-text" style="font-size:0.95rem;"><i class="fa-solid fa-chart-line text-accent me-2"></i> ATS Scorecard</h4>
                         <button class="ats-drawer-close-btn" onclick="toggleAtsDrawer()"><i class="fa-solid fa-xmark"></i></button>
@@ -624,6 +549,92 @@
                         </details>
                     </div>
             </div>
+</div>
+
+    <!-- Panel Resizer Divider -->
+    <div id="panel-divider" class="panel-divider"></div>
+
+    <!-- Right Column: Visual Preview & ATS Panel (col-xl-7) -->
+    <div class="visual-viewer-column">
+        <div class="flat-card h-100 bg-secondary-card border d-flex flex-column" style="overflow-y: auto; overflow-x: hidden; padding: 15px;">
+
+            <!-- Before/After optimizations panel -->
+            <div class="flat-card border p-2 mb-3 bg-primary-card" id="before-after-card" style="display:none; border-color: rgba(16,185,129,0.2) !important;">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="fw-bold text-success" style="font-size:0.65rem;"><i class="fa-solid fa-circle-check"></i> Phrasing Optimization applied!</span>
+                    <button class="btn-close" onclick="document.getElementById('before-after-card').style.display='none'" style="background:none; border:none; color:var(--text-secondary); cursor:pointer;"><i class="fa-solid fa-x"></i></button>
+                </div>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <div class="p-1.5 border rounded bg-secondary-card" style="font-size:0.65rem;">
+                            <span class="text-danger d-block fw-bold mb-0.5">Original:</span>
+                            <div id="compare-original" class="text-secondary italic"></div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-1.5 border rounded bg-secondary-card" style="font-size:0.65rem;">
+                            <span class="text-success d-block fw-bold mb-0.5">Optimized:</span>
+                            <div id="compare-optimized" class="text-primary fw-semibold"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Share Link Container -->
+            <div id="share-link-container" class="mt-1 mb-3 p-3 border rounded bg-primary-card" style="display:none;">
+                <label class="form-label" style="font-size: 0.65rem;">Public Read-Only Portfolio URL</label>
+                <div class="d-flex gap-2">
+                    <input type="text" id="share-link-input" class="form-input" readonly>
+                    <button class="btn btn-sm btn-primary px-3 text-nowrap" onclick="copyShareLink()">Copy URL</button>
+                </div>
+            </div>
+
+            <!-- Desktop Download Options Toolbar -->
+            
+
+            <!-- Wrapper for side-by-side preview and ATS diagnostics on desktop >= 1200px -->
+            <div class="preview-ats-container-desktop flex-grow-1 d-flex flex-column" style="min-height:0; width:100%;">
+                
+                <!-- Preview wrapper parent (A4 Resume render container) -->
+                <div id="resume-preview-sheet-wrapper-parent" style="position: relative; flex-grow:1; display:flex; flex-direction:column; min-height:0; width:100%;">
+                    <div class="resume-preview-sheet-wrapper border shadow-sm flex-grow-1" style="min-height:0; width:100%;">
+                        <div id="resume-sheet-scaler">
+                            <!-- A4 Sheet Paper -->
+                            <div class="resume-sheet classic" id="resume-sheet-paper" style="font-family: 'Outfit', sans-serif;">
+                                <div class="resume-render-header" style="border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px;">
+                                    <div style="flex-grow: 1;">
+                                        <h1 id="res-render-name" style="font-size: 22px; font-weight:800; color: #1e3a8a; margin-bottom: 4px; text-transform: uppercase;">Alex Smith</h1>
+                                        <div class="resume-render-meta" style="font-size: 10px; color: #4b5563; line-height: 1.4;">
+                                            <!-- Built dynamically in syncResumeFields -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="resume-sections-container">
+                                    <!-- Reordered dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Premium Floating Zoom & Fit Controls Toolbar -->
+                    <div class="resume-canvas-toolbar shadow-sm">
+                        <button class="btn-canvas-ctrl" onclick="zoomOutResume()" title="Zoom Out"><i class="fa-solid fa-minus"></i></button>
+                        <input type="range" id="resume-zoom-slider" min="30" max="250" value="100" class="canvas-zoom-slider" oninput="onZoomSliderChange(this.value)">
+                        <button class="btn-canvas-ctrl" onclick="zoomInResume()" title="Zoom In"><i class="fa-solid fa-plus"></i></button>
+                        <span id="resume-zoom-percent">100%</span>
+                        <div class="canvas-ctrl-divider"></div>
+                        <button class="btn-canvas-ctrl" onclick="fitResumeToWidth()" title="Fit to Width"><i class="fa-solid fa-arrows-left-right"></i> Fit Width</button>
+                        <button class="btn-canvas-ctrl" onclick="fitResumeToPage()" title="Fit to Page"><i class="fa-solid fa-arrows-up-down"></i> Fit Page</button>
+                        <button class="btn-canvas-ctrl" onclick="resetResumeZoom()" title="Reset Zoom"><i class="fa-solid fa-arrows-to-dot"></i></button>
+                        <button class="btn-canvas-ctrl" onclick="toggleFullScreenResume()" title="Full Screen"><i class="fa-solid fa-expand"></i></button>
+                    </div>
+                </div>
+
+                <!-- ATS Diagnostics & Scoring Panel (Compact Card Layout) -->
+                
             
             </div> <!-- Close preview-ats-container-desktop -->
         </div> <!-- Close flat-card of visual-viewer-column -->
@@ -2509,7 +2520,75 @@ function downloadResumeDOCX() {
             table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
             td { vertical-align: top; }
         </style>
-    </head>
+    
+<style>
+/* ARCHITECTURE BREAKPOINTS CSS */
+.mobile-bottom-nav .btn-nav { color: var(--text-secondary); border: none; background: transparent; }
+.mobile-bottom-nav .btn-nav.active { color: var(--accent-color); }
+.tablet-top-nav .btn.active { background: var(--bg-primary); border-color: var(--accent-color); color: var(--text-primary); font-weight: bold; }
+
+.bottom-tools-container { width: 100%; max-width: 1400px; margin: 0 auto; }
+.bottom-tools-container .desktop-download-toolbar { display: flex !important; }
+
+/* Mobile (360px - 767px) */
+@media (max-width: 767px) {
+    .tablet-top-nav { display: none !important; }
+    .mobile-bottom-nav { display: flex !important; }
+    body { padding-bottom: 70px; }
+    
+    .resume-workspace-wrapper.tab-edit .visual-viewer-column, 
+    .resume-workspace-wrapper.tab-edit .bottom-tools-container { display: none !important; }
+    
+    .resume-workspace-wrapper.tab-preview .editor-form-column, 
+    .resume-workspace-wrapper.tab-preview .bottom-tools-container { display: none !important; }
+    
+    .resume-workspace-wrapper.tab-ats .editor-form-column, 
+    .resume-workspace-wrapper.tab-ats .visual-viewer-column { display: none !important; }
+    .resume-workspace-wrapper.tab-ats .bottom-tools-container .desktop-download-toolbar { display: none !important; }
+    
+    .resume-workspace-wrapper.tab-export .editor-form-column, 
+    .resume-workspace-wrapper.tab-export .visual-viewer-column { display: none !important; }
+    .resume-workspace-wrapper.tab-export .bottom-tools-container #ats-dashboard-parent { display: none !important; }
+}
+
+/* Tablet (768px - 1365px) */
+@media (min-width: 768px) and (max-width: 1365px) {
+    .mobile-bottom-nav { display: none !important; }
+    .tablet-top-nav { display: flex !important; }
+    
+    .resume-workspace-wrapper.tab-edit .visual-viewer-column, 
+    .resume-workspace-wrapper.tab-edit .bottom-tools-container { display: none !important; }
+    
+    .resume-workspace-wrapper.tab-preview .editor-form-column, 
+    .resume-workspace-wrapper.tab-preview .bottom-tools-container { display: none !important; }
+    
+    .resume-workspace-wrapper.tab-ats .editor-form-column, 
+    .resume-workspace-wrapper.tab-ats .visual-viewer-column { display: none !important; }
+    .resume-workspace-wrapper.tab-ats .bottom-tools-container .desktop-download-toolbar { display: none !important; }
+    
+    .resume-workspace-wrapper.tab-export .editor-form-column, 
+    .resume-workspace-wrapper.tab-export .visual-viewer-column { display: none !important; }
+    .resume-workspace-wrapper.tab-export .bottom-tools-container #ats-dashboard-parent { display: none !important; }
+}
+
+/* Laptop / Desktop (1366px+) */
+@media (min-width: 1366px) {
+    .mobile-bottom-nav, .tablet-top-nav { display: none !important; }
+    
+    .resume-workspace-wrapper {
+        display: flex;
+        flex-direction: row;
+        height: calc(100vh - 130px);
+        max-width: 1600px; margin: 0 auto;
+    }
+    .editor-form-column { width: 50%; max-width: 700px; display: block !important; }
+    .visual-viewer-column { width: 50%; flex: 1; display: block !important; }
+    .panel-divider { display: block !important; width: 6px; cursor: col-resize; background: var(--border-color); }
+    .bottom-tools-container { display: block !important; }
+}
+</style>
+
+</head>
     <body>
         <h1>${content.name || 'Alex Smith'}</h1>
         <div class="meta">
@@ -3954,3 +4033,26 @@ body.dark .circle-bg {
 }
 </style>
 {% endblock %}
+
+    <div class="mobile-bottom-nav d-flex justify-content-around align-items-center bg-primary-card border-top p-2" style="position:fixed; bottom:0; left:0; right:0; z-index:2000; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); display:none !important;">
+        <button class="btn btn-sm btn-nav d-flex flex-column align-items-center flex-grow-1 active" onclick="switchMobileTab('edit', this)"><i class="fa-solid fa-pen-to-square mb-1 fs-5"></i><span style="font-size:0.65rem;">Edit</span></button>
+        <button class="btn btn-sm btn-nav d-flex flex-column align-items-center flex-grow-1" onclick="switchMobileTab('preview', this)"><i class="fa-solid fa-file-lines mb-1 fs-5"></i><span style="font-size:0.65rem;">Preview</span></button>
+        <button class="btn btn-sm btn-nav d-flex flex-column align-items-center flex-grow-1" onclick="switchMobileTab('ats', this)"><i class="fa-solid fa-gauge-high mb-1 fs-5"></i><span style="font-size:0.65rem;">ATS</span></button>
+        <button class="btn btn-sm btn-nav d-flex flex-column align-items-center flex-grow-1" onclick="switchMobileTab('export', this)"><i class="fa-solid fa-download mb-1 fs-5"></i><span style="font-size:0.65rem;">PDF</span></button>
+    </div>
+
+<script>
+function switchMobileTab(tabName, btnElement) {
+    const wrapper = document.querySelector('.resume-workspace-wrapper');
+    wrapper.classList.remove('tab-edit', 'tab-preview', 'tab-ats', 'tab-export', 'tab-templates');
+    wrapper.classList.add('tab-' + tabName);
+    
+    document.querySelectorAll('.mobile-bottom-nav button, .tablet-top-nav button').forEach(btn => {
+        if(btn.onclick.toString().includes("'" + tabName + "'")) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+}
+</script>
