@@ -42,6 +42,7 @@ def register():
             flash('Username or Email is already registered.', 'danger')
             return render_template('register.html', form=form)
             
+        from app.models import RoadmapProgress
         new_user = User(
             username=form.username.data,
             email=form.email.data,
@@ -49,11 +50,38 @@ def register():
             is_active=True
         )
         new_user.set_password(form.password.data)
+        
+        # Capture onboarding stepper details
+        name = request.form.get('name')
+        branch = request.form.get('branch')
+        year = request.form.get('year')
+        career_goal = request.form.get('career_goal')
+        
+        new_user.name = name or form.username.data
+        new_user.branch = branch or "Computer Science"
+        new_user.year = year or "1st Year"
+        new_user.career_goal = career_goal or "Full Stack Development"
+        new_user.interests = f"Software development and engineering in {career_goal or 'Full Stack Development'}"
+        new_user.daily_study_time = "2 hours/day"
+        new_user.skills = ""
+        new_user.onboarded = True
+        new_user.xp = 100
+        new_user.learning_streak = 1
+        
         db.session.add(new_user)
         db.session.commit()
         
+        # Seed the RoadmapProgress for this new user
+        new_prog = RoadmapProgress(
+            user_id=new_user.id,
+            role=new_user.career_goal,
+            completed_nodes=""
+        )
+        db.session.add(new_prog)
+        db.session.commit()
+        
         login_user(new_user)
-        flash('Account created successfully!', 'success')
+        flash('Welcome to CampusMate AI! Your career workspace has been generated.', 'success')
         return redirect(url_for('dashboard.home'))
         
     return render_template('register.html', form=form)

@@ -2804,10 +2804,75 @@ def export_pdf():
     try:
         data = request.get_json() or {}
         content = data.get('content', {})
-        theme = data.get('theme', 'ats-modern')
+        theme = data.get('theme', 'classic')
+        preview_html = data.get('preview_html')
         
-        # Always use the clean, structured ATS template builder for server-side PDF generation to ensure perfect format and fit
-        html_content = render_resume_pdf_html(content, theme)
+        if preview_html:
+            import os
+            # Read styles from style.css
+            css_path = os.path.join(current_app.root_path, 'static', 'css', 'style.css')
+            css_content = ""
+            if os.path.exists(css_path):
+                with open(css_path, 'r', encoding='utf-8') as f:
+                    css_content = f.read()
+                    
+            # WeasyPrint layout and pagination styles
+            pdf_styles = """
+            @page {
+                size: a4;
+                margin: 0;
+            }
+            body {
+                margin: 0;
+                padding: 0;
+                background: #ffffff !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .resume-sheet {
+                width: 210mm !important;
+                min-height: 297mm !important;
+                box-shadow: none !important;
+                border: none !important;
+                border-radius: 0 !important;
+                margin: 0 auto !important;
+                padding: 15mm !important;
+                box-sizing: border-box !important;
+                position: relative !important;
+                transform: none !important;
+                overflow: visible !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+            }
+            /* Avoid page breaks inside sections */
+            .resume-section, .resume-render-section, [data-section] {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            """
+            
+            html_content = f"""<!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <link rel="preconnect" href="https://fonts.googleapis.com">
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+                <style>
+                    {css_content}
+                    {pdf_styles}
+                </style>
+            </head>
+            <body>
+                <div class="resume-sheet {theme}">
+                    {preview_html}
+                </div>
+            </body>
+            </html>
+            """
+        else:
+            html_content = render_resume_pdf_html(content, theme)
         
         if weasyprint is not None:
             # Generate PDF using WeasyPrint

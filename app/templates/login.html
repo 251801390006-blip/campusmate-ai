@@ -110,6 +110,12 @@
     box-shadow:0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05) inset;
     position:relative; overflow:hidden;
     animation:cardSlideIn 0.6s ease-out;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.auth-glass-card:hover {
+    transform: translateY(-5px) scale(1.01);
+    box-shadow: 0 40px 100px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.08) inset;
+    border-color: rgba(255,255,255,0.18);
 }
 @keyframes cardSlideIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
 
@@ -270,8 +276,8 @@
                     <i class="fa-solid fa-route"></i>
                 </div>
                 <div class="tx">
-                    <strong>50+ Career Track Roadmaps</strong>
-                    <span>200+ visual milestones with certifications & projects</span>
+                    <strong>Roadmaps</strong>
+                    <span>50+ engineering roadmaps with visual milestones & study guides</span>
                 </div>
             </div>
             <div class="fp">
@@ -279,17 +285,17 @@
                     <i class="fa-solid fa-file-invoice"></i>
                 </div>
                 <div class="tx">
-                    <strong>AI Resume Builder & ATS Scorer</strong>
-                    <span>Real-time keyword matching & PDF downloads</span>
+                    <strong>Resume Builder</strong>
+                    <span>Create ATS-optimized resumes that match live preview exactly</span>
                 </div>
             </div>
             <div class="fp">
                 <div class="ic" style="background:rgba(244,63,94,0.15); color:#fb7185;">
-                    <i class="fa-solid fa-microphone"></i>
+                    <i class="fa-solid fa-briefcase"></i>
                 </div>
                 <div class="tx">
-                    <strong>Live Interview Simulator</strong>
-                    <span>Voice-enabled FAANG-level mock interviews</span>
+                    <strong>Internships</strong>
+                    <span>Apply for 100+ programmatically seeded tech internships</span>
                 </div>
             </div>
             <div class="fp">
@@ -297,8 +303,8 @@
                     <i class="fa-solid fa-wand-magic-sparkles"></i>
                 </div>
                 <div class="tx">
-                    <strong>Smart AI Actions</strong>
-                    <span>Generate study plans, cert guidelines & readiness reports</span>
+                    <strong>Portfolio Builder</strong>
+                    <span>Generate beautiful, recruiter-ready student portfolios with one click</span>
                 </div>
             </div>
 

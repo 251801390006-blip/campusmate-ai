@@ -10,18 +10,22 @@ feedback_bp = Blueprint('feedback', __name__, url_prefix='/feedback')
 def list_feedback():
     form = FeedbackForm()
     if form.validate_on_submit():
-        new_item = FeedbackItem(
-            user_id=current_user.id,
-            title=form.title.data,
-            content=form.content.data,
-            category=form.category.data,
-            is_public=form.is_public.data,
-            status='open'
-        )
-        db.session.add(new_item)
-        db.session.commit()
-        flash('Your feedback has been submitted successfully!', 'success')
-        return redirect(url_for('feedback.list_feedback'))
+        try:
+            new_item = FeedbackItem(
+                user_id=current_user.id,
+                title=form.title.data,
+                content=form.content.data,
+                category=form.category.data,
+                is_public=form.is_public.data,
+                status='open'
+            )
+            db.session.add(new_item)
+            db.session.commit()
+            flash('Your feedback has been submitted successfully!', 'success')
+            return redirect(url_for('feedback.list_feedback'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Database error submitting feedback: {str(e)}', 'danger')
         
     # Query public suggestions
     suggestions = FeedbackItem.query.filter_by(is_public=True).order_by(FeedbackItem.created_at.desc()).all()
@@ -56,15 +60,19 @@ def detail(item_id):
             flash('This ticket is resolved. Standard users cannot reply to resolved tickets.', 'danger')
             return redirect(url_for('feedback.detail', item_id=item.id))
             
-        new_reply = FeedbackReply(
-            feedback_item_id=item.id,
-            user_id=current_user.id,
-            content=reply_form.content.data
-        )
-        db.session.add(new_reply)
-        db.session.commit()
-        flash('Reply posted successfully.', 'success')
-        return redirect(url_for('feedback.detail', item_id=item.id))
+        try:
+            new_reply = FeedbackReply(
+                feedback_item_id=item.id,
+                user_id=current_user.id,
+                content=reply_form.content.data
+            )
+            db.session.add(new_reply)
+            db.session.commit()
+            flash('Reply posted successfully.', 'success')
+            return redirect(url_for('feedback.detail', item_id=item.id))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Database error posting reply: {str(e)}', 'danger')
         
     replies = FeedbackReply.query.filter_by(feedback_item_id=item.id).order_by(FeedbackReply.created_at.asc()).all()
     return render_template('feedback_detail.html', item=item, replies=replies, reply_form=reply_form, can_reply=can_reply)
@@ -78,7 +86,11 @@ def toggle_status(item_id):
     if current_user.role != 'admin' and item.user_id != current_user.id:
         abort(403)
         
-    item.status = 'resolved' if item.status == 'open' else 'open'
-    db.session.commit()
-    flash(f"Ticket status marked as {item.status.upper()}.", "success")
+    try:
+        item.status = 'resolved' if item.status == 'open' else 'open'
+        db.session.commit()
+        flash(f"Ticket status marked as {item.status.upper()}.", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Database error changing status: {str(e)}", "danger")
     return redirect(url_for('feedback.detail', item_id=item.id))

@@ -143,9 +143,13 @@ def delete_user(user_id):
         flash("Administrators cannot be deleted.", "danger")
         return redirect(url_for('admin.dashboard'))
         
-    db.session.delete(user)
-    db.session.commit()
-    flash(f"User {user.username} deleted successfully.", "success")
+    try:
+        db.session.delete(user)
+        db.session.commit()
+        flash(f"User {user.username} deleted successfully.", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Database error deleting user: {str(e)}", "danger")
     return redirect(url_for('admin.dashboard'))
 
 # Emergency Database Control (Reset Database & Seed default users)
@@ -227,10 +231,14 @@ def change_user_role(user_id):
         
     new_role = request.form.get('role')
     if new_role in ['student', 'mentor', 'admin', 'user']:
-        # Map generic 'user' selection to student role
-        user.role = 'user' if new_role == 'student' else new_role
-        db.session.commit()
-        flash(f"User {user.username} role updated to {new_role.upper()}.", "success")
+        try:
+            # Map generic 'student' selection to standard user role
+            user.role = 'user' if new_role == 'student' else new_role
+            db.session.commit()
+            flash(f"User {user.username} role updated to {new_role.upper()}.", "success")
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Database error updating user role: {str(e)}", "danger")
     else:
         flash("Invalid role selection.", "danger")
         
@@ -247,21 +255,25 @@ def update_referral(review_id):
     suggested_improvements = request.form.get('suggested_improvements', '')
     
     if status in ['approved', 'rejected', 'pending']:
-        review.status = status
-        review.feedback = feedback
-        review.suggested_improvements = suggested_improvements
-        db.session.commit()
-        
-        # Notify the user
-        notif = Notification(
-            user_id=review.user_id,
-            title=f"Referral Review Update: {status.upper()} 📝",
-            content=f"Your referral request for Job #{review.job_id} has been reviewed. Status: {status.upper()}. Feedback: {feedback}",
-            category="alert"
-        )
-        db.session.add(notif)
-        db.session.commit()
-        flash("Referral review updated and student notified!", "success")
+        try:
+            review.status = status
+            review.feedback = feedback
+            review.suggested_improvements = suggested_improvements
+            db.session.commit()
+            
+            # Notify the user
+            notif = Notification(
+                user_id=review.user_id,
+                title=f"Referral Review Update: {status.upper()} 📝",
+                content=f"Your referral request for Job #{review.job_id} has been reviewed. Status: {status.upper()}. Feedback: {feedback}",
+                category="alert"
+            )
+            db.session.add(notif)
+            db.session.commit()
+            flash("Referral review updated and student notified!", "success")
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Database error updating referral: {str(e)}", "danger")
     else:
         flash("Invalid status selected.", "danger")
         
@@ -282,17 +294,21 @@ def broadcast_announcement():
         return redirect(url_for('admin.dashboard'))
         
     if target_user_id == "all":
-        users = User.query.filter_by(role='user').all()
-        for u in users:
-            notif = Notification(
-                user_id=u.id,
-                title=title,
-                content=content,
-                category=category
-            )
-            db.session.add(notif)
-        db.session.commit()
-        flash("Successfully broadcasted announcement to all students!", "success")
+        try:
+            users = User.query.filter_by(role='user').all()
+            for u in users:
+                notif = Notification(
+                    user_id=u.id,
+                    title=title,
+                    content=content,
+                    category=category
+                )
+                db.session.add(notif)
+            db.session.commit()
+            flash("Successfully broadcasted announcement to all students!", "success")
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Database error broadcasting announcement: {str(e)}", "danger")
     else:
         try:
             uid = int(target_user_id)
@@ -307,6 +323,9 @@ def broadcast_announcement():
             flash(f"Successfully sent announcement to user #{uid}!", "success")
         except ValueError:
             flash("Invalid target user selected.", "danger")
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Database error sending announcement: {str(e)}", "danger")
             
     return redirect(url_for('admin.dashboard'))
 
@@ -328,22 +347,26 @@ def add_internship():
     official_link = request.form.get('official_link', '')
     is_pinned = 'is_pinned' in request.form
     
-    new_job = Internship(
-        company_name=company_name,
-        company_logo=company_logo,
-        role=role,
-        internship_type=internship_type,
-        location_type=location_type,
-        skills_required=skills_required,
-        eligibility=eligibility,
-        stipend=stipend,
-        deadline=deadline,
-        official_link=official_link,
-        is_pinned=is_pinned
-    )
-    db.session.add(new_job)
-    db.session.commit()
-    flash("New internship listing added successfully!", "success")
+    try:
+        new_job = Internship(
+            company_name=company_name,
+            company_logo=company_logo,
+            role=role,
+            internship_type=internship_type,
+            location_type=location_type,
+            skills_required=skills_required,
+            eligibility=eligibility,
+            stipend=stipend,
+            deadline=deadline,
+            official_link=official_link,
+            is_pinned=is_pinned
+        )
+        db.session.add(new_job)
+        db.session.commit()
+        flash("New internship listing added successfully!", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Database error adding internship: {str(e)}", "danger")
     return redirect(url_for('admin.dashboard'))
 
 
@@ -353,20 +376,24 @@ def add_internship():
 def edit_internship(job_id):
     from app.models import Internship
     job = Internship.query.get_or_404(job_id)
-    job.company_name = request.form.get('company_name')
-    job.company_logo = request.form.get('company_logo', 'fa-solid fa-briefcase')
-    job.role = request.form.get('role')
-    job.internship_type = request.form.get('internship_type', 'Summer')
-    job.location_type = request.form.get('location_type', 'Remote')
-    job.skills_required = request.form.get('skills_required', '')
-    job.eligibility = request.form.get('eligibility', '')
-    job.stipend = request.form.get('stipend', '')
-    job.deadline = request.form.get('deadline', '')
-    job.official_link = request.form.get('official_link', '')
-    job.is_pinned = 'is_pinned' in request.form
-    
-    db.session.commit()
-    flash("Internship listing updated successfully!", "success")
+    try:
+        job.company_name = request.form.get('company_name')
+        job.company_logo = request.form.get('company_logo', 'fa-solid fa-briefcase')
+        job.role = request.form.get('role')
+        job.internship_type = request.form.get('internship_type', 'Summer')
+        job.location_type = request.form.get('location_type', 'Remote')
+        job.skills_required = request.form.get('skills_required', '')
+        job.eligibility = request.form.get('eligibility', '')
+        job.stipend = request.form.get('stipend', '')
+        job.deadline = request.form.get('deadline', '')
+        job.official_link = request.form.get('official_link', '')
+        job.is_pinned = 'is_pinned' in request.form
+        
+        db.session.commit()
+        flash("Internship listing updated successfully!", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Database error editing internship: {str(e)}", "danger")
     return redirect(url_for('admin.dashboard'))
 
 
@@ -376,9 +403,13 @@ def edit_internship(job_id):
 def delete_internship(job_id):
     from app.models import Internship
     job = Internship.query.get_or_404(job_id)
-    db.session.delete(job)
-    db.session.commit()
-    flash("Internship listing deleted.", "info")
+    try:
+        db.session.delete(job)
+        db.session.commit()
+        flash("Internship listing deleted.", "info")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Database error deleting internship: {str(e)}", "danger")
     return redirect(url_for('admin.dashboard'))
 
 
@@ -388,9 +419,13 @@ def delete_internship(job_id):
 def pin_internship(job_id):
     from app.models import Internship
     job = Internship.query.get_or_404(job_id)
-    job.is_pinned = not job.is_pinned
-    db.session.commit()
-    flash(f"Internship pin {'enabled' if job.is_pinned else 'disabled'}.", "success")
+    try:
+        job.is_pinned = not job.is_pinned
+        db.session.commit()
+        flash(f"Internship pin {'enabled' if job.is_pinned else 'disabled'}.", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Database error pinning internship: {str(e)}", "danger")
     return redirect(url_for('admin.dashboard'))
 
 
