@@ -1986,27 +1986,7 @@ def apply_internship():
     return jsonify({"success": True, "message": "Your referral review request has been routed to the admin panel!"})
 
 
-@features_bp.route('/portfolio-builder/publish', methods=['POST'])
-@login_required
-def portfolio_builder_publish():
-    data = request.get_json() or {}
-    html = data.get('html')
-    if not html:
-        return jsonify({"success": False, "error": "HTML content is required"}), 400
-        
-    current_user.published_portfolio_html = html
-    db.session.commit()
-    
-    public_url = url_for('features.public_portfolio', username=current_user.username, _external=True)
-    return jsonify({"success": True, "public_url": public_url})
 
-
-@features_bp.route('/published-portfolio/<username>', methods=['GET'])
-def public_portfolio(username):
-    user = User.query.filter_by(username=username).first()
-    if not user or not user.published_portfolio_html:
-        abort(404)
-    return user.published_portfolio_html
 
 
 # --- RESUME 5.0 THEMES & EXPORT ENDPOINTS ---
