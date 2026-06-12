@@ -2867,8 +2867,8 @@ def export_resume_pdf():
     try:
         from weasyprint import HTML, CSS
         from weasyprint.text.fonts import FontConfiguration
-    except ImportError:
-        return jsonify({'error': 'PDF engine (WeasyPrint) not installed.'}), 500
+    except Exception as e:
+        return jsonify({'error': 'PDF engine (WeasyPrint) not installed.', 'details': str(e)}), 500
 
     data = request.get_json()
     if not data or 'html' not in data:
@@ -2976,7 +2976,7 @@ def export_resume_pdf_debug():
     try:
         from weasyprint import HTML, CSS
         from weasyprint.text.fonts import FontConfiguration
-    except ImportError as e:
+    except Exception as e:
         return jsonify({'error': 'PDF engine (WeasyPrint) not installed.', 'details': str(e)}), 500
 
     data = request.get_json()

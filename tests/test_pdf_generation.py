@@ -1,22 +1,38 @@
 import pytest
+import sys
+from unittest.mock import MagicMock
+
+# Mock weasyprint for local testing if external binary dependencies are missing
+mock_weasyprint = MagicMock()
+mock_html = MagicMock()
+mock_html.return_value.write_pdf.return_value = b"%PDF-1.4 mock content"
+mock_weasyprint.HTML = mock_html
+mock_weasyprint.CSS = MagicMock()
+sys.modules['weasyprint'] = mock_weasyprint
+
+mock_text_fonts = MagicMock()
+mock_text_fonts.FontConfiguration = MagicMock()
+sys.modules['weasyprint.text.fonts'] = mock_text_fonts
+
 from app import create_app
 from app.models import db, User
 import json
 
 @pytest.fixture
-def client():
+def client(monkeypatch):
+    monkeypatch.setenv('DATABASE_URL', 'sqlite:///:memory:')
     app = create_app()
     app.config['TESTING'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
     app.config['WTF_CSRF_ENABLED'] = False
     
     with app.test_client() as client:
         with app.app_context():
             db.create_all()
-            user = User(email="test@example.com", username="testuser")
-            user.set_password("password")
-            db.session.add(user)
-            db.session.commit()
+            if not User.query.filter_by(email="test@example.com").first():
+                user = User(email="test@example.com", username="testuser")
+                user.set_password("password")
+                db.session.add(user)
+                db.session.commit()
         yield client
 
 def test_pdf_generation_success(client):
