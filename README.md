@@ -6,6 +6,14 @@
 [![Flask Version](https://img.shields.io/badge/Flask-3.0.3-009688?style=flat-square&logo=flask)](https://flask.palletsprojects.com/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/251801390006-blip/campusmate-ai?style=flat-square)](https://github.com/251801390006-blip/campusmate-ai/stargazers)
+---
+
+## 🏆 Microsoft Hackathon Submission
+Welcome Judges! CampusMate AI is fully ready for your review. Please see our official evaluation resources:
+- [Architecture Diagram](./ARCHITECTURE.md)
+- [System Workflow](./WORKFLOW.md)
+- [Demo Video Checklist](./DEMO_CHECKLIST.md)
+- [Judge Evaluation Rubric](./JUDGE_RUBRIC.md)
 
 ---
 
