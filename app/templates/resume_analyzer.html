@@ -2857,6 +2857,13 @@ async function loadVersionsFromCloud() {
                     historyPane.appendChild(card);
                 }
             });
+            if (data.versions.length > 0) {
+                const currentVal = select.value;
+                if (currentVal === "new" || !currentVal) {
+                    select.value = data.versions[0].id;
+                    handleVersionChange();
+                }
+            }
             loadCompareVersions();
         }
     } catch(e) {
@@ -3102,7 +3109,7 @@ async function downloadResumePDF() {
             btn.innerHTML = originals[i] || `<i class="fa-solid fa-download me-1"></i> Download PDF`;
         });
     }
-}}
+}
 
 
 // Export DOCX (Word File)
@@ -4072,36 +4079,78 @@ document.addEventListener("DOMContentLoaded", () => {
     margin-bottom: 4px;
 }
 
-.form-input {
-    width: 100%;
-    background-color: var(--bg-primary);
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
-    border-radius: 6px;
-    padding: 8px 12px;
-    font-size: 0.8rem;
-    box-sizing: border-box;
-    transition: border-color 0.2s;
-}
-
-.form-input:focus {
-    outline: none;
-    border-color: var(--accent-color);
-}
-
+/* Pro-Level Edit Sidebar Upgrades */
 .accordion-section {
-    transition: border-color 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    border-color: rgba(148, 163, 184, 0.15) !important;
+    border-radius: 12px !important;
+    overflow: hidden;
 }
-
+.accordion-section:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-color: rgba(148, 163, 184, 0.3) !important;
+    transform: translateY(-1px);
+}
 .accordion-section summary {
+    font-size: 0.82rem;
     font-weight: 700;
-    user-select: none;
-    outline: none;
-    padding: 2px 0;
+    padding: 10px 12px;
+    margin: -8px;
+    background: var(--primary-card);
+    transition: background-color 0.2s, color 0.2s;
+    border-radius: 12px;
 }
-
+.accordion-section[open] summary {
+    border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    background: rgba(139, 92, 246, 0.03);
+    color: var(--accent-color);
+}
 .accordion-section[open] {
     border-color: var(--accent-color) !important;
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.1);
+    background: var(--primary-card);
+}
+.form-input {
+    width: 100%;
+    border-radius: 8px !important;
+    border: 1px solid rgba(148, 163, 184, 0.3) !important;
+    font-size: 0.8rem;
+    padding: 8px 12px !important;
+    transition: all 0.2s ease;
+    background: var(--primary-card) !important;
+    color: var(--text-primary) !important;
+    box-sizing: border-box;
+}
+.form-input:focus {
+    outline: none;
+    border-color: var(--accent-color) !important;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15) !important;
+}
+.form-label {
+    font-weight: 600 !important;
+    color: var(--text-secondary) !important;
+    margin-bottom: 4px;
+    font-size: 0.68rem !important;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+.btn-ai-optimize {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1)) !important;
+    border: 1px dashed var(--accent-color) !important;
+    color: var(--accent-color) !important;
+    border-radius: 6px !important;
+    font-weight: 600;
+    padding: 6px 12px !important;
+    transition: all 0.2s ease;
+}
+.btn-ai-optimize:hover {
+    background: linear-gradient(135deg, var(--accent-color), #3b82f6) !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+    border-style: solid !important;
 }
 
 .resume-preview-sheet-wrapper {
