@@ -3057,6 +3057,32 @@ function runVersionComparison() {
     historyPane.innerHTML = historyHtml;
 }
 
+async function ensureHtml2PdfLoaded() {
+    if (typeof html2pdf !== 'undefined') return true;
+    
+    const cdns = [
+        "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js",
+        "https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js",
+        "https://unpkg.com/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"
+    ];
+    
+    for (const cdn of cdns) {
+        try {
+            await new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = cdn;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+            if (typeof html2pdf !== 'undefined') return true;
+        } catch (e) {
+            console.warn(`Failed to load html2pdf from ${cdn}`);
+        }
+    }
+    return false;
+}
+
 // Server-side PDF export trigger (WeasyPrint on server, html2pdf.js fallback on client)
 async function downloadResumePDF() {
     const btns = document.querySelectorAll('button[onclick="downloadResumePDF()"]');
@@ -3068,6 +3094,10 @@ async function downloadResumePDF() {
     });
     
     try {
+        const isLoaded = await ensureHtml2PdfLoaded();
+        if (!isLoaded) {
+            throw new Error("html2pdf library could not be loaded. Please disable adblockers or check your connection.");
+        }
         const content = getFormContent();
         
         const resetButtons = () => {
