@@ -31,12 +31,15 @@ class User(db.Model, UserMixin):
     
     # Profile Extensions
     name = db.Column(db.String(100), nullable=True)
+    college = db.Column(db.String(150), nullable=True)
     avatar = db.Column(db.String(200), nullable=True, default='avatar-1.png')
     bio = db.Column(db.Text, nullable=True)
     profile_photo = db.Column(db.String(255), nullable=True)
     published_portfolio_html = db.Column(db.Text, nullable=True)
     public_profile = db.Column(db.Boolean, default=True, nullable=False)
     notifications_enabled = db.Column(db.Boolean, default=True, nullable=False)
+    roles = db.Column(db.String(200), nullable=True)
+    domains = db.Column(db.String(200), nullable=True)
 
     
     # Relationships

@@ -201,8 +201,10 @@ def settings():
             bio = request.form.get('bio')
             branch = request.form.get('branch')
             year = request.form.get('year')
+            college = request.form.get('college')
             skills = request.form.get('skills')
-            goals = request.form.get('goals')
+            roles = request.form.get('roles')
+            domains = request.form.get('domains')
             email = request.form.get('email')
             
             if email:
@@ -216,8 +218,10 @@ def settings():
             current_user.bio = bio
             current_user.branch = branch
             current_user.year = year
+            current_user.college = college
             current_user.skills = skills
-            current_user.career_goal = goals
+            current_user.roles = roles
+            current_user.domains = domains
             db.session.commit()
             flash("Profile settings updated successfully!", "success")
         else:

@@ -1619,47 +1619,101 @@ def interview_prep():
     
     return render_template('interview_prep.html', user_track=user_track, tracks=tracks)
 
+@features_bp.route('/interview-prep/generate', methods=['POST'])
+@login_required
+def interview_prep_generate():
+    data = request.get_json() or {}
+    role = data.get('role', 'Software Engineering')
+    difficulty = data.get('difficulty', 'Intermediate')
+    company = data.get('company', 'General')
+    custom_key = data.get('custom_key', '').strip()
+
+    system_prompt = (
+        "You are an expert Technical Interviewer. Generate exactly 5 highly realistic interview questions "
+        "tailored to the candidate's profile. "
+        "Return ONLY a valid JSON array of strings containing the questions. Do not use markdown blocks."
+    )
+    user_prompt = f"Role: {role}\nDifficulty: {difficulty}\nCompany Focus: {company}\nGenerate 5 questions covering HR, technical, and situational aspects."
+
+    ai_res = call_gemini(system_prompt, user_prompt, user_key=custom_key)
+    
+    questions = [
+        "Can you introduce yourself and walk me through your technical background?",
+        f"What motivated you to apply for a {role} position at {company}?",
+        "Describe a challenging technical problem you solved recently.",
+        "How do you handle disagreements with team members regarding technical architecture?",
+        "Where do you see your career progressing in the next three years?"
+    ]
+
+    if ai_res:
+        try:
+            json_match = re.search(r'\[.*\]', ai_res, re.DOTALL)
+            if json_match:
+                parsed = json.loads(json_match.group(0))
+                if isinstance(parsed, list) and len(parsed) > 0:
+                    questions = parsed
+        except Exception as e:
+            print("Error parsing interview questions:", e)
+
+    return jsonify({"success": True, "questions": questions})
+
 @features_bp.route('/interview-prep/evaluate', methods=['POST'])
 @login_required
 def interview_prep_evaluate():
     data = request.get_json() or {}
-    question = data.get('question', '')
-    answer = data.get('answer', '')
+    transcript = data.get('transcript', [])
     custom_key = data.get('custom_key', '').strip()
     
-    if not answer:
-        return jsonify({"success": False, "error": "Answer is required"}), 400
+    if not transcript:
+        return jsonify({"success": False, "error": "Interview transcript is empty"}), 400
         
     system_prompt = (
-        "You are a Senior Technical Recruiter grading a mock coding/engineering interview. "
-        "Analyze the candidate's answer for the technical question. "
-        "Grade their answer out of 100, and provide clear constructive feedback. "
-        "Provide your evaluation in JSON format with two keys: "
-        "\"score\" (an integer from 0 to 100) and \"feedback\" (a detailed string summary)."
+        "You are a Senior Technical Recruiter. Review the following interview transcript. "
+        "Provide a granular evaluation in JSON format containing ONLY these keys:\n"
+        "\"confidence_score\" (int 0-100)\n"
+        "\"communication_score\" (int 0-100)\n"
+        "\"technical_score\" (int 0-100)\n"
+        "\"problem_solving_score\" (int 0-100)\n"
+        "\"overall_score\" (int 0-100)\n"
+        "\"strengths\" (list of strings)\n"
+        "\"weaknesses\" (list of strings)\n"
+        "\"improvement_areas\" (list of strings)\n"
+        "\"suggested_roadmaps\" (list of strings)\n"
+        "\"suggested_certifications\" (list of strings)\n"
     )
-    user_prompt = f"Question: {question}\nCandidate Answer: {answer}"
+    
+    formatted_transcript = "\n\n".join([f"Q: {item['question']}\nA: {item['answer']}" for item in transcript])
+    user_prompt = f"Evaluate this interview:\n\n{formatted_transcript}"
     
     ai_res = call_gemini(system_prompt, user_prompt, user_key=custom_key)
-    score = 80
-    feedback = "Good description of the concepts. Expand on practical edge cases."
+    
+    # Fallback response
+    response_data = {
+        "confidence_score": 75,
+        "communication_score": 80,
+        "technical_score": 70,
+        "problem_solving_score": 75,
+        "overall_score": 75,
+        "strengths": ["Clear communication", "Willingness to learn"],
+        "weaknesses": ["Lack of deep technical depth in answers"],
+        "improvement_areas": ["Dive deeper into architectural trade-offs", "Use the STAR method for behavioral questions"],
+        "suggested_roadmaps": ["Advanced Data Structures", "System Design"],
+        "suggested_certifications": ["AWS Certified Developer"]
+    }
     
     if ai_res:
         try:
             json_match = re.search(r'\{.*\}', ai_res, re.DOTALL)
             if json_match:
                 parsed = json.loads(json_match.group(0))
-                score = int(parsed.get('score', 80))
-                feedback = parsed.get('feedback', ai_res)
-            else:
-                feedback = ai_res
-        except Exception:
-            feedback = ai_res
+                # Safely update response data
+                for key in response_data.keys():
+                    if key in parsed:
+                        response_data[key] = parsed[key]
+        except Exception as e:
+            print("Error parsing interview evaluation:", e)
             
-    return jsonify({
-        "success": True,
-        "score": score,
-        "feedback": feedback
-    })
+    return jsonify({"success": True, "evaluation": response_data})
 
 
 # 7. Internship Center

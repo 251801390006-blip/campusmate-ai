@@ -23,9 +23,38 @@
                 <div class="mb-3">
                     <label for="mock-role-input" class="fw-semibold text-secondary d-block mb-1" style="font-size: 0.82rem;">Target Career Role</label>
                     <select id="mock-role-input" class="form-select shadow-sm" style="font-size:0.9rem; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); width: 100%;">
-                        {% for track in tracks %}
-                            <option value="{{ track }}" {% if user_track == track %}selected{% endif %}>{{ track }}</option>
-                        {% endfor %}
+                        <option value="HR Interview">HR Interview</option>
+                        <option value="Technical Interview">Technical Interview</option>
+                        <option value="Cybersecurity Interview">Cybersecurity Interview</option>
+                        <option value="Software Engineering Interview" selected>Software Engineering Interview</option>
+                        <option value="Frontend Interview">Frontend Interview</option>
+                        <option value="Backend Interview">Backend Interview</option>
+                        <option value="Full Stack Interview">Full Stack Interview</option>
+                        <option value="Data Structures Interview">Data Structures Interview</option>
+                        <option value="Freshers Interview">Freshers Interview</option>
+                        <option value="Internship Interview">Internship Interview</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="mock-difficulty-input" class="fw-semibold text-secondary d-block mb-1" style="font-size: 0.82rem;">Difficulty Level</label>
+                    <select id="mock-difficulty-input" class="form-select shadow-sm" style="font-size:0.9rem; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); width: 100%;">
+                        <option value="Beginner">Beginner</option>
+                        <option value="Intermediate" selected>Intermediate</option>
+                        <option value="Advanced">Advanced</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="mock-company-input" class="fw-semibold text-secondary d-block mb-1" style="font-size: 0.82rem;">Mock Placement Mode (Company)</label>
+                    <select id="mock-company-input" class="form-select shadow-sm" style="font-size:0.9rem; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); width: 100%;">
+                        <option value="General" selected>General / Standard</option>
+                        <option value="TCS">TCS (Tata Consultancy Services)</option>
+                        <option value="Infosys">Infosys</option>
+                        <option value="Wipro">Wipro</option>
+                        <option value="Accenture">Accenture</option>
+                        <option value="Cognizant">Cognizant</option>
+                        <option value="Capgemini">Capgemini</option>
                     </select>
                 </div>
 
@@ -39,7 +68,7 @@
                     </div>
                 </div>
 
-                <button class="btn btn-primary w-100 py-2.5 fw-bold shadow-sm" onclick="startMockInterview()" style="background: linear-gradient(135deg, #0078d4, #00bcf2); border: none; font-size: 0.95rem;">
+                <button id="launch-interview-btn" class="btn btn-primary w-100 py-2.5 fw-bold shadow-sm" onclick="startMockInterview()" style="background: linear-gradient(135deg, #0078d4, #00bcf2); border: none; font-size: 0.95rem;">
                     Launch Interactive Panel <i class="fa-solid fa-circle-play ms-1"></i>
                 </button>
             </div>
@@ -88,23 +117,66 @@
 
             <!-- Grade & Feedback Scorecard -->
             <div class="mock-feedback-box mt-4 p-4 border rounded hidden" id="mock-feedback-box" style="background-color: #fafbfc; border-color: #dee2e6;">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h4 class="fw-bold mb-0 text-dark" style="font-size: 1rem;"><i class="fa-solid fa-square-poll-vertical text-primary me-2"></i> Recruiter Evaluation Scorecard</h4>
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="text-secondary" style="font-size:0.85rem;">Score:</span>
-                        <strong id="mock-item-score" class="text-primary" style="font-size: 1.25rem;">0/100</strong>
-                    </div>
+                <div class="text-center mb-4 pb-3 border-bottom">
+                    <h3 class="fw-bold mb-1 text-dark" style="font-size: 1.25rem;"><i class="fa-solid fa-square-poll-vertical text-primary me-2"></i> Final Interview Evaluation Report</h3>
+                    <p class="text-secondary mb-0" style="font-size: 0.9rem;">Granular assessment of your performance.</p>
                 </div>
-                
-                <div class="mb-3">
-                    <div class="progress-bar-container" style="background: #e9ecef; height: 8px; border-radius: 4px; overflow: hidden; border: 1px solid #dee2e6;">
-                        <div id="feedback-score-bar" class="progress-bar-fill" style="background: #0078d4; height: 100%; width: 0%; transition: width 0.4s ease;"></div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4 text-center">
+                        <div class="p-3 bg-white border rounded shadow-sm">
+                            <span class="text-secondary d-block fw-semibold mb-1" style="font-size: 0.8rem; text-transform: uppercase;">Overall Score</span>
+                            <strong id="score-overall" class="text-primary" style="font-size: 2rem;">0/100</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="p-3 bg-white border rounded shadow-sm h-100 d-flex flex-column justify-content-center">
+                            <div class="d-flex justify-content-between mb-1" style="font-size: 0.85rem;">
+                                <span class="fw-semibold text-secondary">Technical</span>
+                                <strong id="score-technical">0%</strong>
+                            </div>
+                            <div class="progress mb-3" style="height: 6px;"><div id="bar-technical" class="progress-bar bg-primary" style="width: 0%;"></div></div>
+                            
+                            <div class="d-flex justify-content-between mb-1" style="font-size: 0.85rem;">
+                                <span class="fw-semibold text-secondary">Communication</span>
+                                <strong id="score-communication">0%</strong>
+                            </div>
+                            <div class="progress mb-3" style="height: 6px;"><div id="bar-communication" class="progress-bar bg-info" style="width: 0%;"></div></div>
+                            
+                            <div class="d-flex justify-content-between mb-1" style="font-size: 0.85rem;">
+                                <span class="fw-semibold text-secondary">Confidence</span>
+                                <strong id="score-confidence">0%</strong>
+                            </div>
+                            <div class="progress mb-3" style="height: 6px;"><div id="bar-confidence" class="progress-bar bg-success" style="width: 0%;"></div></div>
+                            
+                            <div class="d-flex justify-content-between mb-1" style="font-size: 0.85rem;">
+                                <span class="fw-semibold text-secondary">Problem Solving</span>
+                                <strong id="score-problem">0%</strong>
+                            </div>
+                            <div class="progress" style="height: 6px;"><div id="bar-problem" class="progress-bar bg-warning" style="width: 0%;"></div></div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="feedback-text-area rounded p-3 bg-white border" style="border-color:#dee2e6;">
-                    <p class="fw-semibold text-secondary mb-1" style="font-size: 0.75rem; text-transform: uppercase;">Constructive Assessment</p>
-                    <p class="feedback-desc text-dark mb-0" id="mock-item-desc" style="font-size: 0.88rem; line-height: 1.5;"></p>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="feedback-text-area rounded p-3 bg-white border h-100">
+                            <p class="fw-semibold text-success mb-2" style="font-size: 0.85rem; text-transform: uppercase;"><i class="fa-solid fa-thumbs-up me-1"></i> Key Strengths</p>
+                            <ul id="list-strengths" class="text-dark mb-0 ps-3" style="font-size: 0.88rem; line-height: 1.5;"></ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="feedback-text-area rounded p-3 bg-white border h-100">
+                            <p class="fw-semibold text-danger mb-2" style="font-size: 0.85rem; text-transform: uppercase;"><i class="fa-solid fa-triangle-exclamation me-1"></i> Weaknesses</p>
+                            <ul id="list-weaknesses" class="text-dark mb-0 ps-3" style="font-size: 0.88rem; line-height: 1.5;"></ul>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="feedback-text-area rounded p-3 bg-white border">
+                            <p class="fw-semibold text-primary mb-2" style="font-size: 0.85rem; text-transform: uppercase;"><i class="fa-solid fa-arrow-trend-up me-1"></i> Actionable Improvement Areas</p>
+                            <ul id="list-improvements" class="text-dark mb-0 ps-3" style="font-size: 0.88rem; line-height: 1.5;"></ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -631,51 +703,64 @@ function speakQuestionText() {
     window.speechSynthesis.speak(utterance);
 }
 
-function startMockInterview() {
+async function startMockInterview() {
     const role = document.getElementById("mock-role-input").value.trim();
+    const difficulty = document.getElementById("mock-difficulty-input").value;
+    const company = document.getElementById("mock-company-input").value;
+    
     if (!role) {
         alert("Please enter a target role.");
         return;
     }
     
     mockInterviewState.role = role;
+    mockInterviewState.difficulty = difficulty;
+    mockInterviewState.company = company;
     mockInterviewState.active = true;
     mockInterviewState.questionIndex = 0;
-    mockInterviewState.answers = [];
+    mockInterviewState.transcript = [];
 
-    // Map role keywords to categories with expanded keyword matching
-    const roleLower = role.toLowerCase();
-    
-    const trackKeywords = {
-        frontend: ['frontend', 'front-end', 'front end', 'ui ', 'ui/', 'ux', 'react', 'angular', 'vue', 'web developer', 'web dev', 'css', 'javascript', 'typescript', 'html', 'next.js', 'nuxt', 'svelte', 'tailwind'],
-        backend_systems: ['backend', 'back-end', 'back end', 'server', 'api ', 'api/', 'java ', 'java/', 'golang', 'go ', 'microservice', 'system design', 'node.js', 'node ', 'django', 'flask', 'spring', 'express', 'graphql', 'rest ', 'database', 'sql', 'distributed'],
-        data_ai: ['data sci', 'machine learning', 'ml ', 'ml/', 'artificial intelligence', 'ai ', 'ai/', 'deep learning', 'nlp', 'natural language', 'analytics', 'scientist', 'neural', 'pytorch', 'tensorflow', 'llm', 'computer vision', 'cv ', 'recommendation', 'mlops'],
-        cybersecurity: ['security', 'cyber', 'soc ', 'soc/', 'penetration', 'pentest', 'network sec', 'hacking', 'hacker', 'forensic', 'malware', 'threat', 'incident', 'compliance', 'grc', 'vulnerability', 'encryption', 'firewall', 'ids', 'ips', 'siem'],
-        cloud_devops: ['cloud', 'devops', 'dev ops', 'sre', 'aws', 'azure', 'gcp', 'kubernetes', 'k8s', 'docker', 'terraform', 'ansible', 'jenkins', 'ci/cd', 'cicd', 'infrastructure', 'platform eng', 'reliability', 'serverless', 'lambda'],
-        hardware_ece: ['vlsi', 'ece', 'electrical', 'electronics', 'circuits', 'robotics', 'iot', 'embedded', 'hardware', 'semiconductor', 'microcontroller', 'chip'],
-        csbs: ['csbs', 'biotech', 'bio science', 'biological', 'bioinformatics', 'medical', 'biomedical'],
-        traditional_eng: ['mechanical', 'civil', 'chemical', 'systems engineering', 'aerospace', 'automotive', 'renewable', 'nuclear', 'marine', 'environmental', 'materials', 'cad', 'cfd', 'thermodynamics'],
-        quantum: ['quantum'],
-        behavioral_hr: ['hr ', 'hr/', 'human resource', 'behavioral', 'behaviour', 'manager', 'management', 'leadership', 'communication', 'product manager', 'project manager', 'scrum', 'agile', 'people', 'recruiter', 'general']
-    };
+    const launchBtn = document.getElementById("launch-interview-btn");
+    launchBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Generating Custom Interview...`;
+    launchBtn.disabled = true;
 
-    let selectedTrack = 'behavioral_hr'; // fallback
-    for (const [track, keywords] of Object.entries(trackKeywords)) {
-        if (keywords.some(kw => roleLower.includes(kw))) {
-            selectedTrack = track;
-            break;
+    try {
+        const customKey = localStorage.getItem("campusmate_gemini_key") || "";
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
+        
+        const response = await fetch("/interview-prep/generate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken
+            },
+            body: JSON.stringify({ role, difficulty, company, custom_key: customKey })
+        });
+        
+        const data = await response.json();
+        if (response.ok && data.success && data.questions && data.questions.length > 0) {
+            mockInterviewState.questions = data.questions;
+            
+            document.getElementById("mock-setup-window").classList.add("hidden");
+            document.getElementById("platforms-panel").classList.add("hidden");
+            document.getElementById("prep-checklist-panel").classList.add("hidden");
+            document.getElementById("mock-active-window").classList.remove("hidden");
+            
+            let badgeText = role;
+            if (company !== 'General') badgeText = company + ' ' + role;
+            document.getElementById("mock-role-badge").innerText = `${badgeText} (${difficulty})`;
+            
+            loadNextMockQuestion();
+        } else {
+            alert("Failed to generate questions. Check API key.");
         }
+    } catch (e) {
+        console.error(e);
+        alert("Error connecting to server.");
+    } finally {
+        launchBtn.innerHTML = `Launch Interactive Panel <i class="fa-solid fa-circle-play ms-1"></i>`;
+        launchBtn.disabled = false;
     }
-
-    mockInterviewState.questions = mockInterviewState.trackDatabase[selectedTrack];
-
-    document.getElementById("mock-setup-window").classList.add("hidden");
-    document.getElementById("platforms-panel").classList.add("hidden");
-    document.getElementById("prep-checklist-panel").classList.add("hidden");
-    document.getElementById("mock-active-window").classList.remove("hidden");
-    document.getElementById("mock-role-badge").innerText = role;
-    
-    loadNextMockQuestion();
 }
 
 function loadNextMockQuestion() {
@@ -710,50 +795,77 @@ async function submitMockAnswer() {
     
     stopListening();
     window.speechSynthesis.cancel();
+    
+    const currentQ = mockInterviewState.questions[mockInterviewState.questionIndex];
+    mockInterviewState.transcript.push({ question: currentQ, answer: answer });
 
     const submitBtn = document.getElementById("mock-submit-btn");
-    submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Evaluating response...`;
-    
-    try {
-        const customKey = localStorage.getItem("campusmate_gemini_key") || "";
-        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
-        
-        const response = await fetch("/interview-prep/evaluate", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": csrfToken
-            },
-            body: JSON.stringify({
-                question: mockInterviewState.questions[mockInterviewState.questionIndex],
-                answer: answer,
-                custom_key: customKey
-            })
-        });
-        
-        const data = await response.json();
-        if (response.ok && data.success) {
-            // Render scorecard visual
-            const scoreBar = document.getElementById("feedback-score-bar");
-            const scoreText = document.getElementById("mock-item-score");
-            const descText = document.getElementById("mock-item-desc");
-            const feedbackBox = document.getElementById("mock-feedback-box");
-            
-            scoreText.innerText = `${data.score}/100`;
-            scoreBar.style.width = `${data.score}%`;
-            descText.innerText = data.feedback;
-            feedbackBox.classList.remove("hidden");
 
-            submitBtn.innerHTML = `Next Question <i class="fa-solid fa-arrow-right ms-1"></i>`;
-            submitBtn.onclick = () => moveToNextQuestion();
-        } else {
-            alert("Grading failed: " + (data.error || "Unknown response error"));
-            submitBtn.innerHTML = `Submit Answer <i class="fa-solid fa-paper-plane ms-1"></i>`;
+    if (mockInterviewState.questionIndex < mockInterviewState.questions.length - 1) {
+        // Go to next question
+        mockInterviewState.questionIndex++;
+        loadNextMockQuestion();
+    } else {
+        // Evaluate
+        submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Evaluating Full Interview...`;
+        submitBtn.disabled = true;
+        
+        try {
+            const customKey = localStorage.getItem("campusmate_gemini_key") || "";
+            const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
+            
+            const response = await fetch("/interview-prep/evaluate", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+                body: JSON.stringify({ transcript: mockInterviewState.transcript, custom_key: customKey })
+            });
+            
+            const data = await response.json();
+            if (response.ok && data.success) {
+                const evalData = data.evaluation;
+                
+                document.getElementById("score-overall").innerText = `${evalData.overall_score}/100`;
+                
+                document.getElementById("score-technical").innerText = `${evalData.technical_score}%`;
+                document.getElementById("bar-technical").style.width = `${evalData.technical_score}%`;
+                
+                document.getElementById("score-communication").innerText = `${evalData.communication_score}%`;
+                document.getElementById("bar-communication").style.width = `${evalData.communication_score}%`;
+                
+                document.getElementById("score-confidence").innerText = `${evalData.confidence_score}%`;
+                document.getElementById("bar-confidence").style.width = `${evalData.confidence_score}%`;
+                
+                document.getElementById("score-problem").innerText = `${evalData.problem_solving_score}%`;
+                document.getElementById("bar-problem").style.width = `${evalData.problem_solving_score}%`;
+                
+                document.getElementById("list-strengths").innerHTML = evalData.strengths.map(s => `<li>${s}</li>`).join('');
+                document.getElementById("list-weaknesses").innerHTML = evalData.weaknesses.map(w => `<li>${w}</li>`).join('');
+                document.getElementById("list-improvements").innerHTML = evalData.improvement_areas.map(i => `<li>${i}</li>`).join('');
+
+                document.getElementById("mock-feedback-box").classList.remove("hidden");
+                
+                // Hide input area since interview is over
+                document.querySelector(".mock-response-area").classList.add("hidden");
+
+                submitBtn.innerHTML = `Finish Session <i class="fa-solid fa-check ms-1"></i>`;
+                submitBtn.onclick = () => {
+                    showCompletionToast();
+                    setTimeout(() => window.location.reload(), 2000);
+                };
+            } else {
+                alert("Grading failed: " + (data.error || "Unknown response error"));
+                submitBtn.innerHTML = `Submit Final Answer <i class="fa-solid fa-paper-plane ms-1"></i>`;
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Failed to grade answer.");
+            submitBtn.innerHTML = `Submit Final Answer <i class="fa-solid fa-paper-plane ms-1"></i>`;
+        } finally {
+            submitBtn.disabled = false;
         }
-    } catch (e) {
-        console.error(e);
-        alert("Failed to grade answer.");
-        submitBtn.innerHTML = `Submit Answer <i class="fa-solid fa-paper-plane ms-1"></i>`;
     }
 }
 
@@ -770,17 +882,7 @@ function showCompletionToast() {
 }
 
 function moveToNextQuestion() {
-    mockInterviewState.questionIndex++;
-    if (mockInterviewState.questionIndex < mockInterviewState.questions.length) {
-        loadNextMockQuestion();
-    } else {
-        // Mock interview complete gamification trigger
-        showCompletionToast();
-        setTimeout(() => {
-            alert("Mock Interview Complete! Excellent work. You've earned 150 XP.");
-            window.location.reload();
-        }, 2000);
-    }
+    // handled internally
 }
 
 function abortMockInterview() {

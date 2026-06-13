@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In — CampusMate AI</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+    <!-- Bootstrap 5 Grid and Utilities only -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap-grid.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap-utilities.min.css">
+    <!-- Custom Light Design System with Cache Busting -->
+    <link rel="stylesheet" href="/static/css/style.css?v=2.0.1">
+    <style>
+        /* Mobile Drawer Styles */
+        .mobile-drawer-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            visibility: hidden;
+            z-index: 1999;
+            transition: all 0.3s ease;
+        }
+        .mobile-drawer-backdrop.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .mobile-landing-drawer {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 260px;
+            height: 100vh;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            box-shadow: 6px 0 18px rgba(0,0,0,0.1);
+            z-index: 2000;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+        .mobile-landing-drawer.open {
+            left: 0;
+        }
+        .drawer-link {
+            transition: all 0.2s;
+        }
+        .drawer-link:hover {
+            background: var(--border-color);
+            color: var(--accent-color) !important;
+        }
+    </style>
+    
+<script type="module" src="https://unpkg.com/@splinetool/viewer@1.0.51/build/spline-viewer.js"></script>
+<style>
+/* ─── Light Mode Google-like Auth Root ─── */
+.landing-layout { min-height:100vh; background:#f8fafc; overflow-x:hidden; }
+.landing-header { background:rgba(255,255,255,0.8); backdrop-filter:blur(18px); border-bottom:1px solid rgba(0,0,0,0.06); }
+.landing-header .logo,
+.landing-header .landing-nav a { color:#1e293b !important; }
+.landing-header .landing-nav a.btn-outline { border-color:rgba(0,0,0,0.18); color:#334155 !important; }
+.landing-header .landing-nav a.btn-primary { background:#2563eb; border:none; color:#fff !important; }
+.landing-footer { background:#f1f5f9; color:#64748b; }
+
+/* Light Animated background */
+.auth-bg { position:fixed; inset:0; z-index:0; overflow:hidden; background: #f8fafc; }
+.auth-bg .orb {
+    position:absolute; border-radius:50%; filter:blur(90px); opacity:0.5;
+    animation: orbFloat 15s ease-in-out infinite alternate;
+}
+.auth-bg .orb-1 { width:600px; height:600px; background:radial-gradient(circle,#bae6fd,transparent 70%); top:-10%; left:-10%; animation-delay:0s; }
+.auth-bg .orb-2 { width:500px; height:500px; background:radial-gradient(circle,#c7d2fe,transparent 70%); bottom:-10%; right:-5%; animation-delay:-4s; }
+.auth-bg .orb-3 { width:400px; height:400px; background:radial-gradient(circle,#e9d5ff,transparent 70%); top:40%; left:55%; animation-delay:-8s; }
+
+@keyframes orbFloat {
+    0% { transform:translate(0,0) scale(1); }
+    50% { transform:translate(40px,-50px) scale(1.05); }
+    100% { transform:translate(-30px,30px) scale(0.95); }
+}
+
+.auth-page-wrapper {
+    position:relative; z-index:1;
+    display:flex; align-items:center; justify-content:center;
+    min-height:calc(100vh - 80px); padding:2rem 1rem;
+}
+
+/* ─── Glass Card (Google-style centered) ─── */
+.auth-card-wrapper { flex-shrink:0; width:100%; max-width:440px; margin: 0 auto; }
+.auth-glass-card {
+    background:rgba(255, 255, 255, 0.85);
+    backdrop-filter:blur(24px) saturate(140%);
+    -webkit-backdrop-filter:blur(24px) saturate(140%);
+    border:1px solid rgba(255,255,255,0.8);
+    border-radius:24px; padding:3rem 2.5rem;
+    box-shadow:0 20px 40px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.03);
+    position:relative; overflow:hidden;
+    animation:cardSlideIn 0.6s ease-out;
+}
+@keyframes cardSlideIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+.auth-logo-badge {
+    width:56px; height:56px; border-radius:16px;
+    background:#2563eb;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.5rem; color:#fff;
+    margin:0 auto 1.5rem;
+    box-shadow:0 8px 20px rgba(37,99,235,0.25);
+}
+.auth-glass-card h2 {
+    color:#0f172a; font-size:1.6rem; font-weight:700;
+    text-align:center; margin-bottom:0.5rem; letter-spacing:-0.02em;
+}
+.auth-glass-card .subtitle { color:#64748b; font-size:0.95rem; text-align:center; margin-bottom:2.2rem; }
+
+/* Fields */
+.auth-field { margin-bottom:1.25rem; }
+.auth-field label { display:none; }
+.auth-field input {
+    width:100%; padding:0.9rem 1rem 0.9rem 2.8rem;
+    border:1.5px solid #cbd5e1;
+    border-radius:12px; font-size:0.95rem;
+    color:#1e293b; background:#fff;
+    transition:all 0.25s;
+    outline:none; font-family:inherit;
+}
+.auth-field input::placeholder { color:#94a3b8; font-weight: 400; }
+.auth-field input:focus {
+    border-color:#2563eb;
+    box-shadow:0 0 0 4px rgba(37,99,235,0.1);
+}
+.input-icon-wrap { position:relative; }
+.input-icon-wrap .field-icon {
+    position:absolute; left:14px; top:50%; transform:translateY(-50%);
+    color:#94a3b8; font-size:1rem; pointer-events:none;
+    transition:color 0.25s;
+}
+.input-icon-wrap:focus-within .field-icon { color:#2563eb; }
+
+.auth-field .pw-wrap { position:relative; }
+.auth-field .pw-wrap input { padding-right:2.75rem; }
+.auth-field .pw-toggle {
+    position:absolute; right:12px; top:50%; transform:translateY(-50%);
+    background:none; border:none; color:#94a3b8;
+    cursor:pointer; padding:0.2rem; font-size:1rem; line-height:1;
+}
+.auth-field .pw-toggle:hover { color:#475569; }
+.auth-field .field-error { display:block; color:#e11d48; font-size:0.8rem; margin-top:0.4rem; font-weight: 500; }
+.auth-field .forgot-link { font-size:0.85rem; font-weight:600; color:#2563eb; text-decoration:none; display:block; text-align:right; margin-top:0.5rem; }
+.auth-field .forgot-link:hover { text-decoration:underline; color:#1d4ed8; }
+
+/* Remember */
+.remember-row { display:flex; align-items:center; gap:0.6rem; margin-bottom:1.5rem; }
+.remember-row input[type="checkbox"] { width:16px; height:16px; border-radius:4px; cursor:pointer; accent-color:#2563eb; }
+.remember-row label { font-size:0.9rem; color:#475569; cursor:pointer; margin:0; font-weight: 500; }
+
+/* Submit */
+.auth-submit-btn {
+    width:100%; padding:0.9rem;
+    background:#2563eb;
+    color:#fff; border:none; border-radius:12px;
+    font-size:1rem; font-weight:600; cursor:pointer;
+    transition:all 0.3s; font-family:inherit; letter-spacing:0.01em;
+}
+.auth-submit-btn:hover {
+    background:#1d4ed8;
+    box-shadow:0 8px 20px rgba(37,99,235,0.25);
+    transform:translateY(-1px);
+}
+.auth-submit-btn:active { transform:translateY(0); }
+
+/* Footer link */
+.auth-footer-link {
+    text-align:center; margin-top:2rem;
+    font-size:0.95rem; color:#64748b;
+}
+.auth-footer-link a { color:#2563eb; font-weight:600; text-decoration:none; }
+.auth-footer-link a:hover { text-decoration:underline; color:#1d4ed8; }
+
+/* Flash */
+.auth-flash {
+    padding:0.8rem 1rem; border-radius:12px; font-size:0.9rem; font-weight: 500;
+    margin-bottom:1.5rem; display:flex; align-items:flex-start; gap:0.5rem;
+}
+.auth-flash.danger { background:#ffe4e6; color:#be123c; border:1px solid #fecdd3; }
+.auth-flash.success { background:#d1fae5; color:#047857; border:1px solid #a7f3d0; }
+
+@media(max-width:480px) {
+    .auth-glass-card { padding:2rem 1.5rem !important; border-radius:20px; box-shadow: none; border: none; background: transparent; }
+    .landing-layout { background: #fff; }
+    .auth-bg { display: none; }
+    .auth-page-wrapper { min-height: calc(100vh - 60px); }
+}
+</style>
+
+</head>
+<body>
+    <div class="landing-layout">
+        <!-- Landing Header -->
+        <header class="landing-header d-flex justify-content-between align-items-center py-3 px-4 border-bottom" style="background: var(--bg-secondary); position: sticky; top: 0; z-index: 1100;">
+            <div class="logo fw-bold" style="font-size: 1.2rem; cursor: pointer;" onclick="window.location.href='/'">🎓 CampusMate AI</div>
+            
+            <!-- Desktop Nav (Visible >= 768px) -->
+            <nav class="landing-nav d-none d-md-flex align-items-center gap-3">
+                <a href="/" class="text-secondary-text" style="text-decoration:none; font-weight:500;">Home</a>
+                
+                    <a href="/auth/login" class="btn btn-sm btn-outline">Sign In</a>
+                    <a href="/auth/register" class="btn btn-sm btn-primary">Sign Up</a>
+                
+            </nav>
+
+            <!-- Mobile Nav Toggle & Quick Actions (Visible < 768px) -->
+            <div class="d-flex d-md-none align-items-center gap-2">
+                
+                    <a href="/auth/login" class="btn btn-sm btn-outline px-3 py-2" style="font-size: 0.72rem; min-height: 40px; display: inline-flex; align-items: center; justify-content: center;">Sign In</a>
+                    <a href="/auth/register" class="btn btn-sm btn-primary px-3 py-2" style="font-size: 0.72rem; min-height: 40px; display: inline-flex; align-items: center; justify-content: center;">Sign Up</a>
+                
+                <button class="btn-hamburger" onclick="toggleMobileDrawer()" aria-label="Toggle Navigation" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: none; border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); cursor: pointer; padding: 0;">
+                    <i class="fa-solid fa-bars" style="font-size: 1.25rem;"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Mobile Drawer Backdrop -->
+        <div id="mobile-drawer-backdrop" class="mobile-drawer-backdrop" onclick="toggleMobileDrawer()"></div>
+
+        <!-- Mobile Slide-out Drawer -->
+        <div id="mobile-landing-drawer" class="mobile-landing-drawer">
+            <div class="drawer-header border-bottom p-3 d-flex justify-content-between align-items-center">
+                <div class="logo fw-bold" style="font-size: 1.15rem;">🎓 CampusMate AI</div>
+                <button onclick="toggleMobileDrawer()" style="background:none; border:none; font-size:1.35rem; color:var(--text-secondary); cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="drawer-content p-3 d-flex flex-column gap-2">
+                <a href="/" class="drawer-link py-2.5 px-3 rounded text-secondary-text" style="text-decoration:none; font-weight:500; display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-house text-muted"></i> Home</a>
+                
+                    <a href="/auth/login" class="drawer-link py-2.5 px-3 rounded text-secondary-text" style="text-decoration:none; font-weight:500; display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-right-to-bracket text-muted"></i> Sign In</a>
+                    <a href="/auth/register" class="drawer-link py-2.5 px-3 rounded text-secondary-text" style="text-decoration:none; font-weight:500; display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-user-plus text-muted"></i> Sign Up</a>
+                
+            </div>
+        </div>
+
+        <script>
+            function toggleMobileDrawer() {
+                const drawer = document.getElementById("mobile-landing-drawer");
+                const backdrop = document.getElementById("mobile-drawer-backdrop");
+                if (drawer && backdrop) {
+                    drawer.classList.toggle("open");
+                    backdrop.classList.toggle("show");
+                }
+            }
+        </script>
+
+        <!-- Main Content Container -->
+        <main class="flex-grow-1">
+            <!-- Flash Message Banner -->
+            <div class="container mt-4">
+                
+                    
+                        
+                            <div class="flash-alert alert-info">
+                                
+                                    <span style="margin-right: 8px;">ℹ️</span>
+                                
+                                <span>Please log in to access this page.</span>
+                            </div>
+                        
+                    
+                
+            </div>
+            
+            
+<!-- Light 3D Visual Background -->
+<div class="auth-bg" style="pointer-events: none;">
+    <spline-viewer url="https://prod.spline.design/qg9bNf5I1B4GfN7E/scene.splinecode" style="width: 100vw; height: 100vh; position: absolute; inset: 0; opacity: 0.8;"></spline-viewer>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+</div>
+
+<div class="auth-page-wrapper">
+    <div class="auth-card-wrapper">
+        <div class="auth-glass-card">
+            <div class="auth-logo-badge">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <h2>Sign in</h2>
+            <p class="subtitle">Continue to CampusMate AI</p>
+
+            <!-- Flash Messages -->
+            
+                
+                    
+                        <div class="auth-flash info">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <span>Please log in to access this page.</span>
+                        </div>
+                    
+                
+            
+
+            <form method="POST" action="/auth/login">
+                <input id="csrf_token" name="csrf_token" type="hidden" value="IjIxODQ4YWZmNDFhNTUxN2IxYTA2ZGM5MDRhY2NlMjdjYTAzZjAzZjEi.aixznQ.1-wq4xGfERMc75BZmftI0a1XBcI">
+
+                <!-- Email -->
+                <div class="auth-field">
+                    <div class="input-icon-wrap">
+                        <i class="fa-solid fa-envelope field-icon"></i>
+                        <input autocomplete="email" id="email" name="email" placeholder="Email address" required type="text" value="">
+                    </div>
+                    
+                </div>
+
+                <!-- Password -->
+                <div class="auth-field">
+                    <div class="input-icon-wrap pw-wrap">
+                        <i class="fa-solid fa-lock field-icon"></i>
+                        <input autocomplete="current-password" id="login-pw" name="password" placeholder="Password" required type="password" value="">
+                        <button type="button" class="pw-toggle" onclick="togglePw('login-pw', this)">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                    
+                    <a href="/auth/forgot-password" class="forgot-link">Forgot Password?</a>
+                </div>
+
+                <!-- Remember Me -->
+                <div class="remember-row">
+                    <input id="remember-me" name="remember_me" type="checkbox" value="y">
+                    <label for="remember-me">Remember Me</label>
+                </div>
+
+                <button type="submit" class="auth-submit-btn">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="auth-footer-link">
+                Don't have an account? <a href="/auth/register">Create account</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePw(id, btn) {
+    const f = document.getElementById(id);
+    if (!f) return;
+    const icon = btn.querySelector('i');
+    if (f.type === 'password') {
+        f.type = 'text';
+        icon.className = 'fa-solid fa-eye-slash';
+    } else {
+        f.type = 'password';
+        icon.className = 'fa-solid fa-eye';
+    }
+}
+</script>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="landing-footer py-5" style="border-top: 1px solid var(--border-color); background-color: var(--bg-secondary); margin-top: 60px;">
+            <div class="container text-center">
+                <div class="logo mb-3" style="font-size: 1.35rem; font-weight: 800; color: var(--text-primary);">🎓 CampusMate AI</div>
+
+                
+                <!-- Contact Section -->
+                <div style="margin-bottom: 20px; display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; font-size: 0.82rem;">
+                    <a href="mailto:251801390006@cutmap.ac.in" class="d-inline-flex align-items-center gap-2 text-secondary" style="transition: color 0.2s ease; text-decoration: none;" onmouseover="this.style.color='var(--neon-blue)'" onmouseout="this.style.color='var(--text-secondary)'">
+                        <i class="fa-solid fa-envelope" style="color: var(--neon-blue);"></i> 251801390006@cutmap.ac.in
+                    </a>
+                    <a href="mailto:vk7798537@gmail.com" class="d-inline-flex align-items-center gap-2 text-secondary" style="transition: color 0.2s ease; text-decoration: none;" onmouseover="this.style.color='var(--neon-blue)'" onmouseout="this.style.color='var(--text-secondary)'">
+                        <i class="fa-solid fa-envelope" style="color: var(--neon-blue);"></i> vk7798537@gmail.com
+                    </a>
+                </div>
+                
+                <p class="mb-0 text-muted" style="font-size: 0.78rem;">© 2026 CampusMate AI. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+    
+    
+</body>
+</html>

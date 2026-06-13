@@ -144,24 +144,32 @@
                     </div>
 
                     <div class="row g-3">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="profile-branch" class="fw-semibold text-secondary" style="font-size:0.8rem;">Branch / Major</label>
                             <input type="text" id="profile-branch" name="branch" value="{{ current_user.branch or '' }}" class="form-control shadow-sm" placeholder="e.g. Cyber Security">
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="profile-year" class="fw-semibold text-secondary" style="font-size:0.8rem;">Year</label>
                             <input type="text" id="profile-year" name="year" value="{{ current_user.year or '' }}" class="form-control shadow-sm" placeholder="e.g. 3rd Year">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="profile-college" class="fw-semibold text-secondary" style="font-size:0.8rem;">College / University</label>
+                            <input type="text" id="profile-college" name="college" value="{{ current_user.college or '' }}" class="form-control shadow-sm" placeholder="e.g. Stanford University">
                         </div>
                     </div>
 
                     <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="profile-skills" class="fw-semibold text-secondary" style="font-size:0.8rem;">Technical Skills (comma-separated)</label>
-                            <input type="text" id="profile-skills" name="skills" value="{{ current_user.skills or '' }}" class="form-control shadow-sm" placeholder="e.g. Python, Git, Wireshark">
+                        <div class="col-md-4">
+                            <label for="profile-skills" class="fw-semibold text-secondary" style="font-size:0.8rem;">Technical Skills (csv)</label>
+                            <input type="text" id="profile-skills" name="skills" value="{{ current_user.skills or '' }}" class="form-control shadow-sm" placeholder="e.g. Python, Git">
                         </div>
-                        <div class="col-md-6">
-                            <label for="profile-goals" class="fw-semibold text-secondary" style="font-size:0.8rem;">Career Goals</label>
-                            <input type="text" id="profile-goals" name="goals" value="{{ current_user.career_goal or '' }}" class="form-control shadow-sm" placeholder="e.g. Security Analyst">
+                        <div class="col-md-4">
+                            <label for="profile-roles" class="fw-semibold text-secondary" style="font-size:0.8rem;">Career Roles</label>
+                            <input type="text" id="profile-roles" name="roles" value="{{ current_user.roles or '' }}" class="form-control shadow-sm" placeholder="e.g. Frontend Engineer">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="profile-domains" class="fw-semibold text-secondary" style="font-size:0.8rem;">Domains</label>
+                            <input type="text" id="profile-domains" name="domains" value="{{ current_user.domains or '' }}" class="form-control shadow-sm" placeholder="e.g. FinTech, AI">
                         </div>
                     </div>
 

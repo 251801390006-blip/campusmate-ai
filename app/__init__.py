@@ -101,7 +101,10 @@ def create_app():
             ("profile_photo", "VARCHAR(255)"),
             ("published_portfolio_html", "TEXT"),
             ("public_profile", "BOOLEAN DEFAULT 1"),
-            ("notifications_enabled", "BOOLEAN DEFAULT 1")
+            ("notifications_enabled", "BOOLEAN DEFAULT 1"),
+            ("college", "VARCHAR(150)"),
+            ("roles", "VARCHAR(200)"),
+            ("domains", "VARCHAR(200)")
         ]:
             try:
                 db.session.execute(db.text(f"ALTER TABLE users ADD COLUMN {col} {col_type}"))

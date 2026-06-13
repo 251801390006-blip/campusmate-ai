@@ -157,7 +157,7 @@
                             <div class="d-flex gap-4 text-muted mb-3 flex-wrap mt-2" style="font-size: 0.78rem;">
                                 <span><i class="fa-solid fa-money-bill-wave text-success me-1"></i> Stipend: <strong>{{ job.stipend or 'Unpaid' }}</strong></span>
                                 <span><i class="fa-solid fa-graduation-cap text-muted me-1"></i> Eligibility: <strong>{{ job.eligibility or 'Open' }}</strong></span>
-                                <span><i class="fa-solid fa-calendar-xmark text-danger me-1"></i> Deadline: <strong>{{ job.deadline or 'N/A' }}</strong></span>
+                                <span><i class="fa-solid fa-clock text-danger me-1"></i> Deadline: <strong>{{ job.deadline or 'N/A' }}</strong> <span class="deadline-countdown text-danger fw-bold ms-1" data-deadline="{{ job.deadline or '' }}"></span></span>
                             </div>
                             <div class="mb-3">
                                 <span class="text-muted d-block mb-1" style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Skills Match</span>
@@ -306,5 +306,39 @@ function sortJobs() {
     
     cards.forEach(card => container.appendChild(card));
 }
+
+function calculateDeadlines() {
+    const countdowns = document.querySelectorAll(".deadline-countdown");
+    const now = new Date();
+    
+    countdowns.forEach(el => {
+        const deadlineStr = el.getAttribute("data-deadline");
+        if (!deadlineStr || deadlineStr === 'None' || deadlineStr === '') return;
+        
+        const deadlineDate = new Date(deadlineStr);
+        if (isNaN(deadlineDate)) return;
+        
+        const diffTime = deadlineDate - now;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays < 0) {
+            el.innerText = "(Expired)";
+        } else if (diffDays === 0) {
+            el.innerText = "(Ends Today)";
+            el.classList.replace("text-danger", "text-warning");
+        } else {
+            el.innerText = `(${diffDays} days left)`;
+            if (diffDays <= 3) {
+                el.classList.add("text-danger");
+            } else {
+                el.classList.replace("text-danger", "text-success");
+            }
+        }
+    });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    calculateDeadlines();
+});
 </script>
 {% endblock %}
