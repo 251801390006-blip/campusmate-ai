@@ -1,11 +1,14 @@
 # CampusMate AI
 AI-Powered Student Career Operating System
+
 Microsoft Agents League 2026 Submission
 
 ---
 
 ## Problem Statement
+
 Students use disconnected tools for:
+
 * Resume Building
 * ATS Optimization
 * Career Roadmapping
@@ -17,7 +20,9 @@ This causes fragmented career growth and poor placement readiness.
 ---
 
 ## Solution
+
 CampusMate AI unifies:
+
 * ATS Resume Builder
 * AI Resume Analyzer
 * Learning Roadmap Engine
@@ -33,6 +38,7 @@ inside a single platform.
 ## Key Features
 
 ### ATS Resume Builder
+
 Live editing
 Professional templates
 One-page ATS format
@@ -43,6 +49,7 @@ PDF export
 ---
 
 ### Resume Live Preview
+
 Real-time rendering
 ATS-friendly formatting
 Responsive preview
@@ -52,6 +59,7 @@ Responsive preview
 ---
 
 ### ATS Analyzer
+
 Resume scoring
 Keyword matching
 Improvement suggestions
@@ -61,6 +69,7 @@ Improvement suggestions
 ---
 
 ### Professional PDF Export
+
 Single-page ATS format
 Production-ready layout
 Consistent rendering
@@ -70,6 +79,7 @@ Consistent rendering
 ---
 
 ### Learning Roadmap Engine
+
 200-node progression system
 Career pathways
 Milestone tracking
@@ -79,6 +89,7 @@ Milestone tracking
 ---
 
 ### Roadmap Resource Explorer
+
 Step-by-step learning resources
 Curated references
 Checkpoint guidance
@@ -88,6 +99,7 @@ Checkpoint guidance
 ---
 
 ### AI Interview Simulator
+
 Technical interviews
 HR interviews
 Voice-enabled practice
@@ -97,6 +109,7 @@ Voice-enabled practice
 ---
 
 ### Internship Command Center
+
 Opportunity matching
 Readiness scoring
 Skill-gap analysis
@@ -106,6 +119,7 @@ Skill-gap analysis
 ---
 
 ### Student Profile System
+
 Skill tracking
 Achievement management
 Career preferences
@@ -115,6 +129,7 @@ Career preferences
 ---
 
 ### Admin Analytics Dashboard
+
 Platform analytics
 Security monitoring
 Student insights
@@ -126,6 +141,7 @@ Student insights
 ## Platform Walkthrough
 
 ![Landing Page](./screenshots/01-landing-page.png)
+
 ![Dashboard](./screenshots/04-dashboard.png)
 
 ---
@@ -133,6 +149,7 @@ Student insights
 ## Authentication System
 
 ![Login Page](./screenshots/02-login-page.png)
+
 ![Register Page](./screenshots/03-register-page.png)
 
 ---
@@ -141,38 +158,54 @@ Student insights
 
 ![System Architecture](./screenshots/15-system-architecture.png)
 
-Cloudflare securely proxies traffic to our Railway instance where the Flask Backend orchestrates the Authentication Service and orchestrates the AI engines (Resume Engine, ATS Engine, Roadmap Engine, and Analytics Module). The system utilizes a dual-ready SQLite/PostgreSQL layer for rapid development and scalable production.
+Explain:
+
+* **Cloudflare**: Edge caching and DNS routing
+* **Railway**: Continuous deployment and container hosting
+* **Flask Backend**: WSGI web application framework
+* **Authentication Service**: Flask-Login session management
+* **Resume Engine**: PDF rendering via WeasyPrint
+* **ATS Engine**: Keyword matching and scoring logic
+* **Roadmap Engine**: JSON-based node progression system
+* **Analytics Module**: System-wide event aggregation
+* **SQLite/PostgreSQL**: Relational data models
 
 ---
 
 ## Technology Stack
 
-**Frontend**
+Frontend
+
 * HTML5
 * CSS3
 * Bootstrap 5
 * JavaScript
 
-**Backend**
+Backend
+
 * Python
 * Flask
 
-**Database**
+Database
+
 * SQLite
 * PostgreSQL Ready
 
-**AI Services**
+AI Services
+
 * Gemini
 * Microsoft Agent Ecosystem
 
-**Deployment**
+Deployment
+
 * Railway
 
 ---
 
 ## Security
 
-**Implemented:**
+Implemented:
+
 * Environment Variable Protection
 * Secret Key Hardening
 * Upload Size Limits
@@ -180,8 +213,9 @@ Cloudflare securely proxies traffic to our Railway instance where the Flask Back
 * Password Hashing
 * Production Deployment Configuration
 
-**Security Audit Status:**
-`PASS`
+Security Audit Status:
+
+PASS
 
 ---
 
@@ -196,8 +230,12 @@ Cloudflare securely proxies traffic to our Railway instance where the Flask Back
 2. **Set up virtual environment:**
    ```bash
    python -m venv .venv
-   .venv\Scripts\activate  # Windows
-   source .venv/bin/activate  # macOS / Linux
+   
+   # Windows (PowerShell/CMD)
+   .venv\Scripts\activate
+   
+   # macOS / Linux
+   source .venv/bin/activate
    ```
 
 3. **Install dependencies:**
@@ -209,29 +247,47 @@ Cloudflare securely proxies traffic to our Railway instance where the Flask Back
    ```bash
    python main.py
    ```
-   Open `http://127.0.0.1:8000` in your browser.
+   Open **`http://127.0.0.1:8000`** in your browser.
 
 ---
 
 ## Environment Variables
-Reference `.env.example`. No secrets inside repository.
+
+Reference `.env.example`
+
+No secrets inside repository.
 
 ---
 
 ## Demo
-Live Application: https://campusmate-ai-production.up.railway.app
+
+Live Application:
+https://campusmate-ai-production.up.railway.app
 
 ---
 
 ## License
+
 MIT License
 
 ---
 
 ## Microsoft Agents League Submission
-**Track:** AI Career Growth & Student Productivity
-**Status:** Submission Ready
-**Repository Visibility:** Public
-**Security Audit:** Passed
-**Documentation:** Complete
-**Deployment:** Live
+
+Track:
+AI Career Growth & Student Productivity
+
+Status:
+Submission Ready
+
+Repository Visibility:
+Public
+
+Security Audit:
+Passed
+
+Documentation:
+Complete
+
+Deployment:
+Live
