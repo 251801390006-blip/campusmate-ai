@@ -2877,15 +2877,24 @@ def export_resume_pdf():
     resume_html = data['html']
     theme_val = data.get('theme', 'classic')
     
-    # 1. Base Structure for WeasyPrint Single Page ATS mode
-    # We must construct a valid HTML document using the client's innerHTML.
-    # Strict A4 sizing, ATS fonts (Arial/Helvetica), thin horizontal dividers.
+    import os
+    style_content = ""
+    try:
+        style_path = os.path.join(current_app.static_folder, 'css', 'style.css')
+        if os.path.exists(style_path):
+            with open(style_path, 'r', encoding='utf-8') as f:
+                style_content = f.read()
+    except Exception as e:
+        pass
+
     full_html = f"""<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
     <title>Resume</title>
     <style>
+        {style_content}
+
         @page {{
             size: A4 portrait;
             margin: 10mm 12mm; /* Professional tight margins for ATS */
@@ -2900,11 +2909,9 @@ def export_resume_pdf():
             padding: 0;
             box-sizing: border-box;
         }}
-        /* Strip background colors and complex CSS for ATS */
+        /* Strip complex shadows for clean print */
         * {{
             box-shadow: none !important;
-            background-color: transparent !important;
-            border-radius: 0 !important;
         }}
         
         /* Enforce thin ATS dividers instead of thick blocks */
@@ -2951,8 +2958,14 @@ def export_resume_pdf():
 </body>
 </html>"""
 
-    font_config = FontConfiguration()
-    pdf_bytes = HTML(string=full_html).write_pdf(font_config=font_config)
+    try:
+        font_config = FontConfiguration()
+        pdf_bytes = HTML(string=full_html).write_pdf(font_config=font_config)
+    except Exception as e:
+        return jsonify({
+            'error': 'Failed to compile PDF. WeasyPrint rendering engine encountered an error.',
+            'details': str(e)
+        }), 500
 
     from io import BytesIO
     from flask import send_file

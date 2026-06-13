@@ -3170,7 +3170,10 @@ async function downloadResumePDF() {
         
     } catch (err) {
         console.error("PDF export error:", err);
-        alert("Failed to generate PDF: " + err.message);
+        const confirmPrint = confirm("Server-side PDF generation failed: " + err.message + "\n\nWould you like to print/save the resume directly using your browser's Print dialog instead?");
+        if (confirmPrint) {
+            window.print();
+        }
     } finally {
         btns.forEach((btn, i) => {
             btn.disabled = false;
