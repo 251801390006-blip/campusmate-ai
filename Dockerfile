@@ -4,8 +4,7 @@ FROM python:3.12
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies for WeasyPrint (PDF generation)
-RUN apt-get update && apt-get install -y libcairo2 libpango-1.0-0 libpangoft2-1.0-0 libjpeg-dev libopenjp2-7-dev libffi-dev shared-mime-info && rm -rf /var/lib/apt/lists/*
+# Install system dependencies (none required for pure client-side PDF)
 
 # Copy requirements file
 COPY requirements.txt .
