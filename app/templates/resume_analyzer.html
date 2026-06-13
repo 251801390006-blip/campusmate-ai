@@ -3158,11 +3158,6 @@ async function downloadResumePDF() {
             }
         }
         
-        // Create a pristine clone for PDF generation
-        const clone = sheet.cloneNode(true);
-        // Remove interactive UI elements that shouldn't be in PDF
-        clone.querySelectorAll('.resume-canvas-toolbar, .resume-zoom-slider, .btn-canvas-ctrl, [data-no-pdf]').forEach(el => el.remove());
-        
         const nameVal = (content.name || 'Resume').trim().replace(/\s+/g, '_');
         const filename = `${nameVal}_ATS_Resume.pdf`;
 
@@ -3170,37 +3165,53 @@ async function downloadResumePDF() {
             margin:       [10, 0, 10, 0],
             filename:     filename,
             image:        { type: 'jpeg', quality: 1.0 },
-            html2canvas:  { scale: 2, useCORS: true, scrollY: 0, windowWidth: 1200 },
+            html2canvas:  { scale: 2, useCORS: true },
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
-        // Temporarily style clone for correct PDF rendering
-        clone.style.transform = 'none';
-        clone.style.width = '210mm';
-        clone.style.minHeight = '297mm';
-        clone.style.padding = '15mm';
-        clone.style.margin = '0';
-        clone.style.boxShadow = 'none';
-        clone.style.border = 'none';
-        clone.style.background = '#fff';
+        // Prepare the actual DOM element for rendering (no clones, to prevent blank PDFs)
+        sheet.querySelectorAll('.resume-canvas-toolbar, .resume-zoom-slider, .btn-canvas-ctrl, [data-no-pdf]').forEach(el => el.setAttribute('data-html2canvas-ignore', 'true'));
+        
+        // Save original styles to restore them later
+        const origStyles = {
+            transform: sheet.style.transform,
+            width: sheet.style.width,
+            minHeight: sheet.style.minHeight,
+            padding: sheet.style.padding,
+            margin: sheet.style.margin,
+            boxShadow: sheet.style.boxShadow,
+            border: sheet.style.border,
+            background: sheet.style.background
+        };
 
-        // Add to a fixed hidden container in body so html2canvas can perfectly capture it
-        // Do NOT use -9999px as html2canvas will clip it. Use z-index instead.
-        const container = document.createElement('div');
-        container.style.position = 'fixed';
-        container.style.left = '0';
-        container.style.top = '0';
-        container.style.zIndex = '-9999'; // Hidden behind other elements
-        container.style.background = '#fff';
-        container.style.width = '210mm';
-        container.style.pointerEvents = 'none';
-        container.appendChild(clone);
-        document.body.appendChild(container);
+        // Temporarily style the sheet for perfect A4 PDF rendering
+        sheet.style.transform = 'none';
+        sheet.style.width = '210mm';
+        sheet.style.minHeight = '297mm';
+        sheet.style.padding = '15mm';
+        sheet.style.margin = '0 auto';
+        sheet.style.boxShadow = 'none';
+        sheet.style.border = 'none';
+        sheet.style.background = '#fff';
+
+        // Scroll to the element to ensure html2canvas captures it if it's offscreen
+        sheet.scrollIntoView({ behavior: 'instant', block: 'start' });
 
         try {
-            await html2pdf().set(opt).from(clone).save();
+            await html2pdf().set(opt).from(sheet).save();
         } finally {
-            document.body.removeChild(container);
+            // Restore all original styles instantly
+            sheet.style.transform = origStyles.transform;
+            sheet.style.width = origStyles.width;
+            sheet.style.minHeight = origStyles.minHeight;
+            sheet.style.padding = origStyles.padding;
+            sheet.style.margin = origStyles.margin;
+            sheet.style.boxShadow = origStyles.boxShadow;
+            sheet.style.border = origStyles.border;
+            sheet.style.background = origStyles.background;
+            
+            // Remove ignore tags
+            sheet.querySelectorAll('[data-html2canvas-ignore="true"]').forEach(el => el.removeAttribute('data-html2canvas-ignore'));
         }
         
     } catch (err) {
