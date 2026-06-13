@@ -140,7 +140,7 @@ The application flow leverages an efficient modular pipeline:
 * **Deployment Platform:** Railway (Automated Containerized Builds)
 
 ### 🎥 Demo Video
-> **[Watch the Full Platform Demo Here](#)**
+> **[Watch the Full Platform Demo Here](https://youtu.be/RlYctGkgnqg)**
 *(Click to view the complete walkthrough demonstrating the Resume Builder, Roadmap Engine, and AI Interview features.)*
 
 ---
