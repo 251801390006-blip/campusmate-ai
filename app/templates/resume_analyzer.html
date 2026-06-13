@@ -811,6 +811,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script>
 let educationList = [];
@@ -3132,47 +3133,41 @@ async function downloadResumePDF() {
         // Remove interactive UI elements that shouldn't be in PDF
         clone.querySelectorAll('.resume-canvas-toolbar, .resume-zoom-slider, .btn-canvas-ctrl, [data-no-pdf]').forEach(el => el.remove());
         
-        // Convert URLs to absolute if needed, or just send raw HTML. WeasyPrint will need absolute URLs for images.
-        // We will just send the innerHTML.
-        const htmlPayload = clone.outerHTML;
-        
-        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || "";
-        
-        const response = await fetch('/resume-analyzer/export-pdf', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
-            },
-            body: JSON.stringify({
-                html: htmlPayload,
-                name: content.name,
-                theme: document.getElementById("resume-theme-select").value || 'classic'
-            })
-        });
-        
-        if (!response.ok) {
-            const errData = await response.json().catch(() => ({}));
-            const errMsg = errData.error || `Server returned ${response.status}`;
-            const detailsMsg = errData.details ? `\nDetails: ${errData.details}` : '';
-            throw new Error(errMsg + detailsMsg);
-        }
-        
-        // Trigger download
-        const blob = await response.blob();
-        const downloadUrl = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = downloadUrl;
         const nameVal = (content.name || 'Resume').trim().replace(/\s+/g, '_');
-        a.download = `${nameVal}_ATS_Resume.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(downloadUrl);
+        const filename = `${nameVal}_ATS_Resume.pdf`;
+
+        const opt = {
+            margin:       [10, 0, 10, 0],
+            filename:     filename,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        // Temporarily style clone for correct PDF rendering
+        clone.style.width = '210mm';
+        clone.style.minHeight = '297mm';
+        clone.style.padding = '15mm';
+        clone.style.margin = '0';
+        clone.style.boxShadow = 'none';
+
+        // Add to a hidden container in body so html2canvas can read it
+        const container = document.createElement('div');
+        container.style.position = 'absolute';
+        container.style.left = '-9999px';
+        container.style.top = '-9999px';
+        container.appendChild(clone);
+        document.body.appendChild(container);
+
+        try {
+            await html2pdf().set(opt).from(clone).save();
+        } finally {
+            document.body.removeChild(container);
+        }
         
     } catch (err) {
         console.error("PDF export error:", err);
-        const confirmPrint = confirm("Server-side PDF generation failed: " + err.message + "\n\nWould you like to print/save the resume directly using your browser's Print dialog instead?");
+        const confirmPrint = confirm("Client-side PDF generation failed: " + err.message + "\n\nWould you like to print/save the resume directly using your browser's Print dialog instead?");
         if (confirmPrint) {
             window.print();
         }
