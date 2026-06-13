@@ -385,24 +385,53 @@
 
             <div id="resume-sections-container">
                 {% for sec in content.sectionOrder or ["education", "skills", "experience", "projects", "certifications", "achievements", "hackathons", "languages"] %}
-                    {% if sec == "education" and (content.edu1Inst or content.edu1Degree) %}
+                    {% if sec == "education" and (content.education or content.edu1Inst or content.edu1Degree) %}
                         <div class="resume-render-section" data-section="education">
                             <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Education</h3>
-                            <div>
-                                <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
-                                    <span>{{ content.edu1Inst }}</span>
-                                    <span style="font-weight:normal;">{{ content.edu1Degree }}</span>
+                            {% if content.education and content.education is iterable and content.education is not string %}
+                                {% for item in content.education %}
+                                    <div style="margin-bottom:8px;">
+                                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
+                                            <span>{{ item.inst }}</span>
+                                            <span style="font-weight:normal;">{{ item.degree }}</span>
+                                        </div>
+                                        <div style="display:flex; justify-content:space-between; font-size:10px; color:#6b7280; margin-top:1px;">
+                                            <span>{{ item.dates }}</span>
+                                            <span>{{ item.gpa }}</span>
+                                        </div>
+                                        {% if item.coursework %}
+                                        <div style="font-size:10px; margin-top:2px; color:#4b5563;">
+                                            Relevant Coursework: {{ item.coursework }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div>
+                                    <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
+                                        <span>{{ content.edu1Inst }}</span>
+                                        <span style="font-weight:normal;">{{ content.edu1Degree }}</span>
+                                    </div>
+                                    <div style="display:flex; justify-content:space-between; font-size:10px; color:#6b7280; margin-top:1px;">
+                                        <span>{{ content.edu1Dates }}</span>
+                                        <span>GPA: <strong>{{ content.edu1Gpa }}</strong></span>
+                                    </div>
+                                    {% if content.edu1Coursework %}
+                                    <div style="font-size:10px; margin-top:2px; color:#4b5563;">
+                                        Relevant Coursework: {{ content.edu1Coursework }}
+                                    </div>
+                                    {% endif %}
                                 </div>
-                                <div style="display:flex; justify-content:space-between; font-size:10px; color:#6b7280; margin-top:1px;">
-                                    <span>{{ content.edu1Dates }}</span>
-                                    <span>GPA: <strong>{{ content.edu1Gpa }}</strong></span>
-                                </div>
-                                {% if content.edu1Coursework %}
-                                <div style="font-size:10px; margin-top:2px; color:#4b5563;">
-                                    Relevant Coursework: {{ content.edu1Coursework }}
-                                </div>
-                                {% endif %}
-                            </div>
+                            {% endif %}
+                        </div>
+                    {% elif sec == "schoolcollege" and (content.schoolCollege or content.schoolCollegeList) %}
+                        <div class="resume-render-section" data-section="schoolcollege">
+                            <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">School & College List</h3>
+                            <ul class="bullet-list" style="font-size:10px; margin-top:2px; line-height:1.4; color:#374151;">
+                                {% for item in content.schoolCollege or content.schoolCollegeList %}
+                                    {% if item.name %}<li style="margin-bottom: 2px;">{{ item.name }}</li>{% endif %}
+                                {% endfor %}
+                            </ul>
                         </div>
                     {% elif sec == "skills" and (content.skillsProg or content.skillsCyber or content.skillsTools or content.skillsWeb) %}
                         <div class="resume-render-section" data-section="skills">
@@ -412,49 +441,177 @@
                                 {% if content.skillsCyber %}<div><strong>Databases & Core CS:</strong> <span>{{ content.skillsCyber }}</span></div>{% endif %}
                                 {% if content.skillsTools %}<div><strong>Tools & Cloud:</strong> <span>{{ content.skillsTools }}</span></div>{% endif %}
                                 {% if content.skillsWeb %}<div><strong>Frameworks:</strong> <span>{{ content.skillsWeb }}</span></div>{% endif %}
-                            </div>
+                             </div>
                         </div>
-                    {% elif sec == "experience" and (content.experienceRole or content.experienceComp) %}
+                    {% elif sec == "experience" and (content.experience or content.experienceRole or content.experienceComp) %}
                         <div class="resume-render-section" data-section="experience">
                             <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Experience</h3>
-                            <div>
-                                <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
-                                    <span>{{ content.experienceRole }}</span>
-                                    <span>{{ content.experienceDates }}</span>
+                            {% if content.experience and content.experience is iterable and content.experience is not string %}
+                                {% for item in content.experience %}
+                                    <div style="margin-bottom:8px;">
+                                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
+                                            <span>{{ item.role }}</span>
+                                            <span>{{ item.dates }}</span>
+                                        </div>
+                                        <div style="font-size:10.5px; font-style:italic; color:#6b7280; margin-bottom:2px;">{{ item.company }}</div>
+                                        {% if item.bullets %}
+                                            <ul class="bullet-list" style="font-size:10px; margin-top:2px; line-height:1.4; color:#374151;">
+                                                {% for bullet in item.bullets %}
+                                                    {% if bullet %}<li style="margin-bottom: 2px;">{{ bullet }}</li>{% endif %}
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div>
+                                    <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
+                                        <span>{{ content.experienceRole }}</span>
+                                        <span>{{ content.experienceDates }}</span>
+                                    </div>
+                                    <div style="font-size:10.5px; font-style:italic; color:#6b7280; margin-bottom:2px;">{{ content.experienceComp }}</div>
+                                    <ul class="bullet-list" style="font-size:10px; margin-top:2px; line-height:1.4; color:#374151;">
+                                        {% if content.experienceB1 %}<li style="margin-bottom: 2px;">{{ content.experienceB1 }}</li>{% endif %}
+                                        {% if content.experienceB2 %}<li style="margin-bottom: 2px;">{{ content.experienceB2 }}</li>{% endif %}
+                                        {% if content.experienceB3 %}<li style="margin-bottom: 2px;">{{ content.experienceB3 }}</li>{% endif %}
+                                        {% if content.experienceB4 %}<li style="margin-bottom: 2px;">{{ content.experienceB4 }}</li>{% endif %}
+                                    </ul>
                                 </div>
-                                <div style="font-size:10.5px; font-style:italic; color:#6b7280; margin-bottom:2px;">{{ content.experienceComp }}</div>
-                                <ul class="bullet-list" style="font-size:10px; margin-top:2px; line-height:1.4; color:#374151;">
-                                    {% if content.experienceB1 %}<li style="margin-bottom: 2px;">{{ content.experienceB1 }}</li>{% endif %}
-                                    {% if content.experienceB2 %}<li style="margin-bottom: 2px;">{{ content.experienceB2 }}</li>{% endif %}
-                                    {% if content.experienceB3 %}<li style="margin-bottom: 2px;">{{ content.experienceB3 }}</li>{% endif %}
-                                    {% if content.experienceB4 %}<li style="margin-bottom: 2px;">{{ content.experienceB4 }}</li>{% endif %}
-                                </ul>
-                            </div>
+                            {% endif %}
                         </div>
-                    {% elif sec == "projects" and content.projectTitle %}
+                    {% elif sec == "internships" and content.internships %}
+                        <div class="resume-render-section" data-section="internships">
+                            <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Internships</h3>
+                            {% for item in content.internships %}
+                                <div style="margin-bottom:8px;">
+                                    <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
+                                        <span>{{ item.role }}</span>
+                                        <span>{{ item.dates }}</span>
+                                    </div>
+                                    <div style="font-size:10.5px; font-style:italic; color:#6b7280; margin-bottom:2px;">{{ item.company }}</div>
+                                    {% if item.bullets %}
+                                        <ul class="bullet-list" style="font-size:10px; margin-top:2px; line-height:1.4; color:#374151;">
+                                            {% for bullet in item.bullets %}
+                                                {% if bullet %}<li style="margin-bottom: 2px;">{{ bullet }}</li>{% endif %}
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% elif sec == "projects" and (content.projects or content.projectTitle) %}
                         <div class="resume-render-section" data-section="projects">
                             <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Projects</h3>
-                            <div>
-                                <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
-                                    <span>{{ content.projectTitle }}</span>
-                                    <span style="font-weight:normal; font-size:10px; color:#4b5563;">{{ content.projectLink }}</span>
+                            {% if content.projects and content.projects is iterable and content.projects is not string %}
+                                {% for item in content.projects %}
+                                    <div style="margin-bottom:8px;">
+                                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
+                                            <span>{{ item.title }}</span>
+                                            <span style="font-weight:normal; font-size:10px; color:#4b5563;">{{ item.link }}</span>
+                                        </div>
+                                        {% if item.bullets %}
+                                            <ul class="bullet-list" style="font-size:10px; margin-top:2px; line-height:1.4; color:#374151;">
+                                                {% for bullet in item.bullets %}
+                                                    {% if bullet %}<li style="margin-bottom: 2px;">{{ bullet }}</li>{% endif %}
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div>
+                                    <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
+                                        <span>{{ content.projectTitle }}</span>
+                                        <span style="font-weight:normal; font-size:10px; color:#4b5563;">{{ content.projectLink }}</span>
+                                    </div>
+                                    <ul class="bullet-list" style="font-size:10px; margin-top:2px; line-height:1.4; color:#374151;">
+                                        {% if content.projectB1 %}<li style="margin-bottom: 2px;">{{ content.projectB1 }}</li>{% endif %}
+                                        {% if content.projectB2 %}<li style="margin-bottom: 2px;">{{ content.projectB2 }}</li>{% endif %}
+                                        {% if content.projectB3 %}<li style="margin-bottom: 2px;">{{ content.projectB3 }}</li>{% endif %}
+                                    </ul>
                                 </div>
-                                <ul class="bullet-list" style="font-size:10px; margin-top:2px; line-height:1.4; color:#374151;">
-                                    {% if content.projectB1 %}<li style="margin-bottom: 2px;">{{ content.projectB1 }}</li>{% endif %}
-                                    {% if content.projectB2 %}<li style="margin-bottom: 2px;">{{ content.projectB2 }}</li>{% endif %}
-                                    {% if content.projectB3 %}<li style="margin-bottom: 2px;">{{ content.projectB3 }}</li>{% endif %}
-                                </ul>
-                            </div>
+                            {% endif %}
                         </div>
-                    {% elif sec == "certifications" and (content.certC1 or content.certC2) %}
+                    {% elif sec == "certifications" and (content.certifications or content.certC1) %}
                         <div class="resume-render-section" data-section="certifications">
                             <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Certifications</h3>
                             <ul class="bullet-list" style="font-size:10px; margin-top:2px; line-height:1.4; color:#374151;">
-                                {% if content.certC1 %}<li style="margin-bottom: 2px;">{{ content.certC1 }}</li>{% endif %}
-                                {% if content.certC2 %}<li style="margin-bottom: 2px;">{{ content.certC2 }}</li>{% endif %}
-                                {% if content.certC3 %}<li style="margin-bottom: 2px;">{{ content.certC3 }}</li>{% endif %}
-                                {% if content.certC4 %}<li style="margin-bottom: 2px;">{{ content.certC4 }}</li>{% endif %}
+                                {% if content.certifications and content.certifications is iterable and content.certifications is not string %}
+                                    {% for item in content.certifications %}
+                                        {% if item.name %}<li style="margin-bottom: 2px;">{{ item.name }}</li>{% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    {% if content.certC1 %}<li style="margin-bottom: 2px;">{{ content.certC1 }}</li>{% endif %}
+                                    {% if content.certC2 %}<li style="margin-bottom: 2px;">{{ content.certC2 }}</li>{% endif %}
+                                    {% if content.certC3 %}<li style="margin-bottom: 2px;">{{ content.certC3 }}</li>{% endif %}
+                                    {% if content.certC4 %}<li style="margin-bottom: 2px;">{{ content.certC4 }}</li>{% endif %}
+                                {% endif %}
                             </ul>
+                        </div>
+                    {% elif sec == "workshopsList" and content.workshopsList %}
+                        <div class="resume-render-section" data-section="workshopsList">
+                            <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Workshops</h3>
+                            {% for item in content.workshopsList %}
+                                <div style="margin-bottom:8px;">
+                                    <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
+                                        <span>{{ item.name }}</span>
+                                        <span>{{ item.dates }}</span>
+                                    </div>
+                                    <div style="font-size:10px; color:#6b7280; margin-top:1px;">{{ item.organizer }}</div>
+                                    {% if item.description %}
+                                        <div style="font-size:10px; margin-top:2px; color:#4b5563;">{{ item.description }}</div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% elif sec == "publications" and content.publications %}
+                        <div class="resume-render-section" data-section="publications">
+                            <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Publications</h3>
+                            {% for item in content.publications %}
+                                <div style="margin-bottom:8px;">
+                                    <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
+                                        <span>{{ item.title }}</span>
+                                        <span>{{ item.dates }}</span>
+                                    </div>
+                                    <div style="font-size:10px; color:#6b7280; margin-top:1px;">{{ item.publisher }}</div>
+                                    {% if item.link %}
+                                        <div style="font-size:10px; margin-top:2px; color:#4b5563;">{{ item.link }}</div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% elif sec == "hackathonsList" and content.hackathonsList %}
+                        <div class="resume-render-section" data-section="hackathonsList">
+                            <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Hackathons</h3>
+                            {% for item in content.hackathonsList %}
+                                <div style="margin-bottom:8px;">
+                                    <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px;">
+                                        <span>{{ item.title }}</span>
+                                        <span style="font-weight:normal; font-size:10px; color:#4b5563;">{{ item.link }}</span>
+                                    </div>
+                                    {% if item.award %}
+                                        <div style="font-size:10px; font-style:italic; color:#6b7280; margin-bottom:2px;">Award: {{ item.award }}</div>
+                                    {% endif %}
+                                    {% if item.bullets %}
+                                        <ul class="bullet-list" style="font-size:10px; margin-top:2px; line-height:1.4; color:#374151;">
+                                            {% for bullet in item.bullets %}
+                                                {% if bullet %}<li style="margin-bottom: 2px;">{{ bullet }}</li>{% endif %}
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% elif sec == "customSection" and content.customSection and content.customSection.title %}
+                        <div class="resume-render-section" data-section="customSection">
+                            <h3 style="font-size:12px; font-weight:800; color:#1e3a8a; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">{{ content.customSection.title }}</h3>
+                            {% if content.customSection.bullets %}
+                                <ul class="bullet-list" style="font-size:10px; margin-top:2px; line-height:1.4; color:#374151;">
+                                    {% for bullet in content.customSection.bullets %}
+                                        {% if bullet %}<li style="margin-bottom: 2px;">{{ bullet }}</li>{% endif %}
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
                         </div>
                     {% elif sec == "achievements" and content.achievements %}
                         <div class="resume-render-section" data-section="achievements">

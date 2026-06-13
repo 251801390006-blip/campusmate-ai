@@ -358,6 +358,15 @@
                     </div>
                 </details>
 
+                <!-- 4b. Internships Accordion -->
+                <details class="accordion-section p-2 border rounded bg-primary-card" id="accordion-internships">
+                    <summary class="fw-bold text-secondary-text" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-user-gear me-2 text-muted"></i> Internships List</summary>
+                    <div class="mt-2">
+                        <div id="internships-items-list"></div>
+                        <button type="button" class="btn btn-sm btn-outline w-100 py-1.5" onclick="addInternshipItem()"><i class="fa-solid fa-plus me-1"></i> Add Internship Entry</button>
+                    </div>
+                </details>
+
                 <!-- 5. Projects Accordion -->
                 <details class="accordion-section p-2 border rounded bg-primary-card" id="accordion-projects">
                     <summary class="fw-bold text-secondary-text" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-code me-2 text-muted"></i> Projects List</summary>
@@ -376,6 +385,15 @@
                     </div>
                 </details>
 
+                <!-- 6b. Workshops Accordion -->
+                <details class="accordion-section p-2 border rounded bg-primary-card" id="accordion-workshops">
+                    <summary class="fw-bold text-secondary-text" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-chalkboard-user me-2 text-muted"></i> Workshops List</summary>
+                    <div class="mt-2">
+                        <div id="workshops-items-list"></div>
+                        <button type="button" class="btn btn-sm btn-outline w-100 py-1.5" onclick="addWorkshopItem()"><i class="fa-solid fa-plus me-1"></i> Add Workshop Entry</button>
+                    </div>
+                </details>
+
                 <!-- 7. Achievements Accordion -->
                 <details class="accordion-section p-2 border rounded bg-primary-card" id="accordion-achievements">
                     <summary class="fw-bold text-secondary-text" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-trophy me-2 text-muted"></i> Achievements</summary>
@@ -389,16 +407,10 @@
 
                 <!-- 8. Hackathons Accordion -->
                 <details class="accordion-section p-2 border rounded bg-primary-card" id="accordion-hackathons">
-                    <summary class="fw-bold text-secondary-text" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-laptop-code me-2 text-muted"></i> Hackathons & Workshops</summary>
-                    <div class="row g-2 mt-2">
-                        <div class="col-12">
-                            <label class="form-label" style="font-size:0.65rem;">Hackathons Completed</label>
-                            <input type="text" id="res-hackathons" class="form-input" value="Participated in Local College Hackathon (2024)" oninput="syncResumeFields()">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label" style="font-size:0.65rem;">Workshops Attended</label>
-                            <input type="text" id="res-workshops" class="form-input" value="Attended Modern Software Development Practices Workshop" oninput="syncResumeFields()">
-                        </div>
+                    <summary class="fw-bold text-secondary-text" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-laptop-code me-2 text-muted"></i> Hackathons List</summary>
+                    <div class="mt-2">
+                        <div id="hackathons-items-list"></div>
+                        <button type="button" class="btn btn-sm btn-outline w-100 py-1.5" onclick="addHackathonItem()"><i class="fa-solid fa-plus me-1"></i> Add Hackathon Entry</button>
                     </div>
                 </details>
 
@@ -434,6 +446,15 @@
                             <textarea id="res-custom-sec-bullets" class="form-input res-bullet-input" rows="4" placeholder="Description of your custom work..." onfocus="setActiveBullet(this)" oninput="updateCustomSectionBullets(this.value)"></textarea>
                             <button type="button" class="btn btn-xs btn-outline mt-1 btn-ai-optimize" onclick="optimizeBullets(this, 'custom', null)" style="font-size: 0.65rem; border-color: var(--accent-color) !important; color: var(--accent-color) !important; cursor:pointer;"><i class="fa-solid fa-wand-magic-sparkles me-1"></i> AI Optimize Bullets</button>
                         </div>
+                    </div>
+                </details>
+
+                <!-- 9c. Publications Accordion -->
+                <details class="accordion-section p-2 border rounded bg-primary-card" id="accordion-publications">
+                    <summary class="fw-bold text-secondary-text" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-book me-2 text-muted"></i> Publications List</summary>
+                    <div class="mt-2">
+                        <div id="publications-items-list"></div>
+                        <button type="button" class="btn btn-sm btn-outline w-100 py-1.5" onclick="addPublicationItem()"><i class="fa-solid fa-plus me-1"></i> Add Publication Entry</button>
                     </div>
                 </details>
 
@@ -747,14 +768,18 @@
 let educationList = [];
 let schoolCollegeList = [];
 let experienceList = [];
+let internshipsList = [];
 let projectsList = [];
 let certificationsList = [];
+let workshopsList = [];
+let hackathonsList = [];
+let publicationsList = [];
 let customSection = { title: "", bullets: [] };
 
 let activeBulletInput = null;
 let savedVersions = [];
 let lastATSFeedback = null;
-let sectionOrder = ["education", "schoolcollege", "skills", "experience", "projects", "certifications", "customSection", "achievements", "hackathons", "languages"];
+let sectionOrder = ["education", "schoolcollege", "skills", "experience", "internships", "projects", "certifications", "workshopsList", "publications", "hackathonsList", "customSection", "achievements", "languages"];
 
 let undoStack = [];
 let redoStack = [];
@@ -920,6 +945,44 @@ document.addEventListener("DOMContentLoaded", () => {
         certificationsList.push({ name: "AWS Certified Cloud Practitioner" });
         certificationsList.push({ name: "Python Programmer Certificate of Excellence" });
     }
+    if (internshipsList.length === 0) {
+        internshipsList.push({
+            role: "Frontend Developer Intern",
+            company: "Web Startups LLC",
+            dates: "May 2024 - August 2024",
+            bullets: [
+                "Designed and implemented responsive web layouts using HTML, CSS, and JavaScript.",
+                "Integrated web pages with JSON APIs to dynamically render learning materials."
+            ]
+        });
+    }
+    if (workshopsList.length === 0) {
+        workshopsList.push({
+            name: "Modern Web Architectures & Security",
+            organizer: "Developer Community Hub",
+            dates: "October 2024",
+            description: "Learned best practices for API security, cloud hosting, and responsive design systems."
+        });
+    }
+    if (publicationsList.length === 0) {
+        publicationsList.push({
+            title: "A Survey of Artificial Intelligence in Student Workspaces",
+            publisher: "Journal of Tech Education",
+            link: "doi.org/10.1234/jte.2025.567",
+            dates: "January 2025"
+        });
+    }
+    if (hackathonsList.length === 0) {
+        hackathonsList.push({
+            title: "HackCampus 2024",
+            award: "First Place Winner",
+            link: "github.com/alexsmith/hackcampus-project",
+            bullets: [
+                "Co-developed a collaborative student learning planner in 36 hours.",
+                "Implemented the dynamic dashboard using Flask and TailwindCSS."
+            ]
+        });
+    }
     schoolCollegeList = [
         { name: "State University" },
         { name: "High School / Preparatory Academy" }
@@ -935,8 +998,12 @@ document.addEventListener("DOMContentLoaded", () => {
     renderEducationListForm();
     renderSchoolCollegeListForm();
     renderExperienceListForm();
+    renderInternshipsListForm();
     renderProjectsListForm();
     renderCertificationsListForm();
+    renderWorkshopsListForm();
+    renderHackathonsListForm();
+    renderPublicationsListForm();
 
     const customTitleEl = document.getElementById("res-custom-sec-title");
     if (customTitleEl) customTitleEl.value = customSection.title;
@@ -1441,6 +1508,261 @@ function updateCustomSectionTitle(val) {
     customSection.title = val;
     syncResumeFields();
 }
+
+// Internships List Form Builder
+function renderInternshipsListForm() {
+    const container = document.getElementById("internships-items-list");
+    if (!container) return;
+    container.innerHTML = "";
+    internshipsList.forEach((item, idx) => {
+        const div = document.createElement("div");
+        div.className = "p-3 border rounded mb-3 bg-primary-card position-relative";
+        div.innerHTML = `
+            <div class="position-absolute top-2 right-2 d-flex gap-1" style="z-index: 10;">
+                <button type="button" class="btn btn-xs btn-outline p-0 px-1" onclick="moveInternshipItem(${idx}, -1)" ${idx === 0 ? 'disabled' : ''} style="cursor:pointer; background:none; border:none;"><i class="fa-solid fa-arrow-up text-muted" style="font-size:10px;"></i></button>
+                <button type="button" class="btn btn-xs btn-outline p-0 px-1" onclick="moveInternshipItem(${idx}, 1)" ${idx === internshipsList.length - 1 ? 'disabled' : ''} style="cursor:pointer; background:none; border:none;"><i class="fa-solid fa-arrow-down text-muted" style="font-size:10px;"></i></button>
+                <button type="button" class="btn btn-xs btn-danger p-0 px-1" onclick="removeInternshipItem(${idx})" style="cursor:pointer; background:none; border:none;"><i class="fa-solid fa-trash text-danger" style="font-size:10px;"></i></button>
+            </div>
+            <div class="row g-2">
+                <div class="col-12">
+                    <label class="form-label" style="font-size:0.65rem;">Role Title</label>
+                    <input type="text" class="form-input" value="${item.role || ''}" oninput="updateInternshipField(${idx}, 'role', this.value)">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" style="font-size:0.65rem;">Company Name</label>
+                    <input type="text" class="form-input" value="${item.company || ''}" oninput="updateInternshipField(${idx}, 'company', this.value)">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" style="font-size:0.65rem;">Dates / Period</label>
+                    <input type="text" class="form-input" value="${item.dates || ''}" oninput="updateInternshipField(${idx}, 'dates', this.value)">
+                </div>
+                <div class="col-12">
+                    <label class="form-label" style="font-size:0.65rem;">Details (one per line)</label>
+                    <textarea class="form-input res-bullet-input" rows="3" onfocus="setActiveBullet(this)" oninput="updateInternshipBullets(${idx}, this.value)">${(item.bullets || []).join('\n')}</textarea>
+                    <button type="button" class="btn btn-xs btn-outline mt-1 btn-ai-optimize" onclick="optimizeBullets(this, 'internship', ${idx})" style="font-size: 0.65rem; border-color: var(--accent-color) !important; color: var(--accent-color) !important; cursor:pointer;"><i class="fa-solid fa-wand-magic-sparkles me-1"></i> AI Optimize Bullets</button>
+                </div>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+function addInternshipItem() {
+    internshipsList.push({ role: "", company: "", dates: "", bullets: [] });
+    renderInternshipsListForm();
+    syncResumeFields();
+}
+function updateInternshipField(idx, field, val) {
+    internshipsList[idx][field] = val;
+    syncResumeFields();
+}
+function updateInternshipBullets(idx, val) {
+    internshipsList[idx].bullets = val.split('\n');
+    syncResumeFields();
+}
+function removeInternshipItem(idx) {
+    internshipsList.splice(idx, 1);
+    renderInternshipsListForm();
+    syncResumeFields();
+}
+function moveInternshipItem(idx, dir) {
+    const targetIdx = idx + dir;
+    if (targetIdx < 0 || targetIdx >= internshipsList.length) return;
+    const temp = internshipsList[idx];
+    internshipsList[idx] = internshipsList[targetIdx];
+    internshipsList[targetIdx] = temp;
+    renderInternshipsListForm();
+    syncResumeFields();
+}
+
+// Workshops List Form Builder
+function renderWorkshopsListForm() {
+    const container = document.getElementById("workshops-items-list");
+    if (!container) return;
+    container.innerHTML = "";
+    workshopsList.forEach((item, idx) => {
+        const div = document.createElement("div");
+        div.className = "p-3 border rounded mb-3 bg-primary-card position-relative";
+        div.innerHTML = `
+            <div class="position-absolute top-2 right-2 d-flex gap-1" style="z-index: 10;">
+                <button type="button" class="btn btn-xs btn-outline p-0 px-1" onclick="moveWorkshopItem(${idx}, -1)" ${idx === 0 ? 'disabled' : ''} style="cursor:pointer; background:none; border:none;"><i class="fa-solid fa-arrow-up text-muted" style="font-size:10px;"></i></button>
+                <button type="button" class="btn btn-xs btn-outline p-0 px-1" onclick="moveWorkshopItem(${idx}, 1)" ${idx === workshopsList.length - 1 ? 'disabled' : ''} style="cursor:pointer; background:none; border:none;"><i class="fa-solid fa-arrow-down text-muted" style="font-size:10px;"></i></button>
+                <button type="button" class="btn btn-xs btn-danger p-0 px-1" onclick="removeWorkshopItem(${idx})" style="cursor:pointer; background:none; border:none;"><i class="fa-solid fa-trash text-danger" style="font-size:10px;"></i></button>
+            </div>
+            <div class="row g-2">
+                <div class="col-12">
+                    <label class="form-label" style="font-size:0.65rem;">Workshop Name</label>
+                    <input type="text" class="form-input" value="${item.name || ''}" oninput="updateWorkshopField(${idx}, 'name', this.value)">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" style="font-size:0.65rem;">Organizer</label>
+                    <input type="text" class="form-input" value="${item.organizer || ''}" oninput="updateWorkshopField(${idx}, 'organizer', this.value)">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" style="font-size:0.65rem;">Dates</label>
+                    <input type="text" class="form-input" value="${item.dates || ''}" oninput="updateWorkshopField(${idx}, 'dates', this.value)">
+                </div>
+                <div class="col-12">
+                    <label class="form-label" style="font-size:0.65rem;">Description</label>
+                    <input type="text" class="form-input" value="${item.description || ''}" oninput="updateWorkshopField(${idx}, 'description', this.value)">
+                </div>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+function addWorkshopItem() {
+    workshopsList.push({ name: "", organizer: "", dates: "", description: "" });
+    renderWorkshopsListForm();
+    syncResumeFields();
+}
+function updateWorkshopField(idx, field, val) {
+    workshopsList[idx][field] = val;
+    syncResumeFields();
+}
+function removeWorkshopItem(idx) {
+    workshopsList.splice(idx, 1);
+    renderWorkshopsListForm();
+    syncResumeFields();
+}
+function moveWorkshopItem(idx, dir) {
+    const targetIdx = idx + dir;
+    if (targetIdx < 0 || targetIdx >= workshopsList.length) return;
+    const temp = workshopsList[idx];
+    workshopsList[idx] = workshopsList[targetIdx];
+    workshopsList[targetIdx] = temp;
+    renderWorkshopsListForm();
+    syncResumeFields();
+}
+
+// Publications List Form Builder
+function renderPublicationsListForm() {
+    const container = document.getElementById("publications-items-list");
+    if (!container) return;
+    container.innerHTML = "";
+    publicationsList.forEach((item, idx) => {
+        const div = document.createElement("div");
+        div.className = "p-3 border rounded mb-3 bg-primary-card position-relative";
+        div.innerHTML = `
+            <div class="position-absolute top-2 right-2 d-flex gap-1" style="z-index: 10;">
+                <button type="button" class="btn btn-xs btn-outline p-0 px-1" onclick="movePublicationItem(${idx}, -1)" ${idx === 0 ? 'disabled' : ''} style="cursor:pointer; background:none; border:none;"><i class="fa-solid fa-arrow-up text-muted" style="font-size:10px;"></i></button>
+                <button type="button" class="btn btn-xs btn-outline p-0 px-1" onclick="movePublicationItem(${idx}, 1)" ${idx === publicationsList.length - 1 ? 'disabled' : ''} style="cursor:pointer; background:none; border:none;"><i class="fa-solid fa-arrow-down text-muted" style="font-size:10px;"></i></button>
+                <button type="button" class="btn btn-xs btn-danger p-0 px-1" onclick="removePublicationItem(${idx})" style="cursor:pointer; background:none; border:none;"><i class="fa-solid fa-trash text-danger" style="font-size:10px;"></i></button>
+            </div>
+            <div class="row g-2">
+                <div class="col-12">
+                    <label class="form-label" style="font-size:0.65rem;">Publication Title</label>
+                    <input type="text" class="form-input" value="${item.title || ''}" oninput="updatePublicationField(${idx}, 'title', this.value)">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" style="font-size:0.65rem;">Publisher / Journal</label>
+                    <input type="text" class="form-input" value="${item.publisher || ''}" oninput="updatePublicationField(${idx}, 'publisher', this.value)">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" style="font-size:0.65rem;">Dates</label>
+                    <input type="text" class="form-input" value="${item.dates || ''}" oninput="updatePublicationField(${idx}, 'dates', this.value)">
+                </div>
+                <div class="col-12">
+                    <label class="form-label" style="font-size:0.65rem;">Link / DOI URL</label>
+                    <input type="text" class="form-input" value="${item.link || ''}" oninput="updatePublicationField(${idx}, 'link', this.value)">
+                </div>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+function addPublicationItem() {
+    publicationsList.push({ title: "", publisher: "", link: "", dates: "" });
+    renderPublicationsListForm();
+    syncResumeFields();
+}
+function updatePublicationField(idx, field, val) {
+    publicationsList[idx][field] = val;
+    syncResumeFields();
+}
+function removePublicationItem(idx) {
+    publicationsList.splice(idx, 1);
+    renderPublicationsListForm();
+    syncResumeFields();
+}
+function movePublicationItem(idx, dir) {
+    const targetIdx = idx + dir;
+    if (targetIdx < 0 || targetIdx >= publicationsList.length) return;
+    const temp = publicationsList[idx];
+    publicationsList[idx] = publicationsList[targetIdx];
+    publicationsList[targetIdx] = temp;
+    renderPublicationsListForm();
+    syncResumeFields();
+}
+
+// Hackathons List Form Builder
+function renderHackathonsListForm() {
+    const container = document.getElementById("hackathons-items-list");
+    if (!container) return;
+    container.innerHTML = "";
+    hackathonsList.forEach((item, idx) => {
+        const div = document.createElement("div");
+        div.className = "p-3 border rounded mb-3 bg-primary-card position-relative";
+        div.innerHTML = `
+            <div class="position-absolute top-2 right-2 d-flex gap-1" style="z-index: 10;">
+                <button type="button" class="btn btn-xs btn-outline p-0 px-1" onclick="moveHackathonItem(${idx}, -1)" ${idx === 0 ? 'disabled' : ''} style="cursor:pointer; background:none; border:none;"><i class="fa-solid fa-arrow-up text-muted" style="font-size:10px;"></i></button>
+                <button type="button" class="btn btn-xs btn-outline p-0 px-1" onclick="moveHackathonItem(${idx}, 1)" ${idx === hackathonsList.length - 1 ? 'disabled' : ''} style="cursor:pointer; background:none; border:none;"><i class="fa-solid fa-arrow-down text-muted" style="font-size:10px;"></i></button>
+                <button type="button" class="btn btn-xs btn-danger p-0 px-1" onclick="removeHackathonItem(${idx})" style="cursor:pointer; background:none; border:none;"><i class="fa-solid fa-trash text-danger" style="font-size:10px;"></i></button>
+            </div>
+            <div class="row g-2">
+                <div class="col-12">
+                    <label class="form-label" style="font-size:0.65rem;">Hackathon Title</label>
+                    <input type="text" class="form-input" value="${item.title || ''}" oninput="updateHackathonField(${idx}, 'title', this.value)">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" style="font-size:0.65rem;">Award / Rank (Optional)</label>
+                    <input type="text" class="form-input" value="${item.award || ''}" oninput="updateHackathonField(${idx}, 'award', this.value)">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" style="font-size:0.65rem;">Project Link (Optional)</label>
+                    <input type="text" class="form-input" value="${item.link || ''}" oninput="updateHackathonField(${idx}, 'link', this.value)">
+                </div>
+                <div class="col-12">
+                    <label class="form-label" style="font-size:0.65rem;">Details (one per line)</label>
+                    <textarea class="form-input res-bullet-input" rows="3" onfocus="setActiveBullet(this)" oninput="updateHackathonBullets(${idx}, this.value)">${(item.bullets || []).join('\n')}</textarea>
+                    <button type="button" class="btn btn-xs btn-outline mt-1 btn-ai-optimize" onclick="optimizeBullets(this, 'hackathon', ${idx})" style="font-size: 0.65rem; border-color: var(--accent-color) !important; color: var(--accent-color) !important; cursor:pointer;"><i class="fa-solid fa-wand-magic-sparkles me-1"></i> AI Optimize Bullets</button>
+                </div>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+function addHackathonItem() {
+    hackathonsList.push({ title: "", award: "", link: "", bullets: [] });
+    renderHackathonsListForm();
+    syncResumeFields();
+}
+function updateHackathonField(idx, field, val) {
+    hackathonsList[idx][field] = val;
+    syncResumeFields();
+}
+function updateHackathonBullets(idx, val) {
+    hackathonsList[idx].bullets = val.split('\n');
+    syncResumeFields();
+}
+function removeHackathonItem(idx) {
+    hackathonsList.splice(idx, 1);
+    renderHackathonsListForm();
+    syncResumeFields();
+}
+function moveHackathonItem(idx, dir) {
+    const targetIdx = idx + dir;
+    if (targetIdx < 0 || targetIdx >= hackathonsList.length) return;
+    const temp = hackathonsList[idx];
+    hackathonsList[idx] = hackathonsList[targetIdx];
+    hackathonsList[targetIdx] = temp;
+    renderHackathonsListForm();
+    syncResumeFields();
+}
+
+function updateCustomSectionTitle(val) {
+    customSection.title = val;
+    syncResumeFields();
+}
 function updateCustomSectionBullets(val) {
     customSection.bullets = val.split('\n');
     syncResumeFields();
@@ -1448,10 +1770,7 @@ function updateCustomSectionBullets(val) {
 
 async function optimizeBullets(btn, type, idx) {
     let textarea = null;
-    if (type === 'experience') {
-        const parent = btn.closest('.col-12');
-        textarea = parent ? parent.querySelector('textarea') : null;
-    } else if (type === 'project') {
+    if (type === 'experience' || type === 'project' || type === 'internship' || type === 'hackathon') {
         const parent = btn.closest('.col-12');
         textarea = parent ? parent.querySelector('textarea') : null;
     } else if (type === 'custom') {
@@ -1480,6 +1799,10 @@ async function optimizeBullets(btn, type, idx) {
                     updateExperienceBullets(idx, data.optimized);
                 } else if (type === 'project') {
                     updateProjectBullets(idx, data.optimized);
+                } else if (type === 'internship') {
+                    updateInternshipBullets(idx, data.optimized);
+                } else if (type === 'hackathon') {
+                    updateHackathonBullets(idx, data.optimized);
                 } else if (type === 'custom') {
                     updateCustomSectionBullets(data.optimized);
                 }
@@ -1624,6 +1947,30 @@ function syncResumeFields() {
                 });
                 rightSideHtml += `</div>`;
             }
+            else if (sec === "internships" && internshipsList.length > 0) {
+                rightSideHtml += `<div style="margin-bottom:12px;"><h3 style="font-size:10.5px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; border-bottom:1px solid #cbd5e1; padding-bottom:1px;">Internships</h3>`;
+                internshipsList.forEach(item => {
+                    if (item.role || item.company) {
+                        let bulletsHtml = "";
+                        if (item.bullets && Array.isArray(item.bullets)) {
+                            item.bullets.forEach(b => {
+                                if (b.trim()) bulletsHtml += `<li style="margin-bottom:2px;">${b.trim()}</li>`;
+                            });
+                        }
+                        rightSideHtml += `
+                        <div style="margin-bottom:6px;">
+                            <div style="display:flex; justify-content:space-between; font-weight:700; font-size:9.5px;">
+                                <span>${item.role || ''}</span>
+                                <span style="font-weight:normal; font-size:8px; color:#6b7280;">${item.dates || ''}</span>
+                            </div>
+                            <div style="font-size:8.5px; font-style:italic; color:#475569; margin-bottom:2px;">${item.company || ''}</div>
+                            ${bulletsHtml ? `<ul class="bullet-list" style="font-size:8px; margin-left:12px; margin-top:2px; line-height:1.3; color:#374151;">${bulletsHtml}</ul>` : ''}
+                        </div>
+                        `;
+                    }
+                });
+                rightSideHtml += `</div>`;
+            }
             else if (sec === "projects" && projectsList.length > 0) {
                 rightSideHtml += `<div style="margin-bottom:12px;"><h3 style="font-size:10.5px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; border-bottom:1px solid #cbd5e1; padding-bottom:1px;">Projects</h3>`;
                 projectsList.forEach(item => {
@@ -1683,6 +2030,66 @@ function syncResumeFields() {
                     if (item.name.trim()) rightSideHtml += `<li style="margin-bottom:2px;">${item.name.trim()}</li>`;
                 });
                 rightSideHtml += `</ul></div>`;
+            }
+            else if (sec === "workshopsList" && workshopsList.length > 0) {
+                rightSideHtml += `<div style="margin-bottom:12px;"><h3 style="font-size:10.5px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; border-bottom:1px solid #cbd5e1; padding-bottom:1px;">Workshops</h3>`;
+                workshopsList.forEach(item => {
+                    if (item.name || item.organizer) {
+                        rightSideHtml += `
+                        <div style="margin-bottom:6px;">
+                            <div style="display:flex; justify-content:space-between; font-weight:700; font-size:9.5px;">
+                                <span>${item.name || ''}</span>
+                                <span style="font-weight:normal; font-size:8px; color:#6b7280;">${item.dates || ''}</span>
+                            </div>
+                            <div style="font-size:8.5px; color:#475569; margin-bottom:2px;">${item.organizer || ''}</div>
+                            ${item.description ? `<div style="font-size:8px; color:#374151;">${item.description}</div>` : ''}
+                        </div>
+                        `;
+                    }
+                });
+                rightSideHtml += `</div>`;
+            }
+            else if (sec === "publications" && publicationsList.length > 0) {
+                rightSideHtml += `<div style="margin-bottom:12px;"><h3 style="font-size:10.5px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; border-bottom:1px solid #cbd5e1; padding-bottom:1px;">Publications</h3>`;
+                publicationsList.forEach(item => {
+                    if (item.title) {
+                        rightSideHtml += `
+                        <div style="margin-bottom:6px;">
+                            <div style="display:flex; justify-content:space-between; font-weight:700; font-size:9.5px;">
+                                <span>${item.title || ''}</span>
+                                <span style="font-weight:normal; font-size:8px; color:#6b7280;">${item.dates || ''}</span>
+                            </div>
+                            <div style="font-size:8.5px; color:#475569; margin-bottom:2px;">${item.publisher || ''}</div>
+                            ${item.link ? `<div style="font-size:8px; color:#4b5563;">${item.link}</div>` : ''}
+                        </div>
+                        `;
+                    }
+                });
+                rightSideHtml += `</div>`;
+            }
+            else if (sec === "hackathonsList" && hackathonsList.length > 0) {
+                rightSideHtml += `<div style="margin-bottom:12px;"><h3 style="font-size:10.5px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; border-bottom:1px solid #cbd5e1; padding-bottom:1px;">Hackathons</h3>`;
+                hackathonsList.forEach(item => {
+                    if (item.title) {
+                        let bulletsHtml = "";
+                        if (item.bullets && Array.isArray(item.bullets)) {
+                            item.bullets.forEach(b => {
+                                if (b.trim()) bulletsHtml += `<li style="margin-bottom:2px;">${b.trim()}</li>`;
+                            });
+                        }
+                        rightSideHtml += `
+                        <div style="margin-bottom:6px;">
+                            <div style="display:flex; justify-content:space-between; font-weight:700; font-size:9.5px;">
+                                <span>${item.title || ''}</span>
+                                <span style="font-weight:normal; font-size:8px; color:#6b7280;">${item.link || ''}</span>
+                            </div>
+                            ${item.award ? `<div style="font-size:8.5px; font-style:italic; color:#475569; margin-bottom:2px;">Award: ${item.award}</div>` : ''}
+                            ${bulletsHtml ? `<ul class="bullet-list" style="font-size:8px; margin-left:12px; margin-top:2px; line-height:1.3; color:#374151;">${bulletsHtml}</ul>` : ''}
+                        </div>
+                        `;
+                    }
+                });
+                rightSideHtml += `</div>`;
             }
             else if (sec === "customSection" && customSection && customSection.title && customSection.title.trim()) {
                 const title = customSection.title.trim();
@@ -1834,6 +2241,33 @@ function syncResumeFields() {
             container.insertAdjacentHTML('beforeend', html);
         }
         
+        else if (sec === "internships" && internshipsList.length > 0) {
+            let html = `<div class="resume-render-section" data-section="internships">`;
+            html += `<h3 style="font-size:12px; font-weight:700; color:${accentColor}; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px; border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 2px; text-align: ${isElegant ? 'center' : 'left'}">Internships</h3>`;
+            internshipsList.forEach(item => {
+                if (item.role || item.company) {
+                    let bulletsHtml = "";
+                    if (item.bullets && Array.isArray(item.bullets)) {
+                        item.bullets.forEach(b => {
+                            if (b.trim()) bulletsHtml += `<li style="margin-bottom:2px;">${b.trim()}</li>`;
+                        });
+                    }
+                    html += `
+                    <div style="margin-bottom:8px; text-align:left;">
+                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:10.5px;">
+                            <span>${item.role || ''}</span>
+                            <span style="font-weight:normal; font-size:9.5px; color:#6b7280;">${item.dates || ''}</span>
+                        </div>
+                        <div style="font-size:9.5px; font-style:italic; color:#6b7280; margin-bottom:2px;">${item.company || ''}</div>
+                        ${bulletsHtml ? `<ul class="bullet-list" style="font-size:9.5px; margin-left:14px; margin-top:2px; line-height:1.45; color:#374151;">${bulletsHtml}</ul>` : ''}
+                    </div>
+                    `;
+                }
+            });
+            html += `</div>`;
+            container.insertAdjacentHTML('beforeend', html);
+        }
+        
         else if (sec === "projects" && projectsList.length > 0) {
             let html = `<div class="resume-render-section" data-section="projects">`;
             html += `<h3 style="font-size:12px; font-weight:700; color:${accentColor}; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px; border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 2px; text-align: ${isElegant ? 'center' : 'left'}">Projects</h3>`;
@@ -1879,6 +2313,75 @@ function syncResumeFields() {
                 if (item.name.trim()) html += `<li style="margin-bottom:2px;">${item.name.trim()}</li>`;
             });
             html += `</ul></div>`;
+            container.insertAdjacentHTML('beforeend', html);
+        }
+        
+        else if (sec === "workshopsList" && workshopsList.length > 0) {
+            let html = `<div class="resume-render-section" data-section="workshopsList">`;
+            html += `<h3 style="font-size:12px; font-weight:700; color:${accentColor}; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px; border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 2px; text-align: ${isElegant ? 'center' : 'left'}">Workshops</h3>`;
+            workshopsList.forEach(item => {
+                if (item.name || item.organizer) {
+                    html += `
+                    <div style="margin-bottom:8px; text-align:left;">
+                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:10.5px;">
+                            <span>${item.name || ''}</span>
+                            <span style="font-weight:normal; font-size:9.5px; color:#6b7280;">${item.dates || ''}</span>
+                        </div>
+                        <div style="font-size:9.5px; color:#6b7280; margin-bottom:2px;">${item.organizer || ''}</div>
+                        ${item.description ? `<div style="font-size:9.5px; color:#374151; line-height:1.45;">${item.description}</div>` : ''}
+                    </div>
+                    `;
+                }
+            });
+            html += `</div>`;
+            container.insertAdjacentHTML('beforeend', html);
+        }
+        
+        else if (sec === "publications" && publicationsList.length > 0) {
+            let html = `<div class="resume-render-section" data-section="publications">`;
+            html += `<h3 style="font-size:12px; font-weight:700; color:${accentColor}; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px; border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 2px; text-align: ${isElegant ? 'center' : 'left'}">Publications</h3>`;
+            publicationsList.forEach(item => {
+                if (item.title) {
+                    html += `
+                    <div style="margin-bottom:8px; text-align:left;">
+                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:10.5px;">
+                            <span>${item.title || ''}</span>
+                            <span style="font-weight:normal; font-size:9.5px; color:#6b7280;">${item.dates || ''}</span>
+                        </div>
+                        <div style="font-size:9.5px; color:#6b7280; margin-bottom:2px;">${item.publisher || ''}</div>
+                        ${item.link ? `<div style="font-size:9.5px; color:#4b5563; line-height:1.45;">${item.link}</div>` : ''}
+                    </div>
+                    `;
+                }
+            });
+            html += `</div>`;
+            container.insertAdjacentHTML('beforeend', html);
+        }
+        
+        else if (sec === "hackathonsList" && hackathonsList.length > 0) {
+            let html = `<div class="resume-render-section" data-section="hackathonsList">`;
+            html += `<h3 style="font-size:12px; font-weight:700; color:${accentColor}; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px; border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 2px; text-align: ${isElegant ? 'center' : 'left'}">Hackathons</h3>`;
+            hackathonsList.forEach(item => {
+                if (item.title) {
+                    let bulletsHtml = "";
+                    if (item.bullets && Array.isArray(item.bullets)) {
+                        item.bullets.forEach(b => {
+                            if (b.trim()) bulletsHtml += `<li style="margin-bottom:2px;">${b.trim()}</li>`;
+                        });
+                    }
+                    html += `
+                    <div style="margin-bottom:8px; text-align:left;">
+                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:10.5px;">
+                            <span>${item.title || ''}</span>
+                            <span style="font-weight:normal; font-size:9.5px; color:#6b7280;">${item.link || ''}</span>
+                        </div>
+                        ${item.award ? `<div style="font-size:9.5px; font-style:italic; color:#6b7280; margin-bottom:2px;">Award: ${item.award}</div>` : ''}
+                        ${bulletsHtml ? `<ul class="bullet-list" style="font-size:9.5px; margin-left:14px; margin-top:2px; line-height:1.45; color:#374151;">${bulletsHtml}</ul>` : ''}
+                    </div>
+                    `;
+                }
+            });
+            html += `</div>`;
             container.insertAdjacentHTML('beforeend', html);
         }
         
@@ -2014,8 +2517,12 @@ function getFormContent() {
         education: educationList,
         schoolCollege: schoolCollegeList,
         experience: experienceList,
+        internships: internshipsList,
         projects: projectsList,
         certifications: certificationsList,
+        workshopsList: workshopsList,
+        hackathonsList: hackathonsList,
+        publications: publicationsList,
         customSection: customSection,
         
         // Legacy flat backup keys just to prevent any database mismatches
@@ -2158,6 +2665,30 @@ function populateForm(c) {
         });
     }
     renderCertificationsListForm();
+
+    internshipsList = c.internships || [];
+    renderInternshipsListForm();
+
+    workshopsList = c.workshopsList || [];
+    renderWorkshopsListForm();
+
+    publicationsList = c.publications || [];
+    renderPublicationsListForm();
+
+    hackathonsList = [];
+    if (c.hackathonsList && Array.isArray(c.hackathonsList)) {
+        hackathonsList = c.hackathonsList;
+    } else {
+        if (c.hackathons) {
+            hackathonsList.push({
+                title: c.hackathons,
+                award: "",
+                link: "",
+                bullets: []
+            });
+        }
+    }
+    renderHackathonsListForm();
     
     customSection = c.customSection || { title: "", bullets: [] };
     setValSafe("res-custom-sec-title", customSection.title);
@@ -2465,17 +2996,27 @@ async function downloadResumePDF() {
     try {
         const content = getFormContent();
         
+        const resetButtons = () => {
+            btns.forEach((btn, i) => {
+                btn.disabled = false;
+                btn.innerHTML = originals[i] || `<i class="fa-solid fa-download me-1"></i> Download PDF`;
+            });
+        };
+
         // PRE-FLIGHT VALIDATION
         if (!content.name || content.name.trim() === "") {
             alert("Validation Error: Please enter your Name before generating PDF.");
+            resetButtons();
             return;
         }
         if (!content.email || content.email.trim() === "") {
             alert("Validation Error: Please enter your Email before generating PDF.");
+            resetButtons();
             return;
         }
-        if (!content.education || content.education.length === 0) {
-            alert("Validation Error: Please add at least one Education entry.");
+        if ((!content.education || content.education.length === 0) && (!content.schoolCollege || content.schoolCollege.length === 0)) {
+            alert("Validation Error: Please add at least one Education or School/College entry.");
+            resetButtons();
             return;
         }
         const hasSkill = (content.skillsProg && content.skillsProg.trim()) ||
@@ -2484,6 +3025,7 @@ async function downloadResumePDF() {
                          (content.skillsWeb && content.skillsWeb.trim());
         if (!hasSkill) {
             alert("Validation Error: Please add at least one Skill.");
+            resetButtons();
             return;
         }
 
