@@ -3169,23 +3169,31 @@ async function downloadResumePDF() {
         const opt = {
             margin:       [10, 0, 10, 0],
             filename:     filename,
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true },
+            image:        { type: 'jpeg', quality: 1.0 },
+            html2canvas:  { scale: 2, useCORS: true, scrollY: 0, windowWidth: 1200 },
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
         // Temporarily style clone for correct PDF rendering
+        clone.style.transform = 'none';
         clone.style.width = '210mm';
         clone.style.minHeight = '297mm';
         clone.style.padding = '15mm';
         clone.style.margin = '0';
         clone.style.boxShadow = 'none';
+        clone.style.border = 'none';
+        clone.style.background = '#fff';
 
-        // Add to a hidden container in body so html2canvas can read it
+        // Add to a fixed hidden container in body so html2canvas can perfectly capture it
+        // Do NOT use -9999px as html2canvas will clip it. Use z-index instead.
         const container = document.createElement('div');
-        container.style.position = 'absolute';
-        container.style.left = '-9999px';
-        container.style.top = '-9999px';
+        container.style.position = 'fixed';
+        container.style.left = '0';
+        container.style.top = '0';
+        container.style.zIndex = '-9999'; // Hidden behind other elements
+        container.style.background = '#fff';
+        container.style.width = '210mm';
+        container.style.pointerEvents = 'none';
         container.appendChild(clone);
         document.body.appendChild(container);
 
