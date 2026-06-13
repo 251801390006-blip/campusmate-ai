@@ -824,6 +824,23 @@ let hackathonsList = [];
 let publicationsList = [];
 let customSection = { title: "", bullets: [] };
 
+function hasVal(val) {
+    return val && typeof val === 'string' && val.trim().length > 0;
+}
+
+function isListNonEmpty(list, fields) {
+    if (!list || !Array.isArray(list) || list.length === 0) return false;
+    return list.some(item => {
+        return fields.some(f => {
+            if (f === 'bullets') {
+                return item.bullets && Array.isArray(item.bullets) && item.bullets.some(b => hasVal(b));
+            }
+            return hasVal(item[f]);
+        });
+    });
+}
+
+
 let activeBulletInput = null;
 let savedVersions = [];
 let lastATSFeedback = null;
@@ -1971,7 +1988,7 @@ function syncResumeFields() {
         }
         
         sectionOrder.forEach(sec => {
-            if (sec === "experience" && experienceList.length > 0) {
+            if (sec === "experience" && isListNonEmpty(experienceList, ['role', 'company', 'dates', 'bullets'])) {
                 rightSideHtml += `<div style="margin-bottom:12px;"><h3 style="font-size:10.5px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; border-bottom:1px solid #cbd5e1; padding-bottom:1px;">Experience</h3>`;
                 experienceList.forEach(item => {
                     if (item.role || item.company) {
@@ -1995,7 +2012,7 @@ function syncResumeFields() {
                 });
                 rightSideHtml += `</div>`;
             }
-            else if (sec === "internships" && internshipsList.length > 0) {
+            else if (sec === "internships" && isListNonEmpty(internshipsList, ['role', 'company', 'dates', 'bullets'])) {
                 rightSideHtml += `<div style="margin-bottom:12px;"><h3 style="font-size:10.5px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; border-bottom:1px solid #cbd5e1; padding-bottom:1px;">Internships</h3>`;
                 internshipsList.forEach(item => {
                     if (item.role || item.company) {
@@ -2019,7 +2036,7 @@ function syncResumeFields() {
                 });
                 rightSideHtml += `</div>`;
             }
-            else if (sec === "projects" && projectsList.length > 0) {
+            else if (sec === "projects" && isListNonEmpty(projectsList, ['title', 'link', 'bullets'])) {
                 rightSideHtml += `<div style="margin-bottom:12px;"><h3 style="font-size:10.5px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; border-bottom:1px solid #cbd5e1; padding-bottom:1px;">Projects</h3>`;
                 projectsList.forEach(item => {
                     if (item.title) {
@@ -2042,7 +2059,7 @@ function syncResumeFields() {
                 });
                 rightSideHtml += `</div>`;
             }
-            else if (sec === "education" && educationList.length > 0) {
+            else if (sec === "education" && isListNonEmpty(educationList, ['inst', 'degree', 'dates', 'gpa', 'coursework'])) {
                 rightSideHtml += `<div style="margin-bottom:12px;"><h3 style="font-size:10.5px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; border-bottom:1px solid #cbd5e1; padding-bottom:1px;">Education</h3>`;
                 educationList.forEach(item => {
                     if (item.inst || item.degree) {
@@ -2063,7 +2080,7 @@ function syncResumeFields() {
                 });
                 rightSideHtml += `</div>`;
             }
-            else if (sec === "schoolcollege" && schoolCollegeList.length > 0) {
+            else if (sec === "schoolcollege" && isListNonEmpty(schoolCollegeList, ['name'])) {
                 rightSideHtml += `<div style="margin-bottom:12px;"><h3 style="font-size:10.5px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; border-bottom:1px solid #cbd5e1; padding-bottom:1px;">School & College List</h3>`;
                 rightSideHtml += `<ul class="bullet-list" style="font-size:8.5px; margin-left:12px; margin-top:2px; line-height:1.3; color:#374151;">`;
                 schoolCollegeList.forEach(item => {
@@ -2071,7 +2088,7 @@ function syncResumeFields() {
                 });
                 rightSideHtml += `</ul></div>`;
             }
-            else if (sec === "certifications" && certificationsList.length > 0) {
+            else if (sec === "certifications" && isListNonEmpty(certificationsList, ['name'])) {
                 rightSideHtml += `<div style="margin-bottom:12px;"><h3 style="font-size:10.5px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; border-bottom:1px solid #cbd5e1; padding-bottom:1px;">Certifications</h3>`;
                 rightSideHtml += `<ul class="bullet-list" style="font-size:8.5px; margin-left:12px; margin-top:2px; line-height:1.3; color:#374151;">`;
                 certificationsList.forEach(item => {
@@ -2079,7 +2096,7 @@ function syncResumeFields() {
                 });
                 rightSideHtml += `</ul></div>`;
             }
-            else if (sec === "workshopsList" && workshopsList.length > 0) {
+            else if (sec === "workshopsList" && isListNonEmpty(workshopsList, ['name', 'organizer', 'dates', 'description'])) {
                 rightSideHtml += `<div style="margin-bottom:12px;"><h3 style="font-size:10.5px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; border-bottom:1px solid #cbd5e1; padding-bottom:1px;">Workshops</h3>`;
                 workshopsList.forEach(item => {
                     if (item.name || item.organizer) {
@@ -2097,7 +2114,7 @@ function syncResumeFields() {
                 });
                 rightSideHtml += `</div>`;
             }
-            else if (sec === "publications" && publicationsList.length > 0) {
+            else if (sec === "publications" && isListNonEmpty(publicationsList, ['title', 'link', 'publisher', 'dates'])) {
                 rightSideHtml += `<div style="margin-bottom:12px;"><h3 style="font-size:10.5px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; border-bottom:1px solid #cbd5e1; padding-bottom:1px;">Publications</h3>`;
                 publicationsList.forEach(item => {
                     if (item.title) {
@@ -2115,7 +2132,7 @@ function syncResumeFields() {
                 });
                 rightSideHtml += `</div>`;
             }
-            else if (sec === "hackathonsList" && hackathonsList.length > 0) {
+            else if (sec === "hackathonsList" && isListNonEmpty(hackathonsList, ['title', 'link', 'award', 'bullets'])) {
                 rightSideHtml += `<div style="margin-bottom:12px;"><h3 style="font-size:10.5px; font-weight:800; color:${accentColor}; text-transform:uppercase; margin-bottom:5px; border-bottom:1px solid #cbd5e1; padding-bottom:1px;">Hackathons</h3>`;
                 hackathonsList.forEach(item => {
                     if (item.title) {
@@ -2139,7 +2156,7 @@ function syncResumeFields() {
                 });
                 rightSideHtml += `</div>`;
             }
-            else if (sec === "customSection" && customSection && customSection.title && customSection.title.trim()) {
+            else if (sec === "customSection" && customSection && customSection.title && customSection.title.trim() && customSection.bullets && customSection.bullets.some(b => b.trim())) {
                 const title = customSection.title.trim();
                 let bulletsHtml = "";
                 if (customSection.bullets && Array.isArray(customSection.bullets)) {
@@ -2219,7 +2236,7 @@ function syncResumeFields() {
         container.insertAdjacentHTML('beforeend', summaryHtml);
     }
       sectionOrder.forEach(sec => {
-        if (sec === "education" && educationList.length > 0) {
+        if (sec === "education" && isListNonEmpty(educationList, ['inst', 'degree', 'dates', 'gpa', 'coursework'])) {
             let html = `<div class="resume-render-section" data-section="education">`;
             html += `<h3 style="font-size:12px; font-weight:700; color:${accentColor}; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px; border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 2px; text-align: ${isElegant ? 'center' : 'left'}">Education</h3>`;
             educationList.forEach(item => {
@@ -2262,7 +2279,7 @@ function syncResumeFields() {
             }
         }
         
-        else if (sec === "experience" && experienceList.length > 0) {
+        else if (sec === "experience" && isListNonEmpty(experienceList, ['role', 'company', 'dates', 'bullets'])) {
             let html = `<div class="resume-render-section" data-section="experience">`;
             html += `<h3 style="font-size:12px; font-weight:700; color:${accentColor}; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px; border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 2px; text-align: ${isElegant ? 'center' : 'left'}">Experience</h3>`;
             experienceList.forEach(item => {
@@ -2289,7 +2306,7 @@ function syncResumeFields() {
             container.insertAdjacentHTML('beforeend', html);
         }
         
-        else if (sec === "internships" && internshipsList.length > 0) {
+        else if (sec === "internships" && isListNonEmpty(internshipsList, ['role', 'company', 'dates', 'bullets'])) {
             let html = `<div class="resume-render-section" data-section="internships">`;
             html += `<h3 style="font-size:12px; font-weight:700; color:${accentColor}; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px; border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 2px; text-align: ${isElegant ? 'center' : 'left'}">Internships</h3>`;
             internshipsList.forEach(item => {
@@ -2316,7 +2333,7 @@ function syncResumeFields() {
             container.insertAdjacentHTML('beforeend', html);
         }
         
-        else if (sec === "projects" && projectsList.length > 0) {
+        else if (sec === "projects" && isListNonEmpty(projectsList, ['title', 'link', 'bullets'])) {
             let html = `<div class="resume-render-section" data-section="projects">`;
             html += `<h3 style="font-size:12px; font-weight:700; color:${accentColor}; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px; border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 2px; text-align: ${isElegant ? 'center' : 'left'}">Projects</h3>`;
             projectsList.forEach(item => {
@@ -2342,7 +2359,7 @@ function syncResumeFields() {
             container.insertAdjacentHTML('beforeend', html);
         }
         
-        else if (sec === "schoolcollege" && schoolCollegeList.length > 0) {
+        else if (sec === "schoolcollege" && isListNonEmpty(schoolCollegeList, ['name'])) {
             let html = `<div class="resume-render-section" data-section="schoolcollege">`;
             html += `<h3 style="font-size:12px; font-weight:700; color:${accentColor}; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px; border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 2px; text-align: ${isElegant ? 'center' : 'left'}">School & College List</h3>`;
             html += `<ul class="bullet-list" style="font-size:9.5px; margin-left:14px; margin-top:2px; line-height:1.45; color:#374151; text-align:left;">`;
@@ -2353,7 +2370,7 @@ function syncResumeFields() {
             container.insertAdjacentHTML('beforeend', html);
         }
         
-        else if (sec === "certifications" && certificationsList.length > 0) {
+        else if (sec === "certifications" && isListNonEmpty(certificationsList, ['name'])) {
             let html = `<div class="resume-render-section" data-section="certifications">`;
             html += `<h3 style="font-size:12px; font-weight:700; color:${accentColor}; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px; border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 2px; text-align: ${isElegant ? 'center' : 'left'}">Certifications</h3>`;
             html += `<ul class="bullet-list" style="font-size:9.5px; margin-left:14px; margin-top:2px; line-height:1.45; color:#374151; text-align:left;">`;
@@ -2364,7 +2381,7 @@ function syncResumeFields() {
             container.insertAdjacentHTML('beforeend', html);
         }
         
-        else if (sec === "workshopsList" && workshopsList.length > 0) {
+        else if (sec === "workshopsList" && isListNonEmpty(workshopsList, ['name', 'organizer', 'dates', 'description'])) {
             let html = `<div class="resume-render-section" data-section="workshopsList">`;
             html += `<h3 style="font-size:12px; font-weight:700; color:${accentColor}; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px; border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 2px; text-align: ${isElegant ? 'center' : 'left'}">Workshops</h3>`;
             workshopsList.forEach(item => {
@@ -2385,7 +2402,7 @@ function syncResumeFields() {
             container.insertAdjacentHTML('beforeend', html);
         }
         
-        else if (sec === "publications" && publicationsList.length > 0) {
+        else if (sec === "publications" && isListNonEmpty(publicationsList, ['title', 'link', 'publisher', 'dates'])) {
             let html = `<div class="resume-render-section" data-section="publications">`;
             html += `<h3 style="font-size:12px; font-weight:700; color:${accentColor}; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px; border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 2px; text-align: ${isElegant ? 'center' : 'left'}">Publications</h3>`;
             publicationsList.forEach(item => {
@@ -2406,7 +2423,7 @@ function syncResumeFields() {
             container.insertAdjacentHTML('beforeend', html);
         }
         
-        else if (sec === "hackathonsList" && hackathonsList.length > 0) {
+        else if (sec === "hackathonsList" && isListNonEmpty(hackathonsList, ['title', 'link', 'award', 'bullets'])) {
             let html = `<div class="resume-render-section" data-section="hackathonsList">`;
             html += `<h3 style="font-size:12px; font-weight:700; color:${accentColor}; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px; border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 2px; text-align: ${isElegant ? 'center' : 'left'}">Hackathons</h3>`;
             hackathonsList.forEach(item => {
@@ -2433,7 +2450,7 @@ function syncResumeFields() {
             container.insertAdjacentHTML('beforeend', html);
         }
         
-        else if (sec === "customSection" && customSection && customSection.title && customSection.title.trim()) {
+        else if (sec === "customSection" && customSection && customSection.title && customSection.title.trim() && customSection.bullets && customSection.bullets.some(b => b.trim())) {
             const title = customSection.title.trim();
             let bulletsHtml = "";
             if (customSection.bullets && Array.isArray(customSection.bullets)) {
@@ -2492,6 +2509,7 @@ function syncResumeFields() {
     scanKeywordsInline();
     pushState();
     scaleResumePreview();
+    calculateRealtimeAtsScore();
 }
 
 function scanKeywordsInline() {
@@ -3069,7 +3087,9 @@ async function downloadResumePDF() {
             resetButtons();
             return;
         }
-        if ((!content.education || content.education.length === 0) && (!content.schoolCollege || content.schoolCollege.length === 0)) {
+        const hasEdu = isListNonEmpty(content.education, ['inst', 'degree', 'dates', 'gpa', 'coursework']) ||
+                       isListNonEmpty(content.schoolCollege, ['name']);
+        if (!hasEdu) {
             alert("Validation Error: Please add at least one Education or School/College entry.");
             resetButtons();
             return;
@@ -3679,9 +3699,35 @@ async function triggerResumeATSAnalysis() {
 // Helper function to update circular charts and progress bars
 function updateAtsScores(overall, formatting, skills, keyword, readability, projects) {
     const circleMain = document.getElementById("circle-main");
-    const textMain = document.getElementById("score-text-main");
     if (circleMain) circleMain.setAttribute("stroke-dasharray", `${overall}, 100`);
-    if (textMain) textMain.innerText = `${overall}%`;
+    
+    // Update all elements with id="score-text-main" (sidebar drawer and main dashboard board)
+    document.querySelectorAll("[id='score-text-main']").forEach(el => {
+        el.innerText = `${overall}%`;
+    });
+    
+    // Update overall match progress bar in desktop view
+    const progressBarMain = document.getElementById("progress-bar-main");
+    if (progressBarMain) {
+        progressBarMain.style.width = `${overall}%`;
+    }
+    
+    // Update top header badge score text and ensure it is visible
+    const atsScoreText = document.getElementById("ats-score-text");
+    if (atsScoreText) {
+        atsScoreText.innerText = overall;
+    }
+    const atsScoreBadgeBtn = document.getElementById("ats-score-badge-btn");
+    if (atsScoreBadgeBtn) {
+        atsScoreBadgeBtn.style.display = "inline-flex";
+    }
+    
+    // Update overall match status badge (Passed / Review / Needs Work)
+    const scoreBadgeMain = document.getElementById("score-badge-main");
+    if (scoreBadgeMain) {
+        scoreBadgeMain.innerText = overall >= 75 ? "Passed" : (overall >= 50 ? "Review" : "Needs Work");
+        scoreBadgeMain.className = `badge ${overall >= 75 ? 'bg-success' : (overall >= 50 ? 'bg-warning text-dark' : 'bg-danger')}`;
+    }
     
     const map = {
         "formatting": formatting,
@@ -3702,6 +3748,181 @@ function updateAtsScores(overall, formatting, skills, keyword, readability, proj
         const fill = document.getElementById(`score-${key}`);
         if (fill) fill.style.width = `${val}%`;
     });
+}
+
+function calculateRealtimeAtsScore() {
+    const content = getFormContent();
+    
+    // 1. Formatting Score (max 100)
+    let formatting = 50;
+    if (content.name && content.name.trim()) formatting += 10;
+    if (content.email && content.email.trim() && content.email.includes("@")) formatting += 10;
+    if (content.phone && content.phone.trim()) formatting += 10;
+    if (content.address && content.address.trim()) formatting += 10;
+    if ((content.linkedin && content.linkedin.trim()) || (content.github && content.github.trim())) formatting += 10;
+    formatting = Math.min(100, formatting);
+    
+    // 2. Skills Score (max 100)
+    let skills = 40;
+    const skillsProg = getValSafe("res-skills-prog").trim();
+    const skillsCyber = getValSafe("res-skills-cyber").trim();
+    const skillsTools = getValSafe("res-skills-tools").trim();
+    const skillsWeb = getValSafe("res-skills-web").trim();
+    
+    if (skillsProg) skills += 20;
+    if (skillsCyber) skills += 15;
+    if (skillsTools) skills += 15;
+    if (skillsWeb) skills += 15;
+    
+    let totalSkillsCount = 0;
+    [skillsProg, skillsCyber, skillsTools, skillsWeb].forEach(s => {
+        if (s) {
+            totalSkillsCount += s.split(",").map(x => x.trim()).filter(Boolean).length;
+        }
+    });
+    skills += Math.min(15, totalSkillsCount);
+    skills = Math.min(100, skills);
+    
+    // 3. Keyword Score (max 100)
+    let keyword = 50;
+    const textToSearch = JSON.stringify(content).toLowerCase();
+    const techKeywords = [
+        "python", "javascript", "typescript", "java", "c++", "c#", "rust", "go", "ruby", "php",
+        "wireshark", "nmap", "metasploit", "penetration", "cybersecurity", "firewall", "snort", "cryptography",
+        "linux", "windows", "macos", "ubuntu",
+        "git", "docker", "kubernetes", "aws", "azure", "gcp", "terraform", "jenkins", "ansible",
+        "react", "vue", "angular", "fastapi", "django", "flask", "node", "express", "html", "css",
+        "sql", "nosql", "mongodb", "postgresql", "mysql", "redis", "rest api", "graphql"
+    ];
+    let matchedKeywords = 0;
+    techKeywords.forEach(k => {
+        if (textToSearch.includes(k)) matchedKeywords++;
+    });
+    keyword += Math.min(40, matchedKeywords * 2);
+    if (isListNonEmpty(content.experience, ['role', 'company'])) keyword += 5;
+    if (isListNonEmpty(content.projects, ['title'])) keyword += 5;
+    keyword = Math.min(100, keyword);
+    
+    // 4. Readability Score (max 100)
+    let readability = 65;
+    let bulletCount = 0;
+    
+    [content.experience, content.internships, content.projects].forEach(list => {
+        if (list && Array.isArray(list)) {
+            list.forEach(item => {
+                if (item.bullets && Array.isArray(item.bullets)) {
+                    item.bullets.forEach(b => {
+                        if (b && b.trim()) bulletCount++;
+                    });
+                }
+            });
+        }
+    });
+    readability += Math.min(20, bulletCount * 2);
+    if (content.headline && content.headline.trim()) readability += 5;
+    if (getValSafe("res-achievements").trim()) readability += 5;
+    if (getValSafe("res-interests").trim()) readability += 5;
+    readability = Math.min(100, readability);
+    
+    // 5. Projects Quality Score (max 100)
+    let projectsScore = 40;
+    if (content.projects && Array.isArray(content.projects)) {
+        content.projects.forEach(p => {
+            if (p.title && p.title.trim()) {
+                projectsScore += 25;
+                if (p.link && p.link.trim()) projectsScore += 5;
+            }
+        });
+    }
+    projectsScore = Math.min(100, projectsScore);
+    
+    // 6. Overall ATS Score (max 100)
+    let overall = Math.round((formatting * 0.15) + (skills * 0.25) + (keyword * 0.30) + (readability * 0.10) + (projectsScore * 0.20));
+    overall = Math.max(10, Math.min(100, overall));
+    
+    updateAtsScores(overall, formatting, skills, keyword, readability, projectsScore);
+    updateBriefFeedbackList(overall, formatting, skills, keyword, readability, projectsScore, content);
+}
+
+function updateBriefFeedbackList(overall, formatting, skills, keyword, readability, projectsScore, content) {
+    const briefBox = document.getElementById("ats-feedback-list-brief");
+    if (!briefBox) return;
+    
+    let briefHtml = "";
+    
+    if (!content.email || !content.email.trim()) {
+        briefHtml += `
+            <div class="p-2 border rounded bg-secondary-card d-flex align-items-center gap-2">
+                <i class="fa-solid fa-triangle-exclamation text-danger"></i>
+                <span>Contact email address is missing.</span>
+            </div>
+        `;
+    }
+    if (!content.phone || !content.phone.trim()) {
+        briefHtml += `
+            <div class="p-2 border rounded bg-secondary-card d-flex align-items-center gap-2">
+                <i class="fa-solid fa-triangle-exclamation text-danger"></i>
+                <span>Phone contact number is missing.</span>
+            </div>
+        `;
+    }
+    if (!content.github || !content.github.trim()) {
+        briefHtml += `
+            <div class="p-2 border rounded bg-secondary-card d-flex align-items-center gap-2">
+                <i class="fa-solid fa-circle-exclamation text-warning"></i>
+                <span>Add GitHub link to showcase code repositories.</span>
+            </div>
+        `;
+    }
+    
+    const skillsProg = getValSafe("res-skills-prog").trim();
+    if (!skillsProg) {
+        briefHtml += `
+            <div class="p-2 border rounded bg-secondary-card d-flex align-items-center gap-2">
+                <i class="fa-solid fa-triangle-exclamation text-danger"></i>
+                <span>Technical programming skills section is empty.</span>
+            </div>
+        `;
+    }
+    
+    if (!isListNonEmpty(content.experience, ['role', 'company'])) {
+        briefHtml += `
+            <div class="p-2 border rounded bg-secondary-card d-flex align-items-center gap-2">
+                <i class="fa-solid fa-circle-exclamation text-warning"></i>
+                <span>Adding professional experience will boost overall score.</span>
+            </div>
+        `;
+    }
+    if (!isListNonEmpty(content.projects, ['title'])) {
+        briefHtml += `
+            <div class="p-2 border rounded bg-secondary-card d-flex align-items-center gap-2">
+                <i class="fa-solid fa-circle-exclamation text-warning"></i>
+                <span>Add at least one technical project with details.</span>
+            </div>
+        `;
+    }
+    
+    if (overall >= 75 && briefHtml === "") {
+        briefHtml = `
+            <div class="p-2 border rounded bg-secondary-card d-flex align-items-center gap-2">
+                <i class="fa-solid fa-circle-check text-success"></i>
+                <span>Excellent resume structure! All core elements verified.</span>
+            </div>
+            <div class="p-2 border rounded bg-secondary-card d-flex align-items-center gap-2">
+                <i class="fa-solid fa-circle-check text-success"></i>
+                <span>Format is highly ATS-compliant.</span>
+            </div>
+        `;
+    } else if (briefHtml === "") {
+        briefHtml = `
+            <div class="p-2 border rounded bg-secondary-card d-flex align-items-center gap-2">
+                <i class="fa-solid fa-circle-check text-success"></i>
+                <span>Basic structure is valid. Add more content details to improve.</span>
+            </div>
+        `;
+    }
+    
+    briefBox.innerHTML = briefHtml;
 }
 
 function renderATSFeedback(feedback) {
