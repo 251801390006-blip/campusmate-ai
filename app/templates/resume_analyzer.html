@@ -509,16 +509,16 @@
                 <button class="btn btn-sm btn-outline w-100 py-1.5" onclick="duplicateCurrentVersion()" title="Duplicate Draft"><i class="fa-solid fa-copy me-1"></i> Duplicate Version</button>
             </div>
         </div>
-    </div><div class="bottom-tools-container container-fluid mt-4 mb-5">
-<div class="desktop-download-toolbar d-none d-lg-flex justify-content-between align-items-center mb-3 p-2.5 border rounded bg-primary-card" style="border-color: var(--border-color) !important;">
-                <span class="fw-bold" style="font-size:0.75rem; color:var(--text-secondary);"><i class="fa-solid fa-cloud-arrow-down me-2 text-accent"></i> Download & Export Options</span>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-sm btn-primary py-1 px-3 fw-semibold text-nowrap" style="font-size: 0.72rem; height: 30px; display: inline-flex; align-items: center;" onclick="downloadResumePDF()"><i class="fa-solid fa-file-pdf me-1.5"></i> PDF</button>
-                    <button class="btn btn-sm btn-outline py-1 px-3 text-nowrap" style="font-size: 0.72rem; height: 30px; display: inline-flex; align-items: center;" onclick="downloadResumeDOCX()"><i class="fa-solid fa-file-word text-primary me-1.5"></i> Word</button>
-                    <button class="btn btn-sm btn-outline py-1 px-3 text-nowrap" style="font-size: 0.72rem; height: 30px; display: inline-flex; align-items: center;" onclick="downloadResumeJSON()"><i class="fa-solid fa-file-code text-info me-1.5"></i> JSON</button>
-                    <button class="btn btn-sm btn-outline py-1 px-3 text-nowrap" style="font-size: 0.72rem; height: 30px; display: inline-flex; align-items: center;" onclick="generateShareLink()"><i class="fa-solid fa-share-nodes text-success me-1.5"></i> Share</button>
-                </div>
-            </div>
+    </div><div class="bottom-tools-container container-fluid mt-4 mb-5" id="mobile-export-section">
+    <div class="desktop-download-toolbar d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center gap-3 mb-3 p-4 border rounded bg-primary-card" style="border-color: var(--border-color) !important; box-shadow: 0 4px 20px rgba(0,0,0,0.02);">
+        <span class="fw-bold fs-6" style="color:var(--text-secondary);"><i class="fa-solid fa-cloud-arrow-down me-2 text-accent fs-5"></i> Download & Export Options</span>
+        <div class="d-flex flex-wrap gap-2.5">
+            <button class="btn btn-sm btn-primary py-2 px-4 fw-bold text-nowrap text-white" style="font-size: 0.8rem; border-radius: 10px; background: linear-gradient(135deg, var(--accent-color), #3b82f6); border: none; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.25); display: inline-flex; align-items: center; justify-content: center; height: 40px; cursor: pointer; transition: all 0.2s;" onclick="downloadResumePDF()"><i class="fa-solid fa-file-arrow-down me-2 fs-5"></i> Download Resume PDF</button>
+            <button class="btn btn-sm btn-outline py-2 px-3 text-nowrap" style="font-size: 0.78rem; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; height: 40px;" onclick="downloadResumeDOCX()"><i class="fa-solid fa-file-word text-primary me-2 fs-5"></i> Word (DOCX)</button>
+            <button class="btn btn-sm btn-outline py-2 px-3 text-nowrap" style="font-size: 0.78rem; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; height: 40px;" onclick="downloadResumeJSON()"><i class="fa-solid fa-file-code text-info me-2 fs-5"></i> JSON Schema</button>
+            <button class="btn btn-sm btn-outline py-2 px-3 text-nowrap" style="font-size: 0.78rem; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; height: 40px;" onclick="generateShareLink()"><i class="fa-solid fa-share-nodes text-success me-2 fs-5"></i> Share Link</button>
+        </div>
+    </div>
 <div id="ats-dashboard-parent" class="ats-slide-out-panel">
                     <div class="ats-drawer-header">
                         <h4 class="fw-bold mb-0 text-secondary-text" style="font-size:0.95rem;"><i class="fa-solid fa-chart-line text-accent me-2"></i> ATS Scorecard</h4>
@@ -654,9 +654,57 @@
                     </div>
                 </div>
 
-                <!-- ATS Diagnostics & Scoring Panel (Compact Card Layout) -->
-                
-            
+                <!-- ATS & Upload Section Grid -->
+                <div class="row g-3 mt-3" id="ats-upload-desktop-section">
+                    <!-- ATS Score Card -->
+                    <div class="col-md-7">
+                        <div id="ats-dashboard-section" class="p-3 border rounded bg-primary-card h-100" style="border-color: var(--border-color) !important;">
+                            <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2" style="border-color: var(--border-color) !important;">
+                                <h4 class="fw-bold mb-0 text-secondary-text" style="font-size:0.95rem;"><i class="fa-solid fa-chart-line text-accent me-2"></i> ATS Scorecard</h4>
+                                <span class="badge badge-success" id="score-badge-main" style="font-size: 0.72rem;">Passed</span>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between p-3 border rounded bg-secondary-card mb-3" style="border-color: var(--border-color) !important;">
+                                <div>
+                                    <span class="text-secondary fw-bold" style="font-size: 0.65rem; text-transform: uppercase;">Overall Match</span>
+                                    <h3 class="fw-bold mb-0 text-accent animate-pulse" id="score-text-main" style="font-size:1.8rem; line-height:1; color: var(--accent-color) !important;">85%</h3>
+                                </div>
+                                <div class="d-flex flex-column gap-1 w-50">
+                                    <small class="text-secondary" style="font-size: 0.65rem;">ATS Keywords Found</small>
+                                    <div class="progress" style="height: 6px; background: rgba(0,0,0,0.08);">
+                                        <div class="progress-bar bg-accent" id="progress-bar-main" style="width: 85%; background: var(--accent-color) !important;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="ats-feedback-list-brief" class="d-flex flex-column gap-2" style="max-height: 200px; overflow-y: auto; font-size: 0.75rem;">
+                                <div class="p-2 border rounded bg-secondary-card d-flex align-items-center gap-2">
+                                    <i class="fa-solid fa-circle-check text-success"></i>
+                                    <span>Resume format is ATS-compliant.</span>
+                                </div>
+                                <div class="p-2 border rounded bg-secondary-card d-flex align-items-center gap-2">
+                                    <i class="fa-solid fa-circle-exclamation text-warning"></i>
+                                    <span>Add more metrics to describe achievements.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Upload Zone Card -->
+                    <div class="col-md-5">
+                        <div id="upload-section-card" class="p-3 border rounded bg-primary-card h-100 d-flex flex-column justify-content-between" style="border-color: var(--border-color) !important;">
+                            <div class="border-bottom pb-2 mb-3" style="border-color: var(--border-color) !important;">
+                                <h4 class="fw-bold mb-0 text-secondary-text" style="font-size:0.95rem;"><i class="fa-solid fa-file-arrow-up text-accent me-2"></i> Import/Upload</h4>
+                            </div>
+                            <div class="border-dashed rounded p-3 text-center d-flex flex-column align-items-center justify-content-center flex-grow-1" id="drop-zone-main" style="border: 2px dashed rgba(139, 92, 246, 0.4); cursor: pointer; transition: all 0.2s; min-height: 120px;" onclick="document.getElementById('resume-file-input-main').click()">
+                                <i class="fa-solid fa-cloud-arrow-up text-accent fs-3 mb-2 animate-bounce"></i>
+                                <span class="fw-semibold d-block text-primary-text" style="font-size:0.75rem;">Drag & Drop Resume</span>
+                                <small class="text-secondary" style="font-size:0.6rem;">Supports PDF/DOCX (Max 5MB)</small>
+                                <input type="file" id="resume-file-input-main" style="display:none;" accept=".pdf,.docx">
+                            </div>
+                            <!-- Upload status text -->
+                            <div id="upload-status-text-main" class="text-center p-2 mt-2 border rounded bg-secondary-card text-secondary animate-fade-in" style="font-size: 0.72rem; display:none; border-color: var(--accent-color) !important;"></div>
+                        </div>
+                    </div>
+                </div>
             </div> <!-- Close preview-ats-container-desktop -->
         </div> <!-- Close flat-card of visual-viewer-column -->
         
@@ -3157,11 +3205,14 @@ function downloadResumeDOCX() {
         flex-direction: column !important;
         width: 100%;
         margin: 0 auto;
+        gap: 30px;
     }
     
     .editor-form-column, .visual-viewer-column {
         width: 100% !important;
         max-width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
     }
     
     .editor-form-column > .flat-card, .visual-viewer-column > .flat-card {
@@ -3170,36 +3221,33 @@ function downloadResumeDOCX() {
         overflow-y: visible !important;
     }
 
+    /* Continuous scroll layout: display all columns */
     .resume-workspace-wrapper.tab-edit .visual-viewer-column, 
-    .resume-workspace-wrapper.tab-edit .bottom-tools-container { display: none !important; }
-    .resume-workspace-wrapper.tab-edit .editor-form-column { display: flex !important; flex-direction: column; }
-
+    .resume-workspace-wrapper.tab-edit .bottom-tools-container,
     .resume-workspace-wrapper.tab-preview .editor-form-column, 
-    .resume-workspace-wrapper.tab-preview .bottom-tools-container { display: none !important; }
-    .resume-workspace-wrapper.tab-preview .visual-viewer-column { display: flex !important; flex-direction: column; }
-
+    .resume-workspace-wrapper.tab-preview .bottom-tools-container,
     .resume-workspace-wrapper.tab-ats .editor-form-column, 
-    .resume-workspace-wrapper.tab-ats .visual-viewer-column { display: none !important; }
-    .resume-workspace-wrapper.tab-ats .bottom-tools-container { display: block !important; }
-    .resume-workspace-wrapper.tab-ats .bottom-tools-container .desktop-download-toolbar { display: none !important; }
-
+    .resume-workspace-wrapper.tab-ats .visual-viewer-column,
     .resume-workspace-wrapper.tab-export .editor-form-column, 
-    .resume-workspace-wrapper.tab-export .visual-viewer-column { display: none !important; }
-    .resume-workspace-wrapper.tab-export .bottom-tools-container { display: block !important; }
-    .resume-workspace-wrapper.tab-export .bottom-tools-container #ats-dashboard-parent { display: none !important; }
-}
-
-/* Specific Mobile Nav (max 767px) */
-@media (max-width: 767.98px) {
-    .tablet-top-nav { display: none !important; }
-    .mobile-bottom-nav { display: flex !important; }
-    body { padding-bottom: 70px; }
-}
-
-/* Specific Tablet Nav (768px to 991px) */
-@media (min-width: 768px) and (max-width: 991.98px) {
-    .mobile-bottom-nav { display: none !important; }
-    .tablet-top-nav { display: flex !important; max-width: 800px; margin: 0 auto 20px auto; }
+    .resume-workspace-wrapper.tab-export .visual-viewer-column {
+        display: flex !important;
+    }
+    
+    .bottom-tools-container {
+        display: block !important;
+    }
+    
+    .tablet-top-nav {
+        display: none !important;
+    }
+    
+    .mobile-bottom-nav {
+        display: flex !important;
+    }
+    
+    body {
+        padding-bottom: 95px !important;
+    }
 }
 
 /* ---------------------------------------------------- */
@@ -3476,37 +3524,64 @@ function copyShareLink() {
 
 // Drag & Drop File handler
 function setupUploadDragAndDrop() {
+    // Setup for main drag & drop zone
+    const zoneMain = document.getElementById("drop-zone-main");
+    const inputMain = document.getElementById("resume-file-input-main");
+    const statusTextMain = document.getElementById("upload-status-text-main");
+    
+    if (zoneMain && inputMain) {
+        zoneMain.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            zoneMain.style.borderColor = "var(--accent-color)";
+            zoneMain.style.backgroundColor = "rgba(139,92,246,0.04)";
+        });
+        zoneMain.addEventListener("dragleave", () => {
+            zoneMain.style.borderColor = "rgba(139, 92, 246, 0.4)";
+            zoneMain.style.backgroundColor = "transparent";
+        });
+        zoneMain.addEventListener("drop", (e) => {
+            e.preventDefault();
+            zoneMain.style.borderColor = "rgba(139, 92, 246, 0.4)";
+            zoneMain.style.backgroundColor = "transparent";
+            if (e.dataTransfer.files.length > 0) {
+                uploadFileAJAX(e.dataTransfer.files[0], statusTextMain);
+            }
+        });
+        inputMain.addEventListener("change", (e) => {
+            if (e.target.files.length > 0) {
+                uploadFileAJAX(e.target.files[0], statusTextMain);
+            }
+        });
+    }
+
+    // Setup for original builder drag & drop zone (fallback/backwards compatibility)
     const zone = document.getElementById("drop-zone-builder");
     const input = document.getElementById("resume-file-input-builder");
     const statusText = document.getElementById("upload-status-text-builder");
-    if (!zone || !input) return;
-
-    zone.addEventListener("click", () => {
-        input.click();
-    });
-
-    input.addEventListener("change", (e) => {
-        if (e.target.files.length > 0) {
-            uploadFileAJAX(e.target.files[0], statusText);
-        }
-    });
-
-    zone.addEventListener("dragover", (e) => {
-        e.preventDefault();
-        zone.style.backgroundColor = "rgba(99,102,241,0.06)";
-    });
-
-    zone.addEventListener("dragleave", () => {
-        zone.style.backgroundColor = "transparent";
-    });
-
-    zone.addEventListener("drop", (e) => {
-        e.preventDefault();
-        zone.style.backgroundColor = "transparent";
-        if (e.dataTransfer.files.length > 0) {
-            uploadFileAJAX(e.dataTransfer.files[0], statusText);
-        }
-    });
+    if (zone && input) {
+        zone.addEventListener("click", () => {
+            input.click();
+        });
+        input.addEventListener("change", (e) => {
+            if (e.target.files.length > 0) {
+                uploadFileAJAX(e.target.files[0], statusText);
+            }
+        });
+        zone.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            zone.style.backgroundColor = "rgba(99,102,241,0.06)";
+        });
+        zone.addEventListener("dragleave", () => {
+            zone.style.backgroundColor = "transparent";
+        });
+        zone.addEventListener("drop", (e) => {
+            e.preventDefault();
+            zone.style.backgroundColor = "transparent";
+            if (e.dataTransfer.files.length > 0) {
+                uploadFileAJAX(e.dataTransfer.files[0], statusText);
+            }
+        });
+    }
 }
 
 async function uploadFileAJAX(file, statusText) {
@@ -3976,9 +4051,73 @@ document.addEventListener("DOMContentLoaded", () => {
 .mobile-bottom-tabs-nav {
     display: none !important;
 }
-/* Hide dashboard mobile nav bottom bar globally on this page */
+/* Instagram-like Premium Navigation Bar */
 .mobile-bottom-nav {
-    display: none !important;
+    position: fixed !important;
+    bottom: 15px !important;
+    left: 15px !important;
+    right: 15px !important;
+    height: 64px;
+    background: rgba(255, 255, 255, 0.82) !important;
+    backdrop-filter: blur(25px) !important;
+    -webkit-backdrop-filter: blur(25px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.45) !important;
+    border-radius: 20px !important;
+    z-index: 2500 !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+    display: none !important; /* Managed by media queries */
+    padding: 0 10px !important;
+    align-items: center;
+    justify-content: space-around;
+}
+
+body.dark .mobile-bottom-nav {
+    background: rgba(30, 41, 59, 0.82) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+}
+
+.mobile-bottom-nav .btn-nav {
+    color: var(--text-secondary) !important;
+    border: none !important;
+    background: transparent !important;
+    font-size: 0.65rem !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 12px !important;
+    height: 48px !important;
+    position: relative !important;
+    cursor: pointer !important;
+}
+
+.mobile-bottom-nav .btn-nav i {
+    font-size: 1.15rem !important;
+    margin-bottom: 3px !important;
+    transition: transform 0.2s ease !important;
+}
+
+.mobile-bottom-nav .btn-nav.active {
+    color: var(--accent-color) !important;
+}
+
+.mobile-bottom-nav .btn-nav.active i {
+    transform: scale(1.1) !important;
+}
+
+.mobile-bottom-nav .btn-nav.active::after {
+    content: '' !important;
+    position: absolute !important;
+    bottom: -4px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 4px !important;
+    height: 4px !important;
+    border-radius: 50% !important;
+    background-color: var(--accent-color) !important;
 }
 
 @media (max-width: 1023.98px) {
@@ -4587,25 +4726,54 @@ body.dark .circle-bg {
 </style>
 {% endblock %}
 
-    <div class="mobile-bottom-nav d-flex justify-content-around align-items-center bg-primary-card border-top p-2" style="position:fixed; bottom:0; left:0; right:0; z-index:2000; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); display:none !important;">
-        <button class="btn btn-sm btn-nav d-flex flex-column align-items-center flex-grow-1 active" onclick="switchMobileTab('edit', this)"><i class="fa-solid fa-pen-to-square mb-1 fs-5"></i><span style="font-size:0.65rem;">Edit</span></button>
-        <button class="btn btn-sm btn-nav d-flex flex-column align-items-center flex-grow-1" onclick="switchMobileTab('preview', this)"><i class="fa-solid fa-file-lines mb-1 fs-5"></i><span style="font-size:0.65rem;">Preview</span></button>
-        <button class="btn btn-sm btn-nav d-flex flex-column align-items-center flex-grow-1" onclick="switchMobileTab('ats', this)"><i class="fa-solid fa-gauge-high mb-1 fs-5"></i><span style="font-size:0.65rem;">ATS</span></button>
-        <button class="btn btn-sm btn-nav d-flex flex-column align-items-center flex-grow-1" onclick="switchMobileTab('export', this)"><i class="fa-solid fa-download mb-1 fs-5"></i><span style="font-size:0.65rem;">PDF</span></button>
+    <div class="mobile-bottom-nav d-flex justify-content-around align-items-center bg-primary-card border-top p-2">
+        <button class="btn btn-sm btn-nav d-flex flex-column align-items-center flex-grow-1 active" onclick="switchMobileTab('edit', this)"><i class="fa-solid fa-pen-to-square mb-1"></i><span style="font-size:0.65rem;">Edit</span></button>
+        <button class="btn btn-sm btn-nav d-flex flex-column align-items-center flex-grow-1" onclick="switchMobileTab('preview', this)"><i class="fa-solid fa-eye mb-1"></i><span style="font-size:0.65rem;">Preview</span></button>
+        <button class="btn btn-sm btn-nav d-flex flex-column align-items-center flex-grow-1" onclick="switchMobileTab('ats', this)"><i class="fa-solid fa-chart-line mb-1"></i><span style="font-size:0.65rem;">ATS Score</span></button>
+        <button class="btn btn-sm btn-nav d-flex flex-column align-items-center flex-grow-1" onclick="switchMobileTab('templates', this)"><i class="fa-solid fa-palette mb-1"></i><span style="font-size:0.65rem;">Templates</span></button>
+        <button class="btn btn-sm btn-nav d-flex flex-column align-items-center flex-grow-1" onclick="switchMobileTab('export', this)"><i class="fa-solid fa-download mb-1"></i><span style="font-size:0.65rem;">Export</span></button>
     </div>
 
 <script>
 function switchMobileTab(tabName, btnElement) {
     const wrapper = document.querySelector('.resume-workspace-wrapper');
-    wrapper.classList.remove('tab-edit', 'tab-preview', 'tab-ats', 'tab-export', 'tab-templates');
-    wrapper.classList.add('tab-' + tabName);
+    if (wrapper) {
+        wrapper.classList.remove('tab-edit', 'tab-preview', 'tab-ats', 'tab-export', 'tab-templates');
+        wrapper.classList.add('tab-' + tabName);
+    }
     
-    document.querySelectorAll('.mobile-bottom-nav button, .tablet-top-nav button').forEach(btn => {
-        if(btn.onclick.toString().includes("'" + tabName + "'")) {
-            btn.classList.add('active');
-        } else {
-            btn.classList.remove('active');
-        }
+    // Highlight the active button
+    document.querySelectorAll('.mobile-bottom-nav button').forEach(btn => {
+        btn.classList.remove('active');
     });
+    if (btnElement) {
+        btnElement.classList.add('active');
+    } else {
+        document.querySelectorAll('.mobile-bottom-nav button').forEach(btn => {
+            if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(tabName)) {
+                btn.classList.add('active');
+            }
+        });
+    }
+    
+    // Smooth scroll on mobile/tablet viewports
+    if (window.innerWidth < 992) {
+        let targetEl = null;
+        if (tabName === 'edit') {
+            targetEl = document.querySelector('.editor-form-column');
+        } else if (tabName === 'preview') {
+            targetEl = document.getElementById('resume-preview-sheet-wrapper-parent');
+        } else if (tabName === 'ats') {
+            targetEl = document.getElementById('ats-dashboard-section');
+        } else if (tabName === 'templates') {
+            targetEl = document.getElementById('mobile-templates-container') || document.getElementById('accordion-templates');
+        } else if (tabName === 'export') {
+            targetEl = document.getElementById('mobile-export-section');
+        }
+        
+        if (targetEl) {
+            targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
 }
 </script>
