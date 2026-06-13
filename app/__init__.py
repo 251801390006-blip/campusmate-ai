@@ -1,6 +1,6 @@
 import os
 from datetime import timedelta
-from flask import Flask
+from flask import Flask, render_template
 from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager
 
@@ -22,8 +22,9 @@ def create_app():
     app = Flask(__name__)
     
     # Configuration
-    secret_key = os.environ.get('SECRET_KEY', 'dev_secret_key_campusmate_ai_99182312')
+    secret_key = os.environ.get('SECRET_KEY', os.urandom(24).hex())
     app.config['SECRET_KEY'] = secret_key
+    app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max-limit
     
     # Configure database
     db_url = os.environ.get('DATABASE_URL', 'sqlite:///../database.db')
@@ -149,7 +150,13 @@ def create_app():
             'unread_notifications': [],
             'unread_notifications_count': 0
         }
+    @app.errorhandler(404)
+    def page_not_found(e):
+        return render_template('errors/404.html'), 404
 
+    @app.errorhandler(500)
+    def internal_server_error(e):
+        return render_template('errors/500.html'), 500
     return app
 
 

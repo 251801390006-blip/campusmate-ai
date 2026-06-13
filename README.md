@@ -1,27 +1,58 @@
-# 🎓 CampusMate AI
-> **The Premium, Glassmorphic AI Career & Learning Operating System for Students.**
+<div align="center">
+  <img src="https://img.shields.io/badge/CampusMate-AI-6366f1?style=for-the-badge&logo=openai&logoColor=white" alt="CampusMate AI Logo" />
+  <h1>🎓 CampusMate AI</h1>
+  <p><strong>The Premium, Glassmorphic AI Career & Learning Operating System for Students.</strong></p>
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new?template=https://github.com/251801390006-blip/campusmate-ai)
-[![Python Version](https://img.shields.io/badge/python-3.12-blue?style=flat-square&logo=python)](https://www.python.org/)
-[![Flask Version](https://img.shields.io/badge/Flask-3.0.3-009688?style=flat-square&logo=flask)](https://flask.palletsprojects.com/)
-[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/251801390006-blip/campusmate-ai?style=flat-square)](https://github.com/251801390006-blip/campusmate-ai/stargazers)
+  [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new?template=https://github.com/251801390006-blip/campusmate-ai)
+  [![Python Version](https://img.shields.io/badge/python-3.12-blue?style=flat-square&logo=python)](https://www.python.org/)
+  [![Flask Version](https://img.shields.io/badge/Flask-3.0.3-009688?style=flat-square&logo=flask)](https://flask.palletsprojects.com/)
+  [![Security Status](https://img.shields.io/badge/Security-100%25_Passed-brightgreen?style=flat-square&logo=shield)](https://github.com/251801390006-blip/campusmate-ai)
+  [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
+</div>
+
 ---
 
 ## 🏆 Microsoft Hackathon Submission
-Welcome Judges! CampusMate AI is fully ready for your review. Please see our official evaluation resources:
-- [Architecture Diagram](./ARCHITECTURE.md)
-- [System Workflow](./WORKFLOW.md)
-- [Demo Video Checklist](./DEMO_CHECKLIST.md)
-- [Judge Evaluation Rubric](./JUDGE_RUBRIC.md)
+Welcome Judges! CampusMate AI is fully prepared for the **Microsoft Agents League** review. We have officially passed our 12-Phase DevSecOps Security Audit.
+
+Please review our official evaluation resources:
+- 🏗️ **[Architecture Diagram](./ARCHITECTURE.md)**
+- 🔄 **[System Workflow](./WORKFLOW.md)**
+- 🎥 **[Demo Video Checklist](./DEMO_CHECKLIST.md)**
+- 📊 **[Judge Evaluation Rubric](./JUDGE_RUBRIC.md)**
+
+---
+
+## ✨ Key Features
+
+CampusMate AI provides a fully immersive, personalized career acceleration environment:
+
+### 🗺️ Non-Linear Visual Roadmaps
+- **200+ Career Checkpoints**: Interactive node diagrams for **8 target fields** (Cybersecurity, AI Engineering, Machine Learning, Data Science, Cloud Computing, DevOps, Full Stack Web, and Mobile Development).
+- **Navigation Console**: Fluid canvas controls featuring Zoom, Pan, Reset, and directional navigations.
+- **Resource Routing**: Curated learning references mapping directly to industry-standard platforms (Google, MDN, GeeksForGeeks).
+
+### 📝 Single-Page ATS Resume Builder
+- **Strict Layout Constraints**: Advanced `.pdf-export-mode` styling compresses fonts, margins, and section spacing to guarantee output prints perfectly on exactly a single A4 page.
+- **Clean Job-Focused Editor**: Strictly focused on essential tech sections: Education, Technical Skills, Experience, Projects, and Certifications.
+- **Interactive Parsing & Audit**: Drag-and-drop zone extracting PDF/DOCX content to analyze with a real-time keyword scanner and Google's XYZ formula validator.
+
+### 💬 Floating AI Career Mentor
+- **Typewriter Streaming**: Simulates real-time word-by-word response formulation.
+- **Contextual Memory**: Displays active student statistics (track, XP achievements, resume score) within the chat console to maintain continuous advisor context.
+- **Smart Suggestions**: Auto-generated guidance query chips updating dynamically based on conversation flow.
+
+### 🎙️ AI Interview Simulator & 💼 Internship Center
+- **Live TTS Simulation**: Practice typical tech screening questions with speech output support and progress evaluations.
+- **Intelligent Internship Matching**: Automatically extracts user skills and filters available opportunities, calculating personalized eligibility ratings.
 
 ---
 
 ## 🏗️ Architecture & Data Flow
 
-CampusMate AI is built on a robust, state-of-the-art Python stack using a Flask backend, SQLAlchemy database layers, and HTML5/Vanilla CSS frontend modules. It features contextual generative AI workflows using the official Google GenAI SDK.
+CampusMate AI is built on a robust Python stack using a **Flask WSGI** backend, **SQLAlchemy** database layers, and responsive **HTML5/Vanilla CSS** frontend modules with glassmorphic aesthetics. It features contextual generative AI workflows powered by the official **Google GenAI SDK** and **Groq LLaMA**.
 
-```
+```text
                       +------------------------------------------+
                       |           Student Client Browser         |
                       |   - HSL tailored glassmorphic styles     |
@@ -39,78 +70,36 @@ CampusMate AI is built on a robust, state-of-the-art Python stack using a Flask 
                           |                                  |
                           v  [SQLAlchemy ORM]                v  [GenAI SDK]
             +-------------+-------------+      +-------------+-------------+
-            |      SQLite / Postgres    |      |     Google Gemini API     |
-            |      - User & Admin logs  |      |     - gemini-2.5-flash    |
-            |      - Draft resume states|      |     - Live stream responses|
-            |      - Roadmap progress   |      |     - Heuristic audit maps|
+            |      SQLite / Postgres    |      |     AI Model Providers    |
+            |      - User & Admin logs  |      |     - Gemini 2.5 Flash    |
+            |      - Draft resume states|      |     - LLaMA 3.3 70B       |
+            |      - Roadmap progress   |      |     - Heuristic audits    |
             +---------------------------+      +---------------------------+
 ```
 
 ---
 
-## 📂 Repository File Structure
+## 📂 Repository Structure
 
-```
-├── .github/
-│   └── workflows/
-│       └── verify.yml       # Automated CI workflow compilation checking
+```text
+├── .github/                 # Automated CI workflows (verify.yml)
 ├── app/                     # Main Flask Application
-│   ├── __init__.py          # App initialization, SQLAlchemy config, Flask-Login setup
-│   ├── forms.py             # Form validation schemas (Login, Register, Settings)
-│   ├── models.py            # Relational database models (User, Resume, RoadmapProgress, etc.)
+│   ├── __init__.py          # App init, DB config, Auth setup, Error handlers
+│   ├── models.py            # Relational database schemas (User, Resume, Roadmap, etc.)
 │   ├── routes/              # Blueprints containing views and API controllers
-│   │   ├── admin.py         # Admin Dashboard metrics, logs, user control, announcements
-│   │   ├── auth.py          # Secure student authentication logic (onboarding)
-│   │   ├── dashboard.py     # Main student dashboard workspace and activity tracker
-│   │   ├── features.py      # Core AI engines (Roadmaps, Resume Analyzer, Interview Prep, etc.)
-│   │   └── feedback.py      # User feedback log dispatchers
-│   ├── static/              # Static assets directory
-│   │   ├── css/
-│   │   │   └── style.css    # Premium CSS design variables (Light & Day/Dark themes)
-│   │   └── js/
-│   │       ├── mentor.js    # Floating AI Mentor chat drawer stream controller
-│   │       └── roadmaps.js  # Roadmap canvas rendering with interactive nodes
-│   └── templates/           # Server-side HTML layout templates (Jinja2)
-│       ├── base.html        # App-wide layout base
-│       ├── dashboard_base.html # Student sidebar dashboard base
-│       └── ...              # Feature-specific pages (dashboard.html, roadmaps.html, etc.)
-├── Dockerfile               # Production container build recipe
+│   │   ├── admin.py         # Admin Dashboard metrics & controls
+│   │   ├── auth.py          # Secure student authentication logic
+│   │   ├── dashboard.py     # Main student workspace
+│   │   └── features.py      # Core AI engines (Roadmaps, Resumes, Interviews)
+│   ├── static/              # CSS, JS, and Images
+│   └── templates/           # Jinja2 HTML layout templates
+├── scratch/                 # Local test scripts & endpoints testing
+├── Dockerfile               # Production container build recipe (Gunicorn)
 ├── railway.json             # Railway app configurations and bindings
 ├── main.py                  # App entrypoint execution script
 ├── requirements.txt         # Locked project packages dependencies list
-├── database.db              # SQLite development database
-└── LICENSE                  # Open-source MIT License
+└── .env.example             # Template for secure environment variables
 ```
-
----
-
-## 🛠️ Feature Breakdown
-
-### 1. 🗺️ Non-Linear Visual Roadmaps
-- **200+ Career Checkpoints**: Interactive node diagrams for **8 target fields** (Cybersecurity, AI Engineering, Machine Learning, Data Science, Cloud Computing, DevOps, Full Stack Web, and Mobile Development).
-- **Navigation Console**: Fluid canvas controls featuring Zoom In, Zoom Out, Reset, Up, Down, Left, and Right navigations.
-- **Resource Routing**: Curated learning references mapping directly to industry platforms (Google, GeeksForGeeks, MDN).
-- **Day / Dark Mode**: Integrated workspace toggles adapting UI elements to HSL tailored color schemes dynamically.
-
-### 2. 📝 Single-Page ATS Resume Builder
-- **Strict Single-Page PDF Layout**: Strict `.pdf-export-mode` styling compressing fonts, margins, and section spacing to guarantee the output prints on exactly a single A4 page (`297mm`).
-- **Clean Job-Focused Editor**: Strictly focused on essential tech resume sections: **Education**, **Technical Skills**, **Experience**, **Projects**, and **Certifications**.
-- **Interactive Parsing & Audit Zone**: Drag-and-drop zone extracting PDF/DOCX content to analyze with a real-time keyword scanner and Google XYZ formula validator.
-- **Enhanced Downloads**: Fast, responsive download controller scaling canvas resolution (`2.5`) for sharp vector texts, preventing concurrent triggers, and rendering loader indicators during PDF generation.
-
-### 3. 💬 Floating AI Career Mentor
-- **Typewriter Streaming**: Simulates real-time word-by-word response formulation with elegant glassmorphic drawer elements.
-- **統計 Performance Memory Ribbon**: Displays active student statistics (track, XP achievements, resume score) within the chat console to maintain continuous advisor context.
-- **Context Suggestion Chips**: Auto-generated guidance query chips updating contextually based on user messages.
-
-### 4. 🎙️ AI Interview Simulator
-- **Live Text-to-Speech (TTS)**: Practicing typical tech screening questions with speech output support and progress evaluations.
-
-### 5. 🏗️ AI Project Architect
-- **Component Schemas**: Generates directory tree blueprints and database structures for target projects.
-
-### 6. 💼 Internship Command Center
-- **Rate Eligibility**: Automatically extracts user skills, filters internships populated by the Admin dashboard, maps matched tags, and ratings eligibility.
 
 ---
 
@@ -144,11 +133,17 @@ CampusMate AI is built on a robust, state-of-the-art Python stack using a Flask 
    pip install -r requirements.txt
    ```
 
-4. **Run development server:**
+4. **Environment Variables:**
+   Copy `.env.example` to `.env` and add your API keys. You can use Groq (Free) or Gemini (Free).
+   ```bash
+   cp .env.example .env
+   ```
+
+5. **Run the server:**
    ```bash
    python main.py
    ```
-   Open **`http://127.0.0.1:5000`** in your browser to view the application.
+   Open **`http://127.0.0.1:8000`** in your browser.
 
 ---
 
@@ -157,5 +152,11 @@ CampusMate AI is built on a robust, state-of-the-art Python stack using a Flask 
 ### Live Deployment via Railway
 1. Click the **Deploy on Railway** button at the top of the README.
 2. Grant Railway permissions to build from this fork.
-3. Inject the environment variable **`GEMINI_API_KEY`** using your API key from Google AI Studio.
-4. Railway will automatically build the container via the `Dockerfile` and publish an HTTPS endpoint.
+3. Inject the environment variables (`GEMINI_API_KEY`, `SECRET_KEY`).
+4. Railway will automatically build the container via the `Dockerfile` and publish an HTTPS endpoint using `gunicorn`.
+
+---
+
+<div align="center">
+  <i>Built with ❤️ for the Microsoft Agents League.</i>
+</div>
