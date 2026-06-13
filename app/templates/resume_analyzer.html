@@ -319,20 +319,20 @@
                     <summary class="fw-bold text-secondary-text" style="font-size:0.8rem; cursor:pointer; list-style:none;"><i class="fa-solid fa-gears me-2 text-muted"></i> Technical Skills</summary>
                     <div class="row g-2 mt-2">
                         <div class="col-12">
-                            <label class="form-label" style="font-size:0.65rem;">Programming Languages</label>
-                            <input type="text" id="res-skills-prog" class="form-input" value="Python, Java, C++, JavaScript" oninput="syncResumeFields()">
+                            <input type="text" id="res-skills-prog-label" class="form-control form-control-sm border-0 bg-transparent px-0 fw-bold mb-1" style="font-size:0.65rem; color: var(--text-secondary);" value="Category 1 (e.g. Languages)" oninput="syncResumeFields()">
+                            <input type="text" id="res-skills-prog" class="form-input" placeholder="Python, Java, C++, JavaScript..." oninput="syncResumeFields()">
                         </div>
                         <div class="col-12">
-                            <label class="form-label" style="font-size:0.65rem;">Cybersecurity & Databases</label>
-                            <input type="text" id="res-skills-cyber" class="form-input" value="SQL, NoSQL, Database Management, System Analysis" oninput="syncResumeFields()">
+                            <input type="text" id="res-skills-cyber-label" class="form-control form-control-sm border-0 bg-transparent px-0 fw-bold mb-1" style="font-size:0.65rem; color: var(--text-secondary);" value="Category 2 (e.g. Core Subjects)" oninput="syncResumeFields()">
+                            <input type="text" id="res-skills-cyber" class="form-input" placeholder="Database Management, System Analysis..." oninput="syncResumeFields()">
                         </div>
                         <div class="col-12">
-                            <label class="form-label" style="font-size:0.65rem;">Tools & Operating Systems</label>
-                            <input type="text" id="res-skills-tools" class="form-input" value="Git, Docker, VS Code, Command Line, Linux, Windows" oninput="syncResumeFields()">
+                            <input type="text" id="res-skills-tools-label" class="form-control form-control-sm border-0 bg-transparent px-0 fw-bold mb-1" style="font-size:0.65rem; color: var(--text-secondary);" value="Category 3 (e.g. Tools)" oninput="syncResumeFields()">
+                            <input type="text" id="res-skills-tools" class="form-input" placeholder="Git, Docker, VS Code..." oninput="syncResumeFields()">
                         </div>
                         <div class="col-12">
-                            <label class="form-label" style="font-size:0.65rem;">Web Frameworks & Libraries</label>
-                            <input type="text" id="res-skills-web" class="form-input" value="HTML, CSS, Bootstrap, Flask, React" oninput="syncResumeFields()">
+                            <input type="text" id="res-skills-web-label" class="form-control form-control-sm border-0 bg-transparent px-0 fw-bold mb-1" style="font-size:0.65rem; color: var(--text-secondary);" value="Category 4 (e.g. Frameworks)" oninput="syncResumeFields()">
+                            <input type="text" id="res-skills-web" class="form-input" placeholder="HTML, CSS, React..." oninput="syncResumeFields()">
                         </div>
                     </div>
                 </details>
@@ -1960,10 +1960,16 @@ function syncResumeFields() {
             leftSideHtml += `<div style="margin-bottom:15px;">`;
             leftSideHtml += `<h4 style="font-size:10px; font-weight:800; border-bottom:1px solid ${dividerColor}; padding-bottom:2px; margin-bottom:6px; text-transform:uppercase; color:${titleColor};">Skills</h4>`;
             leftSideHtml += `<div style="font-size:8px; line-height:1.3; ${isDarkSidebar ? 'color:rgba(255,255,255,0.85);' : 'color:#4b5563;'}">`;
-            if (skillsProg) leftSideHtml += `<div style="margin-bottom:3px;"><strong>Lang:</strong> ${skillsProg}</div>`;
-            if (skillsCyber) leftSideHtml += `<div style="margin-bottom:3px;"><strong>Cyber:</strong> ${skillsCyber}</div>`;
-            if (skillsTools) leftSideHtml += `<div style="margin-bottom:3px;"><strong>Tools:</strong> ${skillsTools}</div>`;
-            if (skillsWeb) leftSideHtml += `<div style="margin-bottom:3px;"><strong>Web:</strong> ${skillsWeb}</div>`;
+            
+            const labelProg = (getValSafe("res-skills-prog-label") || "Category 1").replace(/ \(.*\)/, '');
+            const labelCyber = (getValSafe("res-skills-cyber-label") || "Category 2").replace(/ \(.*\)/, '');
+            const labelTools = (getValSafe("res-skills-tools-label") || "Category 3").replace(/ \(.*\)/, '');
+            const labelWeb = (getValSafe("res-skills-web-label") || "Category 4").replace(/ \(.*\)/, '');
+
+            if (skillsProg) leftSideHtml += `<div style="margin-bottom:3px;"><strong>${labelProg}:</strong> ${skillsProg}</div>`;
+            if (skillsCyber) leftSideHtml += `<div style="margin-bottom:3px;"><strong>${labelCyber}:</strong> ${skillsCyber}</div>`;
+            if (skillsTools) leftSideHtml += `<div style="margin-bottom:3px;"><strong>${labelTools}:</strong> ${skillsTools}</div>`;
+            if (skillsWeb) leftSideHtml += `<div style="margin-bottom:3px;"><strong>${labelWeb}:</strong> ${skillsWeb}</div>`;
             leftSideHtml += `</div></div>`;
         }
         
@@ -2271,10 +2277,16 @@ function syncResumeFields() {
                 let html = `<div class="resume-render-section" data-section="skills">`;
                 html += `<h3 style="font-size:12px; font-weight:700; color:${accentColor}; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px; border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-bottom: 2px; text-align: ${isElegant ? 'center' : 'left'}">Technical Skills</h3>`;
                 html += `<div style="font-size:10px; line-height:1.45; color:#374151; text-align:left;">`;
-                if (skillsProg) html += `<div><strong>Programming:</strong> <span>${skillsProg}</span></div>`;
-                if (skillsCyber) html += `<div><strong>Cybersecurity:</strong> <span>${skillsCyber}</span></div>`;
-                if (skillsTools) html += `<div><strong>Tools:</strong> <span>${skillsTools}</span></div>`;
-                if (skillsWeb) html += `<div><strong>Web:</strong> <span>${skillsWeb}</span></div>`;
+                
+                const labelProg = (getValSafe("res-skills-prog-label") || "Category 1").replace(/ \(.*\)/, '');
+                const labelCyber = (getValSafe("res-skills-cyber-label") || "Category 2").replace(/ \(.*\)/, '');
+                const labelTools = (getValSafe("res-skills-tools-label") || "Category 3").replace(/ \(.*\)/, '');
+                const labelWeb = (getValSafe("res-skills-web-label") || "Category 4").replace(/ \(.*\)/, '');
+
+                if (skillsProg) html += `<div><strong>${labelProg}:</strong> <span>${skillsProg}</span></div>`;
+                if (skillsCyber) html += `<div><strong>${labelCyber}:</strong> <span>${skillsCyber}</span></div>`;
+                if (skillsTools) html += `<div><strong>${labelTools}:</strong> <span>${skillsTools}</span></div>`;
+                if (skillsWeb) html += `<div><strong>${labelWeb}:</strong> <span>${skillsWeb}</span></div>`;
                 html += `</div></div>`;
                 container.insertAdjacentHTML('beforeend', html);
             }
@@ -2604,9 +2616,13 @@ function getFormContent() {
         edu2Gpa: educationList[1]?.gpa || "",
         
         skillsProg: getValSafe("res-skills-prog"),
+        skillsProgLabel: getValSafe("res-skills-prog-label"),
         skillsCyber: getValSafe("res-skills-cyber"),
+        skillsCyberLabel: getValSafe("res-skills-cyber-label"),
         skillsTools: getValSafe("res-skills-tools"),
+        skillsToolsLabel: getValSafe("res-skills-tools-label"),
         skillsWeb: getValSafe("res-skills-web"),
+        skillsWebLabel: getValSafe("res-skills-web-label"),
         
         experienceRole: experienceList[0]?.role || "",
         experienceComp: experienceList[0]?.company || "",
@@ -2762,9 +2778,13 @@ function populateForm(c) {
     setValSafe("res-custom-sec-bullets", (customSection.bullets || []).join("\n"));
     
     setValSafe("res-skills-prog", c.skillsProg);
+    if (c.skillsProgLabel !== undefined) setValSafe("res-skills-prog-label", c.skillsProgLabel);
     setValSafe("res-skills-cyber", c.skillsCyber);
+    if (c.skillsCyberLabel !== undefined) setValSafe("res-skills-cyber-label", c.skillsCyberLabel);
     setValSafe("res-skills-tools", c.skillsTools);
+    if (c.skillsToolsLabel !== undefined) setValSafe("res-skills-tools-label", c.skillsToolsLabel);
     setValSafe("res-skills-web", c.skillsWeb);
+    if (c.skillsWebLabel !== undefined) setValSafe("res-skills-web-label", c.skillsWebLabel);
     
     setValSafe("res-achievements", c.achievements);
     setValSafe("res-hackathons", c.hackathons);
