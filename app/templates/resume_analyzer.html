@@ -3161,57 +3161,75 @@ async function downloadResumePDF() {
         const nameVal = (content.name || 'Resume').trim().replace(/\s+/g, '_');
         const filename = `${nameVal}_ATS_Resume.pdf`;
 
+        // 1. Create a pristine clone for PDF generation
+        const clone = sheet.cloneNode(true);
+        // Remove interactive UI elements
+        clone.querySelectorAll('.resume-canvas-toolbar, .resume-zoom-slider, .btn-canvas-ctrl, [data-no-pdf]').forEach(el => el.remove());
+        
+        // 2. Put it in an absolute container at the very top of the page, visible but masking the UI
+        const container = document.createElement('div');
+        container.style.position = 'absolute';
+        container.style.left = '0';
+        container.style.top = '0';
+        container.style.width = '100%';
+        container.style.height = '100%';
+        container.style.background = '#e2e8f0'; // Gray background
+        container.style.zIndex = '999999';
+        container.style.display = 'flex';
+        container.style.justifyContent = 'center';
+        container.style.alignItems = 'flex-start';
+        container.style.paddingTop = '20px';
+        
+        // Temporarily style clone for perfect rendering
+        clone.style.transform = 'none';
+        clone.style.width = '210mm';
+        clone.style.minHeight = '297mm';
+        clone.style.padding = '15mm';
+        clone.style.margin = '0';
+        clone.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
+        clone.style.border = 'none';
+        clone.style.background = '#fff';
+        clone.style.position = 'relative';
+
+        // Show a "generating" overlay on top of the clone so the user knows what's happening
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.top = '50%';
+        overlay.style.left = '50%';
+        overlay.style.transform = 'translate(-50%, -50%)';
+        overlay.style.background = 'rgba(0, 0, 0, 0.8)';
+        overlay.style.color = 'white';
+        overlay.style.padding = '15px 30px';
+        overlay.style.borderRadius = '8px';
+        overlay.style.fontSize = '1.2rem';
+        overlay.style.fontWeight = 'bold';
+        overlay.style.zIndex = '1000000';
+        overlay.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i> Generating High-Quality PDF...';
+
+        container.appendChild(clone);
+        document.body.appendChild(container);
+        document.body.appendChild(overlay);
+
+        // Scroll to top to ensure html2canvas starts from 0
+        window.scrollTo(0, 0);
+
         const opt = {
             margin:       [10, 0, 10, 0],
             filename:     filename,
             image:        { type: 'jpeg', quality: 1.0 },
-            html2canvas:  { scale: 2, useCORS: true },
+            html2canvas:  { scale: 2, useCORS: true, scrollY: 0, windowWidth: document.body.scrollWidth },
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
-        // Prepare the actual DOM element for rendering (no clones, to prevent blank PDFs)
-        sheet.querySelectorAll('.resume-canvas-toolbar, .resume-zoom-slider, .btn-canvas-ctrl, [data-no-pdf]').forEach(el => el.setAttribute('data-html2canvas-ignore', 'true'));
-        
-        // Save original styles to restore them later
-        const origStyles = {
-            transform: sheet.style.transform,
-            width: sheet.style.width,
-            minHeight: sheet.style.minHeight,
-            padding: sheet.style.padding,
-            margin: sheet.style.margin,
-            boxShadow: sheet.style.boxShadow,
-            border: sheet.style.border,
-            background: sheet.style.background
-        };
-
-        // Temporarily style the sheet for perfect A4 PDF rendering
-        sheet.style.transform = 'none';
-        sheet.style.width = '210mm';
-        sheet.style.minHeight = '297mm';
-        sheet.style.padding = '15mm';
-        sheet.style.margin = '0 auto';
-        sheet.style.boxShadow = 'none';
-        sheet.style.border = 'none';
-        sheet.style.background = '#fff';
-
-        // Scroll to the element to ensure html2canvas captures it if it's offscreen
-        sheet.scrollIntoView({ behavior: 'instant', block: 'start' });
-
         try {
-            await html2pdf().set(opt).from(sheet).save();
-        } finally {
-            // Restore all original styles instantly
-            sheet.style.transform = origStyles.transform;
-            sheet.style.width = origStyles.width;
-            sheet.style.minHeight = origStyles.minHeight;
-            sheet.style.padding = origStyles.padding;
-            sheet.style.margin = origStyles.margin;
-            sheet.style.boxShadow = origStyles.boxShadow;
-            sheet.style.border = origStyles.border;
-            sheet.style.background = origStyles.background;
+            // WAIT 200ms to allow browser to completely repaint the DOM with the clone
+            await new Promise(r => setTimeout(r, 200));
             
-            // Remove ignore tags
-            sheet.querySelectorAll('[data-html2canvas-ignore="true"]').forEach(el => el.removeAttribute('data-html2canvas-ignore'));
+            await html2pdf().set(opt).from(clone).save();
+        } finally {
+            // Clean up
+            document.body.removeChild(container);
+            document.body.removeChild(overlay);
         }
         
     } catch (err) {
