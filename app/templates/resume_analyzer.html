@@ -3153,7 +3153,9 @@ async function downloadResumePDF() {
         
         if (!response.ok) {
             const errData = await response.json().catch(() => ({}));
-            throw new Error(errData.error || `Server returned ${response.status}`);
+            const errMsg = errData.error || `Server returned ${response.status}`;
+            const detailsMsg = errData.details ? `\nDetails: ${errData.details}` : '';
+            throw new Error(errMsg + detailsMsg);
         }
         
         // Trigger download
