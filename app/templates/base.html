@@ -4,6 +4,31 @@
     <meta charset="UTF-8">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script>
+    (function() {
+        const originalFetch = window.fetch;
+        window.fetch = async function() {
+            let [resource, config] = arguments;
+            if (config && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(config.method?.toUpperCase())) {
+                config.headers = config.headers || {};
+                // Handle Headers object or plain object
+                if (config.headers instanceof Headers) {
+                    if (!config.headers.has('X-CSRFToken')) {
+                        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                        if (token) config.headers.append('X-CSRFToken', token);
+                    }
+                } else {
+                    if (!config.headers['X-CSRFToken'] && !config.headers['x-csrftoken']) {
+                        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                        if (token) config.headers['X-CSRFToken'] = token;
+                    }
+                }
+            }
+            return originalFetch.apply(this, arguments);
+        };
+    })();
+    </script>
     <title>{% block title %}CampusMate AI - Student Growth OS{% endblock %}</title>
     <!-- Google Fonts: Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

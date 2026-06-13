@@ -1,7 +1,7 @@
 import os
 from datetime import timedelta
-from flask import Flask, render_template
-from flask_wtf.csrf import CSRFProtect
+from flask import Flask, render_template, flash, redirect, request, url_for
+from flask_wtf.csrf import CSRFProtect, CSRFError
 from flask_login import LoginManager
 
 # Load .env file for local development (ignored in production where env vars are set directly)
@@ -22,7 +22,7 @@ def create_app():
     app = Flask(__name__)
     
     # Configuration
-    secret_key = os.environ.get('SECRET_KEY', os.urandom(24).hex())
+    secret_key = os.environ.get('SECRET_KEY', 'campusmate-default-static-key-12345')
     app.config['SECRET_KEY'] = secret_key
     app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max-limit
     
@@ -157,6 +157,12 @@ def create_app():
     @app.errorhandler(500)
     def internal_server_error(e):
         return render_template('errors/500.html'), 500
+
+    @app.errorhandler(CSRFError)
+    def handle_csrf_error(e):
+        flash("Your session expired. Please refresh and try again.", "warning")
+        return redirect(request.referrer or url_for('auth.login'))
+
     return app
 
 
