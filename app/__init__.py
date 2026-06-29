@@ -202,7 +202,7 @@ def seed_default_users(db, User):
 def seed_default_internships(db):
     from app.models import Internship
     try:
-        if Internship.query.count() != 35:
+        if Internship.query.count() != 40:
             # Wipe existing generic records and re-seed with 35 specific market internships
             Internship.query.delete()
             db.session.commit()
@@ -398,6 +398,33 @@ def seed_default_internships(db):
                     "company_name": "Vercel", "company_logo": "fa-solid fa-v", "role": "Frontend Infrastructure Intern", 
                     "type": "Summer", "location": "Remote", "skills": "Next.js, TypeScript, Rust", "eligibility": "B.Tech/BS",
                     "stipend": "$8,500/mo", "deadline": "2026-10-20", "official_link": "https://vercel.com/careers", "is_pinned": False
+                },
+                
+                # Dedicated Cybersecurity Expansion
+                {
+                    "company_name": "FireEye / Mandiant", "company_logo": "fa-solid fa-fire-flame-curved", "role": "Incident Response Intern", 
+                    "type": "Summer", "location": "Hybrid", "skills": "Digital Forensics, Python, Network Security", "eligibility": "B.Tech/BS/MS (Cyber Security)",
+                    "stipend": "$8,200/mo", "deadline": "2026-10-31", "official_link": "https://www.mandiant.com/company/careers", "is_pinned": True
+                },
+                {
+                    "company_name": "Fortinet", "company_logo": "fa-solid fa-shield", "role": "Network Security Engineer Intern", 
+                    "type": "Summer", "location": "Onsite", "skills": "Firewalls, TCP/IP, Linux", "eligibility": "B.Tech (CS/ECE)",
+                    "stipend": "$7,800/mo", "deadline": "2026-09-20", "official_link": "https://www.fortinet.com/corporate/careers", "is_pinned": False
+                },
+                {
+                    "company_name": "Zscaler", "company_logo": "fa-solid fa-cloud-bolt", "role": "Zero Trust Security Intern", 
+                    "type": "Fall", "location": "Remote", "skills": "Cloud Security, Python, IAM", "eligibility": "B.Tech 3rd/4th Year",
+                    "stipend": "$8,000/mo", "deadline": "2026-08-25", "official_link": "https://www.zscaler.com/careers", "is_pinned": False
+                },
+                {
+                    "company_name": "Akamai", "company_logo": "fa-solid fa-server", "role": "Application Security Intern", 
+                    "type": "Summer", "location": "Hybrid", "skills": "Web Security, C++, Networking", "eligibility": "BS/MS",
+                    "stipend": "$8,500/mo", "deadline": "2026-11-15", "official_link": "https://www.akamai.com/careers/university-programs", "is_pinned": False
+                },
+                {
+                    "company_name": "Darktrace", "company_logo": "fa-solid fa-eye", "role": "AI Cyber Threat Analyst Intern", 
+                    "type": "Summer", "location": "Onsite", "skills": "Threat Hunting, ML, SIEM", "eligibility": "B.Tech/B.Sc (Cyber Security)",
+                    "stipend": "$7,500/mo", "deadline": "2026-12-10", "official_link": "https://darktrace.com/careers", "is_pinned": False
                 }
             ]
 
