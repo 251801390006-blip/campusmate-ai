@@ -202,66 +202,105 @@ def seed_default_users(db, User):
 def seed_default_internships(db):
     from app.models import Internship
     try:
-        if Internship.query.count() < 100:
-            # Wipe existing records and re-seed with the full 105-entry set
+        if Internship.query.count() != 15:
+            # Wipe existing generic records and re-seed with 15 specific market internships
             Internship.query.delete()
             db.session.commit()
 
-            # --- 15 companies -------------------------------------------------
-            companies = [
-                {"name": "Google",      "logo": "fa-brands fa-google",              "link": "https://careers.google.com",                              "stipend": "$9,000/mo",  "pinned": True},
-                {"name": "Microsoft",   "logo": "fa-brands fa-microsoft",           "link": "https://careers.microsoft.com",                           "stipend": "$8,500/mo",  "pinned": True},
-                {"name": "Meta",        "logo": "fa-brands fa-meta",                "link": "https://www.metacareers.com",                             "stipend": "$9,200/mo",  "pinned": False},
-                {"name": "Amazon",      "logo": "fa-brands fa-amazon",              "link": "https://www.amazon.jobs",                                 "stipend": "$8,800/mo",  "pinned": False},
-                {"name": "Apple",       "logo": "fa-brands fa-apple",               "link": "https://jobs.apple.com",                                  "stipend": "$9,000/mo",  "pinned": False},
-                {"name": "NVIDIA",      "logo": "fa-solid fa-microchip",            "link": "https://www.nvidia.com/en-us/about-nvidia/careers/",      "stipend": "$8,200/mo",  "pinned": False},
-                {"name": "Netflix",     "logo": "fa-solid fa-film",                 "link": "https://jobs.netflix.com",                                "stipend": "$8,000/mo",  "pinned": False},
-                {"name": "OpenAI",      "logo": "fa-solid fa-brain",                "link": "https://openai.com/careers",                              "stipend": "$10,000/mo", "pinned": False},
-                {"name": "Stripe",      "logo": "fa-brands fa-stripe",              "link": "https://stripe.com/jobs",                                 "stipend": "$8,500/mo",  "pinned": False},
-                {"name": "CrowdStrike", "logo": "fa-solid fa-shield-halved",        "link": "https://www.crowdstrike.com/careers/",                    "stipend": "$7,500/mo",  "pinned": False},
-                {"name": "Adobe",       "logo": "fa-solid fa-wand-magic-sparkles",  "link": "https://www.adobe.com/careers.html",                      "stipend": "$7,800/mo",  "pinned": False},
-                {"name": "Salesforce",  "logo": "fa-brands fa-salesforce",          "link": "https://www.salesforce.com/company/careers/",             "stipend": "$7,600/mo",  "pinned": False},
-                {"name": "Intel",       "logo": "fa-solid fa-memory",               "link": "https://jobs.intel.com",                                  "stipend": "$7,200/mo",  "pinned": False},
-                {"name": "IBM",         "logo": "fa-solid fa-server",               "link": "https://www.ibm.com/careers",                             "stipend": "$6,800/mo",  "pinned": False},
-                {"name": "Cisco",       "logo": "fa-solid fa-network-wired",        "link": "https://jobs.cisco.com",                                  "stipend": "$7,000/mo",  "pinned": False},
+            # Specific current market internships (Summer/Fall 2026/2027)
+            market_internships = [
+                {
+                    "company_name": "Google", "company_logo": "fa-brands fa-google", "role": "Software Engineering Intern, Summer 2027", 
+                    "type": "Summer", "location": "Hybrid", "skills": "C++, Java, Python", "eligibility": "B.Tech/BS in CS (Graduating 2028)",
+                    "stipend": "$9,500/mo", "deadline": "2026-10-15", "official_link": "https://www.google.com/about/careers/applications/students/", "is_pinned": True
+                },
+                {
+                    "company_name": "Rivian", "company_logo": "fa-solid fa-car", "role": "Software Engineer Intern, Fall 2026", 
+                    "type": "Fall", "location": "Onsite", "skills": "Python, React, AWS", "eligibility": "B.Tech 3rd/4th Year",
+                    "stipend": "$8,000/mo", "deadline": "2026-08-01", "official_link": "https://careers.rivian.com/university", "is_pinned": True
+                },
+                {
+                    "company_name": "Databricks", "company_logo": "fa-solid fa-database", "role": "Data Science Intern", 
+                    "type": "Summer", "location": "Hybrid", "skills": "SQL, Python, Spark", "eligibility": "MS/PhD in CS or Stats",
+                    "stipend": "$10,500/mo", "deadline": "2026-09-30", "official_link": "https://www.databricks.com/company/careers/university", "is_pinned": True
+                },
+                {
+                    "company_name": "Microsoft", "company_logo": "fa-brands fa-microsoft", "role": "Cloud Security Engineering Intern", 
+                    "type": "Summer", "location": "Remote", "skills": "Azure, Networking, Python", "eligibility": "B.Tech/M.Tech (Cyber Security)",
+                    "stipend": "$8,700/mo", "deadline": "2026-11-01", "official_link": "https://careers.microsoft.com/students/us/en", "is_pinned": False
+                },
+                {
+                    "company_name": "Meta", "company_logo": "fa-brands fa-meta", "role": "AI/ML Research Intern", 
+                    "type": "Research", "location": "Onsite", "skills": "PyTorch, Computer Vision", "eligibility": "PhD (AI/ML/CS)",
+                    "stipend": "$11,000/mo", "deadline": "2026-10-31", "official_link": "https://www.metacareers.com/students", "is_pinned": False
+                },
+                {
+                    "company_name": "NVIDIA", "company_logo": "fa-solid fa-microchip", "role": "Deep Learning Intern (Autonomous Vehicles)", 
+                    "type": "Summer", "location": "Hybrid", "skills": "C++, CUDA, Deep Learning", "eligibility": "M.Tech/PhD",
+                    "stipend": "$9,800/mo", "deadline": "2026-09-15", "official_link": "https://www.nvidia.com/en-us/about-nvidia/careers/university-recruiting/", "is_pinned": True
+                },
+                {
+                    "company_name": "Amazon", "company_logo": "fa-brands fa-amazon", "role": "SDE Intern (AWS Core)", 
+                    "type": "Summer", "location": "Hybrid", "skills": "Java, Linux, Distributed Systems", "eligibility": "B.Tech 3rd Year",
+                    "stipend": "$9,200/mo", "deadline": "2026-12-01", "official_link": "https://www.amazon.jobs/en/landing_pages/interns", "is_pinned": False
+                },
+                {
+                    "company_name": "Netflix", "company_logo": "fa-solid fa-film", "role": "Frontend Engineering Intern", 
+                    "type": "Summer", "location": "Remote", "skills": "React, TypeScript, GraphQL", "eligibility": "B.Tech/BS",
+                    "stipend": "$10,000/mo", "deadline": "2026-09-20", "official_link": "https://jobs.netflix.com/early-career", "is_pinned": False
+                },
+                {
+                    "company_name": "Apple", "company_logo": "fa-brands fa-apple", "role": "Hardware Engineering Intern", 
+                    "type": "Summer", "location": "Onsite", "skills": "Verilog, Circuit Design, C", "eligibility": "B.Tech (ECE/EE)",
+                    "stipend": "$8,900/mo", "deadline": "2026-10-10", "official_link": "https://www.apple.com/careers/us/students.html", "is_pinned": False
+                },
+                {
+                    "company_name": "OpenAI", "company_logo": "fa-solid fa-brain", "role": "AI Alignment Intern", 
+                    "type": "Research", "location": "Hybrid", "skills": "Python, LLMs, RLHF", "eligibility": "PhD/Post-Doc",
+                    "stipend": "$12,000/mo", "deadline": "2026-11-15", "official_link": "https://openai.com/careers/search?department=Research", "is_pinned": True
+                },
+                {
+                    "company_name": "Stripe", "company_logo": "fa-brands fa-stripe", "role": "Backend Software Engineer Intern", 
+                    "type": "Summer", "location": "Remote", "skills": "Ruby, Go, API Design", "eligibility": "B.Tech (Graduating 2027/2028)",
+                    "stipend": "$9,500/mo", "deadline": "2026-10-01", "official_link": "https://stripe.com/jobs/university", "is_pinned": False
+                },
+                {
+                    "company_name": "CrowdStrike", "company_logo": "fa-solid fa-shield-halved", "role": "Cybersecurity Analyst Intern", 
+                    "type": "Summer", "location": "Hybrid", "skills": "SIEM, Python, Network Forensics", "eligibility": "B.Sc/B.Tech (Cyber Security)",
+                    "stipend": "$7,800/mo", "deadline": "2026-12-15", "official_link": "https://www.crowdstrike.com/careers/university/", "is_pinned": False
+                },
+                {
+                    "company_name": "Adobe", "company_logo": "fa-solid fa-wand-magic-sparkles", "role": "UI/UX Design Intern", 
+                    "type": "Summer", "location": "Remote", "skills": "Figma, Prototyping, User Research", "eligibility": "B.Des/BCA/B.Tech",
+                    "stipend": "$7,500/mo", "deadline": "2026-11-20", "official_link": "https://careers.adobe.com/us/en/university", "is_pinned": False
+                },
+                {
+                    "company_name": "Salesforce", "company_logo": "fa-brands fa-salesforce", "role": "Product Management Intern", 
+                    "type": "Summer", "location": "Hybrid", "skills": "Agile, Jira, Data Analysis", "eligibility": "MBA/B.Tech",
+                    "stipend": "$8,200/mo", "deadline": "2026-10-25", "official_link": "https://salesforce.wd1.myworkdayjobs.com/Futureforce_Internships", "is_pinned": False
+                },
+                {
+                    "company_name": "Simplify", "company_logo": "fa-solid fa-briefcase", "role": "Software Engineer Intern (Off-Cycle)", 
+                    "type": "Off-Cycle", "location": "Remote", "skills": "React, Node.js, Next.js", "eligibility": "Any Student",
+                    "stipend": "$6,000/mo", "deadline": "2026-08-30", "official_link": "https://simplify.jobs/", "is_pinned": True
+                }
             ]
-
-            # --- 7 roles ------------------------------------------------------
-            roles = [
-                {"role": "Software Engineer Intern",    "type": "Summer",   "location": "Hybrid",  "skills": "Python, Java, Data Structures, Algorithms",        "eligibility": "B.Tech 3rd/4th Year (CS/IT)"},
-                {"role": "Frontend Developer Intern",    "type": "Summer",   "location": "Remote",  "skills": "React, TypeScript, CSS, Figma",                    "eligibility": "B.Tech/BCA (CS/IT/Design)"},
-                {"role": "Data Science Intern",          "type": "Summer",   "location": "Onsite",  "skills": "Python, Pandas, SQL, Tableau",                     "eligibility": "B.Tech/M.Tech (CS/Stats/Math)"},
-                {"role": "Machine Learning Intern",      "type": "Research", "location": "Hybrid",  "skills": "PyTorch, TensorFlow, NLP, Computer Vision",        "eligibility": "M.Tech/PhD (AI/ML/CS)"},
-                {"role": "DevOps/Cloud Intern",          "type": "Summer",   "location": "Remote",  "skills": "AWS/GCP, Docker, Kubernetes, CI/CD",               "eligibility": "B.Tech 3rd/4th Year (CS/IT)"},
-                {"role": "Cybersecurity Intern",         "type": "Summer",   "location": "Onsite",  "skills": "Nmap, Wireshark, Linux, SIEM",                     "eligibility": "B.Tech/B.Sc (Cyber Security/CS)"},
-                {"role": "Product Management Intern",    "type": "Summer",   "location": "Hybrid",  "skills": "Analytics, Jira, A/B Testing, SQL",                "eligibility": "MBA/B.Tech (Any Branch)"},
-            ]
-
-            # Stagger deadlines across Aug-Dec 2026 (months 8-12)
-            deadline_months = [8, 9, 10, 11, 12]
 
             internships = []
-            entry_index = 0
-            for company in companies:
-                for role_info in roles:
-                    month = deadline_months[entry_index % len(deadline_months)]
-                    day = 1 + (entry_index % 28)  # days 1-28 to stay valid
-                    deadline = f"2026-{month:02d}-{day:02d}"
-
-                    internships.append(Internship(
-                        company_name=company["name"],
-                        company_logo=company["logo"],
-                        role=role_info["role"],
-                        internship_type=role_info["type"],
-                        location_type=role_info["location"],
-                        skills_required=role_info["skills"],
-                        eligibility=role_info["eligibility"],
-                        stipend=company["stipend"],
-                        deadline=deadline,
-                        official_link=company["link"],
-                        is_pinned=company["pinned"],
-                    ))
-                    entry_index += 1
+            for item in market_internships:
+                internships.append(Internship(
+                    company_name=item["company_name"],
+                    company_logo=item["company_logo"],
+                    role=item["role"],
+                    internship_type=item["type"],
+                    location_type=item["location"],
+                    skills_required=item["skills"],
+                    eligibility=item["eligibility"],
+                    stipend=item["stipend"],
+                    deadline=item["deadline"],
+                    official_link=item["official_link"],
+                    is_pinned=item["is_pinned"],
+                ))
 
             db.session.add_all(internships)
             db.session.commit()
