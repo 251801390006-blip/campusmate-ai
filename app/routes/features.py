@@ -558,7 +558,11 @@ def get_predefined_roadmap(role: str) -> list:
         cert = "Meta Front-End Developer Certificate"
 
     # Map tracks to distinct stages
-    if "cyber" in role_lower or "security" in role_lower or "hacking" in role_lower or "soc" in role_lower or "forensics" in role_lower or "network" in role_lower or "linux" in role_lower:
+    if "cloud security" in role_lower:
+        track_type = "cloud_security"
+    elif "ai security" in role_lower:
+        track_type = "ai_security"
+    elif "cyber" in role_lower or "security" in role_lower or "hacking" in role_lower or "soc" in role_lower or "forensics" in role_lower or "network" in role_lower or "linux" in role_lower:
         track_type = "security"
     elif "ai" in role_lower or "intelligence" in role_lower or "machine" in role_lower or "deep" in role_lower or "learning" in role_lower or "prompt" in role_lower or "agentic" in role_lower or "analytics" in role_lower or "data" in role_lower:
         track_type = "data_ai"
@@ -580,7 +584,51 @@ def get_predefined_roadmap(role: str) -> list:
         track_type = "dev" # standard programming and full-stack development
 
     # Stage themes
-    if track_type == "security":
+    if track_type == "cloud_security":
+        beginner_themes = [
+            "Computer Fundamentals & Hardware", "Operating Systems & Linux Basics",
+            "Networking Foundations & IP Addressing", "Linux Administration & Scripting",
+            "Python Programming & Automation", "Security Foundations & CIA Triad"
+        ]
+        inter_themes = [
+            "Cloud Computing Fundamentals", "AWS Global Infrastructure & IAM",
+            "Azure Architecture & IAM", "Cloud Attack Surfaces & Identity",
+            "Cloud Encryption & Secrets Management", "Cloud Monitoring & Threat Detection"
+        ]
+        adv_themes = [
+            "DevOps & CI/CD Pipelines", "Container Security (Docker/Kubernetes)",
+            "Infrastructure as Code (Terraform)", "SAST/DAST & Secret Scanning",
+            "Cloud Risk Assessments & Compliance"
+        ]
+        prof_themes = [
+            "AWS Certified Security Frameworks", "Microsoft Azure Administrator Tactics",
+            "DevSecOps Pipeline Architecture", "Cloud Security Professional Capstone"
+        ]
+        cert_name = "AWS Certified Security - Specialty"
+        cert_provider = "AWS"
+    elif track_type == "ai_security":
+        beginner_themes = [
+            "Computer Science & Python Basics", "Machine Learning Fundamentals",
+            "Data Preprocessing & Security", "Neural Networks & Deep Learning",
+            "Natural Language Processing (NLP)", "AI Model Training & Optimization"
+        ]
+        inter_themes = [
+            "Adversarial Machine Learning Basics", "Data Poisoning & Model Inversion",
+            "Securing LLMs & Generative AI", "Prompt Injection & Jailbreak Defenses",
+            "AI Data Privacy & Encryption", "MLOps & CI/CD for AI Models"
+        ]
+        adv_themes = [
+            "Advanced Adversarial Defenses", "Federated Learning Security",
+            "AI Compliance & Bias Auditing", "Threat Modeling for AI Systems",
+            "AI Red Teaming & Penetration Testing"
+        ]
+        prof_themes = [
+            "Enterprise AI Security Architecture", "AI Governance & Policy Frameworks",
+            "Securing Cloud AI Services", "AI Security Professional Capstone"
+        ]
+        cert_name = "Certified AI Security Specialist"
+        cert_provider = "Industry Standard"
+    elif track_type == "security":
         beginner_themes = [
             "Networking Foundations & OSI Model", "IP Routing & Local Subnets",
             "Command Line Interfaces & Linux Bash", "Basic Cryptography & Hashing Keys",
@@ -908,7 +956,7 @@ def list_roadmaps():
         progress = RoadmapProgress.query.filter_by(user_id=current_user.id).first()
         
         tracks = [
-            "Cyber Security", "Ethical Hacking", "SOC Analyst", "Digital Forensics",
+            "Cyber Security", "Cloud Security Engineer", "AI Security Engineer", "Ethical Hacking", "SOC Analyst", "Digital Forensics",
             "AI Engineering", "Machine Learning", "Deep Learning", "Generative AI", "Prompt Engineering", "Agentic AI",
             "Data Science", "Data Analytics", "Python Developer", "Java Developer", "C++ Developer",
             "Full Stack Development", "Frontend Development", "Backend Development", "React Developer", "Node.js Developer",
